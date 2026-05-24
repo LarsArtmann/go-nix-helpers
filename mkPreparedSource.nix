@@ -4,9 +4,8 @@
 # sandbox (no SSH, no network for go mod download). Solution: fetch deps as
 # flake inputs, copy them into _local_deps/, add `replace` directives to go.mod.
 #
-# Usage in a flake.nix:
-#   let
-#     mkPreparedSource = import ./mkPreparedSource.nix { inherit pkgs lib; goPkg = pkgs.go_1_26; };
+# Usage (add as `flake = false` input, then import):
+#   mkPreparedSource = import (go-nix-helpers + "/mkPreparedSource.nix") {
 #     preparedSrc = mkPreparedSource {
 #       name = "my-app";
 #       version = "dev";
