@@ -102,7 +102,7 @@
             fullPath = "${depPath}/${sub}";
           in ''
             if ! grep -q '${fullPath} ' go.mod; then
-              echo '	${fullPath} ${subModuleVersion} // indirect' >> go.mod
+              echo 'require ${fullPath} ${subModuleVersion} // indirect' >> go.mod
             fi
           '')
           subs
