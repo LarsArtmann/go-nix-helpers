@@ -32,10 +32,10 @@
 #   - src: source derivation/path
 #   - deps: attrset of { "import/path" = flake-input; }
 #   - subModules: attrset of { "import/path" = [ "sub1" "sub2" ]; } (optional)
-#     Auto-generates both `require` and `replace` directives for each sub-module.
+#     Auto-generates `replace` directives and normalizes pseudo-versions for each sub-module.
 #   - requireDeps: attrset of { "import/path" = "version"; } (optional, rarely needed)
-#     Manually inject require lines — prefer subModules which auto-generates them.
-#   - subModuleVersion: version for auto-generated sub-module require lines (default: "v0.0.0")
+#     Manually inject require lines. Use for sub-modules not yet in go.mod.
+#   - subModuleVersion: version for pseudo-version normalization (default: "v0.0.0")
 #   - stripLocalReplaces: strip stale `replace X => /home/...` directives from go.mod (default: true)
 #   - postPatchExtra: additional shell commands (optional)
 {
@@ -93,23 +93,6 @@
 
   hasRequires = requireDeps != {};
 
-  subModuleRequire =
-    lib.concatStringsSep "\n"
-    (lib.concatLists (
-      lib.mapAttrsToList (
-        depPath: subs:
-          map (sub: let
-            fullPath = "${depPath}/${sub}";
-          in ''
-            if ! grep -q '${fullPath} ' go.mod; then
-              echo 'require ${fullPath} ${subModuleVersion} // indirect' >> go.mod
-            fi
-          '')
-          subs
-      )
-      subModules
-    ));
-
   subModuleVersionNormalize =
     lib.concatStringsSep "\n"
     (lib.concatLists (
@@ -147,8 +130,6 @@ in
       ${postPatchExtra}
 
       ${subModuleVersionNormalize}
-
-      ${subModuleRequire}
 
       ${lib.optionalString hasRequires ''
         echo "" >> go.mod
