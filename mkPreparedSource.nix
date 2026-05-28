@@ -6,25 +6,24 @@
 #
 # Usage (add as `flake = false` input, then import):
 #   mkPreparedSource = import (go-nix-helpers + "/mkPreparedSource.nix") {
-#     preparedSrc = mkPreparedSource {
-#       name = "my-app";
-#       version = "dev";
-#       src = srcFiltered;
-#       deps = {
-#         "github.com/larsartmann/go-output" = go-output;
-#         "github.com/larsartmann/go-branded-id" = go-branded-id;
-#       };
-#       subModules = {
-#         "github.com/larsartmann/go-output" = [ "enum" "escape" "sort" "table" ];
-#       };
-#       requireDeps = {
-#         "github.com/larsartmann/go-branded-id" = "v0.1.0";
-#       };
-#       postPatchExtra = ''
-#         # Additional sed commands
-#       '';
+#     inherit pkgs lib;
+#     goPkg = pkgs.go_1_26;
+#   };
+#   preparedSrc = mkPreparedSource {
+#     name = "my-app";
+#     version = "dev";
+#     src = srcFiltered;
+#     deps = {
+#       "github.com/larsartmann/go-output" = go-output;
+#       "github.com/larsartmann/go-branded-id" = go-branded-id;
 #     };
-#   in
+#     subModules = {
+#       "github.com/larsartmann/go-output" = [ "enum" "escape" "sort" "table" ];
+#     };
+#     postPatchExtra = ''
+#       # Additional custom commands
+#     '';
+#   };
 #   buildGoModule { src = preparedSrc; vendorHash = "..."; }
 #
 # Parameters:
@@ -33,8 +32,11 @@
 #   - src: source derivation/path
 #   - deps: attrset of { "import/path" = flake-input; }
 #   - subModules: attrset of { "import/path" = [ "sub1" "sub2" ]; } (optional)
-#     Only generates replace directives — Go discovers sub-modules transitively.
-#   - requireDeps: attrset of { "import/path" = "version"; } for extra require lines (optional)
+#     Auto-generates both `require` and `replace` directives for each sub-module.
+#   - requireDeps: attrset of { "import/path" = "version"; } (optional, rarely needed)
+#     Manually inject require lines — prefer subModules which auto-generates them.
+#   - subModuleVersion: version for auto-generated sub-module require lines (default: "v0.0.0")
+#   - stripLocalReplaces: strip stale `replace X => /home/...` directives from go.mod (default: true)
 #   - postPatchExtra: additional shell commands (optional)
 {
   pkgs,
@@ -47,6 +49,8 @@
   version ? "dev",
   subModules ? {},
   requireDeps ? {},
+  subModuleVersion ? "v0.0.0",
+  stripLocalReplaces ? true,
   postPatchExtra ? "",
 }: let
   copyDeps =
@@ -88,6 +92,43 @@
       requireDeps);
 
   hasRequires = requireDeps != {};
+
+  subModuleRequire =
+    lib.concatStringsSep "\n"
+    (lib.concatLists (
+      lib.mapAttrsToList (
+        depPath: subs:
+          map (sub: let
+            fullPath = "${depPath}/${sub}";
+          in ''
+            if ! grep -q '${fullPath} ' go.mod; then
+              echo '	${fullPath} ${subModuleVersion} // indirect' >> go.mod
+            fi
+          '')
+          subs
+      )
+      subModules
+    ));
+
+  subModuleVersionNormalize =
+    lib.concatStringsSep "\n"
+    (lib.concatLists (
+      lib.mapAttrsToList (
+        depPath: subs:
+          map (sub: ''
+            sed -i 's|${depPath}/${sub} v0\.0\.0-[^ ]*|${depPath}/${sub} ${subModuleVersion}|g' go.mod
+          '')
+          subs
+      )
+      subModules
+    ));
+
+  stripLocalReplacesScript = ''
+    # Strip replace directives pointing to local home directories (stale dev artifacts)
+    sed -i '/=> \/home\//d' go.mod
+    # Remove replace blocks that became empty after stripping
+    sed -i '/^replace ($/{N;/\n)$/d}' go.mod
+  '';
 in
   pkgs.stdenv.mkDerivation {
     pname = "${name}-prepared-source";
@@ -101,7 +142,13 @@ in
       ${copyDeps}
       chmod -R u+w _local_deps
 
+      ${lib.optionalString stripLocalReplaces stripLocalReplacesScript}
+
       ${postPatchExtra}
+
+      ${subModuleVersionNormalize}
+
+      ${subModuleRequire}
 
       ${lib.optionalString hasRequires ''
         echo "" >> go.mod
