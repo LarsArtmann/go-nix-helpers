@@ -64,7 +64,7 @@
           # -- Use go-nix-helpers for private deps (optional) ----------------
           # mkPreparedSource = import (go-nix-helpers + "/mkPreparedSource.nix") {
           #   inherit pkgs lib;
-          #   goPkg = goPkg;
+          #   inherit goPkg;
           # };
           #
           # preparedSrc = mkPreparedSource {
@@ -95,6 +95,7 @@
           };
         in
         {
+          # -- Packages -----------------------------------------------------------
           packages = {
             default = config.packages.REPLACE_ME;
 
@@ -116,6 +117,7 @@
             );
           };
 
+          # -- Apps (nix run .#<name>) --------------------------------------------
           apps = {
             default = {
               type = "app";
@@ -124,19 +126,24 @@
 
             test = {
               type = "app";
-              program = pkgs.writeShellScriptBin "run-test" ''
-                exec go test -race -v -coverprofile=coverage.out ./...
-              '';
+              program = pkgs.writeShellApplication {
+                name = "run-test";
+                runtimeInputs = [ goPkg ];
+                text = "go test -race -v -coverprofile=coverage.out ./...";
+              };
             };
 
             lint = {
               type = "app";
-              program = pkgs.writeShellScriptBin "run-lint" ''
-                exec golangci-lint run ./...
-              '';
+              program = pkgs.writeShellApplication {
+                name = "run-lint";
+                runtimeInputs = [ goPkg pkgs.golangci-lint ];
+                text = "golangci-lint run ./...";
+              };
             };
           };
 
+          # -- Dev Shells ---------------------------------------------------------
           devShells = {
             default = pkgs.mkShell {
               packages = with pkgs; [
@@ -147,6 +154,8 @@
                 golangci-lint
                 git
               ];
+
+              inputsFrom = [ config.packages.default ];
 
               GOWORK = "off";
               GOTOOLCHAIN = "local";
@@ -166,11 +175,20 @@
             };
           };
 
+          # -- Checks (nix flake check) -------------------------------------------
+          # IMPORTANT: Always use a single checks = { ... } attrset.
+          # NEVER use dot-notation (checks.X = ...) outside this block.
+          # NEVER place checks inside treefmt or other blocks.
           checks = {
             format = config.treefmt.build.check self;
             build = config.packages.default;
+            test = config.packages.default.overrideAttrs (_: {
+              doCheck = true;
+            });
           };
 
+          # -- Formatter (nix fmt) ------------------------------------------------
+          # IMPORTANT: Always use programs.X.enable, never bare X.enable.
           treefmt = {
             projectRootFile = "go.mod";
             programs = {
@@ -181,6 +199,7 @@
           };
         };
 
+      # -- Overlay (for other flakes to consume) --------------------------------
       flake.overlays.default = final: _prev: {
         REPLACE_ME = self.packages.${final.stdenv.system}.default;
       };
