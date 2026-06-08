@@ -16,6 +16,7 @@
 #     deps = {
 #       "github.com/larsartmann/go-output" = go-output;
 #       "github.com/larsartmann/go-branded-id" = go-branded-id;
+#       "github.com/larsartmann/go-filewatcher/v2" = go-filewatcher;
 #     };
 #     subModules = {
 #       "github.com/larsartmann/go-output" = [ "enum" "escape" "sort" "table" ];
@@ -53,11 +54,20 @@
   stripLocalReplaces ? true,
   postPatchExtra ? "",
 }: let
+  # Extract repo name from Go import path, stripping any /vN major version suffix
+  repoName = path: let
+    parts = lib.splitString "/" path;
+    last = lib.last parts;
+  in
+    if builtins.match "v[0-9]+" last != null
+    then lib.last (lib.init parts)
+    else last;
+
   copyDeps =
     lib.concatStringsSep "\n"
     (lib.mapAttrsToList (
         path: _: let
-          basename = lib.last (lib.splitString "/" path);
+          basename = repoName path;
         in ''cp -r ${deps.${path}} _local_deps/${basename}''
       )
       deps);
@@ -66,7 +76,7 @@
     lib.concatStringsSep "\n"
     (lib.mapAttrsToList (
         path: _: let
-          basename = lib.last (lib.splitString "/" path);
+          basename = repoName path;
         in ''echo "  ${path} => ./_local_deps/${basename}" >> go.mod''
       )
       deps);
@@ -77,7 +87,7 @@
       lib.mapAttrsToList (
         depPath: subs:
           map (sub: let
-            basename = lib.last (lib.splitString "/" depPath);
+            basename = repoName depPath;
           in ''echo "  ${depPath}/${sub} => ./_local_deps/${basename}/${sub}" >> go.mod'')
           subs
       )
