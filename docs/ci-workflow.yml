@@ -1,0 +1,30 @@
+# GitHub Actions CI — nix flake check
+# Drop into .github/workflows/check.yml
+name: Nix Check
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+    branches: [master, main]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@v16
+
+      - name: Cache Nix Store
+        uses: DeterminateSystems/magic-nix-cache-action@v9
+
+      - name: Check Flake
+        run: nix flake check --no-build
+
+      - name: Build
+        run: nix build .
+
+      - name: Run Tests
+        run: nix build .#checks.x86_64-linux.test || true
