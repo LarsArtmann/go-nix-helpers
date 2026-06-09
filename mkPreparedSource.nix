@@ -20,6 +20,7 @@
 #     };
 #     subModules = {
 #       "github.com/larsartmann/go-output" = [ "enum" "escape" "sort" "table" ];
+#       "github.com/larsartmann/go-cqrs-lite" = [ "codec/v2" "command/v2" "core" ];
 #     };
 #     postPatchExtra = ''
 #       # Additional custom commands
@@ -32,8 +33,11 @@
 #   - version: version string (default: "dev")
 #   - src: source derivation/path
 #   - deps: attrset of { "import/path" = flake-input; }
-#   - subModules: attrset of { "import/path" = [ "sub1" "sub2" ]; } (optional)
+#   - subModules: attrset of { "import/path" = [ "sub1" "sub2/v2" ]; } (optional)
 #     Auto-generates `replace` directives and normalizes pseudo-versions for each sub-module.
+#     Versioned sub-paths (ending in /vN) are handled automatically: the /vN suffix
+#     is kept in the module path but stripped from the local directory path.
+#     e.g. "codec/v2" → replace directive: `.../codec/v2 => ./_local_deps/<repo>/codec`
 #   - requireDeps: attrset of { "import/path" = "version"; } (optional, rarely needed)
 #     Manually inject require lines. Use for sub-modules not yet in go.mod.
 #   - subModuleVersion: version for pseudo-version normalization (default: "v0.0.0")
@@ -54,14 +58,19 @@
   stripLocalReplaces ? true,
   postPatchExtra ? "",
 }: let
-  # Extract repo name from Go import path, stripping any /vN major version suffix
-  repoName = path: let
+  # Strip trailing /vN major version suffix from a path
+  stripVersionSuffix = path: let
     parts = lib.splitString "/" path;
     last = lib.last parts;
   in
     if builtins.match "v[0-9]+" last != null
-    then lib.last (lib.init parts)
-    else last;
+    then lib.concatStringsSep "/" (lib.init parts)
+    else path;
+
+  # Extract repo name from Go import path, stripping any /vN major version suffix
+  repoName = path: let
+    stripped = stripVersionSuffix path;
+  in lib.last (lib.splitString "/" stripped);
 
   copyDeps =
     lib.concatStringsSep "\n"
@@ -88,7 +97,8 @@
         depPath: subs:
           map (sub: let
             basename = repoName depPath;
-          in ''echo "  ${depPath}/${sub} => ./_local_deps/${basename}/${sub}" >> go.mod'')
+            localSub = stripVersionSuffix sub;
+          in ''echo "  ${depPath}/${sub} => ./_local_deps/${basename}/${localSub}" >> go.mod'')
           subs
       )
       subModules
