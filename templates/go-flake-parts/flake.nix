@@ -75,9 +75,8 @@
           #     "github.com/larsartmann/go-finding" = go-finding;
           #     "github.com/larsartmann/go-filewatcher/v2" = go-filewatcher;
           #   };
-          #   subModules = {
-          #     "github.com/larsartmann/go-finding" = [ "enum" ];
-          #   };
+          #   # subModules auto-discovered — no manual list needed.
+          #   # Build validates that all private requires have replaces.
           # };
 
           vendorHash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
