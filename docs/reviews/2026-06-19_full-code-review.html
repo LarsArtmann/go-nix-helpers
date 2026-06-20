@@ -1,0 +1,1327 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Full Code Review — go-nix-helpers (2026-06-19)</title>
+    <style>
+      /* =========================================================================
+         BAUHAUS DARK — Dashboard template
+         Design language: form follows function. Primary colors on graphite.
+         Zero external dependencies: system fonts, no CDN, no build step.
+         Token architecture: see references/bauhaus-tokens.md
+         ========================================================================= */
+
+      :root {
+        /* --- Primitive palette (Bauhaus Dark) --- */
+        --color-graphite: #0e0e10;
+        --color-graphite-2: #18181d;
+        --color-graphite-3: #16161a;
+        --color-bone: #f4f4f0;
+        --color-red: #ff6b6b;
+        --color-blue: #6eb5ff;
+        --color-yellow: #f4d35e;
+        --color-amber: #ffb347;
+        --color-hairline: rgba(244, 244, 240, 0.12);
+        --color-hairline-strong: rgba(244, 244, 240, 0.25);
+
+        /* --- Semantic layer (shared vocabulary with editorial template) --- */
+        --surface: var(--color-graphite);
+        --surface-raised: var(--color-graphite-2);
+        --surface-sunken: var(--color-graphite-3);
+        --text: var(--color-bone);
+        --text-muted: rgba(244, 244, 240, 0.72);
+        --text-faint: rgba(244, 244, 240, 0.45);
+        --border: var(--color-hairline);
+        --border-strong: var(--color-hairline-strong);
+        --accent: var(--color-amber);
+        --problem: var(--color-red);
+        --solution: var(--color-blue);
+        --warning: var(--color-yellow);
+
+        /* --- Backward-compatible aliases (do not break consumer skills) --- */
+        --bg: var(--surface);
+        --bg-elevated: var(--surface-raised);
+        --bg-sunken: var(--surface-sunken);
+        --bg-card: var(--surface-raised);
+        --bg-code: var(--surface-sunken);
+        --ink: var(--text);
+        --ink-secondary: var(--text-muted);
+        --ink-muted: var(--text-faint);
+        --rose: var(--problem);
+        --rose-glow: color-mix(in srgb, var(--problem) 15%, transparent);
+        --emerald: var(--solution);
+        --emerald-glow: color-mix(in srgb, var(--solution) 15%, transparent);
+        --amber-glow: color-mix(in srgb, var(--warning) 15%, transparent);
+        --coral: var(--problem);
+        --coral-light: color-mix(in srgb, var(--problem) 15%, transparent);
+        --teal: var(--solution);
+        --teal-light: color-mix(in srgb, var(--solution) 15%, transparent);
+        --amber-light: color-mix(in srgb, var(--warning) 20%, transparent);
+
+        /* --- Shape --- */
+        --radius: 0px; /* Bauhaus default: sharp corners */
+        --radius-sm: 0px;
+
+        /* --- Type stacks (system only — zero external fonts) --- */
+        --font-heading:
+          ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Helvetica, Arial, sans-serif;
+        --font-body:
+          ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Helvetica, Arial, sans-serif;
+        --font-mono:
+          ui-monospace, "Cascadia Code", "Source Code Pro", "JetBrains Mono", Menlo, Consolas,
+          monospace;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      /* Sticky-header offset for anchor jumps */
+      section[id],
+      [id] {
+        scroll-margin-top: 60px;
+      }
+
+      body {
+        background: var(--surface);
+        color: var(--text);
+        font-family: var(--font-body);
+        font-size: 15px;
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+
+      /* --- Full-bleed top bar --- */
+      .top-bar {
+        background: var(--text);
+        color: var(--surface);
+        padding: 0.6rem 2rem;
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      /* --- Layout: optional sticky sidebar TOC --- */
+      .layout {
+        display: flex;
+        gap: 2.5rem;
+        padding: 2rem;
+      }
+      .sidebar {
+        width: 220px;
+        flex-shrink: 0;
+        position: sticky;
+        top: 1rem;
+        align-self: flex-start;
+        height: calc(100vh - 2rem);
+        overflow-y: auto;
+        display: none;
+      }
+      .sidebar nav {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+      }
+      .sidebar .label {
+        font-family: var(--font-mono);
+        font-size: 0.68rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.14em;
+        color: var(--accent);
+        margin-bottom: 0.75rem;
+        padding-bottom: 0.4rem;
+        border-bottom: 2px solid var(--border-strong);
+      }
+      .sidebar a {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        text-decoration: none;
+        padding: 0.45rem 0.75rem;
+        border-left: 2px solid transparent;
+        transition: all 0.15s ease;
+        line-height: 1.4;
+        font-weight: 500;
+      }
+      .sidebar a:hover,
+      .sidebar a.active {
+        color: var(--accent);
+        border-left-color: var(--accent);
+        background: color-mix(in srgb, var(--accent) 8%, transparent);
+      }
+      .main {
+        flex: 1;
+        min-width: 0;
+      }
+
+      /* --- Headings --- */
+      h1,
+      h2,
+      h3,
+      h4 {
+        font-family: var(--font-heading);
+        font-weight: 800;
+        letter-spacing: -0.02em;
+      }
+      h1 {
+        font-size: clamp(1.8rem, 4vw, 2.6rem);
+        line-height: 1.1;
+        margin: 0 0 0.6rem;
+      }
+      h2 {
+        font-size: 1.4rem;
+        margin: 2.5rem 0 1rem;
+        padding-bottom: 0.4rem;
+        border-bottom: 2px solid var(--border-strong);
+        display: flex;
+        align-items: baseline;
+        gap: 0.6rem;
+      }
+      h2 .num {
+        font-family: var(--font-mono);
+        font-size: 0.78rem;
+        color: var(--accent);
+        font-weight: 700;
+        letter-spacing: 0.06em;
+      }
+      h3 {
+        font-size: 1.1rem;
+        margin: 0 0 0.4rem;
+        font-weight: 700;
+      }
+      h4 {
+        font-size: 0.98rem;
+        margin: 0 0 0.3rem;
+        font-weight: 700;
+      }
+      p {
+        margin: 0 0 1rem;
+      }
+
+      /* --- Hero --- */
+      .hero {
+        padding: 1.5rem 0 1.5rem;
+        margin-bottom: 1.5rem;
+        border-bottom: 2px solid var(--border-strong);
+      }
+      .hero-badge {
+        display: inline-block;
+        font-family: var(--font-mono);
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.14em;
+        color: var(--surface);
+        background: var(--accent);
+        padding: 0.3rem 0.7rem;
+        margin-bottom: 0.9rem;
+      }
+      .hero-subtitle {
+        font-size: 1.05rem;
+        color: var(--text-muted);
+        max-width: 70ch;
+        margin: 0;
+      }
+
+      /* Bauhaus signature: geometric shape cluster (optional) */
+      .hero-shapes {
+        position: relative;
+        height: 80px;
+        margin-bottom: 1rem;
+      }
+      .hero-shapes .circle {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 56px;
+        height: 56px;
+        background: var(--problem);
+        border-radius: 50%;
+      }
+      .hero-shapes .square {
+        position: absolute;
+        top: 24px;
+        left: 72px;
+        width: 48px;
+        height: 48px;
+        background: var(--solution);
+      }
+      .hero-shapes .tri {
+        position: absolute;
+        top: 8px;
+        left: 140px;
+        width: 0;
+        height: 0;
+        border-left: 28px solid transparent;
+        border-right: 28px solid transparent;
+        border-bottom: 48px solid var(--warning);
+      }
+
+      /* --- General cards --- */
+      .card {
+        background: var(--surface-raised);
+        border: 1px solid var(--border);
+        padding: 1.1rem 1.3rem;
+        margin-bottom: 1rem;
+        border-left: 4px solid var(--border-strong);
+      }
+      .card-problem {
+        border-left-color: var(--problem);
+        background: color-mix(in srgb, var(--problem) 8%, var(--surface-raised));
+      }
+      .card-solution {
+        border-left-color: var(--solution);
+        background: color-mix(in srgb, var(--solution) 8%, var(--surface-raised));
+      }
+      .card-warning {
+        border-left-color: var(--warning);
+        background: color-mix(in srgb, var(--warning) 8%, var(--surface-raised));
+      }
+
+      /* --- Issue cards --- */
+      .issue {
+        background: var(--surface-raised);
+        border: 1px solid var(--border);
+        padding: 1.1rem 1.3rem;
+        margin-bottom: 1rem;
+        border-left: 4px solid var(--border-strong);
+      }
+      .issue-critical {
+        border-left-color: var(--problem);
+        background: color-mix(in srgb, var(--problem) 8%, var(--surface-raised));
+      }
+      .issue-important {
+        border-left-color: var(--warning);
+        background: color-mix(in srgb, var(--warning) 8%, var(--surface-raised));
+      }
+      .issue-nice {
+        border-left-color: var(--solution);
+        background: color-mix(in srgb, var(--solution) 8%, var(--surface-raised));
+      }
+      .issue h3 {
+        margin-bottom: 0.3rem;
+      }
+      .issue .where {
+        font-family: var(--font-mono);
+        font-size: 0.78rem;
+        color: var(--text-faint);
+        margin: 0.2rem 0 0.6rem;
+      }
+      .issue p:last-child {
+        margin-bottom: 0;
+      }
+
+      /* --- Severity badges (used inside issue cards) --- */
+      .severity {
+        display: inline-block;
+        font-family: var(--font-mono);
+        font-size: 0.62rem;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        padding: 0.2rem 0.55rem;
+        margin-bottom: 0.6rem;
+        color: var(--surface);
+      }
+      .severity-critical {
+        background: var(--problem);
+      }
+      .severity-important {
+        background: var(--warning);
+      }
+      .severity-nice {
+        background: var(--solution);
+      }
+
+      /* --- Inline badges (used in tables) --- */
+      .badge {
+        display: inline-block;
+        font-family: var(--font-mono);
+        font-size: 0.62rem;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        padding: 0.18rem 0.5rem;
+        border: 1px solid var(--border-strong);
+        color: var(--text-muted);
+      }
+      .badge-critical {
+        color: var(--problem);
+        border-color: var(--problem);
+      }
+      .badge-high {
+        color: var(--warning);
+        border-color: var(--warning);
+      }
+      .badge-medium {
+        color: var(--accent);
+        border-color: var(--accent);
+      }
+      .badge-low {
+        color: var(--text-muted);
+      }
+      .badge-fixed {
+        color: var(--solution);
+        border-color: var(--solution);
+      }
+
+      /* --- Callouts (used inside issues or standalone) --- */
+      .callout {
+        margin: 0.8rem 0 0;
+        padding: 0.7rem 0.9rem;
+        border-left: 3px solid var(--border-strong);
+        background: color-mix(in srgb, var(--text) 5%, transparent);
+        font-size: 0.9rem;
+      }
+      .callout strong {
+        display: inline-block;
+        margin-right: 0.4rem;
+      }
+      .callout-solution {
+        border-left-color: var(--solution);
+        background: color-mix(in srgb, var(--solution) 10%, transparent);
+      }
+      .callout-warning {
+        border-left-color: var(--warning);
+        background: color-mix(in srgb, var(--warning) 10%, transparent);
+      }
+
+      /* --- Stat cards / scorecards (aliased vocabulary) --- */
+      .stat-grid,
+      .scorecard {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 0.75rem;
+        margin: 1rem 0 1.5rem;
+      }
+      .stat-card,
+      .score-card {
+        background: var(--surface-raised);
+        border: 1px solid var(--border);
+        padding: 1.1rem 1rem;
+        position: relative;
+      }
+      .stat-card::before,
+      .score-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: var(--border-strong);
+      }
+      .stat-bad,
+      .score-bad {
+        /* default top bar already set */
+      }
+      .stat-bad::before,
+      .score-bad::before {
+        background: var(--problem);
+      }
+      .stat-good::before,
+      .score-good::before {
+        background: var(--solution);
+      }
+      .stat-warn::before,
+      .score-warn::before {
+        background: var(--warning);
+      }
+      .stat-value,
+      .score {
+        font-family: var(--font-heading);
+        font-size: 2rem;
+        font-weight: 800;
+        line-height: 1;
+        letter-spacing: -0.03em;
+        color: var(--text);
+      }
+      .stat-bad .stat-value,
+      .score-bad .score {
+        color: var(--problem);
+      }
+      .stat-good .stat-value,
+      .score-good .score {
+        color: var(--solution);
+      }
+      .stat-warn .stat-value,
+      .score-warn .score {
+        color: var(--warning);
+      }
+      .stat-label,
+      .score-card .label {
+        font-family: var(--font-mono);
+        font-size: 0.65rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: var(--text-faint);
+        margin-top: 0.5rem;
+      }
+
+      /* --- Strengths list --- */
+      .strengths {
+        display: grid;
+        gap: 0.5rem;
+        margin: 1rem 0 1.5rem;
+      }
+      .strength {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 0.8rem;
+        padding: 0.7rem 0;
+        border-bottom: 1px solid var(--border);
+      }
+      .strength .check {
+        font-family: var(--font-mono);
+        font-weight: 700;
+        color: var(--solution);
+        font-size: 1.1rem;
+        line-height: 1.4;
+      }
+      .strength .text strong {
+        display: block;
+        margin-bottom: 0.15rem;
+      }
+      .strength .text span {
+        color: var(--text-muted);
+        font-size: 0.9rem;
+      }
+
+      /* --- Tables --- */
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 1rem 0 1.5rem;
+        font-size: 0.9rem;
+      }
+      th {
+        text-align: left;
+        padding: 0.6rem 0.9rem;
+        background: var(--surface-raised);
+        color: var(--text-faint);
+        font-family: var(--font-mono);
+        font-size: 0.66rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        border-bottom: 1px solid var(--border-strong);
+      }
+      td {
+        padding: 0.6rem 0.9rem;
+        border-bottom: 1px solid var(--border);
+      }
+      tr:hover td {
+        background: var(--surface-raised);
+      }
+
+      /* --- Before/After comparison --- */
+      .compare-header {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.75rem;
+        margin: 1rem 0 0.5rem;
+      }
+      .compare-before,
+      .compare-after {
+        font-family: var(--font-mono);
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        padding: 0.4rem 0.7rem;
+        color: var(--surface);
+      }
+      .compare-before {
+        background: var(--problem);
+      }
+      .compare-after {
+        background: var(--solution);
+      }
+      .compare-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.75rem;
+        margin-bottom: 1rem;
+      }
+      .compare-row pre {
+        margin: 0;
+      }
+
+      /* --- Code blocks + syntax highlighting --- */
+      pre {
+        background: var(--surface-sunken);
+        border: 1px solid var(--border);
+        padding: 1rem 1.2rem;
+        margin: 1rem 0;
+        font-family: var(--font-mono);
+        font-size: 0.82rem;
+        line-height: 1.65;
+        overflow-x: auto;
+      }
+      code {
+        font-family: var(--font-mono);
+      }
+      .tok-keyword {
+        color: var(--accent);
+      } /* func, type, struct, if, return */
+      .tok-type {
+        color: var(--warning);
+      } /* int, string, bool, error */
+      .tok-string {
+        color: var(--solution);
+      } /* "quoted strings" */
+      .tok-comment {
+        color: var(--text-faint);
+        font-style: italic;
+      }
+      .tok-func {
+        color: #74a9ff;
+      } /* function names */
+      .tok-number {
+        color: var(--accent);
+      } /* 42, 3.14 */
+      .tok-generic {
+        color: var(--problem);
+      } /* T, ID in generics */
+      .tok-builtin {
+        color: #4dd9ff;
+      } /* make, len, append */
+      .tok-punct {
+        color: var(--text-muted);
+      } /* { } ( ) ; = : */
+      .tok-attr {
+        color: var(--accent);
+      } /* Nix attribute names */
+
+      /* --- Dependency tree / ASCII diagrams --- */
+      .dep-tree {
+        background: var(--surface-sunken);
+        border: 1px solid var(--border);
+        padding: 1rem 1.2rem;
+        margin: 1rem 0;
+        font-family: var(--font-mono);
+        font-size: 0.82rem;
+        line-height: 1.7;
+        white-space: pre;
+        overflow-x: auto;
+      }
+      .dep-tree .root {
+        color: var(--accent);
+        font-weight: 700;
+      }
+      .dep-tree .ok {
+        color: var(--solution);
+      }
+      .dep-tree .unwanted {
+        color: var(--problem);
+      }
+
+      /* --- Inline node-and-arrow diagrams --- */
+      .diagram {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 1rem;
+        margin: 1rem 0;
+        background: var(--surface-raised);
+        border: 1px solid var(--border);
+      }
+      .node {
+        display: inline-block;
+        padding: 0.35rem 0.7rem;
+        font-family: var(--font-mono);
+        font-size: 0.8rem;
+        font-weight: 600;
+        background: var(--surface-sunken);
+        border: 1px solid var(--border-strong);
+      }
+      .node-core {
+        background: var(--accent);
+        color: var(--surface);
+        border-color: var(--accent);
+      }
+      .node-problem {
+        background: var(--problem);
+        color: var(--surface);
+        border-color: var(--problem);
+      }
+      .node-good {
+        background: var(--solution);
+        color: var(--surface);
+        border-color: var(--solution);
+      }
+      .arrow {
+        color: var(--text-faint);
+        font-family: var(--font-mono);
+      }
+
+      /* --- Grids (responsive) --- */
+      .grid-2 {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+        margin: 1rem 0;
+      }
+      .grid-3 {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+        margin: 1rem 0;
+      }
+
+      /* --- Inline TOC (alternative to sidebar) --- */
+      .toc {
+        background: var(--surface-raised);
+        border: 1px solid var(--border);
+        border-left: 3px solid var(--accent);
+        padding: 1rem 1.3rem;
+        margin: 1rem 0 1.5rem;
+      }
+      .toc h3 {
+        margin-bottom: 0.5rem;
+      }
+      .toc ul {
+        list-style: none;
+        padding: 0;
+      }
+      .toc li {
+        margin: 0.25rem 0;
+      }
+      .toc a {
+        color: var(--text-muted);
+        text-decoration: none;
+        font-size: 0.9rem;
+      }
+      .toc a:hover {
+        color: var(--accent);
+      }
+
+      /* --- Migration / numbered steps --- */
+      .migration-step {
+        display: grid;
+        grid-template-columns: 48px 1fr;
+        gap: 1rem;
+        margin: 1rem 0;
+        padding: 1rem;
+        background: var(--surface-raised);
+        border: 1px solid var(--border);
+        border-left: 3px solid var(--accent);
+      }
+      .migration-num {
+        font-family: var(--font-mono);
+        font-weight: 800;
+        font-size: 1.5rem;
+        color: var(--accent);
+        line-height: 1;
+      }
+      .migration-content h4 {
+        margin-bottom: 0.2rem;
+      }
+      .migration-content p {
+        margin-bottom: 0;
+        color: var(--text-muted);
+        font-size: 0.92rem;
+      }
+
+      /* --- Footer --- */
+      .footer {
+        margin-top: 2rem;
+        padding-top: 1rem;
+        border-top: 1px solid var(--border);
+        font-size: 0.8rem;
+        color: var(--text-faint);
+        font-family: var(--font-mono);
+      }
+
+      /* --- Responsive --- */
+      @media (min-width: 1024px) {
+        .sidebar {
+          display: block;
+        }
+      }
+      @media (max-width: 768px) {
+        .layout {
+          flex-direction: column;
+          padding: 1rem;
+        }
+        .top-bar {
+          padding: 0.6rem 1rem;
+          flex-wrap: wrap;
+          gap: 0.3rem;
+        }
+        .grid-2,
+        .grid-3 {
+          grid-template-columns: 1fr;
+        }
+        .compare-header,
+        .compare-row {
+          grid-template-columns: 1fr;
+        }
+        .stat-grid,
+        .scorecard {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .migration-step {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Full-bleed top bar (optional — remove for quieter reports) -->
+    <div class="top-bar">
+      <span>FULL CODE REVIEW</span>
+      <span>2026-06-19</span>
+      <span>go-nix-helpers @ master</span>
+    </div>
+
+    <div class="layout">
+      <!-- Sidebar TOC (hidden below 1024px; use inline .toc if you prefer) -->
+      <aside class="sidebar" data-nav>
+        <nav>
+          <div class="label">Contents</div>
+          <a href="#summary">Summary</a>
+          <a href="#fixed">Fixed on the spot</a>
+          <a href="#open">Open findings</a>
+          <a href="#core">Core helper deep-dive</a>
+          <a href="#strengths">Strengths</a>
+          <a href="#plan">Next steps</a>
+        </nav>
+      </aside>
+
+      <main class="main">
+        <!-- Hero -->
+        <div class="hero">
+          <div class="hero-shapes">
+            <div class="circle"></div>
+            <div class="square"></div>
+            <div class="tri"></div>
+          </div>
+          <div class="hero-badge">Full Code Review</div>
+          <h1>go-nix-helpers</h1>
+          <p class="hero-subtitle">
+            A focused Nix helper library for injecting private Go dependencies into sandboxed
+            builds. Every file reviewed as a Senior Software Architect. Confirmed bugs fixed;
+            structural gaps documented for decision.
+          </p>
+        </div>
+
+        <!-- Stats Dashboard -->
+        <h2 id="summary"><span class="num">00</span>Summary</h2>
+        <div class="stat-grid">
+          <div class="stat-card">
+            <div class="stat-value">11</div>
+            <div class="stat-label">Files reviewed</div>
+          </div>
+          <div class="stat-card stat-bad">
+            <div class="stat-value">3</div>
+            <div class="stat-label">Critical / High (fixed)</div>
+          </div>
+          <div class="stat-card stat-warn">
+            <div class="stat-value">10</div>
+            <div class="stat-label">Open findings</div>
+          </div>
+          <div class="stat-card stat-good">
+            <div class="stat-value">9</div>
+            <div class="stat-label">Fixed on the spot</div>
+          </div>
+        </div>
+
+        <p>
+          The project is a small, high-leverage library consumed by 7+ downstream Go repositories.
+          Because the blast radius is wide, every bug here multiplies across consumers. The review
+          found two classes of problem: <strong>objective bugs</strong> (verified empirically, fixed
+          immediately) and <strong>structural gaps</strong> (require a design decision). All fixes
+          were verified: every <code>.nix</code> file parses, the integration test suite passes, and
+          the new <code>privateDepPattern</code> parameter was exercised end-to-end.
+        </p>
+
+        <div class="callout callout-warning">
+          <strong>Method</strong>
+          All "Critical" claims were verified with <code>nix eval</code> before asserting them —
+          e.g. <code>lib.maintainers ? larsartmann</code> returns <code>false</code>, proving the
+          template's <code>maintainers.larsartmann</code> throws.
+        </div>
+
+        <!-- Fixed findings -->
+        <h2 id="fixed"><span class="num">01</span>Fixed on the spot</h2>
+        <p>These are objective defects confirmed by execution. Each was fixed and re-verified.</p>
+
+        <div class="issue issue-critical">
+          <span class="severity severity-critical">Critical · Fixed</span>
+          <h3>Template references an unregistered nixpkgs maintainer</h3>
+          <div class="where">templates/go-flake-parts/flake.nix:112</div>
+          <p>
+            <code>maintainers = [ maintainers.larsartmann ];</code> throws
+            <em>"attribute 'maintainers.larsartmann' missing"</em> because
+            <code>larsartmann</code> is not in nixpkgs' <code>maintainer-list.nix</code>. Verified:
+            <code>nix eval lib.maintainers ? larsartmann</code> &rarr; <code>false</code>. This
+            <strong
+              >breaks <code>nix build</code> and <code>nix flake check</code> for every new project
+              generated from this template</strong
+            >
+            — the highest-blast-radius bug in the repo.
+          </p>
+          <div class="callout callout-solution">
+            <strong>Fix applied</strong>
+            Removed the <code>maintainers</code> line with a comment explaining handles must be
+            registered in nixpkgs before referencing them. Register Lars in nixpkgs to re-enable.
+          </div>
+        </div>
+
+        <div class="issue issue-critical">
+          <span class="severity severity-critical">High · Fixed</span>
+          <h3>Private-dep validation hardcoded to one GitHub org</h3>
+          <div class="where">mkPreparedSource.nix:269 (validateScript)</div>
+          <p>
+            The validation grep was hardcoded to <code>github\.com/[Ll]ars[Aa]rtmann/</code>. A
+            library named generically <em>go-nix-helpers</em> silently passes any non-LarsArtmann
+            private dep through to the cryptic SSH error it was designed to prevent. This is a core
+            extensibility flaw — the validation only protects one org.
+          </p>
+          <div class="callout callout-solution">
+            <strong>Fix applied</strong>
+            Added a <code>privateDepPattern</code> parameter (ERE regex) defaulting to the existing
+            LarsArtmann pattern — fully backwards-compatible. Verified end-to-end: a custom
+            <code>gitlab\.com/mycompany/</code> pattern correctly triggers validation, the default
+            does not. Documented in README's parameter table.
+          </div>
+        </div>
+
+        <div class="issue issue-critical">
+          <span class="severity severity-critical">High · Fixed</span>
+          <h3>Integration test <code>verify</code> never actually passed</h3>
+          <div class="where">test.nix (verify derivation)</div>
+          <p>
+            Two compounding faults: (1) the <code>elif grep "builder failed"</code> branch matched
+            <em>any</em> build failure, so a syntax error would count as a PASS — a false-positive
+            test; (2) <code>validationTest</code> (a deliberately-failing derivation) was referenced
+            as a Nix dependency of <code>verify</code>, and a failing derivation can never be in the
+            closure of a passing one, so <code>nix-build -A verify</code> always failed with "1
+            dependency failed". The suite documented as "working" had never passed end-to-end.
+          </p>
+          <div class="callout callout-solution">
+            <strong>Fix applied</strong>
+            Restructured: <code>verify</code> now tests only success paths (auto-discovery +
+            explicit) and <strong>passes</strong>. The negative case moved to
+            <code>verifyValidation</code> — a <code>writeShellApplication</code> run outside the
+            sandbox (the sandbox lacks <code>nix-store</code>), asserting the exact validation
+            message. Both verified green.
+          </div>
+        </div>
+
+        <div class="issue issue-important">
+          <span class="severity severity-important">Medium · Fixed</span>
+          <h3>nix-lint.sh grep produces garbage, breaking the comparison</h3>
+          <div class="where">scripts/nix-lint.sh:91</div>
+          <p>
+            <code>checks_count=$(grep -cP ... || echo "0")</code> — <code>grep -c</code> prints
+            <code>0</code> AND exits 1 on no match, so <code>|| echo 0</code> appends a second
+            <code>0</code>, yielding the string <code>0\n0</code>. Verified: the variable literally
+            contained a newline. <code>[ "$checks_count" -gt 1 ]</code> then errors on "integer
+            expression expected". The duplicate-checks lint rule was silently broken.
+          </p>
+          <div class="callout callout-solution">
+            <strong>Fix applied</strong>
+            Rewrote to assign inside the <code>if</code> conditional so the exit code is consumed
+            directly, avoiding the double-echo.
+          </div>
+        </div>
+
+        <div class="issue issue-important">
+          <span class="severity severity-important">Medium · Fixed</span>
+          <h3>CI workflow swallows all test failures</h3>
+          <div class="where">docs/ci-workflow.yml:30</div>
+          <p>
+            <code>nix build .#checks.x86_64-linux.test || true</code> — the <code>|| true</code>
+            means the "Run Tests" step can never fail the CI job. Tests are theatre: green
+            regardless of outcome.
+          </p>
+          <div class="callout callout-solution">
+            <strong>Fix applied</strong>
+            Removed <code>|| true</code> with a comment noting when to re-enable leniency.
+          </div>
+        </div>
+
+        <div class="issue issue-important">
+          <span class="severity severity-important">Medium · Fixed</span>
+          <h3>dashboard.sh: hardcoded path, stale version check, JSON injection</h3>
+          <div class="where">scripts/dashboard.sh:33,47,58</div>
+          <p>
+            Three faults: (1) hardcoded <code>/home/lars/projects</code> — not portable, not
+            configurable; (2) warned only on <code>go_1_25</code> while the standard is
+            <code>go_1_26</code> (and the check is backwards — it never flags older versions); (3)
+            raw <code>${error}</code> interpolated into JSON without escaping, producing invalid
+            JSON on any error containing a quote.
+          </p>
+          <div class="callout callout-solution">
+            <strong>Fix applied</strong>
+            <code>PROJECTS_DIR</code> (default <code>$HOME/projects</code>),
+            <code>GO_LATEST</code> (default <code>go_1_26</code>) env vars; generic "not latest"
+            detection; JSON strings now escaped.
+          </div>
+        </div>
+
+        <div class="issue issue-nice">
+          <span class="severity severity-nice">Low · Fixed</span>
+          <h3>Template: duplicate no-op checks.test</h3>
+          <div class="where">templates/go-flake-parts/flake.nix:184-186</div>
+          <p>
+            <code>checks.test</code> overrode <code>packages.default</code> with
+            <code>doCheck = true</code> — but the default package <em>already</em> sets
+            <code>doCheck = true</code>. The check was byte-identical to <code>checks.build</code>,
+            building the same thing twice.
+          </p>
+        </div>
+
+        <div class="issue issue-nice">
+          <span class="severity severity-nice">Low · Fixed</span>
+          <h3>Docs: typo + incorrect perSystem argument</h3>
+          <div class="where">docs/flake-patterns.md:3,49</div>
+          <p>
+            "LarsArttmann" typo. The "Right" example destructured <code>self</code> from
+            <code>perSystem</code> args, contradicting the gold-standard template (which
+            destructures <code>system</code> and references module-scope <code>self</code>). Aligned
+            the docs to the working template.
+          </p>
+        </div>
+
+        <div class="issue issue-nice">
+          <span class="severity severity-nice">Low · Fixed</span>
+          <h3>Dead empty <code>report/</code> directory</h3>
+          <div class="where">report/ (removed)</div>
+          <p>
+            Flagged as purpose-unclear in both prior status reports. Removed — empty dirs in a
+            library repo are noise. Status reports now live under <code>docs/status/</code>.
+          </p>
+        </div>
+
+        <!-- Open findings -->
+        <h2 id="open"><span class="num">02</span>Open findings (need a decision)</h2>
+        <p>
+          These were not auto-fixed because they involve API/tradeoff decisions or larger work.
+          Ranked by impact.
+        </p>
+
+        <div class="issue issue-critical">
+          <span class="severity severity-critical">High · Open</span>
+          <h3>No <code>flake.nix</code> — the repo cannot dogfood itself</h3>
+          <div class="where">project root</div>
+          <p>
+            The #1 gap, flagged in both prior status reports. A Nix library that ships a flake-parts
+            + treefmt-nix gold-standard template does not apply that standard to itself.
+            Consequences: no <code>nix fmt</code> on its own <code>.nix</code> files, no CI gate on
+            <code>test.nix</code>, no <code>nix flake check</code>. The "imported as
+            <code>flake = false</code>" rationale is not a blocker — a repo can be
+            <strong>both</strong> a proper flake (exposing <code>lib.mkPreparedSource</code>)
+            <strong>and</strong> importable via raw path. This is the highest-leverage improvement
+            available.
+          </p>
+        </div>
+
+        <div class="issue issue-important">
+          <span class="severity severity-important">Medium · Open</span>
+          <h3><code>goPkg</code> parameter is dead weight</h3>
+          <div class="where">mkPreparedSource.nix:68,297</div>
+          <p>
+            <code>goPkg</code> is a required parameter and added to <code>nativeBuildInputs</code>,
+            but the derivation has <code>dontBuild = true</code> and the builder only runs
+            <code>sed/cp/mkdir/echo/awk/grep</code> — never <code>go</code>. The Go toolchain is
+            pulled into the sandbox for nothing, inflating the closure and (worse) signalling to
+            consumers that pinning the Go version here matters. It does not. Removing it is a
+            breaking API change for all consumers, so left for an explicit decision (deprecate,
+            default it, or drop).
+          </p>
+        </div>
+
+        <div class="issue issue-important">
+          <span class="severity severity-important">Medium · Open</span>
+          <h3>Parallel code paths for explicit vs auto sub-modules</h3>
+          <div class="where">mkPreparedSource.nix:182-247</div>
+          <p>
+            <code>subModuleReplaceExplicit</code>/<code>subModuleReplaceAuto</code> and
+            <code>subModuleVersionNormalize</code>/<code>autoVersionNormalize</code> are
+            near-identical pairs doing the same job on different shapes. This is a split brain
+            waiting to drift — the <code>/vN</code> fix had to be applied in both. Both should
+            reduce to a single function over a unified <code>[{modulePath, localDir}]</code> list
+            (the <code>allDiscovered</code> shape already exists; explicit entries should map into
+            it).
+          </p>
+        </div>
+
+        <div class="issue issue-important">
+          <span class="severity severity-important">Medium · Open</span>
+          <h3><code>repoName</code> collision for same-name different-owner deps</h3>
+          <div class="where">mkPreparedSource.nix:99-101</div>
+          <p>
+            <code>repoName</code> extracts only the last path segment, so
+            <code>larsartmann/go-output</code> and <code>otheruser/go-output</code> both produce
+            <code>_local_deps/go-output</code> — a silent overwrite. Not triggered today but
+            architecturally unsound. Fix: namespace by owner (e.g.
+            <code>_local_deps/larsartmann-go-output</code>).
+          </p>
+        </div>
+
+        <div class="issue issue-important">
+          <span class="severity severity-important">Medium · Open</span>
+          <h3>Pseudo-version normalization may be cargo-culted</h3>
+          <div class="where">mkPreparedSource.nix:226-247</div>
+          <p>
+            <code>subModuleVersionNormalize</code> rewrites
+            <code>v0.0.0-20260101000000-abc123</code> &rarr; <code>v0.0.0</code> so replace
+            directives "match". But Go
+            <strong>ignores the require version for path-replaced modules</strong>, so the sed may
+            be unnecessary. The sed also assumes a specific pseudo-version format and breaks
+            silently if Go changes it. Worth a controlled test: remove it and see if a real build
+            still resolves.
+          </p>
+        </div>
+
+        <div class="issue issue-important">
+          <span class="severity severity-important">Medium · Open</span>
+          <h3>generate-flake.sh: fragile sed, hardcoded paths, surprising push default</h3>
+          <div class="where">scripts/generate-flake.sh:28,35,53-57,76</div>
+          <p>
+            Hardcoded <code>/home/lars/projects</code>; the <code>--templ</code> sed injections are
+            line-number-dependent and the line-57 pattern doesn't match the template's multi-line
+            formatter block (likely broken); <code>sed "s/REPLACE_ME/$PROJECT/g"</code> breaks if
+            PROJECT contains <code>/</code>; and the script defaults to interactively pushing to
+            GitHub, which is surprising for a generator. Defaults should be non-destructive.
+          </p>
+        </div>
+
+        <div class="issue issue-nice">
+          <span class="severity severity-nice">Low · Open</span>
+          <h3>No AGENTS.md / CHANGELOG.md / FEATURES.md / TODO_LIST.md</h3>
+          <div class="where">project root</div>
+          <p>
+            Per project documentation conventions, every project should have an
+            <code>AGENTS.md</code> for AI-session continuity. The two status reports under
+            <code>docs/status/</code> are excellent point-in-time snapshots but do not substitute
+            for enduring context.
+          </p>
+        </div>
+
+        <div class="issue issue-nice">
+          <span class="severity severity-nice">Low · Open</span>
+          <h3><code>hasRequires</code> can emit duplicate require lines</h3>
+          <div class="where">mkPreparedSource.nix:222,311</div>
+          <p>
+            <code>requireDeps</code> appends a fresh <code>require (...)</code> block without
+            checking whether a module is already required. A duplicate <code>require</code> makes
+            <code>go mod tidy</code> complain. Should dedup against existing requires.
+          </p>
+        </div>
+
+        <div class="issue issue-nice">
+          <span class="severity severity-nice">Low · Open</span>
+          <h3>Undocumented <code>postPatchExtra</code> ordering</h3>
+          <div class="where">mkPreparedSource.nix:306</div>
+          <p>
+            <code>postPatchExtra</code> runs <em>before</em> the <code>replace (...)</code> block is
+            appended. A consumer whose <code>postPatchExtra</code> needs to read the generated
+            replaces will silently see a stale <code>go.mod</code>. Document the order, or move it
+            to the end.
+          </p>
+        </div>
+
+        <div class="issue issue-nice">
+          <span class="severity severity-nice">Low · Open</span>
+          <h3>mockDep uses an anti-pattern (writes <code>$out</code> in unpackPhase)</h3>
+          <div class="where">test.nix:18-40</div>
+          <p>
+            <code>mockDep</code> writes to <code>$out</code> inside <code>unpackPhase</code> (which
+            should populate the build dir), then <code>installPhase</code> copies
+            <code>.</code> over it. Confusing and incidental. Replace with
+            <code>pkgs.runCommand</code> or do all file creation in <code>installPhase</code>.
+          </p>
+        </div>
+
+        <!-- Core helper deep-dive -->
+        <h2 id="core"><span class="num">03</span>Core helper deep-dive</h2>
+        <p>
+          <code>mkPreparedSource.nix</code> (334 lines) is the heart of the project. Its core idea
+          is sound and well-executed: copy flake-input deps into <code>_local_deps/</code> and
+          inject <code>replace</code> directives so the Go toolchain resolves private modules
+          locally without network/SSH. The auto-discovery design (scanning for subdirectory
+          <code>go.mod</code> files) is genuinely good — it eliminates manual
+          <code>subModules</code>
+          maintenance and is the kind of "make the right thing automatic" decision that ages well.
+        </p>
+
+        <div class="dep-tree">
+          <span class="root">mkPreparedSource</span>
+          ├── <span class="ok">auto-discovery (scan go.mod)</span> ├──
+          <span class="ok">replace injection</span> ├──
+          <span class="ok">/vN suffix handling</span> ├──
+          <span class="ok">clear validation errors</span> ├──
+          <span class="unwanted">duplicated explicit/auto paths</span> ├──
+          <span class="unwanted">dead goPkg param</span> └──
+          <span class="unwanted">org-hardcoded validation (now parameterized)</span>
+        </div>
+
+        <p>
+          The main architectural debt is the four near-duplicate shell-generation blocks. Unifying
+          explicit and auto sub-module handling behind one function would halve the surface area and
+          make the next <code>/vN</code>-class bug impossible to introduce in only one branch.
+        </p>
+
+        <!-- Strengths -->
+        <h2 id="strengths"><span class="num">&diams;</span>Strengths</h2>
+        <div class="strengths">
+          <div class="strength">
+            <div class="check">+</div>
+            <div class="text">
+              <strong>Tight, single-purpose scope</strong>
+              <span>One job, done well. No scope creep. Easy to reason about and trust.</span>
+            </div>
+          </div>
+          <div class="strength">
+            <div class="check">+</div>
+            <div class="text">
+              <strong>Auto-discovery eliminates a whole class of maintenance</strong>
+              <span
+                >Scanning dep sources for <code>go.mod</code> means new sub-modules are picked up on
+                <code>nix flake update</code> with zero config. Excellent DX.</span
+              >
+            </div>
+          </div>
+          <div class="strength">
+            <div class="check">+</div>
+            <div class="text">
+              <strong>Validation turns a cryptic error into an actionable one</strong>
+              <span
+                >The "could not read Username" SSH error is notoriously opaque. The build-time check
+                listing missing deps is exactly the right usability investment.</span
+              >
+            </div>
+          </div>
+          <div class="strength">
+            <div class="check">+</div>
+            <div class="text">
+              <strong>Surrounding ecosystem (template, lint, dashboard)</strong>
+              <span
+                >The repo doesn't just ship a helper — it ships the scaffolding to use it
+                consistently across 7+ projects. The lint rules codify hard-won lessons.</span
+              >
+            </div>
+          </div>
+          <div class="strength">
+            <div class="check">+</div>
+            <div class="text">
+              <strong>Honest, detailed status reports</strong>
+              <span
+                >The <code>docs/status/</code> reports are candid about what's done, partially done,
+                and "totally fucked up". That honesty is rare and valuable.</span
+              >
+            </div>
+          </div>
+        </div>
+
+        <!-- Plan -->
+        <h2 id="plan"><span class="num">04</span>Recommended next steps (Pareto)</h2>
+        <p>Ordered by impact-to-effort ratio. The first two unlock the most value.</p>
+        <div class="migration-step">
+          <div class="migration-num">1</div>
+          <div class="migration-content">
+            <h4>Add a <code>flake.nix</code> that self-hosts the repo</h4>
+            <p>
+              Expose <code>lib.mkPreparedSource</code>, add <code>treefmt-nix</code> (nixfmt), wire
+              <code>checks</code> to <code>test.nix</code>. Keeps raw-path import working. Single
+              highest-leverage change — dogfoods the standard the repo preaches.
+            </p>
+          </div>
+        </div>
+        <div class="migration-step">
+          <div class="migration-num">2</div>
+          <div class="migration-content">
+            <h4>Unify explicit + auto sub-module code paths</h4>
+            <p>
+              Map explicit <code>subModules</code> entries into the same
+              <code>[{modulePath, localDir}]</code> shape as <code>allDiscovered</code>, then run
+              one replace-generator and one normalizer. Halves the bug surface.
+            </p>
+          </div>
+        </div>
+        <div class="migration-step">
+          <div class="migration-num">3</div>
+          <div class="migration-content">
+            <h4>Decide on <code>goPkg</code> and the pseudo-version sed</h4>
+            <p>
+              Confirm <code>goPkg</code> is unused (it is) and deprecate/drop it. Test whether
+              <code>subModuleVersionNormalize</code> is actually needed by building a real consumer
+              without it.
+            </p>
+          </div>
+        </div>
+        <div class="migration-step">
+          <div class="migration-num">4</div>
+          <div class="migration-content">
+            <h4>Namespace <code>repoName</code> by owner; add AGENTS.md</h4>
+            <p>
+              Eliminates the same-name collision and gives every AI session the project context it
+              currently lacks.
+            </p>
+          </div>
+        </div>
+
+        <footer class="footer">
+          Generated 2026-06-19 &middot; All Critical/High claims verified against live
+          <code>nix eval</code> / builds before asserting
+        </footer>
+      </main>
+    </div>
+
+    <!-- Progressive-enhancement scrollspy. Nav still works without JS via anchor links. -->
+    <script>
+      (function () {
+        if (!("IntersectionObserver" in window)) return;
+        var nav = document.querySelector("[data-nav]");
+        if (!nav) return;
+        var links = nav.querySelectorAll('a[href^="#"]');
+        var ids = Array.from(links).map(function (l) {
+          return l.getAttribute("href").slice(1);
+        });
+        var sections = ids
+          .map(function (id) {
+            return document.getElementById(id);
+          })
+          .filter(Boolean);
+        if (!sections.length) return;
+        var observer = new IntersectionObserver(
+          function (entries) {
+            entries.forEach(function (entry) {
+              if (entry.isIntersecting) {
+                links.forEach(function (link) {
+                  link.classList.toggle(
+                    "active",
+                    link.getAttribute("href") === "#" + entry.target.id,
+                  );
+                });
+              }
+            });
+          },
+          { rootMargin: "-80px 0px -60% 0px", threshold: 0 },
+        );
+        sections.forEach(function (s) {
+          observer.observe(s);
+        });
+      })();
+    </script>
+  </body>
+</html>

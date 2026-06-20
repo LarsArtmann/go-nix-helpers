@@ -25,12 +25,17 @@ YELLOW='\033[1;33m'
 CYAN='\033[0;36m'
 NC='\033[0m'
 
+# Projects root is configurable; defaults to ~/projects.
+PROJECTS_DIR="${PROJECTS_DIR:-$HOME/projects}"
+# Go version considered current. Override with GO_LATEST=go_1_27 etc.
+GO_LATEST="${GO_LATEST:-go_1_26}"
+
 pass=0
 fail=0
 skip=0
 results=()
 
-for f in $(find /home/lars/projects -maxdepth 2 -name "flake.nix" -exec dirname {} \; | sort); do
+for f in $(find "$PROJECTS_DIR" -maxdepth 2 -name "flake.nix" -exec dirname {} \; | sort); do
   project=$(basename "$f")
 
   if [ "$CHECK" = true ]; then
@@ -43,8 +48,8 @@ for f in $(find /home/lars/projects -maxdepth 2 -name "flake.nix" -exec dirname 
       fail=$((fail + 1))
     fi
   else
-    # Quick static analysis only
-    if grep -q 'go_1_25\b' "$f/flake.nix" 2>/dev/null; then
+    # Quick static analysis: warn on any pinned go_1_X that is not the latest.
+    if grep -qE 'go_1_[0-9]+' "$f/flake.nix" 2>/dev/null && ! grep -q "$GO_LATEST" "$f/flake.nix" 2>/dev/null; then
       status="WARN"
       skip=$((skip + 1))
     else
@@ -55,7 +60,9 @@ for f in $(find /home/lars/projects -maxdepth 2 -name "flake.nix" -exec dirname 
   fi
 
   if [ "$JSON" = true ]; then
-    results+=("{\"project\":\"$project\",\"status\":\"$status\",\"error\":\"${error:-}\"}")
+    # Escape backslashes and double-quotes so the emitted JSON stays valid.
+    esc_error=$(printf '%s' "${error:-}" | sed 's/\\/\\\\/g; s/"/\\"/g')
+    results+=("{\"project\":\"$project\",\"status\":\"$status\",\"error\":\"$esc_error\"}")
   else
     case "$status" in
       PASS|OK)  printf "${GREEN}%-40s${NC} %s\n" "$project" "$status" ;;

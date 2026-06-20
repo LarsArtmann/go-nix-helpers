@@ -116,8 +116,13 @@ in {
   # nix-build test.nix -A autoDiscovery -o result-auto
   inherit autoDiscovery explicitOnly validationTest;
 
-  # Verification script: checks all test outputs
+  # Verification script: checks the success-path test outputs.
   # nix-build test.nix -A verify -o result-verify && ./result-verify
+  #
+  # NOTE: validationTest is deliberately a FAILING derivation (its build must be
+  # rejected with the validation message). It CANNOT be a Nix dependency of this
+  # verify derivation — a failing derivation can never be in the closure of a
+  # passing one. So the negative case is verified separately below.
   verify = pkgs.runCommand "test-verify" {} ''
     set -e
 
@@ -174,22 +179,41 @@ in {
     fi
 
     echo ""
-    echo "=== Test 3: Validation (should FAIL the build) ==="
-    if nix-store -r ${validationTest.drvPath} 2>&1 | grep -q "private modules without local replace"; then
-      echo "PASS: validation caught missing dep with clear error"
-    elif nix-store -r ${validationTest.drvPath} 2>&1 | grep -q "builder failed"; then
-      echo "PASS: validation caught missing dep (build failed as expected)"
-    else
-      echo "FAIL: validation did not catch missing dep"
-      exit 1
-    fi
-
+    echo "==========================================="
+    echo "SUCCESS-PATH TESTS PASSED"
+    echo "==========================================="
     echo ""
-    echo "==========================================="
-    echo "ALL TESTS PASSED"
-    echo "==========================================="
+    echo "Test 3 (validation) is a deliberately-failing derivation."
+    echo "Verify it separately; it MUST fail with the validation message:"
+    echo "  nix-build test.nix -A validationTest  # expect: exit 1 +"
+    echo "    'private modules without local replace'"
 
     mkdir $out
-    echo "all tests passed" > $out/result.txt
+    echo "all success-path tests passed" > $out/result.txt
   '';
+
+  # Test 3 helper: a RUNNABLE script that asserts validationTest fails as
+  # expected. Must be a script (not runCommand) because the Nix sandbox has no
+  # `nix-store`, and a failing derivation cannot be in the closure of a passing
+  # one. The drvPath context is discarded so building this script does NOT pull
+  # validationTest into the build closure.
+  #
+  # Build + run:
+  #   nix-build test.nix -A verifyValidation -o result-vv
+  #   ./result-vv/bin/verify-validation
+  verifyValidation = pkgs.writeShellApplication {
+    name = "verify-validation";
+    runtimeInputs = [ pkgs.nix ];
+    text = ''
+      set +e
+      log=$(nix-store -r ${builtins.unsafeDiscardStringContext validationTest.drvPath} 2>&1)
+      if echo "$log" | grep -q "private modules without local replace"; then
+        echo "PASS: validation caught missing dep with clear error"
+      else
+        echo "FAIL: validation did not emit the expected error"
+        echo "$log" | tail -8
+        exit 1
+      fi
+    '';
+  };
 }

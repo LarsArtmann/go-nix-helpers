@@ -109,7 +109,11 @@
                   description = "REPLACE_ME — short description";
                   homepage = "https://github.com/LarsArtmann/REPLACE_ME";
                   license = licenses.mit;
-                  maintainers = [ maintainers.larsartmann ];
+                  # NOTE: maintainers must reference handles registered in
+                  # nixpkgs (lib/maintainers/maintainer-list.nix). Using an
+                  # unregistered handle like `maintainers.larsartmann` THROWS
+                  # and breaks `nix build`/`nix flake check`. Register yourself
+                  # in nixpkgs, then add: maintainers = [ maintainers.larsartmann ];
                   mainProgram = "REPLACE_ME";
                 };
               }
@@ -181,9 +185,6 @@
           checks = {
             format = config.treefmt.build.check self;
             build = config.packages.default;
-            test = config.packages.default.overrideAttrs (_: {
-              doCheck = true;
-            });
           };
 
           # -- Formatter (nix fmt) ------------------------------------------------

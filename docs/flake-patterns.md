@@ -1,6 +1,6 @@
 # Flake.nix Correct Patterns Reference
 
-All LarsArttmann Go projects use the **flake-parts** + **treefmt-nix** + **systems** + **git-hooks.nix** standard stack.
+All LarsArtmann Go projects use the **flake-parts** + **treefmt-nix** + **systems** + **git-hooks.nix** standard stack.
 
 ## Table of Contents
 
@@ -18,6 +18,7 @@ All LarsArttmann Go projects use the **flake-parts** + **treefmt-nix** + **syste
 ### 1. Checks inside treefmt block
 
 **Wrong:**
+
 ```nix
 treefmt = {
   projectRootFile = "go.mod";
@@ -28,6 +29,7 @@ checks.format = config.treefmt.build.check self;  # ← This is INSIDE treefmt's
 ```
 
 **Right:**
+
 ```nix
 treefmt = {
   projectRootFile = "go.mod";
@@ -45,8 +47,11 @@ checks = {
 **Wrong:** `config` and `self` only exist inside `perSystem`.
 
 **Right:** Always place `checks`, `packages`, etc. inside the `perSystem` block:
+
 ```nix
-perSystem = { config, pkgs, lib, self, ... }: {
+perSystem = { config, pkgs, lib, system, ... }: {
+  # `self` is the module-scope binding (from `inputs@{ self, ... }`), not a
+  # perSystem argument — do NOT destructure it here.
   checks = { format = config.treefmt.build.check self; };
 };
 ```
@@ -54,11 +59,13 @@ perSystem = { config, pkgs, lib, self, ... }: {
 ### 3. goPkg = goPkg self-reference
 
 **Wrong:**
+
 ```nix
 let goPkg = goPkg; in
 ```
 
 **Right:**
+
 ```nix
 let goPkg = pkgs.go_1_26; in
 ```
@@ -66,12 +73,14 @@ let goPkg = pkgs.go_1_26; in
 ### 4. Duplicate checks attributes
 
 **Wrong:**
+
 ```nix
 checks.build = config.packages.default;
 checks = { format = ...; };  # ← Overwrites the build check!
 ```
 
 **Right:**
+
 ```nix
 checks = {
   format = config.treefmt.build.check self;
@@ -82,6 +91,7 @@ checks = {
 ### 5. Formatter outside programs
 
 **Wrong:**
+
 ```nix
 treefmt = {
   nixfmt.enable = true;  # ← Wrong level
@@ -89,6 +99,7 @@ treefmt = {
 ```
 
 **Right:**
+
 ```nix
 treefmt = {
   programs.nixfmt.enable = true;
@@ -104,11 +115,13 @@ treefmt = {
 ### 7. outputs = inputs: missing self
 
 **Wrong:**
+
 ```nix
 outputs = inputs: flake-parts.lib.mkFlake { inherit inputs; } {
 ```
 
 **Right:**
+
 ```nix
 outputs = inputs@{ self, ... }: flake-parts.lib.mkFlake { inherit inputs; } {
 ```

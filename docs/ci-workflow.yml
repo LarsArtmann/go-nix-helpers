@@ -27,4 +27,6 @@ jobs:
         run: nix build .
 
       - name: Run Tests
-        run: nix build .#checks.x86_64-linux.test || true
+        # Runs the `checks.<system>.test` attribute. Remove the `|| true` if you
+        # want test failures to break CI — recommended once tests are stable.
+        run: nix build .#checks.x86_64-linux.test

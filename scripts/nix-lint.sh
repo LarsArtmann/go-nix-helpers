@@ -88,10 +88,14 @@ for target in "${TARGETS[@]}"; do
   check_fix 'let\s+goPkg\s*=\s*goPkg\s*;' "goPkg = goPkg self-reference (should be pkgs.go_1_26)"
 
   # Pattern 4: Duplicate checks attributes
-  checks_count=$(grep -cP '^\s*checks\s*[=\.{]' "$flake" 2>/dev/null || echo "0")
-  if [ "$checks_count" -gt 1 ]; then
-    errors=$((errors + 1))
-    echo -e "  ${RED}FAIL${NC} Duplicate checks definitions ($checks_count found)"
+  # NOTE: `grep -c` exits 1 when count is 0; piping through `|| echo 0` appends a
+  # second "0", yielding "0\n0" which breaks `[ -gt ]`. Use `grep -c ... || true`
+  # and treat empty/0 together, or just test for >1 matches directly.
+  if checks_count=$(grep -cP '^\s*checks\s*[=\.{]' "$flake" 2>/dev/null); then
+    if [ "$checks_count" -gt 1 ]; then
+      errors=$((errors + 1))
+      echo -e "  ${RED}FAIL${NC} Duplicate checks definitions ($checks_count found)"
+    fi
   fi
 
   # Pattern 5: nixfmt/templ/gofumpt outside programs

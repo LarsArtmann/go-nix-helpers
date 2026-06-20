@@ -140,16 +140,17 @@ cat result-auto/go.mod                                  # inspect generated go.m
 
 ### Parameters
 
-| Parameter              | Default     | Description                                                        |
-| ---------------------- | ----------- | ------------------------------------------------------------------ |
-| `name`                 | (required)  | Derivation name prefix                                             |
-| `src`                  | (required)  | Source derivation or path                                          |
-| `deps`                 | (required)  | Attrset of `{ "import/path" = flake-input; }`                     |
-| `version`              | `"dev"`     | Version string                                                     |
-| `autoSubModules`       | `true`      | Auto-discover sub-modules from dep source trees                    |
-| `subModules`           | `{}`        | Explicit sub-modules (merged with auto-discovered)                 |
-| `requireDeps`          | `{}`        | Manually inject require lines (rarely needed)                      |
-| `subModuleVersion`     | `"v0.0.0"`  | Version for pseudo-version normalization                           |
-| `stripLocalReplaces`   | `true`      | Strip stale `replace X => /home/...` directives                    |
-| `validatePrivateDeps`  | `true`      | Verify every private require has a replace directive               |
-| `postPatchExtra`       | `""`        | Additional shell commands appended to postPatch                    |
+| Parameter             | Default                             | Description                                                                                                             |
+| --------------------- | ----------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| `name`                | (required)                          | Derivation name prefix                                                                                                  |
+| `src`                 | (required)                          | Source derivation or path                                                                                               |
+| `deps`                | (required)                          | Attrset of `{ "import/path" = flake-input; }`                                                                           |
+| `version`             | `"dev"`                             | Version string                                                                                                          |
+| `autoSubModules`      | `true`                              | Auto-discover sub-modules from dep source trees                                                                         |
+| `subModules`          | `{}`                                | Explicit sub-modules (merged with auto-discovered)                                                                      |
+| `requireDeps`         | `{}`                                | Manually inject require lines (rarely needed)                                                                           |
+| `subModuleVersion`    | `"v0.0.0"`                          | Version for pseudo-version normalization                                                                                |
+| `stripLocalReplaces`  | `true`                              | Strip stale `replace X => /home/...` directives                                                                         |
+| `validatePrivateDeps` | `true`                              | Verify every private require has a replace directive                                                                    |
+| `privateDepPattern`   | `"github\\.com/[Ll]ars[Aa]rtmann/"` | ERE regex matching private module paths that must have a replace. Override to validate deps outside the LarsArtmann org |
+| `postPatchExtra`      | `""`                                | Additional shell commands appended to postPatch                                                                         |

@@ -61,6 +61,9 @@
 #   subModuleVersion     Version for pseudo-version normalization (default: "v0.0.0").
 #   stripLocalReplaces   Strip stale `replace X => /home/...` directives (default: true).
 #   validatePrivateDeps  Verify every private require has a replace (default: true).
+#   privateDepPattern    ERE regex matching private module paths in go.mod that must
+#                        have a replace directive (default: "github\\.com/[Ll]ars[Aa]rtmann/").
+#                        Override to support deps outside the LarsArtmann org.
 #   postPatchExtra       Additional shell commands appended to postPatch.
 {
   pkgs,
@@ -77,6 +80,7 @@
   subModuleVersion ? "v0.0.0",
   stripLocalReplaces ? true,
   validatePrivateDeps ? true,
+  privateDepPattern ? "github\\.com/[Ll]ars[Aa]rtmann/",
   postPatchExtra ? "",
 }: let
   # ---------------------------------------------------------------------------
@@ -266,7 +270,7 @@
           /^\)/{inreq=0; next}
           /^require[[:space:]]+[^(]/{if(!inreq){print $2; next}}
           inreq{print $1}
-        ' go.mod | grep -E 'github\.com/[Ll]ars[Aa]rtmann/' | sort -u
+        ' go.mod | grep -E '${privateDepPattern}' | sort -u
       )
       for mod in $REQUIRED; do
         if ! grep -qF "  $mod => " go.mod; then
