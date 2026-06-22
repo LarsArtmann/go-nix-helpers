@@ -3,8 +3,9 @@
 # Run:  nix-build test.nix -o test-result && cat test-result/go.mod
 # Or:   nix-build test.nix -A autoDiscovery -o test-result && cat test-result/go.mod
 {
-  pkgs ? import <nixpkgs> {},
-}: let
+  pkgs ? import <nixpkgs> { },
+}:
+let
   lib = pkgs.lib;
 
   mkPreparedSource = import ./mkPreparedSource.nix {
@@ -15,29 +16,23 @@
   # ---------------------------------------------------------------------------
   # Mock dep: a repo with sub-modules (like go-cqrs-lite)
   # ---------------------------------------------------------------------------
-  mockDep = pkgs.stdenv.mkDerivation {
-    name = "mock-dep";
-    dontBuild = true;
-    src = ./.;
-    unpackPhase = ''
-      mkdir -p $out
-      cat > $out/go.mod <<'EOF'
-      module github.com/larsartmann/mock-dep
-      go 1.26
-      EOF
-      for sub in codec storage kv; do
-        mkdir -p $out/$sub
-        cat > $out/$sub/go.mod <<EOF
-      module github.com/larsartmann/mock-dep/$sub/v2
-      go 1.26
-      EOF
-      done
-      # Add a non-module directory (no go.mod) to verify it's skipped
-      mkdir -p $out/docs
-      echo "documentation" > $out/docs/README.md
-    '';
-    installPhase = "cp -r . $out/";
-  };
+  mockDep = pkgs.runCommandLocal "mock-dep" { } ''
+    mkdir -p $out
+    cat > $out/go.mod <<'EOF'
+    module github.com/larsartmann/mock-dep
+    go 1.26
+    EOF
+    for sub in codec storage kv; do
+      mkdir -p $out/$sub
+      cat > $out/$sub/go.mod <<EOF
+    module github.com/larsartmann/mock-dep/$sub/v2
+    go 1.26
+    EOF
+    done
+    # Add a non-module directory (no go.mod) to verify it's skipped
+    mkdir -p $out/docs
+    echo "documentation" > $out/docs/README.md
+  '';
 
   # Mock consumer go.mod that requires two of the three sub-modules
   mockConsumerSrc = pkgs.writeTextDir "go.mod" ''
@@ -85,7 +80,7 @@
     };
     autoSubModules = false;
     subModules = {
-      "github.com/larsartmann/mock-dep" = ["codec/v2"];
+      "github.com/larsartmann/mock-dep" = [ "codec/v2" ];
     };
   };
 
@@ -108,11 +103,12 @@
     name = "test-validation";
     version = "test";
     src = mockMissingDepSrc;
-    deps = {};
+    deps = { };
     autoSubModules = false;
     validatePrivateDeps = true;
   };
-in {
+in
+{
   # nix-build test.nix -A autoDiscovery -o result-auto
   inherit autoDiscovery explicitOnly validationTest;
 
@@ -123,7 +119,7 @@ in {
   # rejected with the validation message). It CANNOT be a Nix dependency of this
   # verify derivation — a failing derivation can never be in the closure of a
   # passing one. So the negative case is verified separately below.
-  verify = pkgs.runCommand "test-verify" {} ''
+  verify = pkgs.runCommand "test-verify" { } ''
     set -e
 
     echo "=== Test 1: Auto-discovery ==="
@@ -204,6 +200,7 @@ in {
   verifyValidation = pkgs.writeShellApplication {
     name = "verify-validation";
     runtimeInputs = [ pkgs.nix ];
+    meta.description = "Verify that validationTest fails with the expected error message";
     text = ''
       set +e
       log=$(nix-store -r ${builtins.unsafeDiscardStringContext validationTest.drvPath} 2>&1)

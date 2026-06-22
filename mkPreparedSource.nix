@@ -69,57 +69,59 @@
   pkgs,
   lib,
   goPkg,
-}: {
+}:
+{
   name,
   src,
   deps,
   version ? "dev",
-  subModules ? {},
+  subModules ? { },
   autoSubModules ? true,
-  requireDeps ? {},
+  requireDeps ? { },
   subModuleVersion ? "v0.0.0",
   stripLocalReplaces ? true,
   validatePrivateDeps ? true,
   privateDepPattern ? "github\\.com/[Ll]ars[Aa]rtmann/",
   postPatchExtra ? "",
-}: let
+}:
+let
   # ---------------------------------------------------------------------------
   # Path helpers
   # ---------------------------------------------------------------------------
 
   # Strip trailing /vN major version suffix from a path.
   # "codec/v2" → "codec", "core" → "core"
-  stripVersionSuffix = path: let
-    parts = lib.splitString "/" path;
-    last = lib.last parts;
-  in
-    if builtins.match "v[0-9]+" last != null
-    then lib.concatStringsSep "/" (lib.init parts)
-    else path;
+  stripVersionSuffix =
+    path:
+    let
+      parts = lib.splitString "/" path;
+      last = lib.last parts;
+    in
+    if builtins.match "v[0-9]+" last != null then lib.concatStringsSep "/" (lib.init parts) else path;
 
   # Extract repo name from Go import path, stripping any /vN major version suffix.
   # "github.com/larsartmann/go-cqrs-lite" → "go-cqrs-lite"
   # "github.com/larsartmann/go-filewatcher/v2" → "go-filewatcher"
-  repoName = path: let
-    stripped = stripVersionSuffix path;
-  in lib.last (lib.splitString "/" stripped);
+  repoName =
+    path:
+    let
+      stripped = stripVersionSuffix path;
+    in
+    lib.last (lib.splitString "/" stripped);
 
   # Read the module path from the first non-empty line of a go.mod file.
   # go.mod line 1 is always: "module <import-path>"
   # Returns "" for empty/malformed files.
-  readModulePath = goModFile: let
-    content = builtins.readFile goModFile;
-    lines = lib.splitString "\n" content;
-    nonEmpty = lib.filter (l: l != "") lines;
-    firstLine =
-      if lib.length nonEmpty > 0
-      then lib.head nonEmpty
-      else "";
-    parts = lib.splitString " " firstLine;
-  in
-    if lib.length parts >= 2
-    then lib.elemAt parts 1
-    else "";
+  readModulePath =
+    goModFile:
+    let
+      content = builtins.readFile goModFile;
+      lines = lib.splitString "\n" content;
+      nonEmpty = lib.filter (l: l != "") lines;
+      firstLine = if lib.length nonEmpty > 0 then lib.head nonEmpty else "";
+      parts = lib.splitString " " firstLine;
+    in
+    if lib.length parts >= 2 then lib.elemAt parts 1 else "";
 
   # ---------------------------------------------------------------------------
   # Auto-discovery: scan dep source for sub-modules
@@ -131,29 +133,31 @@
   #   [ { modulePath = ".../catalog/v2"; localDir = "./_local_deps/go-cqrs-lite/catalog"; }
   #     { modulePath = ".../codec/v2";   localDir = "./_local_deps/go-cqrs-lite/codec"; }
   #     ... ]
-  discoverSubModules = depPath: depSrc:
-    if !autoSubModules
-    then []
-    else let
-      entries = builtins.readDir depSrc;
-      dirs = lib.attrNames (lib.filterAttrs (_: type: type == "directory") entries);
-      dirsGoMod = lib.filter (dir:
-        builtins.pathExists "${depSrc}/${dir}/go.mod"
-      ) dirs;
-      basename = repoName depPath;
-      discover = dir: let
-        modulePath = readModulePath "${depSrc}/${dir}/go.mod";
-      in {
-        inherit modulePath;
-        localDir = "./_local_deps/${basename}/${dir}";
-      };
-    in map discover dirsGoMod;
+  discoverSubModules =
+    depPath: depSrc:
+    if !autoSubModules then
+      [ ]
+    else
+      let
+        entries = builtins.readDir depSrc;
+        dirs = lib.attrNames (lib.filterAttrs (_: type: type == "directory") entries);
+        dirsGoMod = lib.filter (dir: builtins.pathExists "${depSrc}/${dir}/go.mod") dirs;
+        basename = repoName depPath;
+        discover =
+          dir:
+          let
+            modulePath = readModulePath "${depSrc}/${dir}/go.mod";
+          in
+          {
+            inherit modulePath;
+            localDir = "./_local_deps/${basename}/${dir}";
+          };
+      in
+      map discover dirsGoMod;
 
   # Collect all auto-discovered sub-modules across all deps.
   allDiscovered = lib.flatten (
-    lib.mapAttrsToList (depPath: depSrc:
-      discoverSubModules depPath depSrc
-    ) deps
+    lib.mapAttrsToList (depPath: depSrc: discoverSubModules depPath depSrc) deps
   );
 
   # ---------------------------------------------------------------------------
@@ -161,94 +165,65 @@
   # ---------------------------------------------------------------------------
 
   # Copy each dep into _local_deps/<basename>
-  copyDeps =
-    lib.concatStringsSep "\n"
-    (lib.mapAttrsToList (
-        path: _: let
-          basename = repoName path;
-        in ''cp -r ${deps.${path}} _local_deps/${basename}''
-      )
-      deps);
+  copyDeps = lib.concatStringsSep "\n" (
+    lib.mapAttrsToList (
+      path: _:
+      let
+        basename = repoName path;
+      in
+      "cp -r ${deps.${path}} _local_deps/${basename}"
+    ) deps
+  );
 
   # Replace directives for main deps:
   # "github.com/.../go-cqrs-lite" => ./_local_deps/go-cqrs-lite
-  replaceLines =
-    lib.concatStringsSep "\n"
-    (lib.mapAttrsToList (
-        path: _: let
-          basename = repoName path;
-        in ''echo "  ${path} => ./_local_deps/${basename}" >> go.mod''
-      )
-      deps);
+  replaceLines = lib.concatStringsSep "\n" (
+    lib.mapAttrsToList (
+      path: _:
+      let
+        basename = repoName path;
+      in
+      ''echo "  ${path} => ./_local_deps/${basename}" >> go.mod''
+    ) deps
+  );
 
-  # Replace directives for explicit subModules:
-  # "github.com/.../go-cqrs-lite/codec/v2" => ./_local_deps/go-cqrs-lite/codec
-  subModuleReplaceExplicit =
-    lib.concatStringsSep "\n"
-    (lib.concatLists (
-      lib.mapAttrsToList (
-        depPath: subs:
-          map (sub: let
-            basename = repoName depPath;
-            localSub = stripVersionSuffix sub;
-          in ''echo "  ${depPath}/${sub} => ./_local_deps/${basename}/${localSub}" >> go.mod'')
-          subs
-      )
-      subModules
-    ));
+  # Unify explicit subModules into the same {modulePath, localDir} shape as
+  # auto-discovered entries. Both sources then share ONE replace generator and
+  # ONE version normalizer — eliminating the split brain where /vN handling
+  # and dedup logic had to be maintained in two parallel code paths.
+  explicitSubModules = lib.flatten (
+    lib.mapAttrsToList (
+      depPath: subs:
+      map (sub: {
+        modulePath = "${depPath}/${sub}";
+        localDir = "./_local_deps/${repoName depPath}/${stripVersionSuffix sub}";
+      }) subs
+    ) subModules
+  );
 
-  # Replace directives for auto-discovered sub-modules:
+  # Merged + deduplicated sub-module list (explicit entries first).
+  allSubModules = lib.unique (explicitSubModules ++ allDiscovered);
+
+  # Single replace-directive generator for ALL sub-modules (explicit + auto).
   # "github.com/.../codec/v2" => ./_local_deps/go-cqrs-lite/codec
-  subModuleReplaceAuto =
-    lib.concatStringsSep "\n"
-    (map (
-        sm: ''echo "  ${sm.modulePath} => ${sm.localDir}" >> go.mod''
-      )
-      allDiscovered);
-
-  # Deduplicate: merge explicit + auto, remove exact-duplicate echo lines.
-  # Go ignores duplicate replace directives, but keeping them clean is nicer.
-  allSubModuleReplace =
-    lib.concatStringsSep "\n"
-    (lib.unique (
-      lib.splitString "\n" subModuleReplaceExplicit
-      ++ lib.splitString "\n" subModuleReplaceAuto
-    ));
+  allSubModuleReplace = lib.concatStringsSep "\n" (
+    map (sm: ''echo "  ${sm.modulePath} => ${sm.localDir}" >> go.mod'') allSubModules
+  );
 
   # Require lines for manually injected deps (rarely needed).
-  extraRequireLines =
-    lib.concatStringsSep "\n"
-    (lib.mapAttrsToList (
-        path: ver: ''echo "	${path} ${ver}" >> go.mod''
-      )
-      requireDeps);
+  extraRequireLines = lib.concatStringsSep "\n" (
+    lib.mapAttrsToList (path: ver: ''echo "	${path} ${ver}" >> go.mod'') requireDeps
+  );
 
-  hasRequires = requireDeps != {};
+  hasRequires = requireDeps != { };
 
-  # Normalize pseudo-versions for explicit sub-modules.
-  # Replaces "v0.0.0-20260101000000-abc123" with "v0.0.0" so replace directives match.
-  subModuleVersionNormalize =
-    lib.concatStringsSep "\n"
-    (lib.concatLists (
-      lib.mapAttrsToList (
-        depPath: subs:
-          map (sub: ''
-            sed -i 's|${depPath}/${sub} v0\.0\.0-[^ ]*|${depPath}/${sub} ${subModuleVersion}|g' go.mod
-          '')
-          subs
-      )
-      subModules
-    ));
-
-  # Normalize pseudo-versions for auto-discovered sub-modules.
-  autoVersionNormalize =
-    lib.concatStringsSep "\n"
-    (map (
-        sm: ''
-          sed -i 's|${sm.modulePath} v0\.0\.0-[^ ]*|${sm.modulePath} ${subModuleVersion}|g' go.mod
-        ''
-      )
-      allDiscovered);
+  # Normalize pseudo-versions for ALL sub-modules so replace directives match.
+  # Replaces "v0.0.0-20260101000000-abc123" with "v0.0.0".
+  subModuleVersionNormalize = lib.concatStringsSep "\n" (
+    map (sm: ''
+      sed -i 's|${sm.modulePath} v0\.0\.0-[^ ]*|${sm.modulePath} ${subModuleVersion}|g' go.mod
+    '') allSubModules
+  );
 
   # Strip stale `replace X => /home/...` directives (leftover dev artifacts).
   stripLocalReplacesScript = ''
@@ -293,45 +268,44 @@
     fi
   '';
 in
-  pkgs.stdenv.mkDerivation {
-    pname = "${name}-prepared-source";
-    inherit version src;
+pkgs.stdenv.mkDerivation {
+  pname = "${name}-prepared-source";
+  inherit version src;
 
-    dontBuild = true;
-    nativeBuildInputs = [goPkg];
+  dontBuild = true;
+  nativeBuildInputs = [ goPkg ];
 
-    postPatch = ''
-      mkdir -p _local_deps
-      ${copyDeps}
-      chmod -R u+w _local_deps
+  postPatch = ''
+    mkdir -p _local_deps
+    ${copyDeps}
+    chmod -R u+w _local_deps
 
-      ${lib.optionalString stripLocalReplaces stripLocalReplacesScript}
+    ${lib.optionalString stripLocalReplaces stripLocalReplacesScript}
 
-      ${postPatchExtra}
+    ${postPatchExtra}
 
-      ${subModuleVersionNormalize}
-      ${autoVersionNormalize}
+    ${subModuleVersionNormalize}
 
-      ${lib.optionalString hasRequires ''
-        echo "" >> go.mod
-        echo 'require (' >> go.mod
-        ${extraRequireLines}
-        echo ')' >> go.mod
-      ''}
-
-      if [ -n "$(cat go.mod | tr -d '\n')" ]; then
-        echo "" >> go.mod
-      fi
-      echo 'replace (' >> go.mod
-      ${replaceLines}
-      ${allSubModuleReplace}
+    ${lib.optionalString hasRequires ''
+      echo "" >> go.mod
+      echo 'require (' >> go.mod
+      ${extraRequireLines}
       echo ')' >> go.mod
+    ''}
 
-      ${lib.optionalString validatePrivateDeps validateScript}
-    '';
+    if [ -n "$(cat go.mod | tr -d '\n')" ]; then
+      echo "" >> go.mod
+    fi
+    echo 'replace (' >> go.mod
+    ${replaceLines}
+    ${allSubModuleReplace}
+    echo ')' >> go.mod
 
-    installPhase = ''
-      mkdir $out
-      cp -r . $out/
-    '';
-  }
+    ${lib.optionalString validatePrivateDeps validateScript}
+  '';
+
+  installPhase = ''
+    mkdir $out
+    cp -r . $out/
+  '';
+}

@@ -41,7 +41,13 @@
       imports = [ inputs.treefmt-nix.flakeModule ];
 
       perSystem =
-        { config, pkgs, lib, system, ... }:
+        {
+          config,
+          pkgs,
+          lib,
+          system,
+          ...
+        }:
         let
           goPkg = pkgs.go_1_26;
 
@@ -56,10 +62,7 @@
           ];
 
           buildTags = [ ];
-          buildTagsFlag =
-            if buildTags != [ ]
-            then "-tags=${lib.concatStringsSep "," buildTags}"
-            else "";
+          buildTagsFlag = if buildTags != [ ] then "-tags=${lib.concatStringsSep "," buildTags}" else "";
 
           # -- Use go-nix-helpers for private deps (optional) ----------------
           # mkPreparedSource = import (go-nix-helpers + "/mkPreparedSource.nix") {
@@ -140,7 +143,10 @@
               type = "app";
               program = pkgs.writeShellApplication {
                 name = "run-lint";
-                runtimeInputs = [ goPkg pkgs.golangci-lint ];
+                runtimeInputs = [
+                  goPkg
+                  pkgs.golangci-lint
+                ];
                 text = "golangci-lint run ./...";
               };
             };
