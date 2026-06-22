@@ -154,3 +154,120 @@ cat result-auto/go.mod                                  # inspect generated go.m
 | `validatePrivateDeps` | `true`                              | Verify every private require has a replace directive                                                                    |
 | `privateDepPattern`   | `"github\\.com/[Ll]ars[Aa]rtmann/"` | ERE regex matching private module paths that must have a replace. Override to validate deps outside the LarsArtmann org |
 | `postPatchExtra`      | `""`                                | Additional shell commands appended to postPatch                                                                         |
+
+---
+
+## `mkGoFlake.nix`
+
+Shared flake-parts module that generates standard flake outputs from a single config attrset.
+Eliminates ~150 lines of duplicated flake.nix boilerplate per project.
+
+### What it generates
+
+- `packages.default` + `packages.<pname>` — buildGoModule with private deps via mkPreparedSource
+- `apps.default`, `apps.test`, `apps.lint` — standard CLI entrypoints
+- `devShells.default`, `devShells.ci` — Go + golangci-lint, with optional extras
+- `checks.format` (treefmt), `checks.build` (package build)
+- `treefmt` — gofumpt + goimports + nixfmt
+- `flake.overlays.default` — expose package for other flakes
+
+### Usage
+
+```nix
+{
+  inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    flake-parts = { url = "github:hercules-ci/flake-parts"; inputs.nixpkgs-lib.follows = "nixpkgs"; };
+    systems.url = "github:nix-systems/default";
+    treefmt-nix = { url = "github:numtide/treefmt-nix"; inputs.nixpkgs.follows = "nixpkgs"; };
+    go-nix-helpers = {
+      url = "git+ssh://git@github.com/LarsArtmann/go-nix-helpers?ref=master";
+      flake = false;
+    };
+    # Private deps (flake = false)
+    go-cqrs-lite = {
+      url = "git+ssh://git@github.com/LarsArtmann/go-cqrs-lite?ref=master";
+      flake = false;
+    };
+  };
+
+  outputs = inputs@{ self, ... }:
+    flake-parts.lib.mkFlake { inherit inputs; }
+      (import (inputs.go-nix-helpers + "/mkGoFlake.nix") {
+        inherit inputs self;
+        pname = "my-project";
+        version = "0.1.0";
+        vendorHash = "sha256-AAA...";
+        description = "What this project does";
+        src = ./.;
+        deps = {
+          "github.com/larsartmann/go-cqrs-lite" = inputs.go-cqrs-lite;
+        };
+      });
+}
+```
+
+That's the entire flake.nix. No perSystem boilerplate, no manual devShell/checks/treefmt config.
+
+### Parameters
+
+| Parameter             | Default                              | Description                                                        |
+| --------------------- | ------------------------------------ | ------------------------------------------------------------------ |
+| `inputs`              | (required)                           | Consumer's full flake inputs attrset                               |
+| `self`                | (required)                           | Consumer's flake self reference                                    |
+| `pname`               | (required)                           | Package name (e.g. `"my-project"`)                                 |
+| `version`             | (required)                           | Version string                                                     |
+| `vendorHash`          | (required)                           | Vendor hash for buildGoModule                                      |
+| `description`         | (required)                           | Short description for `meta.description`                           |
+| `src`                 | (required)                           | Source path (usually `./.`)                                        |
+| `deps`                | `{}`                                 | Private dep map for mkPreparedSource (empty = no prepared source)  |
+| `subModules`          | `{}`                                 | Sub-module overrides for mkPreparedSource                          |
+| `postPatchExtra`      | `""`                                 | Extra postPatch commands for mkPreparedSource                      |
+| `doCheck`             | `true`                               | Whether to run Go tests in buildGoModule                           |
+| `ldflags`             | `null` (auto-computed)              | Custom ldflags (default: `["-s" "-w" "-X main.version=${version}"]`) |
+| `goPkgAttr`           | `"go_1_26"`                          | Which nixpkgs Go attribute to use                                  |
+| `buildGoModuleOverrides` | `{}`                             | Extra/override attrs merged into buildGoModule                     |
+| `devShellExtraPackages` | `_pkgs: []`                       | Function receiving pkgs, returns extra devShell packages           |
+| `devShellShellHook`   | `""` (auto: echoes pname + version) | Custom shell hook text                                             |
+| `shellExtraEnv`       | `{}`                                 | Extra env vars in both devShells (e.g. `{ GOTOOLCHAIN = "local"; }`) |
+| `extraApps`           | `_: {}`                              | Function receiving `{config, pkgs, lib, goPkg, package}`, returns extra apps |
+| `extraChecks`         | `_: {}`                              | Function receiving `{config, pkgs, lib, goPkg, package}`, returns extra checks |
+| `extraFlake`          | `{}`                                 | Extra flake-level outputs (e.g. nixosModules)                      |
+
+### Project-specific customisation
+
+For projects that need extra apps, NixOS modules, or custom build flags:
+
+```nix
+(import (inputs.go-nix-helpers + "/mkGoFlake.nix") {
+  inherit inputs self;
+  pname = "crush-daily";
+  version = "0.1.0";
+  vendorHash = "sha256-...";
+  description = "Daily AI-powered insights";
+  src = ./.;
+  deps = { ... };
+
+  # Extra env for both devShells
+  shellExtraEnv = { GOTOOLCHAIN = "local"; };
+
+  # Extra devShell packages
+  devShellExtraPackages = pkgs: [ pkgs.gotools pkgs.trash-cli ];
+
+  # Custom build overrides
+  buildGoModuleOverrides = {
+    env = { CGO_ENABLED = "0"; };
+    preBuild = ''export HOME=$TMPDIR; go mod tidy'';
+  };
+
+  # Extra checks (e.g. a separate test check)
+  extraChecks = { config, ... }: {
+    test = config.packages.default.overrideAttrs (_: { doCheck = true; });
+  };
+
+  # NixOS module
+  extraFlake = {
+    nixosModules.my-project = { ... };
+  };
+})
+```

@@ -35,6 +35,7 @@
       #   (b) flake lib (works when imported as a real flake):
       #       mkPreparedSource = go-nix-helpers.lib.mkPreparedSource { inherit pkgs lib; goPkg = pkgs.go_1_26; };
       flake.lib.mkPreparedSource = import ./mkPreparedSource.nix;
+      flake.lib.mkGoFlake = import ./mkGoFlake.nix;
 
       perSystem =
         {

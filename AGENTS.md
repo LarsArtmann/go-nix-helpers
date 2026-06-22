@@ -4,7 +4,11 @@ Shared Nix helpers for LarsArtmann Go repositories. This is a **Nix library**, n
 
 ## What this project does
 
-`mkPreparedSource.nix` solves one problem: Go repos with private dependencies can't fetch them inside the Nix sandbox (no SSH, no network). The helper copies flake-input deps into `_local_deps/` and injects `replace` directives into `go.mod` so the Go toolchain resolves them locally.
+This repo provides two Nix helpers for LarsArtmann Go projects:
+
+1. **`mkPreparedSource.nix`** — Solves private Go dependency injection for Nix sandbox builds. Go repos with private dependencies can't fetch them inside the Nix sandbox (no SSH, no network). This helper copies flake-input deps into `_local_deps/` and injects `replace` directives into `go.mod`.
+
+2. **`mkGoFlake.nix`** — A shared flake-parts module that generates standard flake outputs (packages, apps, devShells, checks, treefmt, overlay) from a single config attrset. Eliminates ~150 lines of duplicated flake.nix boilerplate per project.
 
 ## Consumption pattern
 
@@ -36,6 +40,7 @@ nix run .#verifyValidation         # negative-case validation test (run outside 
 ## Architecture
 
 - **`mkPreparedSource.nix`** — the core helper. Takes `{pkgs, lib, goPkg}` then `{name, src, deps, ...}`. Returns a derivation that produces a patched source tree.
+- **`mkGoFlake.nix`** — shared flake-parts module. Takes a config attrset with `{inputs, self, pname, version, vendorHash, description, src, deps, ...}`. Returns a flake-parts module attrset with packages, apps, devShells, checks, treefmt, and overlay. Consumers call it as `import (go-nix-helpers + "/mkGoFlake.nix") { ... }` inside `flake-parts.lib.mkFlake`.
 - **Auto-discovery** — scans each dep source for subdirectories containing `go.mod`, reads the module path, and generates replace directives automatically. No manual `subModules` list needed.
 - **Unified sub-module pipeline** — explicit `subModules` entries are mapped into the same `{modulePath, localDir}` shape as auto-discovered ones, then a single replace generator and single version normalizer process both. (Unified 2026-06-19; previously was a split brain with 4 duplicate code paths.)
 - **`/vN` handling** — `stripVersionSuffix` strips `/v2`, `/v3` etc. from local directory paths while keeping the full versioned module path in replace directives.
@@ -53,7 +58,8 @@ nix run .#verifyValidation         # negative-case validation test (run outside 
 
 | File | Purpose |
 |---|---|
-| `mkPreparedSource.nix` | Core helper — the whole point of this repo |
+| `mkPreparedSource.nix` | Core helper — solves private Go dep injection for Nix sandbox builds |
+| `mkGoFlake.nix` | Shared flake-parts module — generates standard packages/apps/devShells/checks/treefmt/overlay from one config attrset |
 | `flake.nix` | Self-hosting: checks, formatter, devShell, lib export |
 | `test.nix` | Integration tests (auto-discovery, explicit, validation) |
 | `templates/go-flake-parts/flake.nix` | Gold-standard template for new Go projects |
