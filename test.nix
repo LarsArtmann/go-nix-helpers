@@ -29,6 +29,30 @@ let
     go 1.26
     EOF
     done
+    # Depth-2 nested module with /vN in the MIDDLE of the module path
+    # (simulates go-cqrs-lite's event/v3/eventtest)
+    mkdir -p $out/event/eventtest
+    cat > $out/event/eventtest/go.mod <<'EOF'
+    module github.com/larsartmann/mock-dep/event/v3/eventtest
+    go 1.26
+    EOF
+    # Depth-2 nested module under a sub-module (simulates storage/memory)
+    mkdir -p $out/internal/mem
+    cat > $out/internal/mem/go.mod <<'EOF'
+    module github.com/larsartmann/mock-dep/internal/mem/v3
+    go 1.26
+    EOF
+    # Excluded directories: example and testdata should NOT be discovered
+    mkdir -p $out/example/demo
+    cat > $out/example/demo/go.mod <<'EOF'
+    module github.com/larsartmann/mock-dep/example/demo
+    go 1.26
+    EOF
+    mkdir -p $out/testdata/fixtures
+    cat > $out/testdata/fixtures/go.mod <<'EOF'
+    module github.com/larsartmann/mock-dep/testdata/fixtures
+    go 1.26
+    EOF
     # Add a non-module directory (no go.mod) to verify it's skipped
     mkdir -p $out/docs
     echo "documentation" > $out/docs/README.md
@@ -43,6 +67,7 @@ let
     require (
       github.com/larsartmann/mock-dep/codec/v2 v0.0.0
       github.com/larsartmann/mock-dep/storage/v2 v0.0.0
+      github.com/larsartmann/mock-dep/event/v3/eventtest v0.0.0
     )
   '';
 
@@ -128,7 +153,7 @@ in
     cat "$GOMOD"
     echo ""
 
-    # Check that all three sub-modules have replace directives
+    # Check that all three top-level sub-modules have replace directives
     for mod in codec storage kv; do
       path="github.com/larsartmann/mock-dep/$mod/v2"
       if grep -qF "$path => " "$GOMOD"; then
@@ -145,6 +170,44 @@ in
     else
       echo "FAIL: main dep missing replace"
       exit 1
+    fi
+
+    # Check depth-2 nested module with mid-path /vN: event/v3/eventtest
+    if grep -qF "github.com/larsartmann/mock-dep/event/v3/eventtest => " "$GOMOD"; then
+      echo "PASS: depth-2 nested eventtest has replace"
+    else
+      echo "FAIL: depth-2 nested eventtest missing replace"
+      exit 1
+    fi
+    # Verify the local dir is event/eventtest (NOT event/v3/eventtest)
+    if grep -qF "event/v3/eventtest => ./_local_deps/mock-dep/event/eventtest" "$GOMOD"; then
+      echo "PASS: eventtest localDir correctly strips mid-path /v3"
+    else
+      echo "FAIL: eventtest localDir has wrong path (expected event/eventtest)"
+      grep "eventtest" "$GOMOD"
+      exit 1
+    fi
+
+    # Check depth-2 nested module under a regular sub-module: internal/mem/v3
+    if grep -qF "github.com/larsartmann/mock-dep/internal/mem/v3 => " "$GOMOD"; then
+      echo "PASS: depth-2 nested internal/mem has replace"
+    else
+      echo "FAIL: depth-2 nested internal/mem missing replace"
+      exit 1
+    fi
+
+    # Check that excluded directories are NOT in replaces
+    if grep -qF "mock-dep/example/demo" "$GOMOD"; then
+      echo "FAIL: excluded directory 'example/demo' got a replace directive"
+      exit 1
+    else
+      echo "PASS: example/ directories excluded from discovery"
+    fi
+    if grep -qF "mock-dep/testdata/fixtures" "$GOMOD"; then
+      echo "FAIL: excluded directory 'testdata/fixtures' got a replace directive"
+      exit 1
+    else
+      echo "PASS: testdata/ directories excluded from discovery"
     fi
 
     # Check that docs dir (no go.mod) was NOT added as a sub-module

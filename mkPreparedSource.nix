@@ -8,14 +8,19 @@
 # go.mod so the Go toolchain resolves them locally.
 #
 # Key features:
-#   - Auto-discovers sub-modules: scans each dep source for subdirectories
-#     containing `go.mod` and generates replace directives automatically.
+#   - Recursive auto-discovery: walks each dep source recursively to find
+#     ALL go.mod files at any depth (not just top-level) and generates replace
+#     directives automatically. Excludes example/testdata/vendor directories.
 #     No manual `subModules` list needed (though explicit entries are merged).
 #   - Build-time validation: verifies every private module require in go.mod
 #     has a corresponding replace directive, failing with a clear message
 #     instead of a cryptic "could not read Username" SSH error.
-#   - /vN major version suffix handling: the /vN suffix is kept in the module
-#     path but stripped from the local directory path.
+#   - /vN major version suffix handling: ALL /vN segments are stripped from
+#     local directory paths (e.g. "event/v3/eventtest" → "event/eventtest"),
+#     while the full versioned path is kept in replace directives.
+#   - Strips stale local-path replaces: all absolute (/home/...) and relative
+#     (./..., ../...) replace directives are removed before mkPreparedSource
+#     appends its own ./_local_deps/ replaces.
 #
 # Usage:
 #   mkPreparedSource = import (go-nix-helpers + "/mkPreparedSource.nix") {
@@ -49,17 +54,21 @@
 #                         path but stripped from the local directory path.
 #                         (default: {} — auto-discovery handles everything)
 #
-#   autoSubModules       When true, scan each dep source for subdirectories
-#                         containing go.mod and auto-generate replace directives.
-#                         Extra replaces are harmless no-ops for unused modules.
-#                         (default: true)
+#   autoSubModules       When true, recursively scan each dep source for ALL
+#                         go.mod files (at any depth) and auto-generate replace
+#                         directives. Extra replaces are harmless no-ops for
+#                         unused modules. (default: true)
+#
+#   excludeSubModuleDirs Directory names to skip during recursive auto-discovery
+#                         (default: ["example" "examples" "testdata" ".git"
+#                          "vendor" "node_modules"]).
 #
 #   requireDeps          Attrset of { "import/path" = "version"; } (rarely needed).
 #                         Manually inject require lines for sub-modules not yet
 #                         in go.mod.
 #
 #   subModuleVersion     Version for pseudo-version normalization (default: "v0.0.0").
-#   stripLocalReplaces   Strip stale `replace X => /home/...` directives (default: true).
+#   stripLocalReplaces   Strip stale local-path replace directives (default: true).
 #   validatePrivateDeps  Verify every private require has a replace (default: true).
 #   privateDepPattern    ERE regex matching private module paths in go.mod that must
 #                        have a replace directive (default: "github\\.com/[Ll]ars[Aa]rtmann/").
@@ -77,6 +86,14 @@
   version ? "dev",
   subModules ? { },
   autoSubModules ? true,
+  excludeSubModuleDirs ? [
+    "example"
+    "examples"
+    "testdata"
+    ".git"
+    "vendor"
+    "node_modules"
+  ],
   requireDeps ? { },
   subModuleVersion ? "v0.0.0",
   stripLocalReplaces ? true,
@@ -89,15 +106,14 @@ let
   # Path helpers
   # ---------------------------------------------------------------------------
 
-  # Strip trailing /vN major version suffix from a path.
-  # "codec/v2" → "codec", "core" → "core"
+  # Strip ALL /vN major version suffixes from a path — not just trailing.
+  # "codec/v2" → "codec", "event/v3/eventtest" → "event/eventtest", "core" → "core"
   stripVersionSuffix =
     path:
     let
       parts = lib.splitString "/" path;
-      last = lib.last parts;
     in
-    if builtins.match "v[0-9]+" last != null then lib.concatStringsSep "/" (lib.init parts) else path;
+    lib.concatStringsSep "/" (lib.filter (p: builtins.match "v[0-9]+" p == null) parts);
 
   # Extract repo name from Go import path, stripping any /vN major version suffix.
   # "github.com/larsartmann/go-cqrs-lite" → "go-cqrs-lite"
@@ -127,11 +143,12 @@ let
   # Auto-discovery: scan dep source for sub-modules
   # ---------------------------------------------------------------------------
 
-  # Discover sub-modules by scanning a dep source for subdirectories with go.mod.
-  # Returns: [ { modulePath, localDir; } ]
+  # Discover sub-modules by recursively scanning a dep source for go.mod files
+  # at ANY depth (not just top-level). Returns: [ { modulePath, localDir; } ]
   # Example for go-cqrs-lite:
-  #   [ { modulePath = ".../catalog/v2"; localDir = "./_local_deps/go-cqrs-lite/catalog"; }
-  #     { modulePath = ".../codec/v2";   localDir = "./_local_deps/go-cqrs-lite/codec"; }
+  #   [ { modulePath = ".../catalog/v2";           localDir = "./_local_deps/go-cqrs-lite/catalog"; }
+  #     { modulePath = ".../event/v3/eventtest";   localDir = "./_local_deps/go-cqrs-lite/event/eventtest"; }
+  #     { modulePath = ".../storage/memory/v3";    localDir = "./_local_deps/go-cqrs-lite/storage/memory"; }
   #     ... ]
   discoverSubModules =
     depPath: depSrc:
@@ -139,21 +156,29 @@ let
       [ ]
     else
       let
-        entries = builtins.readDir depSrc;
-        dirs = lib.attrNames (lib.filterAttrs (_: type: type == "directory") entries);
-        dirsGoMod = lib.filter (dir: builtins.pathExists "${depSrc}/${dir}/go.mod") dirs;
-        basename = repoName depPath;
-        discover =
+        # Recursively walk the dep tree, collecting relative paths to every
+        # directory that contains a go.mod (excluding the dep root itself
+        # and excluded directories like example/testdata/vendor).
+        walk =
           dir:
           let
-            modulePath = readModulePath "${depSrc}/${dir}/go.mod";
+            entries = builtins.readDir dir;
+            allDirs = lib.attrNames (lib.filterAttrs (_: type: type == "directory") entries);
+            dirs = lib.filter (d: !(lib.elem d excludeSubModuleDirs)) allDirs;
+            subs = lib.flatten (map (d: walk "${dir}/${d}") dirs);
           in
-          {
-            inherit modulePath;
-            localDir = "./_local_deps/${basename}/${dir}";
-          };
+          if builtins.pathExists "${dir}/go.mod" && dir != rootDir then
+            [ (lib.removePrefix (rootDir + "/") dir) ] ++ subs
+          else
+            subs;
+        rootDir = toString depSrc;
+        found = walk rootDir;
+        basename = repoName depPath;
       in
-      map discover dirsGoMod;
+      map (rel: {
+        modulePath = readModulePath "${depSrc}/${rel}/go.mod";
+        localDir = "./_local_deps/${basename}/${rel}";
+      }) found;
 
   # Collect all auto-discovered sub-modules across all deps.
   allDiscovered = lib.flatten (
@@ -225,9 +250,12 @@ let
     '') allSubModules
   );
 
-  # Strip stale `replace X => /home/...` directives (leftover dev artifacts).
+  # Strip stale local-path replace directives (leftover dev artifacts from
+  # go.work, absolute-path development, or ./_third_party stubs).
+  # mkPreparedSource appends fresh ./_local_deps/ replaces after this runs.
   stripLocalReplacesScript = ''
-    sed -i '/=> \/home\//d' go.mod
+    sed -i '/=> \//d' go.mod
+    sed -i '/=> \./d' go.mod
     sed -i '/^replace ($/{N;/\n)$/d}' go.mod
   '';
 

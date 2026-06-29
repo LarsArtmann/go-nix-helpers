@@ -41,9 +41,10 @@ nix run .#verifyValidation         # negative-case validation test (run outside 
 
 - **`mkPreparedSource.nix`** — the core helper. Takes `{pkgs, lib, goPkg}` then `{name, src, deps, ...}`. Returns a derivation that produces a patched source tree.
 - **`mkGoFlake.nix`** — shared flake-parts module. Takes a config attrset with `{inputs, self, pname, version, vendorHash, description, src, deps, ...}`. Returns a flake-parts module attrset with packages, apps, devShells, checks, treefmt, and overlay. Consumers call it as `import (go-nix-helpers + "/mkGoFlake.nix") { ... }` inside `flake-parts.lib.mkFlake`.
-- **Auto-discovery** — scans each dep source for subdirectories containing `go.mod`, reads the module path, and generates replace directives automatically. No manual `subModules` list needed.
+- **Recursive auto-discovery** — walks each dep source recursively to find ALL `go.mod` files at any depth (not just top-level), reads the module path, and generates replace directives automatically. Excludes example/testdata/vendor directories.
 - **Unified sub-module pipeline** — explicit `subModules` entries are mapped into the same `{modulePath, localDir}` shape as auto-discovered ones, then a single replace generator and single version normalizer process both. (Unified 2026-06-19; previously was a split brain with 4 duplicate code paths.)
-- **`/vN` handling** — `stripVersionSuffix` strips `/v2`, `/v3` etc. from local directory paths while keeping the full versioned module path in replace directives.
+- **`/vN` handling** — `stripVersionSuffix` filters ALL `/vN` segments from local directory paths (e.g. `event/v3/eventtest` → `event/eventtest`), while keeping the full versioned module path in replace directives.
+- **Local-path stripping** — `stripLocalReplacesScript` strips all absolute (`/home/...`) and relative (`./...`, `../...`) replace directives before appending fresh `./_local_deps/` replaces.
 - **Build-time validation** — verifies every private module require has a matching replace directive, failing with a clear message instead of the cryptic SSH error.
 
 ## Gotchas

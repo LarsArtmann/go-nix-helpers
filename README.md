@@ -63,8 +63,10 @@ the next `nix flake update` picks it up automatically.
 ### Major version suffixes (`/v2`, `/v3`, ...)
 
 Go modules at v2+ use a `/vN` suffix in the import path. `mkPreparedSource` handles
-this automatically — the repo name is extracted from the path, stripping the version
-suffix so the local directory name is always the repo name (not `v2`, `v3`, etc.).
+this automatically — ALL `/vN` segments are stripped from local directory paths
+(e.g. `event/v3/eventtest` → `event/eventtest`), while the full versioned path is
+kept in replace directives. The repo name is extracted from the path, stripping
+the version suffix so the local directory name is always the repo name.
 
 ```nix
 deps = {
@@ -80,15 +82,21 @@ different repos.
 
 ### Auto-discovery
 
-When `autoSubModules` is `true` (the default), `mkPreparedSource` scans each dep
-source for subdirectories containing `go.mod`. For each one, it:
+When `autoSubModules` is `true` (the default), `mkPreparedSource` **recursively** walks
+each dep source to find ALL `go.mod` files at any depth (not just top-level). For each
+one, it:
 
 1. Reads the module path from `go.mod` line 1
-2. Generates a replace directive pointing to the local copy
+2. Computes the local directory from the actual filesystem path (not the module path)
+3. Generates a replace directive pointing to the local copy
 
-This means you no longer need to maintain a manual list of sub-modules. When a
-dependency repo adds a new sub-module (e.g., go-cqrs-lite adds `kv/v2`), it's
-picked up automatically on the next `nix flake update`.
+Directories named `example`, `examples`, `testdata`, `.git`, `vendor`, and
+`node_modules` are excluded from discovery (override via `excludeSubModuleDirs`).
+
+This means you no longer need to maintain a manual list of sub-modules or write
+`postPatchExtra` workarounds for nested modules. When a dependency repo adds a new
+sub-module at any depth (e.g., go-cqrs-lite adds `event/v3/eventtest` at depth 2),
+it's picked up automatically on the next `nix flake update`.
 
 Extra replace directives for unused sub-modules are harmless — `go mod tidy`
 ignores them.
