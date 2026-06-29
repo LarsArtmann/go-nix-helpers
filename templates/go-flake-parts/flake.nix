@@ -51,7 +51,7 @@
         let
           goPkg = pkgs.go_1_26;
 
-          version = self.shortRev or self.dirtyRev or "dev";
+          version = self.shortRev or self.dirtyShortRev or "dev";
           commit = self.rev or "dirty";
 
           ldflags = [
