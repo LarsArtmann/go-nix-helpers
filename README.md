@@ -219,28 +219,28 @@ That's the entire flake.nix. No perSystem boilerplate, no manual devShell/checks
 
 ### Parameters
 
-| Parameter             | Default                              | Description                                                        |
-| --------------------- | ------------------------------------ | ------------------------------------------------------------------ |
-| `inputs`              | (required)                           | Consumer's full flake inputs attrset                               |
-| `self`                | (required)                           | Consumer's flake self reference                                    |
-| `pname`               | (required)                           | Package name (e.g. `"my-project"`)                                 |
-| `version`             | (required)                           | Version string                                                     |
-| `vendorHash`          | (required)                           | Vendor hash for buildGoModule                                      |
-| `description`         | (required)                           | Short description for `meta.description`                           |
-| `src`                 | (required)                           | Source path (usually `./.`)                                        |
-| `deps`                | `{}`                                 | Private dep map for mkPreparedSource (empty = no prepared source)  |
-| `subModules`          | `{}`                                 | Sub-module overrides for mkPreparedSource                          |
-| `postPatchExtra`      | `""`                                 | Extra postPatch commands for mkPreparedSource                      |
-| `doCheck`             | `true`                               | Whether to run Go tests in buildGoModule                           |
-| `ldflags`             | `null` (auto-computed)              | Custom ldflags (default: `["-s" "-w" "-X main.version=${version}"]`) |
-| `goPkgAttr`           | `"go_1_26"`                          | Which nixpkgs Go attribute to use                                  |
-| `buildGoModuleOverrides` | `{}`                             | Extra/override attrs merged into buildGoModule                     |
-| `devShellExtraPackages` | `_pkgs: []`                       | Function receiving pkgs, returns extra devShell packages           |
-| `devShellShellHook`   | `""` (auto: echoes pname + version) | Custom shell hook text                                             |
-| `shellExtraEnv`       | `{}`                                 | Extra env vars in both devShells (e.g. `{ GOTOOLCHAIN = "local"; }`) |
-| `extraApps`           | `_: {}`                              | Function receiving `{config, pkgs, lib, goPkg, package}`, returns extra apps |
-| `extraChecks`         | `_: {}`                              | Function receiving `{config, pkgs, lib, goPkg, package}`, returns extra checks |
-| `extraFlake`          | `{}`                                 | Extra flake-level outputs (e.g. nixosModules)                      |
+| Parameter                | Default                             | Description                                                                    |
+| ------------------------ | ----------------------------------- | ------------------------------------------------------------------------------ |
+| `inputs`                 | (required)                          | Consumer's full flake inputs attrset                                           |
+| `self`                   | (required)                          | Consumer's flake self reference                                                |
+| `pname`                  | (required)                          | Package name (e.g. `"my-project"`)                                             |
+| `version`                | (required)                          | Version string                                                                 |
+| `vendorHash`             | (required)                          | Vendor hash for buildGoModule                                                  |
+| `description`            | (required)                          | Short description for `meta.description`                                       |
+| `src`                    | (required)                          | Source path (usually `./.`)                                                    |
+| `deps`                   | `{}`                                | Private dep map for mkPreparedSource (empty = no prepared source)              |
+| `subModules`             | `{}`                                | Sub-module overrides for mkPreparedSource                                      |
+| `postPatchExtra`         | `""`                                | Extra postPatch commands for mkPreparedSource                                  |
+| `doCheck`                | `true`                              | Whether to run Go tests in buildGoModule                                       |
+| `ldflags`                | `null` (auto-computed)              | Custom ldflags (default: `["-s" "-w" "-X main.version=${version}"]`)           |
+| `goPkgAttr`              | `"go_1_26"`                         | Which nixpkgs Go attribute to use                                              |
+| `buildGoModuleOverrides` | `{}`                                | Extra/override attrs merged into buildGoModule                                 |
+| `devShellExtraPackages`  | `_pkgs: []`                         | Function receiving pkgs, returns extra devShell packages                       |
+| `devShellShellHook`      | `""` (auto: echoes pname + version) | Custom shell hook text                                                         |
+| `shellExtraEnv`          | `{}`                                | Extra env vars in both devShells (e.g. `{ GOTOOLCHAIN = "local"; }`)           |
+| `extraApps`              | `_: {}`                             | Function receiving `{config, pkgs, lib, goPkg, package}`, returns extra apps   |
+| `extraChecks`            | `_: {}`                             | Function receiving `{config, pkgs, lib, goPkg, package}`, returns extra checks |
+| `extraFlake`             | `{}`                                | Extra flake-level outputs (e.g. nixosModules)                                  |
 
 ### Project-specific customisation
 

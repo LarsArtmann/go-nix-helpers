@@ -57,13 +57,13 @@ nix run .#verifyValidation         # negative-case validation test (run outside 
 
 ## Key files
 
-| File | Purpose |
-|---|---|
-| `mkPreparedSource.nix` | Core helper — solves private Go dep injection for Nix sandbox builds |
-| `mkGoFlake.nix` | Shared flake-parts module — generates standard packages/apps/devShells/checks/treefmt/overlay from one config attrset |
-| `flake.nix` | Self-hosting: checks, formatter, devShell, lib export |
-| `test.nix` | Integration tests (auto-discovery, explicit, validation) |
-| `templates/go-flake-parts/flake.nix` | Gold-standard template for new Go projects |
-| `scripts/nix-lint.sh` | Lints flake.nix files across all projects for common errors |
-| `scripts/dashboard.sh` | Overview of flake check status across all projects |
-| `docs/flake-patterns.md` | Reference: correct patterns and anti-patterns |
+| File                                 | Purpose                                                                                                               |
+| ------------------------------------ | --------------------------------------------------------------------------------------------------------------------- |
+| `mkPreparedSource.nix`               | Core helper — solves private Go dep injection for Nix sandbox builds                                                  |
+| `mkGoFlake.nix`                      | Shared flake-parts module — generates standard packages/apps/devShells/checks/treefmt/overlay from one config attrset |
+| `flake.nix`                          | Self-hosting: checks, formatter, devShell, lib export                                                                 |
+| `test.nix`                           | Integration tests (auto-discovery, explicit, validation)                                                              |
+| `templates/go-flake-parts/flake.nix` | Gold-standard template for new Go projects                                                                            |
+| `scripts/nix-lint.sh`                | Lints flake.nix files across all projects for common errors                                                           |
+| `scripts/dashboard.sh`               | Overview of flake check status across all projects                                                                    |
+| `docs/flake-patterns.md`             | Reference: correct patterns and anti-patterns                                                                         |

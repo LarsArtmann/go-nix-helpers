@@ -85,7 +85,13 @@
 
       preparedSrc = mkPreparedSource {
         name = pname;
-        inherit version src deps subModules postPatchExtra;
+        inherit
+          version
+          src
+          deps
+          subModules
+          postPatchExtra
+          ;
       };
 
       finalSrc = if usePreparedSource then preparedSrc else src;
@@ -120,11 +126,21 @@
         program = "${pkgs.writeShellApplication { inherit name runtimeInputs text; }}/bin/${name}";
       };
 
-      finalShellHook = if devShellShellHook != "" then devShellShellHook else ''
-        echo "${pname} dev shell — $(go version)"'';
+      finalShellHook =
+        if devShellShellHook != "" then
+          devShellShellHook
+        else
+          ''echo "${pname} dev shell — $(go version)"'';
 
       perSystemArgs = {
-        inherit config pkgs lib goPkg package mkApp;
+        inherit
+          config
+          pkgs
+          lib
+          goPkg
+          package
+          mkApp
+          ;
       };
     in
     {
@@ -143,7 +159,8 @@
           goPkg
           pkgs.golangci-lint
         ] "golangci-lint run ./...";
-      } // (extraApps perSystemArgs);
+      }
+      // (extraApps perSystemArgs);
 
       devShells = {
         default = pkgs.mkShell (
@@ -151,7 +168,8 @@
             packages = [
               goPkg
               pkgs.golangci-lint
-            ] ++ (devShellExtraPackages pkgs);
+            ]
+            ++ (devShellExtraPackages pkgs);
             GOWORK = "off";
             shellHook = finalShellHook;
           }
@@ -172,7 +190,8 @@
       checks = {
         format = config.treefmt.build.check self;
         build = config.packages.default;
-      } // (extraChecks perSystemArgs);
+      }
+      // (extraChecks perSystemArgs);
 
       treefmt = {
         projectRootFile = "go.mod";
@@ -188,5 +207,6 @@
     overlays.default = final: _prev: {
       ${pname} = self.packages.${final.stdenv.system}.default;
     };
-  } // extraFlake;
+  }
+  // extraFlake;
 }

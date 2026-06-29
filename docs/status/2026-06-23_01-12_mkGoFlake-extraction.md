@@ -21,6 +21,7 @@ A flake-parts module that generates standard flake outputs from a single config 
 - **flake.overlays.default** — expose package for other flakes
 
 **Extension points** for project-specific needs:
+
 - `deps`, `subModules`, `postPatchExtra` — private dep configuration
 - `buildGoModuleOverrides` — extra/override buildGoModule attrs
 - `devShellExtraPackages`, `devShellShellHook`, `shellExtraEnv` — devShell customization
@@ -29,16 +30,17 @@ A flake-parts module that generates standard flake outputs from a single config 
 
 ### Migrations
 
-| Project | Before | After | Reduction |
-|---|---|---|---|
+| Project                    | Before    | After     | Reduction            |
+| -------------------------- | --------- | --------- | -------------------- |
 | Standup-Killer `flake.nix` | 229 lines | 118 lines | **-111 lines (48%)** |
-| crush-daily `flake.nix` | 387 lines | 296 lines | **-91 lines (24%)** |
+| crush-daily `flake.nix`    | 387 lines | 296 lines | **-91 lines (24%)**  |
 
 crush-daily retains more lines because of its 180-line NixOS module (preserved via `extraFlake`).
 
 ### Verification
 
 All three flakes pass `nix flake check --no-build`:
+
 - `go-nix-helpers` — `flake.lib.mkGoFlake` exported, 20 parameters with correct required/optional flags
 - `crush-daily` — all outputs match: packages (2), apps (4), checks (4), devShells (2), overlays (1), nixosModules (1)
 - `Standup-Killer` — all outputs match: packages (2), apps (3), checks (4), devShells (2), overlays (1)
@@ -81,6 +83,7 @@ Nothing. All verifications pass. No data loss, no broken builds.
 ## f) Top 25 Things to Get Done Next
 
 ### Critical (blocks consumers)
+
 1. **Commit and push go-nix-helpers** — mkGoFlake.nix, flake.nix, AGENTS.md, README.md
 2. **Commit crush-daily flake.nix migration**
 3. **Commit Standup-Killer flake.nix migration**
@@ -88,15 +91,18 @@ Nothing. All verifications pass. No data loss, no broken builds.
 5. **Update flake.lock in Standup-Killer** — after go-nix-helpers is pushed
 
 ### Template & Docs
+
 6. **Update `templates/go-flake-parts/flake.nix`** to use mkGoFlake
 7. **Add a "migration guide" section to README.md** — how to convert an existing flake
 8. **Update `docs/flake-patterns.md`** — reference mkGoFlake as the canonical pattern
 
 ### Extract More (from the comparison report)
+
 9. **Extract HHMM type** — into a shared package (standup-killer `domain.HHMM` vs crush-daily `config.HHMM`)
 10. **Extract event replay helper** — `event.ReplayInto(ctx, store, handler)` into go-cqrs-lite
 
 ### Other Consumer Migrations
+
 11. **Migrate BuildFlow flake.nix** to mkGoFlake
 12. **Migrate mr-sync flake.nix** to mkGoFlake
 13. **Migrate PMA flake.nix** to mkGoFlake
@@ -105,6 +111,7 @@ Nothing. All verifications pass. No data loss, no broken builds.
 16. **Migrate library-policy flake.nix** to mkGoFlake
 
 ### Refinements
+
 17. **Add `meta.description` to all generated apps** — silence nix flake check warnings
 18. **Add a test derivation for mkGoFlake** — verify it produces valid outputs for a minimal config
 19. **Consider a `subPackages` parameter** — for projects with `cmd/<name>/` entrypoints

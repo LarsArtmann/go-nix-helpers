@@ -250,12 +250,16 @@ let
     '') allSubModules
   );
 
-  # Strip stale local-path replace directives (leftover dev artifacts from
-  # go.work, absolute-path development, or ./_third_party stubs).
+  # Strip replace directives that point OUTSIDE the prepared source tree,
+  # where the path cannot exist inside the Nix sandbox:
+  #   - absolute paths (=> /home/..., => /tmp/...)  — dev-machine leftovers
+  #   - sibling/parent dirs (=> ../sibling)          — resolved via _local_deps
+  # In-tree replaces (=> ./submodule) are PRESERVED: the source tree is copied
+  # wholesale into the prepared source, so those paths resolve correctly.
   # mkPreparedSource appends fresh ./_local_deps/ replaces after this runs.
   stripLocalReplacesScript = ''
     sed -i '/=> \//d' go.mod
-    sed -i '/=> \./d' go.mod
+    sed -i '/=> \.\.\//d' go.mod
     sed -i '/^replace ($/{N;/\n)$/d}' go.mod
   '';
 
