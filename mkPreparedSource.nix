@@ -56,8 +56,9 @@
 #
 #   autoSubModules       When true, recursively scan each dep source for ALL
 #                         go.mod files (at any depth) and auto-generate replace
-#                         directives. Extra replaces are harmless no-ops for
-#                         unused modules. (default: true)
+#                         directives. Only submodules referenced in go.mod or
+#                         go.sum are kept — unused replaces break Go's vendor
+#                         consistency check. (default: true)
 #
 #   excludeSubModuleDirs Directory names to skip during recursive auto-discovery
 #                         (default: ["example" "examples" "testdata" ".git"
@@ -180,10 +181,26 @@ let
         localDir = "./_local_deps/${basename}/${rel}";
       }) found;
 
-  # Collect all auto-discovered sub-modules across all deps.
-  allDiscovered = lib.flatten (
+  # Collect all auto-discovered sub-modules across all deps, filtered to only
+  # those whose modulePath appears in go.mod or go.sum. Extra replaces for
+  # unused modules break Go's vendor consistency check when proxyVendor=false
+  # ("X is replaced in go.mod, but not marked as replaced in vendor/modules.txt").
+  allDiscoveredRaw = lib.flatten (
     lib.mapAttrsToList (depPath: depSrc: discoverSubModules depPath depSrc) deps
   );
+
+  # Read go.mod and go.sum to determine which modules are actually imported.
+  goModContent =
+    if builtins.pathExists "${src}/go.mod"
+    then builtins.readFile "${src}/go.mod"
+    else "";
+  goSumContent =
+    if builtins.pathExists "${src}/go.sum"
+    then builtins.readFile "${src}/go.sum"
+    else "";
+  depReferenceText = goModContent + "\n" + goSumContent;
+
+  allDiscovered = lib.filter (sm: sm.modulePath != "" && lib.hasInfix sm.modulePath depReferenceText) allDiscoveredRaw;
 
   # ---------------------------------------------------------------------------
   # Shell script generation
