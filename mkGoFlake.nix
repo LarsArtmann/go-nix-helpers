@@ -1,4 +1,15 @@
-# mkGoFlake.nix
+# mkGoFlake.nix  (DEPRECATED — use modules/go-standard.nix instead)
+#
+# This function-based approach is superseded by the flake-parts module
+# `go-standard`, which provides the same functionality via typed options.
+# New projects should use `flakeModules.go-standard`; existing consumers
+# will be migrated gradually.
+#
+# Migration: replace the `import ... mkGoFlake.nix` call with
+#   imports = [ inputs.go-nix-helpers.flakeModules.go-standard ];
+#   go-standard = { pname = "..."; vendorHash = "..."; ... };
+#
+# --- Original docs (kept for reference during migration) ---
 #
 # Shared flake-parts module for LarsArtmann Go projects.
 #
