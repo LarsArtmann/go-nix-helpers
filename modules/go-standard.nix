@@ -57,6 +57,13 @@ in
       description = "Vendor hash for buildGoModule (null = committed vendor/)";
     };
 
+    src = lib.mkOption {
+      type = lib.types.path;
+      default = self.outPath;
+      defaultText = "self.outPath";
+      description = "Source path for the Go module (use lib.fileset for filtering)";
+    };
+
     description = lib.mkOption {
       type = lib.types.str;
       default = "A LarsArtmann Go project";
@@ -160,7 +167,7 @@ in
           else
             null;
 
-        finalSrc = if usePreparedSource then preparedSrc else self.outPath;
+        finalSrc = if usePreparedSource then preparedSrc else cfg.src;
 
         buildGoModule = pkgs.buildGoModule.override { go = goPkg; };
 
@@ -188,7 +195,7 @@ in
               description = cfg.description;
               license = lib.licenses.mit;
               mainProgram = cfg.pname;
-              maintainers = [ lib.maintainers.larsartmann ];
+              maintainers = [ { name = "Lars Artmann"; github = "LarsArtmann"; } ];
             } // cfg.extraMeta;
           }
           // cfg.extraBuildAttrs

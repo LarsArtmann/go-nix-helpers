@@ -114,9 +114,10 @@
                   license = licenses.mit;
                   # NOTE: maintainers must reference handles registered in
                   # nixpkgs (lib/maintainers/maintainer-list.nix). Using an
-                  # unregistered handle like `maintainers.larsartmann` THROWS
-                  # and breaks `nix build`/`nix flake check`. Register yourself
-                  # in nixpkgs, then add: maintainers = [ maintainers.larsartmann ];
+                  # unregistered handle like `maintainers.larsartmann` produces
+                  # a silent error thunk that breaks `nix build`. Either register
+                  # in nixpkgs, or use an inline record:
+                  #   maintainers = [ { name = "Lars Artmann"; github = "LarsArtmann"; } ];
                   mainProgram = "REPLACE_ME";
                 };
               }
