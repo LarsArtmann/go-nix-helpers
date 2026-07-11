@@ -37,6 +37,8 @@
       flake.lib.mkPreparedSource = import ./mkPreparedSource.nix;
       flake.lib.mkGoFlake = import ./mkGoFlake.nix;
 
+      flake.flakeModules.go-standard = import ./modules/go-standard.nix;
+
       perSystem =
         {
           config,

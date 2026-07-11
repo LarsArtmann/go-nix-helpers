@@ -8,7 +8,9 @@ This repo provides two Nix helpers for LarsArtmann Go projects:
 
 1. **`mkPreparedSource.nix`** — Solves private Go dependency injection for Nix sandbox builds. Go repos with private dependencies can't fetch them inside the Nix sandbox (no SSH, no network). This helper copies flake-input deps into `_local_deps/` and injects `replace` directives into `go.mod`.
 
-2. **`mkGoFlake.nix`** — A shared flake-parts module that generates standard flake outputs (packages, apps, devShells, checks, treefmt, overlay) from a single config attrset. Eliminates ~150 lines of duplicated flake.nix boilerplate per project.
+2. **`mkGoFlake.nix`** — A function-based shared flake-parts module that generates standard flake outputs (packages, apps, devShells, checks, treefmt, overlay) from a single config attrset. Eliminates ~150 lines of duplicated flake.nix boilerplate per project.
+
+3. **`modules/go-standard.nix`** (NEW) — A proper flake-parts module exposed as `flakeModules.go-standard`. Provides the same outputs as mkGoFlake but via the module options system (`go-standard.pname`, `go-standard.vendorHash`, etc.). One-line adoption: `imports = [ inputs.go-nix-helpers.flakeModules.go-standard ];`. Requires go-nix-helpers as a **real flake** input (not `flake = false`).
 
 ## Consumption pattern
 
@@ -26,7 +28,27 @@ mkPreparedSource = import (go-nix-helpers + "/mkPreparedSource.nix") {
 };
 ```
 
-Since 2026-06-19, the repo also has a `flake.nix` exposing `lib.mkPreparedSource` — both import patterns work. 7+ downstream consumers exist (BuildFlow, mr-sync, PMA, go-structure-linter, branching-flow, Standup-Killer, library-policy).
+Since 2026-06-19, the repo also has a `flake.nix` exposing `lib.mkPreparedSource` and `flakeModules.go-standard` — both import patterns work. 7+ downstream consumers exist (BuildFlow, mr-sync, PMA, go-structure-linter, branching-flow, Standup-Killer, library-policy).
+
+### go-standard module adoption
+
+```nix
+# Consumer must add go-nix-helpers as a REAL flake (not flake = false)
+go-nix-helpers = {
+  url = "git+ssh://git@github.com/LarsArtmann/go-nix-helpers?ref=master";
+  inputs.nixpkgs.follows = "nixpkgs";
+};
+
+# Then in outputs:
+flake-parts.lib.mkFlake { inherit inputs; } {
+  imports = [ inputs.go-nix-helpers.flakeModules.go-standard ];
+  go-standard = {
+    pname = "my-project";
+    vendorHash = "sha256-...";
+    description = "What it does";
+  };
+};
+```
 
 ## Build / test commands
 
@@ -49,7 +71,7 @@ nix run .#verifyValidation         # negative-case validation test (run outside 
 
 ## Gotchas
 
-- **`maintainers.larsartmann` is NOT registered in nixpkgs** — the template's `meta.maintainers` must not reference it (throws at eval time). Register in nixpkgs first, or omit.
+- **`maintainers.larsartmann` is NOT registered in nixpkgs** — but works in `meta.maintainers` because Nix evaluation is lazy enough that `nix flake check` and builds pass. The attribute is never deeply evaluated during normal operations. Register in nixpkgs for full correctness (nix-env --maintainer queries).
 - **`goPkg` parameter is dead weight** — the derivation has `dontBuild = true` and never invokes `go`. Kept for API compatibility.
 - **`privateDepPattern` default is LarsArtmann-specific** — `validatePrivateDeps` only validates modules matching `github\.com/[Ll]ars[Aa]rtmann/` by default. Override for other orgs.
 - **`validationTest` is a deliberately-failing derivation** — it cannot be a Nix dependency of a passing derivation. The `verify` check only tests success paths; `verifyValidation` is a separate shell script run outside the sandbox.
@@ -61,9 +83,11 @@ nix run .#verifyValidation         # negative-case validation test (run outside 
 | ------------------------------------ | --------------------------------------------------------------------------------------------------------------------- |
 | `mkPreparedSource.nix`               | Core helper — solves private Go dep injection for Nix sandbox builds                                                  |
 | `mkGoFlake.nix`                      | Shared flake-parts module — generates standard packages/apps/devShells/checks/treefmt/overlay from one config attrset |
-| `flake.nix`                          | Self-hosting: checks, formatter, devShell, lib export                                                                 |
+| `modules/go-standard.nix`            | Proper flake-parts module (exposed as `flakeModules.go-standard`) — one-line adoption via imports                     |
+| `flake.nix`                          | Self-hosting: checks, formatter, devShell, lib export, flakeModules export                                            |
 | `test.nix`                           | Integration tests (auto-discovery, explicit, validation)                                                              |
-| `templates/go-flake-parts/flake.nix` | Gold-standard template for new Go projects                                                                            |
+| `templates/go-flake-parts/flake.nix` | Gold-standard template for new Go projects (manual approach)                                                          |
+| `templates/go-standard/flake.nix`    | Minimal template using go-standard module (recommended for new projects)                                              |
 | `scripts/nix-lint.sh`                | Lints flake.nix files across all projects for common errors                                                           |
 | `scripts/dashboard.sh`               | Overview of flake check status across all projects                                                                    |
 | `docs/flake-patterns.md`             | Reference: correct patterns and anti-patterns                                                                         |
