@@ -43,8 +43,6 @@ in
 {
   imports = [ inputs.treefmt-nix.flakeModule ];
 
-  systems = lib.mkDefault (import inputs.systems);
-
   options.go-standard = {
     pname = lib.mkOption {
       type = lib.types.str;
@@ -138,6 +136,8 @@ in
   };
 
   config = {
+    systems = lib.mkDefault (import inputs.systems);
+
     perSystem =
       {
         config,
