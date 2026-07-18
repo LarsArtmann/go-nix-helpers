@@ -316,25 +316,25 @@ and consumer-migration cadence. This is a one-person ecosystem decision.
 
 ## File Inventory
 
-| File                                            | Lines | Status                                                              |
+| File | Lines | Status |
 | ----------------------------------------------- | ----- | ------------------------------------------------------------------- | --- | ------ |
-| `mkPreparedSource.nix`                          | 311   | **Modified** (round 2: unified sub-module pipeline, -22 lines)      |
-| `flake.nix`                                     | 117   | **New** (round 2: self-hosting)                                     |
-| `flake.lock`                                    | 85    | **New** (round 2: flake lock)                                       |
-| `AGENTS.md`                                     | 62    | **New** (round 2: AI session context)                               |
-| `test.nix`                                      | 216   | **Modified** (round 2: mockDep cleanup, meta.description)           |
-| `templates/go-flake-parts/flake.nix`            | 213   | **Modified** (round 1+2: maintainers fix, checks dedup, formatting) |
-| `README.md`                                     | 156   | Modified (round 1: privateDepPattern docs)                          |
-| `scripts/dashboard.sh`                          | 82    | Modified (round 1: configurable paths, JSON escaping)               |
-| `scripts/nix-lint.sh`                           | 215   | Modified (round 1: grep counting fix)                               |
-| `scripts/generate-flake.sh`                     | 84    | Unchanged (rough edges documented)                                  |
-| `docs/flake-patterns.md`                        | 213   | Modified (round 1: typo fix, perSystem docs)                        |
-| `docs/ci-workflow.yml`                          | 32    | Modified (round 1: removed `                                        |     | true`) |
-| `docs/reviews/2026-06-19_full-code-review.html` | 1327  | New (round 1: full review report)                                   |
-| `docs/status/2026-06-08_*.md`                   | 206   | Prior status report                                                 |
-| `docs/status/2026-06-09_*.md`                   | 283   | Prior status report                                                 |
-| `git-town.toml`                                 | 9     | Unchanged                                                           |
-| `.gitignore`                                    | 3     | Unchanged                                                           |
+| `mkPreparedSource.nix` | 311 | **Modified** (round 2: unified sub-module pipeline, -22 lines) |
+| `flake.nix` | 117 | **New** (round 2: self-hosting) |
+| `flake.lock` | 85 | **New** (round 2: flake lock) |
+| `AGENTS.md` | 62 | **New** (round 2: AI session context) |
+| `test.nix` | 216 | **Modified** (round 2: mockDep cleanup, meta.description) |
+| `templates/go-flake-parts/flake.nix` | 213 | **Modified** (round 1+2: maintainers fix, checks dedup, formatting) |
+| `README.md` | 156 | Modified (round 1: privateDepPattern docs) |
+| `scripts/dashboard.sh` | 82 | Modified (round 1: configurable paths, JSON escaping) |
+| `scripts/nix-lint.sh` | 215 | Modified (round 1: grep counting fix) |
+| `scripts/generate-flake.sh` | 84 | Unchanged (rough edges documented) |
+| `docs/flake-patterns.md` | 213 | Modified (round 1: typo fix, perSystem docs) |
+| `docs/ci-workflow.yml` | 32 | Modified (round 1: removed `                                        |     | true`) |
+| `docs/reviews/2026-06-19_full-code-review.html` | 1327 | New (round 1: full review report) |
+| `docs/status/2026-06-08_*.md` | 206 | Prior status report |
+| `docs/status/2026-06-09_*.md` | 283 | Prior status report |
+| `git-town.toml` | 9 | Unchanged |
+| `.gitignore` | 3 | Unchanged |
 
 ## Downstream Consumers
 

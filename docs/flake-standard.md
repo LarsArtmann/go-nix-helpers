@@ -6,13 +6,13 @@ This document describes the standard flake.nix patterns used across all LarsArtm
 
 Every Go project should use:
 
-| Input | Purpose |
-|-------|---------|
-| `nixpkgs` (`nixos-unstable`) | Package set — always `nixos-unstable`, never `nixpkgs-unstable` |
-| `flake-parts` | Module system for flakes — with `inputs.nixpkgs-lib.follows = "nixpkgs"` |
-| `systems` (`nix-systems/default`) | Multi-arch support — never hardcode system lists |
-| `treefmt-nix` | Code formatting — with `inputs.nixpkgs.follows = "nixpkgs"` |
-| `go-nix-helpers` (optional) | Shared module + private dep helpers |
+| Input                             | Purpose                                                                  |
+| --------------------------------- | ------------------------------------------------------------------------ |
+| `nixpkgs` (`nixos-unstable`)      | Package set — always `nixos-unstable`, never `nixpkgs-unstable`          |
+| `flake-parts`                     | Module system for flakes — with `inputs.nixpkgs-lib.follows = "nixpkgs"` |
+| `systems` (`nix-systems/default`) | Multi-arch support — never hardcode system lists                         |
+| `treefmt-nix`                     | Code formatting — with `inputs.nixpkgs.follows = "nixpkgs"`              |
+| `go-nix-helpers` (optional)       | Shared module + private dep helpers                                      |
 
 ## Recommended: go-standard module
 
@@ -37,18 +37,23 @@ This gives you: packages.default, apps.default/test/lint, devShells.default/ci, 
 If not using the shared module, follow these rules:
 
 ### Inputs
+
 - All URLs quoted: `url = "github:..."` not `url = github:...`
 - `follows = "nixpkgs"` on ALL inputs that have nixpkgs
 - `inputs.nixpkgs-lib.follows = "nixpkgs"` on flake-parts
 
 ### Version
+
 ```nix
 version = self.rev or self.dirtyRev or "dev";
 ```
+
 Never hardcode versions like `"0.1.0"`. For published packages with semver tags, hardcoding is acceptable.
 
 ### Source filtering
+
 Use `lib.fileset` for precise source control:
+
 ```nix
 src = lib.fileset.toSource {
   root = ./.;
@@ -57,14 +62,17 @@ src = lib.fileset.toSource {
 ```
 
 ### Build
+
 ```nix
 buildGoModule = pkgs.buildGoModule.override { go = pkgs.go_1_26; };
 ```
+
 - `proxyVendor = true` — recommended for all projects (ensures sandbox compatibility)
 - `vendorHash` — real hash (never empty string `""`, use `null` for committed vendor/)
 - `ldflags` — inject version: `-X main.version=${version}`
 
 ### Meta
+
 ```nix
 meta = {
   description = "...";
@@ -73,18 +81,22 @@ meta = {
   maintainers = [ lib.maintainers.larsartmann ];
 };
 ```
+
 Every package MUST have a complete meta section.
 
 ### Checks
+
 ```nix
 checks = {
   format = config.treefmt.build.check self;
   build = config.packages.default;
 };
 ```
+
 Every package flake MUST have `checks.build`.
 
 ### Treefmt
+
 ```nix
 treefmt = {
   projectRootFile = "go.mod";
@@ -95,9 +107,11 @@ treefmt = {
   };
 };
 ```
+
 Use `treefmt.programs.*.enable` — NOT the legacy `treefmt.settings.formatter` API.
 
 ### DevShells
+
 ```nix
 devShells = {
   default = pkgs.mkShell {
@@ -110,16 +124,19 @@ devShells = {
   };
 };
 ```
+
 - Use `mkShellNoCC` for CI devShells (no C compiler needed)
 - Use `packages` not `buildInputs` (modern convention)
 - Env vars as attributes, not in shellHook
 
 ### Overlay
+
 ```nix
 flake.overlays.default = final: _prev: {
   my-project = self.packages.${final.stdenv.system}.default;
 };
 ```
+
 - Overlay attr name MUST match the project directory name
 - Use `self.packages` not `inputs.self.packages`
 
@@ -129,24 +146,27 @@ flake.overlays.default = final: _prev: {
 
 These repos require `GOPRIVATE` because `sum.golang.org` returns 404 for them:
 
-| Repo | Consumers |
-|------|-----------|
-| `github.com/larsartmann/go-cqrs-lite` | cqrs-htmx, SwettySwipperWeb, DiscordSync |
-| `github.com/larsartmann/go-finding` | BuildFlow, library-policy, go-auto-upgrade, Code-Quality-Agent, go-functional-fixer, go-business-rules, md-go-validator, +others |
-| `github.com/larsartmann/go-structure-linter` | go-structure-linter (self) |
-| `github.com/LarsArtmann/go-commit` | auto-deduplicate, projects-management-automation |
+| Repo                                         | Consumers                                                                                                                        |
+| -------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| `github.com/larsartmann/go-cqrs-lite`        | cqrs-htmx, SwettySwipperWeb, DiscordSync                                                                                         |
+| `github.com/larsartmann/go-finding`          | BuildFlow, library-policy, go-auto-upgrade, Code-Quality-Agent, go-functional-fixer, go-business-rules, md-go-validator, +others |
+| `github.com/larsartmann/go-structure-linter` | go-structure-linter (self)                                                                                                       |
+| `github.com/LarsArtmann/go-commit`           | auto-deduplicate, projects-management-automation                                                                                 |
 
 All other LarsArtmann repos are public and work fine without GOPRIVATE.
 
 ### In devShells
+
 ```nix
 GOPRIVATE = "github.com/larsartmann/*";
 ```
 
 ### In buildGoModule
+
 `GOPRIVATE` is silently dropped by nixpkgs' buildGoModule env whitelist. For builds that need private deps, use `mkPreparedSource` from `go-nix-helpers` instead.
 
 ### Deprecated: GONOSUMCHECK
+
 `GONOSUMCHECK` was deprecated in Go 1.14. Use `GOPRIVATE` (which implies `GONOSUMDB`) instead. Never use `GONOSUMCHECK`.
 
 ## Formatting
