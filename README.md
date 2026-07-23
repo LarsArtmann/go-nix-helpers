@@ -2,7 +2,118 @@
 
 Shared Nix helpers for LarsArtmann Go repositories.
 
-## `mkPreparedSource.nix`
+**3 inputs. ~20 lines. Full build, test, lint, format, devShell, CI shell, overlay, and private-dep injection.**
+
+---
+
+## `flakeModules.go-standard` (recommended)
+
+A flake-parts module that generates standard flake outputs from a single config block.
+Bundles `treefmt-nix` internally — consumers do **not** need `treefmt-nix` or `systems` inputs.
+
+### What you get
+
+- `packages.default` + `packages.<pname>` — buildGoModule with Go 1.26
+- `apps.default`, `apps.test`, `apps.lint` — CLI entrypoints
+- `devShells.default`, `devShells.ci` — Go + golangci-lint (+ optional gopls, govulncheck, templ)
+- `checks.format` (treefmt), `checks.build` (package build)
+- `treefmt` — gofumpt + goimports + nixfmt (+ optional templ)
+- `formatter` — `nix fmt`
+- `flake.overlays.default` — expose package for other flakes
+- Private dep injection via `mkPreparedSource` (when `deps = { ... }`)
+- `GOPRIVATE` auto-injection (when deps are set)
+- `GOWORK = "off"` and `GOTOOLCHAIN = "local"` in all devShells
+
+### Minimal flake.nix (3 inputs, ~20 lines)
+
+```nix
+{
+  description = "My project — what it does";
+
+  inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+
+    flake-parts = {
+      url = "github:hercules-ci/flake-parts";
+      inputs.nixpkgs-lib.follows = "nixpkgs";
+    };
+
+    go-nix-helpers = {
+      url = "git+ssh://git@github.com/LarsArtmann/go-nix-helpers?ref=master";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+  };
+
+  outputs = inputs@{ self, ... }:
+    flake-parts.lib.mkFlake { inherit inputs; } {
+      imports = [ inputs.go-nix-helpers.flakeModules.go-standard ];
+
+      go-standard = {
+        pname = "my-project";
+        vendorHash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="; # nix build to compute
+        description = "What this project does";
+      };
+    };
+}
+```
+
+### With private dependencies
+
+```nix
+inputs = {
+  # ... nixpkgs, flake-parts, go-nix-helpers as above ...
+
+  go-cqrs-lite = {
+    url = "git+ssh://git@github.com/LarsArtmann/go-cqrs-lite?ref=master";
+    flake = false;
+  };
+};
+
+outputs = inputs@{ self, ... }:
+  flake-parts.lib.mkFlake { inherit inputs; } {
+    imports = [ inputs.go-nix-helpers.flakeModules.go-standard ];
+
+    go-standard = {
+      pname = "my-project";
+      vendorHash = "sha256-...";
+      description = "What it does";
+      deps = {
+        "github.com/larsartmann/go-cqrs-lite" = inputs.go-cqrs-lite;
+      };
+      # GOPRIVATE is auto-injected. mkPreparedSource auto-wired.
+      # Sub-modules are auto-discovered — no manual subModules list needed.
+    };
+  };
+```
+
+### All options
+
+| Option                 | Default                             | Description                                                                        |
+| ---------------------- | ----------------------------------- | ---------------------------------------------------------------------------------- |
+| `pname`                | (required)                          | Package name (also overlay attr and mainProgram)                                   |
+| `vendorHash`           | `null`                              | Vendor hash for buildGoModule (null = committed vendor/)                           |
+| `src`                  | `self.outPath`                      | Source path (use `lib.fileset` for filtering)                                      |
+| `description`          | `"A LarsArtmann Go project"`        | Short description for package meta                                                 |
+| `subPackages`          | `[ "." ]`                           | Subpackages to build                                                               |
+| `goPkgAttr`            | `"go_1_26"`                         | Go package attribute in nixpkgs                                                    |
+| `enableTempl`          | `false`                             | Include templ in devShells and treefmt                                             |
+| `enableGovulncheck`    | `true`                              | Include govulncheck in the default devShell                                        |
+| `enableGopls`          | `true`                              | Include gopls in the default devShell                                              |
+| `deps`                 | `{}`                                | Private Go deps for mkPreparedSource (empty = no prepared source)                  |
+| `subModules`           | `{}`                                | Explicit sub-modules for mkPreparedSource (merged with auto-discovered)            |
+| `postPatchExtra`       | `""`                                | Extra postPatch commands for mkPreparedSource                                      |
+| `autoGoPrivate`        | `true`                              | Auto-inject GOPRIVATE when deps are set                                            |
+| `validatePrivateDeps`  | `true`                              | Fail build if a private require lacks a replace                                    |
+| `proxyVendor`          | `true`                              | Pass proxyVendor to buildGoModule                                                  |
+| `ldflags`              | `null` (auto)                       | Custom ldflags (null = `["-s" "-w" "-X main.version=${version}"]`)                 |
+| `extraMeta`            | `{}`                                | Extra attributes merged into package meta                                          |
+| `extraBuildAttrs`      | `{}`                                | Extra attributes merged into buildGoModule                                         |
+| `devShellExtraPackages`| `_: []`                             | Function receiving pkgs, returns extra devShell packages                           |
+| `shellExtraEnv`        | `{}`                                | Extra env vars for devShells (e.g. `{ GOPRIVATE = "..."; }`)                       |
+
+---
+
+## `mkPreparedSource.nix` (lower-level)
 
 Prepares Go source with local dependency replacement for Nix sandbox builds.
 
@@ -19,31 +130,14 @@ This helper copies flake-input deps into `_local_deps/` and injects `replace` di
 - **`/vN` major version handling** — the `/vN` suffix is kept in the module path but stripped
   from the local directory path automatically.
 
-### Usage
-
-Add as a flake input:
-
-```nix
-inputs = {
-  go-nix-helpers = {
-    url = "git+ssh://git@github.com/LarsArtmann/go-nix-helpers?ref=master";
-    flake = false;
-  };
-};
-```
-
-Then in outputs:
+### Usage (in a manual flake.nix)
 
 ```nix
 mkPreparedSource = import (go-nix-helpers + "/mkPreparedSource.nix") {
   inherit pkgs lib;
   goPkg = pkgs.go_1_26;
 };
-```
 
-### Full example (recommended — auto-discovery)
-
-```nix
 preparedSrc = mkPreparedSource {
   name = "my-app";
   version = "1.0.0";
@@ -53,97 +147,7 @@ preparedSrc = mkPreparedSource {
     "github.com/larsartmann/go-branded-id" = go-branded-id;
   };
   # subModules omitted — auto-discovered from dep sources.
-  # All subdirectories with go.mod are found and replace directives generated.
 };
-```
-
-That's it. No manual `subModules` list to maintain. When go-cqrs-lite adds a new sub-module,
-the next `nix flake update` picks it up automatically.
-
-### Major version suffixes (`/v2`, `/v3`, ...)
-
-Go modules at v2+ use a `/vN` suffix in the import path. `mkPreparedSource` handles
-this automatically — ALL `/vN` segments are stripped from local directory paths
-(e.g. `event/v3/eventtest` → `event/eventtest`), while the full versioned path is
-kept in replace directives. The repo name is extracted from the path, stripping
-the version suffix so the local directory name is always the repo name.
-
-```nix
-deps = {
-  "github.com/larsartmann/go-output" = go-output;
-  "github.com/larsartmann/go-filewatcher/v2" = go-filewatcher;
-  "github.com/LarsArtmann/gogenfilter/v3" = gogenfilter;
-};
-```
-
-This produces `_local_deps/go-output`, `_local_deps/go-filewatcher`,
-`_local_deps/gogenfilter` — no collisions even with multiple `/v2` deps from
-different repos.
-
-### Auto-discovery
-
-When `autoSubModules` is `true` (the default), `mkPreparedSource` **recursively** walks
-each dep source to find ALL `go.mod` files at any depth (not just top-level). For each
-one, it:
-
-1. Reads the module path from `go.mod` line 1
-2. Computes the local directory from the actual filesystem path (not the module path)
-3. Generates a replace directive pointing to the local copy
-
-Directories named `example`, `examples`, `testdata`, `.git`, `vendor`, and
-`node_modules` are excluded from discovery (override via `excludeSubModuleDirs`).
-
-This means you no longer need to maintain a manual list of sub-modules or write
-`postPatchExtra` workarounds for nested modules. When a dependency repo adds a new
-sub-module at any depth (e.g., go-cqrs-lite adds `event/v3/eventtest` at depth 2),
-it's picked up automatically on the next `nix flake update`.
-
-Extra replace directives for unused sub-modules are harmless — `go mod tidy`
-ignores them.
-
-To disable auto-discovery for a specific dep, set `autoSubModules = false` and
-use the explicit `subModules` parameter instead.
-
-### Explicit sub-modules (optional, for edge cases)
-
-If auto-discovery doesn't work for your case (e.g., non-standard directory layout),
-you can specify sub-modules explicitly. These are **merged** with auto-discovered
-entries — no duplication.
-
-```nix
-subModules = {
-  "github.com/larsartmann/go-output" = [ "enum" "escape" ];
-};
-```
-
-Versioned sub-paths (ending in `/vN`) are handled automatically: the `/vN` suffix
-is kept in the module path but stripped from the local directory path.
-
-e.g. `"codec/v2"` → replace directive: `.../codec/v2 => ./_local_deps/<repo>/codec`
-
-### Build-time validation
-
-When `validatePrivateDeps` is `true` (the default), the build checks that every
-`github.com/larsartmann/*` module in go.mod's `require` block has a corresponding
-`replace` directive. If any are missing, the build fails with a clear message:
-
-```
-mkPreparedSource: private modules without local replace:
-
-  github.com/larsartmann/new-private-dep
-
-These modules are required in go.mod but have no replace directive.
-Add the missing repos to your flake.nix inputs and deps map.
-```
-
-This eliminates the cryptic `could not read Username for 'https://github.com'`
-error that occurs when a private dep is in go.mod but not in the flake inputs.
-
-### Testing
-
-```bash
-nix-build test.nix -A autoDiscovery -o result-auto    # verify auto-discovery
-cat result-auto/go.mod                                  # inspect generated go.mod
 ```
 
 ### Parameters
@@ -165,117 +169,24 @@ cat result-auto/go.mod                                  # inspect generated go.m
 
 ---
 
-## `mkGoFlake.nix`
+## `mkGoFlake.nix` (deprecated)
 
-Shared flake-parts module that generates standard flake outputs from a single config attrset.
-Eliminates ~150 lines of duplicated flake.nix boilerplate per project.
+Superseded by `flakeModules.go-standard`. Use the module instead — it provides the same
+functionality via typed options with better IDE support and discoverability.
 
-### What it generates
-
-- `packages.default` + `packages.<pname>` — buildGoModule with private deps via mkPreparedSource
-- `apps.default`, `apps.test`, `apps.lint` — standard CLI entrypoints
-- `devShells.default`, `devShells.ci` — Go + golangci-lint, with optional extras
-- `checks.format` (treefmt), `checks.build` (package build)
-- `treefmt` — gofumpt + goimports + nixfmt
-- `flake.overlays.default` — expose package for other flakes
-
-### Usage
+Migration: replace the `import ... mkGoFlake.nix` call with:
 
 ```nix
-{
-  inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    flake-parts = { url = "github:hercules-ci/flake-parts"; inputs.nixpkgs-lib.follows = "nixpkgs"; };
-    systems.url = "github:nix-systems/default";
-    treefmt-nix = { url = "github:numtide/treefmt-nix"; inputs.nixpkgs.follows = "nixpkgs"; };
-    go-nix-helpers = {
-      url = "git+ssh://git@github.com/LarsArtmann/go-nix-helpers?ref=master";
-      flake = false;
-    };
-    # Private deps (flake = false)
-    go-cqrs-lite = {
-      url = "git+ssh://git@github.com/LarsArtmann/go-cqrs-lite?ref=master";
-      flake = false;
-    };
-  };
-
-  outputs = inputs@{ self, ... }:
-    flake-parts.lib.mkFlake { inherit inputs; }
-      (import (inputs.go-nix-helpers + "/mkGoFlake.nix") {
-        inherit inputs self;
-        pname = "my-project";
-        version = "0.1.0";
-        vendorHash = "sha256-AAA...";
-        description = "What this project does";
-        src = ./.;
-        deps = {
-          "github.com/larsartmann/go-cqrs-lite" = inputs.go-cqrs-lite;
-        };
-      });
-}
+imports = [ inputs.go-nix-helpers.flakeModules.go-standard ];
+go-standard = { pname = "..."; vendorHash = "..."; ... };
 ```
 
-That's the entire flake.nix. No perSystem boilerplate, no manual devShell/checks/treefmt config.
+---
 
-### Parameters
+## Testing
 
-| Parameter                | Default                             | Description                                                                    |
-| ------------------------ | ----------------------------------- | ------------------------------------------------------------------------------ |
-| `inputs`                 | (required)                          | Consumer's full flake inputs attrset                                           |
-| `self`                   | (required)                          | Consumer's flake self reference                                                |
-| `pname`                  | (required)                          | Package name (e.g. `"my-project"`)                                             |
-| `version`                | (required)                          | Version string                                                                 |
-| `vendorHash`             | (required)                          | Vendor hash for buildGoModule                                                  |
-| `description`            | (required)                          | Short description for `meta.description`                                       |
-| `src`                    | (required)                          | Source path (usually `./.`)                                                    |
-| `deps`                   | `{}`                                | Private dep map for mkPreparedSource (empty = no prepared source)              |
-| `subModules`             | `{}`                                | Sub-module overrides for mkPreparedSource                                      |
-| `postPatchExtra`         | `""`                                | Extra postPatch commands for mkPreparedSource                                  |
-| `doCheck`                | `true`                              | Whether to run Go tests in buildGoModule                                       |
-| `ldflags`                | `null` (auto-computed)              | Custom ldflags (default: `["-s" "-w" "-X main.version=${version}"]`)           |
-| `goPkgAttr`              | `"go_1_26"`                         | Which nixpkgs Go attribute to use                                              |
-| `buildGoModuleOverrides` | `{}`                                | Extra/override attrs merged into buildGoModule                                 |
-| `devShellExtraPackages`  | `_pkgs: []`                         | Function receiving pkgs, returns extra devShell packages                       |
-| `devShellShellHook`      | `""` (auto: echoes pname + version) | Custom shell hook text                                                         |
-| `shellExtraEnv`          | `{}`                                | Extra env vars in both devShells (e.g. `{ GOTOOLCHAIN = "local"; }`)           |
-| `extraApps`              | `_: {}`                             | Function receiving `{config, pkgs, lib, goPkg, package}`, returns extra apps   |
-| `extraChecks`            | `_: {}`                             | Function receiving `{config, pkgs, lib, goPkg, package}`, returns extra checks |
-| `extraFlake`             | `{}`                                | Extra flake-level outputs (e.g. nixosModules)                                  |
-
-### Project-specific customisation
-
-For projects that need extra apps, NixOS modules, or custom build flags:
-
-```nix
-(import (inputs.go-nix-helpers + "/mkGoFlake.nix") {
-  inherit inputs self;
-  pname = "crush-daily";
-  version = "0.1.0";
-  vendorHash = "sha256-...";
-  description = "Daily AI-powered insights";
-  src = ./.;
-  deps = { ... };
-
-  # Extra env for both devShells
-  shellExtraEnv = { GOTOOLCHAIN = "local"; };
-
-  # Extra devShell packages
-  devShellExtraPackages = pkgs: [ pkgs.gotools pkgs.trash-cli ];
-
-  # Custom build overrides
-  buildGoModuleOverrides = {
-    env = { CGO_ENABLED = "0"; };
-    preBuild = ''export HOME=$TMPDIR; go mod tidy'';
-  };
-
-  # Extra checks (e.g. a separate test check)
-  extraChecks = { config, ... }: {
-    test = config.packages.default.overrideAttrs (_: { doCheck = true; });
-  };
-
-  # NixOS module
-  extraFlake = {
-    nixosModules.my-project = { ... };
-  };
-})
+```bash
+nix flake check                    # all checks (autoDiscovery, explicitOnly, verify, treefmt)
+nix-build test.nix -A autoDiscovery -o result-auto    # verify auto-discovery
+nix run .#verifyValidation         # negative-case validation (run outside sandbox)
 ```

@@ -10,9 +10,10 @@ Every Go project should use:
 | --------------------------------- | ------------------------------------------------------------------------ |
 | `nixpkgs` (`nixos-unstable`)      | Package set — always `nixos-unstable`, never `nixpkgs-unstable`          |
 | `flake-parts`                     | Module system for flakes — with `inputs.nixpkgs-lib.follows = "nixpkgs"` |
-| `systems` (`nix-systems/default`) | Multi-arch support — never hardcode system lists                         |
-| `treefmt-nix`                     | Code formatting — with `inputs.nixpkgs.follows = "nixpkgs"`              |
-| `go-nix-helpers` (optional)       | Shared module + private dep helpers                                      |
+| `go-nix-helpers`                  | Shared module + private dep helpers — bundles treefmt-nix + systems      |
+
+> **Note:** When using `flakeModules.go-standard`, `treefmt-nix` and `systems` are bundled internally.
+> Only 3 inputs are needed. Declare them separately only for manual flake.nix files.
 
 ## Recommended: go-standard module
 

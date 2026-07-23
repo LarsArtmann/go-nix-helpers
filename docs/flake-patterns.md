@@ -1,6 +1,6 @@
 # Flake.nix Correct Patterns Reference
 
-All LarsArtmann Go projects use the **flake-parts** + **treefmt-nix** + **systems** + **git-hooks.nix** standard stack.
+All LarsArtmann Go projects use the **flake-parts** + **go-nix-helpers** (which bundles treefmt-nix + systems) standard stack.
 
 ## Table of Contents
 
@@ -132,7 +132,7 @@ outputs = inputs@{ self, ... }: flake-parts.lib.mkFlake { inherit inputs; } {
 
 See `templates/go-flake-parts/flake.nix` for the gold standard. Key sections in order:
 
-1. `inputs` — nixpkgs, flake-parts, systems, treefmt-nix, go-nix-helpers
+1. `inputs` — nixpkgs, flake-parts, go-nix-helpers (treefmt-nix + systems bundled)
 2. `outputs` with `inputs@{ self, ... }`
 3. `perSystem` with destructured `{ config, pkgs, lib, system, ... }`
 4. `let` block: `goPkg`, `version`, `ldflags`, `vendorHash`, `buildGoModule`
