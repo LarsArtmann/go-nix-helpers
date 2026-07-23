@@ -212,7 +212,12 @@ in
                 name = cfg.pname;
                 inherit version;
                 src = cfg.src;
-                inherit (cfg) deps subModules postPatchExtra validatePrivateDeps;
+                inherit (cfg)
+                  deps
+                  subModules
+                  postPatchExtra
+                  validatePrivateDeps
+                  ;
               }
           else
             null;
@@ -340,6 +345,7 @@ in
               ++ vulncheckPkg
               ++ (cfg.devShellExtraPackages pkgs);
               GOWORK = "off";
+              GOTOOLCHAIN = "local";
             }
             // finalShellExtraEnv
           );
@@ -352,6 +358,7 @@ in
               ]
               ++ templPkg;
               GOWORK = "off";
+              GOTOOLCHAIN = "local";
             }
             // finalShellExtraEnv
           );

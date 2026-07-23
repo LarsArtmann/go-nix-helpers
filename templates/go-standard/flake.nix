@@ -1,5 +1,6 @@
-# go-standard-template — Minimal flake.nix using go-standard module
+# go-standard-template — Minimal flake.nix using the go-standard module
 #
+# Only 3 flake inputs needed! treefmt-nix and systems are bundled internally.
 # Copy this file as flake.nix, replace YOUR-PROJECT-NAME and vendorHash.
 # Run: nix build && nix flake check
 {
@@ -11,13 +12,6 @@
     flake-parts = {
       url = "github:hercules-ci/flake-parts";
       inputs.nixpkgs-lib.follows = "nixpkgs";
-    };
-
-    systems.url = "github:nix-systems/default";
-
-    treefmt-nix = {
-      url = "github:numtide/treefmt-nix";
-      inputs.nixpkgs.follows = "nixpkgs";
     };
 
     go-nix-helpers = {
