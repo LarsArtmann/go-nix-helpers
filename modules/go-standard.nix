@@ -187,7 +187,7 @@ in
               {
                 name = cfg.pname;
                 inherit version;
-                src = self.outPath;
+                src = cfg.src;
                 inherit (cfg) deps validatePrivateDeps;
               }
           else
