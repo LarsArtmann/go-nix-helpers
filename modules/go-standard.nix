@@ -106,7 +106,26 @@ in
     deps = lib.mkOption {
       type = lib.types.attrsOf lib.types.path;
       default = { };
-      description = "Private Go deps for mkPreparedSource";
+      description = ''
+        Private Go deps for mkPreparedSource.
+        When non-empty, the module auto-wires mkPreparedSource and
+        auto-injects GOPRIVATE into devShells.
+      '';
+    };
+
+    subModules = lib.mkOption {
+      type = lib.types.attrsOf (lib.types.listOf lib.types.str);
+      default = { };
+      description = ''
+        Explicit sub-modules for mkPreparedSource (merged with auto-discovered).
+        Rarely needed — auto-discovery handles everything by default.
+      '';
+    };
+
+    postPatchExtra = lib.mkOption {
+      type = lib.types.str;
+      default = "";
+      description = "Extra postPatch commands for mkPreparedSource (rarely needed)";
     };
 
     autoGoPrivate = lib.mkOption {
@@ -193,7 +212,7 @@ in
                 name = cfg.pname;
                 inherit version;
                 src = cfg.src;
-                inherit (cfg) deps validatePrivateDeps;
+                inherit (cfg) deps subModules postPatchExtra validatePrivateDeps;
               }
           else
             null;
