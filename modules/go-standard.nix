@@ -154,16 +154,15 @@ in
 
         preparedSrc =
           if usePreparedSource then
-            (
-              import "${inputs.go-nix-helpers}/mkPreparedSource.nix" {
-                inherit pkgs lib goPkg;
+            (import "${inputs.go-nix-helpers}/mkPreparedSource.nix" {
+              inherit pkgs lib goPkg;
+            })
+              {
+                name = cfg.pname;
+                inherit version;
+                src = self.outPath;
+                inherit (cfg) deps;
               }
-            ) {
-              name = cfg.pname;
-              inherit version;
-              src = self.outPath;
-              inherit (cfg) deps;
-            }
           else
             null;
 
@@ -183,20 +182,26 @@ in
 
         package = buildGoModule (
           {
-            pname = cfg.pname;
+            inherit (cfg) pname;
             inherit version;
             src = finalSrc;
-            vendorHash = cfg.vendorHash;
+            inherit (cfg) vendorHash;
             proxyVendor = true;
-            subPackages = cfg.subPackages;
+            inherit (cfg) subPackages;
             ldflags = finalLdflags;
             nativeBuildInputs = lib.optionals cfg.enableTempl [ pkgs.templ ];
             meta = {
-              description = cfg.description;
+              inherit (cfg) description;
               license = lib.licenses.mit;
               mainProgram = cfg.pname;
-              maintainers = [ { name = "Lars Artmann"; github = "LarsArtmann"; } ];
-            } // cfg.extraMeta;
+              maintainers = [
+                {
+                  name = "Lars Artmann";
+                  github = "LarsArtmann";
+                }
+              ];
+            }
+            // cfg.extraMeta;
           }
           // cfg.extraBuildAttrs
         );
@@ -231,15 +236,14 @@ in
         devShells = {
           default = pkgs.mkShell (
             {
-              packages =
-                [
-                  goPkg
-                  pkgs.golangci-lint
-                ]
-                ++ templPkg
-                ++ goplsPkg
-                ++ vulncheckPkg
-                ++ (cfg.devShellExtraPackages pkgs);
+              packages = [
+                goPkg
+                pkgs.golangci-lint
+              ]
+              ++ templPkg
+              ++ goplsPkg
+              ++ vulncheckPkg
+              ++ (cfg.devShellExtraPackages pkgs);
               GOWORK = "off";
             }
             // cfg.shellExtraEnv
@@ -247,12 +251,11 @@ in
 
           ci = pkgs.mkShellNoCC (
             {
-              packages =
-                [
-                  goPkg
-                  pkgs.golangci-lint
-                ]
-                ++ templPkg;
+              packages = [
+                goPkg
+                pkgs.golangci-lint
+              ]
+              ++ templPkg;
               GOWORK = "off";
             }
             // cfg.shellExtraEnv
@@ -275,9 +278,8 @@ in
         };
       };
 
-    flake.overlays.default =
-      final: _prev: {
-        ${cfg.pname} = self.packages.${final.stdenv.system}.default;
-      };
+    flake.overlays.default = final: _prev: {
+      ${cfg.pname} = self.packages.${final.stdenv.system}.default;
+    };
   };
 }

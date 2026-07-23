@@ -6,7 +6,7 @@
   pkgs ? import <nixpkgs> { },
 }:
 let
-  lib = pkgs.lib;
+  inherit (pkgs) lib;
 
   mkPreparedSource = import ./mkPreparedSource.nix {
     inherit pkgs lib;

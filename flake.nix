@@ -58,7 +58,7 @@
           # exposed as an app, not a check.
           checks = {
             inherit (tests) autoDiscovery explicitOnly;
-            verify = tests.verify;
+            inherit (tests) verify;
           };
 
           # -- Apps (nix run .#<name>) --------------------------------------------
