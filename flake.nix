@@ -37,7 +37,15 @@
       flake.lib.mkPreparedSource = import ./mkPreparedSource.nix;
       flake.lib.mkGoFlake = import ./mkGoFlake.nix;
 
-      flake.flakeModules.go-standard = import ./modules/go-standard.nix;
+      # go-standard is a composite module that bundles treefmt-nix internally,
+      # so consumers do NOT need to declare treefmt-nix or systems as inputs.
+      # Consumer needs only: nixpkgs, flake-parts, go-nix-helpers.
+      flake.flakeModules.go-standard = {
+        imports = [
+          inputs.treefmt-nix.flakeModule
+          ./modules/go-standard.nix
+        ];
+      };
 
       perSystem =
         {

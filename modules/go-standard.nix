@@ -1,20 +1,21 @@
 # go-standard.nix — Standard flake-parts module for LarsArtmann Go projects
 #
-# Bundles: treefmt-nix + nix-systems + gofumpt/goimports/nixfmt formatters
+# Bundles: treefmt-nix (via composite module in flake.nix)
 #
 # Provides: packages.default, apps.default/test/lint, devShells.default/ci,
 #           checks.format/build, treefmt, flake.overlays.default
 #
-# Usage (consumer's flake.nix):
+# Usage (consumer's flake.nix — only 3 inputs needed!):
 #
 #   inputs = {
 #     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-#     flake-parts.url = "github:hercules-ci/flake-parts";
-#     treefmt-nix.url = "github:numtide/treefmt-nix";
-#     systems.url = "github:nix-systems/default";
+#     flake-parts = {
+#       url = "github:hercules-ci/flake-parts";
+#       inputs.nixpkgs-lib.follows = "nixpkgs";
+#     };
 #     go-nix-helpers = {
 #       url = "git+ssh://git@github.com/LarsArtmann/go-nix-helpers?ref=master";
-#       flake = false;
+#       inputs.nixpkgs.follows = "nixpkgs";
 #     };
 #   };
 #
@@ -27,9 +28,6 @@
 #         description = "What this project does";
 #       };
 #     };
-#
-# Required consumer inputs: nixpkgs, flake-parts, treefmt-nix, systems
-# For private deps: also add go-nix-helpers as a flake (non-flake) input
 {
   config,
   lib,
@@ -39,10 +37,17 @@
 }:
 let
   cfg = config.go-standard;
+
+  # Default systems matching github:nix-systems/default
+  # Consumers no longer need a `systems` flake input.
+  defaultSystems = [
+    "x86_64-linux"
+    "aarch64-linux"
+    "x86_64-darwin"
+    "aarch64-darwin"
+  ];
 in
 {
-  imports = [ inputs.treefmt-nix.flakeModule ];
-
   options.go-standard = {
     pname = lib.mkOption {
       type = lib.types.str;
@@ -163,7 +168,7 @@ in
   };
 
   config = {
-    systems = lib.mkDefault (import inputs.systems);
+    systems = lib.mkDefault defaultSystems;
 
     perSystem =
       {
