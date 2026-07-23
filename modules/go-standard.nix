@@ -207,15 +207,50 @@ in
               "-X main.version=${version}"
             ];
 
+        # When using mkPreparedSource, the local copies may introduce
+        # transitive deps not in go.mod. The FOD (go-modules derivation)
+        # has network access, so we run `go mod tidy` there to resolve
+        # them, then propagate the tidied go.mod/go.sum to the main build.
+        autoDepFodAttrs = lib.optionalAttrs usePreparedSource {
+          modBuildPhase = ''
+            runHook preBuild
+            export GOCACHE=$TMPDIR/go-cache
+            export GOPATH="$TMPDIR/go"
+            cd "$modRoot"
+            go mod tidy
+            go mod vendor
+            mkdir -p vendor
+            runHook postBuild
+          '';
+          modInstallPhase = ''
+            cp -r --reflink=auto vendor $out
+            cp go.mod $out/go.mod
+            cp go.sum $out/go.sum
+          '';
+        };
+
+        # Sync tidied go.mod/go.sum from FOD output to main build directory.
+        autoDepSyncPreBuild = lib.optionalString usePreparedSource ''
+          if [ -n "''${goModules:-}" ] && [ -f "$goModules/go.mod" ]; then
+            cp "$goModules/go.mod" go.mod
+            cp "$goModules/go.sum" go.sum
+          fi
+        '';
+
+        # Merge user's extraBuildAttrs, with special preBuild handling.
+        userExtraMinusPreBuild = builtins.removeAttrs cfg.extraBuildAttrs [ "preBuild" ];
+        mergedPreBuild = autoDepSyncPreBuild + (cfg.extraBuildAttrs.preBuild or "");
+
         package = buildGoModule (
           {
             inherit (cfg) pname;
             inherit version;
             src = finalSrc;
             inherit (cfg) vendorHash;
-            inherit (cfg) proxyVendor;
+            proxyVendor = if usePreparedSource then false else cfg.proxyVendor;
             inherit (cfg) subPackages;
             ldflags = finalLdflags;
+            preBuild = mergedPreBuild;
             nativeBuildInputs = lib.optionals cfg.enableTempl [ pkgs.templ ];
             meta = {
               inherit (cfg) description;
@@ -230,7 +265,8 @@ in
             }
             // cfg.extraMeta;
           }
-          // cfg.extraBuildAttrs
+          // autoDepFodAttrs
+          // userExtraMinusPreBuild
         );
 
         templPkg = lib.optionals cfg.enableTempl [ pkgs.templ ];
