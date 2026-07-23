@@ -104,6 +104,33 @@ in
       description = "Private Go deps for mkPreparedSource";
     };
 
+    autoGoPrivate = lib.mkOption {
+      type = lib.types.bool;
+      default = true;
+      description = ''
+        When deps are set, auto-inject GOPRIVATE into devShells to prevent
+        Go from trying to reach the public proxy for private repos.
+        Uses both casings: github.com/larsartmann/*,github.com/LarsArtmann/*.
+        Can be overridden via shellExtraEnv.GOPRIVATE if needed.
+      '';
+    };
+
+    validatePrivateDeps = lib.mkOption {
+      type = lib.types.bool;
+      default = true;
+      description = ''
+        Pass through to mkPreparedSource. When true, build fails with a clear
+        error if any private require in go.mod lacks a replace directive.
+        Set to false if some LarsArtmann deps are public.
+      '';
+    };
+
+    proxyVendor = lib.mkOption {
+      type = lib.types.bool;
+      default = true;
+      description = "Pass proxyVendor to buildGoModule (true = vendor via Go proxy)";
+    };
+
     ldflags = lib.mkOption {
       type = lib.types.nullOr (lib.types.listOf lib.types.str);
       default = null;
@@ -161,7 +188,7 @@ in
                 name = cfg.pname;
                 inherit version;
                 src = self.outPath;
-                inherit (cfg) deps;
+                inherit (cfg) deps validatePrivateDeps;
               }
           else
             null;
@@ -186,7 +213,7 @@ in
             inherit version;
             src = finalSrc;
             inherit (cfg) vendorHash;
-            proxyVendor = true;
+            inherit (cfg) proxyVendor;
             inherit (cfg) subPackages;
             ldflags = finalLdflags;
             nativeBuildInputs = lib.optionals cfg.enableTempl [ pkgs.templ ];
@@ -214,6 +241,14 @@ in
           type = "app";
           program = lib.getExe (pkgs.writeShellApplication { inherit name runtimeInputs text; });
         };
+
+        autoGoPrivateEnv =
+          if cfg.deps != { } && cfg.autoGoPrivate then
+            { GOPRIVATE = "github.com/larsartmann/*,github.com/LarsArtmann/*"; }
+          else
+            { };
+
+        finalShellExtraEnv = autoGoPrivateEnv // cfg.shellExtraEnv;
       in
       {
         packages = {
@@ -246,7 +281,7 @@ in
               ++ (cfg.devShellExtraPackages pkgs);
               GOWORK = "off";
             }
-            // cfg.shellExtraEnv
+            // finalShellExtraEnv
           );
 
           ci = pkgs.mkShellNoCC (
@@ -258,7 +293,7 @@ in
               ++ templPkg;
               GOWORK = "off";
             }
-            // cfg.shellExtraEnv
+            // finalShellExtraEnv
           );
         };
 
