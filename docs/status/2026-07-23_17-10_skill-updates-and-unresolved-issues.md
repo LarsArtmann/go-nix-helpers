@@ -54,7 +54,7 @@ Since the first status report, the session focused on updating three Nix skills 
 | --- | ------------------------------------------------ | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | 1   | **Auto-commit mechanism STILL not investigated** | CRITICAL | First report flagged 4 mystery commits. Since then, 3 MORE mystery commits appeared in SKILLS repo (`5a786ec`, `3a48f77`, `ac7336d`) and 1 in go-nix-helpers (`503bc40`). I never ran `git commit` in either repo. **9 total mystery commits this session.** I did not investigate this despite flagging it as HIGH severity in report #1. |
 | 2   | **`defaultSystems` still hardcoded**             | MEDIUM   | Report #1 identified this as architecturally worse than `import inputs.systems`. Still not fixed. Two lines of code.                                                                                                                                                                                                                       |
-| 3   | **`test-result` symlink still in git**           | LOW      | Report #1 flagged this. Still tracked. `.gitignore` still doesn't cover it.                                                                                                                                                                                                                                                                |
+| 3   | **`test-result` symlink still in git**           | LOW      | Report #1 flagged this. Still tracked. `.gitignore` still doesn't cover it. **Resolved (2026-07-24):** removed from git tracking and `.gitignore`d.                                                                                                                                                                                        |
 | 4   | **`flake.lib.mkGoFlake` still exported**         | LOW      | Deprecated module still exported in flake.nix line 38. Split brain with go-standard.                                                                                                                                                                                                                                                       |
 | 5   | **`go-flake-parts` template not updated**        | MEDIUM   | Still shows 5-input manual pattern with REPLACE_ME placeholders. Now misleading since go-standard template exists and is recommended. Should be deleted or marked as legacy.                                                                                                                                                               |
 | 6   | **Skills don't list go-standard options**        | MEDIUM   | I added go-standard as recommended but didn't include even a summary of available options. A future session using the skill would have to break flow and visit the repo README to know what `enableTempl`, `deps`, `ldflags` etc. are available.                                                                                           |
@@ -176,3 +176,15 @@ They are NOT symlinks (different inodes, different timestamps). Are they synced 
 ### 3. Should I fix the open issues from report #1 now, or do you want to migrate a consumer first?
 
 The `defaultSystems` fix is a 2-line change. The end-to-end consumer test is the highest-value missing validation. But you might want to see a real consumer migrated first before more module changes. **Which should I prioritize?**
+
+---
+
+## Resolution (2026-07-24)
+
+The five carried-over "critical" issues (end-to-end consumer test,
+`defaultSystems` → `import inputs.systems`, consumer migration plan,
+double-import test, automated module-output test) are **all still open** —
+tracked in `TODO_LIST.md`. Of the "FUCKED UP" items: `#3 test-result` is
+RESOLVED (removed from git, `.gitignore`d); `#4 mkGoFlake` is still exported
+pending formal deprecation (`TODO_LIST.md`). The auto-commit observation (#1)
+and skill-copy sync (#2) are environment/process questions outside this repo.
