@@ -262,7 +262,7 @@ in
         ...
       }:
       let
-        version = self.rev or self.dirtyRev or "dev";
+        inherit (cfg) version;
 
         goPkg = pkgs.${cfg.goPkgAttr};
 
@@ -343,6 +343,8 @@ in
             inherit (cfg) vendorHash;
             proxyVendor = if usePreparedSource then false else cfg.proxyVendor;
             inherit (cfg) subPackages;
+            doCheck = cfg.enableCheck;
+            buildFlags = cfg.buildFlags;
             ldflags = finalLdflags;
             preBuild = mergedPreBuild;
             nativeBuildInputs = lib.optionals cfg.enableTempl [ pkgs.templ ];
@@ -366,6 +368,7 @@ in
         templPkg = lib.optionals cfg.enableTempl [ pkgs.templ ];
         goplsPkg = lib.optionals cfg.enableGopls [ pkgs.gopls ];
         vulncheckPkg = lib.optionals cfg.enableGovulncheck [ pkgs.govulncheck ];
+        golangciLintPkg = lib.optionals cfg.enableGolangciLint [ pkgs.golangci-lint ];
 
         mkApp = name: runtimeInputs: text: {
           type = "app";
@@ -392,10 +395,24 @@ in
             program = lib.getExe config.packages.default;
           };
           test = mkApp "run-test" [ goPkg ] "go test -race -v -coverprofile=coverage.out ./...";
+        }
+        // lib.optionalAttrs cfg.enableGolangciLint {
           lint = mkApp "run-lint" [
             goPkg
             pkgs.golangci-lint
           ] "golangci-lint run ./...";
+        }
+        // {
+          fmt = {
+            type = "app";
+            program = lib.getExe (
+              pkgs.writeShellApplication {
+                name = "run-fmt";
+                runtimeInputs = [ config.treefmt.build.wrapper ];
+                text = "treefmt";
+              }
+            );
+          };
         };
 
         devShells = {
@@ -403,8 +420,8 @@ in
             {
               packages = [
                 goPkg
-                pkgs.golangci-lint
               ]
+              ++ golangciLintPkg
               ++ templPkg
               ++ goplsPkg
               ++ vulncheckPkg
@@ -417,11 +434,7 @@ in
 
           ci = pkgs.mkShellNoCC (
             {
-              packages = [
-                goPkg
-                pkgs.golangci-lint
-              ]
-              ++ templPkg;
+              packages = [ goPkg ] ++ golangciLintPkg ++ templPkg;
               GOWORK = "off";
               GOTOOLCHAIN = "local";
             }
@@ -437,16 +450,18 @@ in
         treefmt = {
           projectRootFile = "go.mod";
           programs = {
-            gofumpt.enable = true;
-            goimports.enable = true;
+            gofumpt.enable = cfg.enableGofumpt;
+            goimports.enable = cfg.enableGoimports;
             nixfmt.enable = true;
             templ.enable = cfg.enableTempl;
           };
         };
       };
 
-    flake.overlays.default = final: _prev: {
-      ${cfg.pname} = self.packages.${final.stdenv.system}.default;
-    };
+    flake.overlays.default = lib.mkIf cfg.enableOverlay (
+      final: _prev: {
+        ${cfg.pname} = self.packages.${final.stdenv.system}.default;
+      }
+    );
   };
 }
