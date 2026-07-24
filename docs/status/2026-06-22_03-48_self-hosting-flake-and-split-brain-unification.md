@@ -4,7 +4,7 @@
 **Project**: [go-nix-helpers](https://github.com/LarsArtmann/go-nix-helpers)
 **Branch**: `master`
 **Total Commits**: 15 (committed) + 1 staged (uncommitted)
-**Working Tree**: 6 files staged for commit (round 2: self-hosting flake + split-brain unification)
+**Working Tree**: ~~6 files staged for commit (round 2: self-hosting flake + split-brain unification)~~ Committed as `3c22ce4` (2026-06-22).
 
 ---
 
@@ -17,7 +17,7 @@ review and fixes performed on 2026-06-19 and 2026-06-22.
   full code review — template evaluation crash, hardcoded validation pattern,
   broken test suite, grep garbage, CI swallowing failures, hardcoded paths, docs
   errors. All verified empirically before fixing.
-- **Round 2** (staged, uncommitted): Structural improvements — added `flake.nix`
+- **Round 2** (~~staged, uncommitted~~ committed as `3c22ce4`): Structural improvements — added `flake.nix`
   so the repo self-hosts, unified the split-brain sub-module code paths, cleaned
   up test anti-patterns, added `AGENTS.md`.
 
@@ -354,3 +354,16 @@ and consumer-migration cadence. This is a one-person ecosystem decision.
 - `nix-build test.nix -A verify` — **SUCCESS-PATH TESTS PASSED** (8/8 assertions)
 - `nix run .#verifyValidation` — **PASS: validation caught missing dep**
 - `nix fmt` — clean (0 files changed)
+
+---
+
+## Resolution (2026-07-24)
+
+Round 2 shipped as `3c22ce4`: the self-hosting `flake.nix`, the unified
+sub-module pipeline (the split-brain fix), and `AGENTS.md`. The "NOT STARTED"
+docs gaps have since closed — `CHANGELOG.md`, `FEATURES.md`, and `TODO_LIST.md`
+now all exist. Still open from this report: a GitHub Actions pipeline for the
+repo itself, the `repoName` same-name collision, and `requireDeps` dedup —
+tracked in `TODO_LIST.md`. The `goPkg` dead-weight question (the report's "Top
+#1 Question") remains unresolved by deliberate decision; see the `goPkg` gotcha
+in `AGENTS.md`.

@@ -26,7 +26,7 @@
 - **Verified**: `nix eval` confirmed correct output for go-output, go-filewatcher/v2, gogenfilter/v3, template-LICENSE/types, go-output/v10
 - **Zero downstream breakage** — no consumer hardcodes `_local_deps/<version-suffix>` in `postPatchExtra`
 
-### 3. `/vN` major version suffix handling in `subModules` — JUST FIXED (uncommitted)
+### 3. `/vN` major version suffix handling in `subModules` — ~~JUST FIXED (uncommitted)~~ Committed as `7b69382` (2026-06-09); folded into recursive discovery in `7fdb95c`.
 
 - **Problem**: `subModuleReplace` generated `.../codec/v2 => ./_local_deps/<repo>/codec/v2` — the `/v2` suffix was kept in the local directory path, pointing to a nonexistent directory (Go multi-module repos use `codec/go.mod` declaring `module .../codec/v2`, but the filesystem path is just `codec/`)
 - **Fix**: Added `stripVersionSuffix` helper; `subModuleReplace` now uses it for the local directory path while keeping the full versioned path in the module path
@@ -281,3 +281,18 @@ Changes:
 - Updated `subModuleReplace` to use `stripVersionSuffix` for local directory path (line 100)
 - Updated doc comments with versioned sub-path documentation (lines 36-40)
 - Updated example to include versioned sub-modules (line 23)
+
+---
+
+## Resolution (2026-07-24)
+
+The `subModules` `/vN` fix this report centres on shipped as `7b69382` and was
+deepened by the recursive discovery + mid-path `/vN` work in `7fdb95c`. The
+foundational gaps under "NOT STARTED" have since closed: `flake.nix` (`3c22ce4`),
+the `test.nix` suite (`befd406`, `a31fec9`), `AGENTS.md` (`3c22ce4`), and
+`CHANGELOG.md` / `FEATURES.md` / `TODO_LIST.md` now all exist; the `report/`
+directory was removed.
+
+The "Top #1 Question" (whether `Standup-Killer`'s `memory` sub-module entry needs
+a `/v2` suffix) is a per-consumer concern, resolved in each downstream flake —
+not in this repo.

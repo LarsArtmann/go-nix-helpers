@@ -125,3 +125,16 @@ Nothing. All verifications pass. No data loss, no broken builds.
 ## g) Top #1 Question
 
 **The go-nix-helpers input in both consumer flakes still points to remote `master` (rev 3c22ce4). Should I push go-nix-helpers to GitHub now, or wait?** Without pushing, both crush-daily and Standup-Killer cannot build via `nix build` without `--override-input`. The changes are verified working locally but are effectively undeployable until the upstream go-nix-helpers commit lands on remote `master`.
+
+---
+
+## Resolution (2026-07-24)
+
+The `mkGoFlake.nix` extraction described here shipped, then was **superseded**
+by the composite `flakeModules.go-standard` module (`927c924`, `9471741`), which
+bundles `treefmt-nix` internally and needs only 3 consumer inputs.
+`mkGoFlake.nix` is now deprecated (`ee8c5b3`) but still exported as
+`flake.lib.mkGoFlake` pending deletion — see `TODO_LIST.md` ("Delete or formally
+deprecate `mkGoFlake.nix`"). The deployment blocker this report worried about
+(the flake.lock pinning the old remote rev `3c22ce4`) resolved once go-nix-helpers
+was pushed; downstream consumers have since advanced past it.

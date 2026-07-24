@@ -204,3 +204,22 @@ I cannot determine whether cross-namespace same-name deps exist in your ecosyste
 | branching-flow                 | No                            | Yes               | No                 | No                    | Unlikely                  |
 | Standup-Killer                 | No                            | Yes               | No                 | No                    | Unlikely                  |
 | library-policy                 | Delegates to `./nix/packages` | —                 | —                  | —                     | Unknown                   |
+
+---
+
+## Resolution (2026-07-24)
+
+This was the first project-status snapshot (7 commits). Every foundational gap
+listed under "NOT STARTED" has since closed:
+
+- ~~No `flake.nix`~~ — added; the repo self-hosts `nix flake check` / `nix fmt` (`3c22ce4`).
+- ~~No automated tests~~ — `test.nix` suite covers auto-discovery, explicit sub-modules, and validation (`befd406`, `a31fec9`).
+- ~~No `CHANGELOG.md`~~ — exists (`[Unreleased]`).
+- ~~No `AGENTS.md`~~ — exists (`3c22ce4`).
+- ~~`report/` directory empty~~ — removed.
+
+The `/v2` major-version fix this report centres on shipped as `532752a`. The
+"Top #1 Question" (`repoName` same-name collision) is still open — not yet
+triggered in practice. Remaining open work (e.g. the hardcoded `defaultSystems`
+and a real consumer end-to-end test) is tracked in `TODO_LIST.md`; see
+`FEATURES.md` for the current honest feature inventory.
