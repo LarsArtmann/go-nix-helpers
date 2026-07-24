@@ -453,7 +453,8 @@ in
         packages = {
           default = package;
           ${cfg.pname} = package;
-        } // extraPackages;
+        }
+        // extraPackages;
 
         apps = {
           default = {
@@ -480,10 +481,13 @@ in
             );
           };
         }
-        // lib.mapAttrs' (name: pkg: lib.nameValuePair name {
-          type = "app";
-          program = lib.getExe pkg;
-        }) extraPackages;
+        // lib.mapAttrs' (
+          name: pkg:
+          lib.nameValuePair name {
+            type = "app";
+            program = lib.getExe pkg;
+          }
+        ) extraPackages;
 
         devShells = {
           default = pkgs.mkShell (
@@ -533,9 +537,7 @@ in
       {
         ${cfg.pname} = self.packages.${final.stdenv.system}.default;
       }
-      // (builtins.mapAttrs (
-        _name: _pkg: self.packages.${final.stdenv.system}.${cfg.pname}
-      ) cfg.packages)
+      // (builtins.mapAttrs (_name: _pkg: self.packages.${final.stdenv.system}.${cfg.pname}) cfg.packages)
     );
   };
 }

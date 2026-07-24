@@ -12,6 +12,72 @@ This project has not made a tagged release yet; all changes below are in
 
 ### Added
 
+- `LICENSE` file (MIT) with copyright Lars Artmann.
+- GitHub Actions CI workflow (`.github/workflows/ci.yml`) with format check,
+  integration tests, and module tests.
+- `.github/ISSUE_TEMPLATE/bug_report.md` and `feature_request.md`.
+- `.github/PULL_REQUEST_TEMPLATE.md` with testing and docs checklist.
+- `.github/CODEOWNERS`.
+- `CONTRIBUTING.md` with development setup, testing, code style, and PR guide.
+- `docs/migration-guide.md` covering mkGoFlake, go-flake-parts, and manual
+  mkPreparedSource migration to go-standard.
+- `docs/architecture.d2` and `docs/architecture.svg` — visual overview of the
+  module flow from consumer inputs to flake outputs.
+- README FAQ / Troubleshooting section covering SSH errors, vendorHash
+  mismatches, GOPRIVATE issues, and validation errors.
+- README architecture diagram section with inlined SVG.
+- README monorepo usage example.
+- `enableCheck` option to control `doCheck` in `buildGoModule` (default: true).
+- `enableOverlay` option to toggle `flake.overlays.default` generation
+  (default: true).
+- `buildFlags` option for passing build tags to `go build` (default: []).
+- `version` option to override git-derived version (default: self.rev or "dev").
+- `enableGolangciLint` toggle to conditionally include golangci-lint in
+  devShells and the lint app (default: true).
+- `enableGofumpt` and `enableGoimports` toggles in treefmt programs
+  (default: true for both).
+- `enableCompletions` option to install shell completions for the default
+  binary (default: false).
+- Monorepo support via `packages` option — generates separate `buildGoModule`
+  per entry with shared source/vendor hash, separate apps and overlay entries.
+- `fmt` app (`nix run .#fmt`) as a treefmt wrapper convenience.
+- `systems` option to the go-standard module — no longer hardcoded; defaults
+  to the standard 4-system list but can be overridden per consumer.
+- `test-module.nix` — module-level test suite with 40+ assertions covering
+  option existence, types, defaults, perSystem outputs, overlay conditional
+  generation. Wired as `checks.moduleTest` and `checks.moduleTestNoOverlay`.
+- Man pages: `docs/man/go-standard.5` and `docs/man/mkPreparedSource.5`
+  documenting all options and parameters.
+- Dynamic CI badge in README (replaces static shields.io badge).
+- MIT license badge in README.
+
+### Changed
+
+- `modules/go-standard.nix`: Refactored package building into reusable
+  `mkGoPackage` function to support monorepo (multiple packages per repo).
+- `modules/go-standard.nix`: `config.systems` now uses `cfg.systems` instead
+  of hardcoded `lib.mkDefault defaultSystems`.
+- `modules/go-standard.nix`: `version` derivation now uses `cfg.version`
+  instead of hardcoded `self.rev or self.dirtyRev or "dev"`.
+- `flake.nix`: `lib.mkGoFlake` export now wraps with `builtins.trace`
+  deprecation warning.
+- `scripts/generate-flake.sh`: Fully rewritten with `--dir`, `--template`,
+  `--no-push` (default), proper `--help`, configurable `PROJECTS_DIR`,
+  and support for both `go-standard` and `go-flake-parts` templates.
+- README: Options table expanded with all new options.
+- README: Templates section marks go-flake-parts as deprecated.
+
+### Deprecated
+
+- `mkGoFlake.nix` now emits `builtins.trace` warning directing to migration
+  guide. Will be removed in a future release.
+- `templates/go-flake-parts/` marked deprecated with banner in README.md
+  and deprecation comment in flake.nix header.
+
+### Previous changes
+
+### Added
+
 - `FEATURES.md`, `TODO_LIST.md`, `ROADMAP.md`, and `CHANGELOG.md` to document
   feature inventory, actionable work, long-term direction, and release history.
 
