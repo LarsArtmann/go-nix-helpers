@@ -12,6 +12,16 @@ This project has not made a tagged release yet; all changes below are in
 
 ### Added
 
+- `FEATURES.md`, `TODO_LIST.md`, `ROADMAP.md`, and `CHANGELOG.md` to document
+  feature inventory, actionable work, long-term direction, and release history.
+
+### Fixed
+
+- Removed committed `test-result` symlink from git tracking and added it to
+  `.gitignore`.
+
+### Added
+
 - `mkPreparedSource.nix` — shared helper that copies flake-input Go deps into
   `_local_deps/` and injects `replace` directives for Nix sandbox builds
   (`775a540`).
