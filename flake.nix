@@ -36,7 +36,11 @@
         #   (b) flake lib (works when imported as a real flake):
         #       mkPreparedSource = go-nix-helpers.lib.mkPreparedSource { inherit pkgs lib; goPkg = pkgs.go_1_26; };
         lib.mkPreparedSource = import ./mkPreparedSource.nix;
-        lib.mkGoFlake = import ./mkGoFlake.nix;
+        lib.mkGoFlake =
+          args:
+          builtins.trace "WARNING: mkGoFlake.nix is deprecated. Migrate to flakeModules.go-standard — see docs/migration-guide.md" (
+            import ./mkGoFlake.nix args
+          );
 
         # go-standard is a composite module that bundles treefmt-nix internally,
         # so consumers do NOT need to declare treefmt-nix or systems as inputs.

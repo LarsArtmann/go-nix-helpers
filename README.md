@@ -1,6 +1,7 @@
 # go-nix-helpers
 
-[![nix flake check](https://img.shields.io/badge/nix%20flake%20check-passing-5277C3?logo=nixos&style=flat-square)](https://nixos.org)
+[![CI](https://github.com/LarsArtmann/go-nix-helpers/actions/workflows/ci.yml/badge.svg)](https://github.com/LarsArtmann/go-nix-helpers/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](https://opensource.org/licenses/MIT)
 [![Go](https://img.shields.io/badge/Go-1.26+-00ADD8?logo=go&style=flat-square)](https://go.dev)
 [![flake-parts](https://img.shields.io/badge/flake--parts-module-blueviolet?style=flat-square)](https://flake.parts)
 
@@ -129,11 +130,19 @@ See the full option table below, or copy one of the [templates](#templates).
 | `vendorHash`            | `null`                       | Vendor hash for `buildGoModule` (`null` = committed `vendor/`)       |
 | `src`                   | `self.outPath`               | Source path (use `lib.fileset` to filter)                            |
 | `description`           | `"A LarsArtmann Go project"` | Short description for package meta                                   |
+| `version`               | `self.rev or "dev"`          | Version string (defaults to git revision)                            |
+| `systems`               | `[x86_64-linux, ...]`        | Systems to build for (matches `nix-systems/default`)                 |
 | `subPackages`           | `[ "." ]`                    | Subpackages to build                                                 |
 | `goPkgAttr`             | `"go_1_26"`                  | Go package attribute in nixpkgs                                      |
+| `enableCheck`           | `true`                       | Run `go test` during the Nix build (`doCheck`)                       |
+| `enableOverlay`         | `true`                       | Generate `flake.overlays.default`                                    |
 | `enableTempl`           | `false`                      | Include `templ` in devShells and treefmt                             |
 | `enableGovulncheck`     | `true`                       | Include `govulncheck` in the default devShell                        |
 | `enableGopls`           | `true`                       | Include `gopls` in the default devShell                              |
+| `enableGolangciLint`    | `true`                       | Include `golangci-lint` in devShells and the lint app                |
+| `enableGofumpt`         | `true`                       | Enable `gofumpt` in treefmt programs                                 |
+| `enableGoimports`       | `true`                       | Enable `goimports` in treefmt programs                               |
+| `buildFlags`            | `[]`                         | Extra build flags for `go build` (e.g. build tags)                   |
 | `deps`                  | `{}`                         | Private Go deps for `mkPreparedSource`                               |
 | `subModules`            | `{}`                         | Explicit sub-modules (merged with auto-discovered)                   |
 | `postPatchExtra`        | `""`                         | Extra `postPatch` commands for `mkPreparedSource`                    |
@@ -187,7 +196,10 @@ preparedSrc = mkPreparedSource {
 
 ### `mkGoFlake.nix` (deprecated)
 
-The function-based predecessor to `flakeModules.go-standard`. It is kept for backwards compatibility; new projects should use the module.
+> **⚠️ Deprecated.** Use `flakeModules.go-standard` instead. See the
+> [migration guide](docs/migration-guide.md) for step-by-step instructions.
+
+The function-based predecessor to `flakeModules.go-standard`. Kept for backwards compatibility; emits a deprecation warning on use.
 
 ---
 
@@ -196,7 +208,7 @@ The function-based predecessor to `flakeModules.go-standard`. It is kept for bac
 | Template                                                                   | Use when...                                                          |
 | -------------------------------------------------------------------------- | -------------------------------------------------------------------- |
 | [`templates/go-standard/flake.nix`](templates/go-standard/flake.nix)       | Starting a new project — recommended, minimal setup                  |
-| [`templates/go-flake-parts/flake.nix`](templates/go-flake-parts/flake.nix) | You need full manual control over packages, apps, shells, and checks |
+| [`templates/go-flake-parts/flake.nix`](templates/go-flake-parts/flake.nix) | ⚠️ **Deprecated.** Old 5-input manual pattern. Migrate to `go-standard`. |
 
 ---
 

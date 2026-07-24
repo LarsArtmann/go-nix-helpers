@@ -1,3 +1,6 @@
+# DEPRECATED — use templates/go-standard or flakeModules.go-standard instead.
+# This template uses the old 5-input manual pattern and is kept for reference.
+# See: https://github.com/LarsArtmann/go-nix-helpers/blob/master/docs/migration-guide.md
 {
   description = "REPLACE_ME — short description of what this project does";
 

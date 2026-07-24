@@ -1,4 +1,8 @@
-# Go Flake-Parts Template
+# Go Flake-Parts Template (DEPRECATED)
+
+> **⚠️ Deprecated.** Use [`templates/go-standard`](../go-standard/) or
+> `inputs.go-nix-helpers.flakeModules.go-standard` instead. This template
+> uses the old 5-input manual pattern and is kept for reference only.
 
 Standardized `flake.nix` for LarsArtmann Go projects using the Nix ecosystem stack.
 
