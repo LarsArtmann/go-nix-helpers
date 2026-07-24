@@ -26,3 +26,26 @@ jobs:
 
       - name: Run Integration Tests
         run: nix build .#checks.x86_64-linux.verify
+
+      - name: Run Module Tests
+        run: nix build .#checks.x86_64-linux.moduleTest
+
+  private-deps-test:
+    runs-on: ubuntu-latest
+    if: false  # Enable when SSH key secret is configured
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@v16
+
+      - name: Configure SSH for private repos
+        uses: webfactory/ssh-agent@v0.9.1
+        with:
+          ssh-private-key: ${{ secrets.DEPLOY_SSH_KEY }}
+
+      - name: Build with private deps
+        run: |
+          # Test that a consumer flake with private deps builds correctly
+          # Requires a test consumer repo with deps on LarsArtmann private repos
+          nix build .#checks.x86_64-linux.verify

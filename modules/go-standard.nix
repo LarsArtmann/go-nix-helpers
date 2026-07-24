@@ -168,6 +168,48 @@ in
       description = "Enable goimports in treefmt programs";
     };
 
+    enableCompletions = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = ''
+        Install shell completions (bash, zsh, fish) for the default binary.
+        Requires `installShellFiles` in nativeBuildInputs (auto-wired when enabled).
+      '';
+    };
+
+    packages = lib.mkOption {
+      type = lib.types.attrsOf (
+        lib.types.submodule {
+          options = {
+            subPackages = lib.mkOption {
+              type = lib.types.listOf lib.types.str;
+              default = [ "." ];
+              description = "Go subPackages to build for this binary";
+            };
+            description = lib.mkOption {
+              type = lib.types.str;
+              default = "A LarsArtmann Go project";
+              description = "Short description for this package's meta";
+            };
+          };
+        }
+      );
+      default = { };
+      description = ''
+        Additional packages for monorepo support.
+        When set, generates a separate buildGoModule for each entry,
+        all sharing the same source and vendor hash.
+
+        Example:
+        ```
+        go-standard.packages = {
+          server.subPackages = [ "cmd/server" ];
+          worker.subPackages = [ "cmd/worker" ];
+        };
+        ```
+      '';
+    };
+
     deps = lib.mkOption {
       type = lib.types.attrsOf lib.types.path;
       default = { };
@@ -335,35 +377,59 @@ in
         userExtraMinusPreBuild = builtins.removeAttrs cfg.extraBuildAttrs [ "preBuild" ];
         mergedPreBuild = autoDepSyncPreBuild + (cfg.extraBuildAttrs.preBuild or "");
 
-        package = buildGoModule (
-          {
-            inherit (cfg) pname;
-            inherit version;
-            src = finalSrc;
-            inherit (cfg) vendorHash;
-            proxyVendor = if usePreparedSource then false else cfg.proxyVendor;
-            inherit (cfg) subPackages;
-            doCheck = cfg.enableCheck;
-            buildFlags = cfg.buildFlags;
-            ldflags = finalLdflags;
-            preBuild = mergedPreBuild;
-            nativeBuildInputs = lib.optionals cfg.enableTempl [ pkgs.templ ];
-            meta = {
-              inherit (cfg) description;
-              license = lib.licenses.mit;
-              mainProgram = cfg.pname;
-              maintainers = [
-                {
-                  name = "Lars Artmann";
-                  github = "LarsArtmann";
-                }
-              ];
+        completionAttrs = lib.optionalAttrs cfg.enableCompletions {
+          nativeBuildInputs = [ pkgs.installShellFiles ];
+          postInstall = ''
+            installShellCompletion --cmd ${cfg.pname} \
+              --bash <($out/bin/${cfg.pname} --completion bash 2>/dev/null || true) \
+              --zsh <($out/bin/${cfg.pname} --completion zsh 2>/dev/null || true) \
+              --fish <($out/bin/${cfg.pname} --completion fish 2>/dev/null || true)
+          '';
+        };
+
+        # Reusable package builder for monorepo support.
+        # Builds one Go binary with the given name and subPackages.
+        mkGoPackage =
+          pkgName: subPkgs: pkgDesc:
+          buildGoModule (
+            {
+              pname = pkgName;
+              inherit version;
+              src = finalSrc;
+              inherit (cfg) vendorHash;
+              proxyVendor = if usePreparedSource then false else cfg.proxyVendor;
+              subPackages = subPkgs;
+              doCheck = cfg.enableCheck;
+              buildFlags = cfg.buildFlags;
+              ldflags = finalLdflags;
+              preBuild = mergedPreBuild;
+              nativeBuildInputs =
+                lib.optionals cfg.enableTempl [ pkgs.templ ]
+                ++ lib.optionals cfg.enableCompletions [ pkgs.installShellFiles ];
+              meta = {
+                description = pkgDesc;
+                license = lib.licenses.mit;
+                mainProgram = pkgName;
+                maintainers = [
+                  {
+                    name = "Lars Artmann";
+                    github = "LarsArtmann";
+                  }
+                ];
+              }
+              // cfg.extraMeta;
             }
-            // cfg.extraMeta;
-          }
-          // autoDepFodAttrs
-          // userExtraMinusPreBuild
-        );
+            // autoDepFodAttrs
+            // userExtraMinusPreBuild
+          );
+
+        # Build the default package (always present)
+        package = mkGoPackage cfg.pname cfg.subPackages cfg.description;
+
+        # Build extra packages when monorepo config is set
+        extraPackages = lib.mapAttrs (
+          name: pcfg: mkGoPackage name pcfg.subPackages pcfg.description
+        ) cfg.packages;
 
         templPkg = lib.optionals cfg.enableTempl [ pkgs.templ ];
         goplsPkg = lib.optionals cfg.enableGopls [ pkgs.gopls ];
@@ -387,7 +453,7 @@ in
         packages = {
           default = package;
           ${cfg.pname} = package;
-        };
+        } // extraPackages;
 
         apps = {
           default = {
@@ -413,7 +479,11 @@ in
               }
             );
           };
-        };
+        }
+        // lib.mapAttrs' (name: pkg: lib.nameValuePair name {
+          type = "app";
+          program = lib.getExe pkg;
+        }) extraPackages;
 
         devShells = {
           default = pkgs.mkShell (
@@ -459,9 +529,13 @@ in
       };
 
     flake.overlays.default = lib.mkIf cfg.enableOverlay (
-      final: _prev: {
+      final: _prev:
+      {
         ${cfg.pname} = self.packages.${final.stdenv.system}.default;
       }
+      // (builtins.mapAttrs (
+        _name: _pkg: self.packages.${final.stdenv.system}.${cfg.pname}
+      ) cfg.packages)
     );
   };
 }

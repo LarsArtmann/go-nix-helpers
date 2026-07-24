@@ -1,0 +1,68 @@
+direction: right
+
+consumer_flake: Consumer flake.nix {
+  shape: package
+  style.fill: "#e3e9fd"
+  inputs: 3 Inputs {
+    shape: text
+    style.fill: transparent
+    nixpkgs
+    flake-parts
+    go-nix-helpers
+  }
+  config: "go-standard = { pname = ...; }" {
+    shape: text
+    style.fill: transparent
+  }
+}
+
+module: go-standard module {
+  shape: package
+  style.fill: "#edf0fd"
+
+  options: Typed Options {
+    shape: rectangle
+    style.fill: "#f7f8fe"
+    pname
+    vendorHash
+    deps
+    systems
+    enableCheck
+    buildFlags
+    "+20 more"
+  }
+
+  config: Config Pipeline {
+    shape: rectangle
+    style.fill: "#f7f8fe"
+    perSystem
+    flake.overlays
+    systems
+  }
+}
+
+prepared_source: mkPreparedSource {
+  shape: package
+  style.fill: "#e3e9fd"
+  copies_deps: "Copies deps into _local_deps/"
+  injects: "Injects replace directives"
+  discovers: "Auto-discovers sub-modules"
+  validates: "Validates private requires"
+}
+
+outputs: Flake Outputs {
+  shape: package
+  style.fill: "#edf0fd"
+  packages.default
+  apps.default/test/lint/fmt
+  devShells.default/ci
+  checks.format/build
+  overlays.default
+  treefmt
+}
+
+consumer_flake -> module: "imports"
+module.options -> module.config
+module.config -> prepared_source: "when deps set"
+prepared_source -> outputs: "prepared src"
+module.config -> outputs: "packages, apps, ..."

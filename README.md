@@ -107,6 +107,28 @@ If you need the lower-level helper directly, import `mkPreparedSource.nix` inste
 
 ---
 
+## Monorepo support
+
+Build multiple binaries from a single repository:
+
+```nix
+go-standard = {
+  pname = "my-project";
+  vendorHash = "sha256-...";
+  description = "What it does";
+
+  packages = {
+    server.subPackages = [ "cmd/server" ];
+    worker.subPackages = [ "cmd/worker" ];
+  };
+};
+```
+
+This generates `packages.server`, `packages.worker` (plus `packages.default`),
+separate `apps` for each, and all entries in the overlay.
+
+---
+
 ## Before and after
 
 | Concern              | Manual flake.nix                           | `go-standard` module                 |
@@ -142,7 +164,9 @@ See the full option table below, or copy one of the [templates](#templates).
 | `enableGolangciLint`    | `true`                       | Include `golangci-lint` in devShells and the lint app                |
 | `enableGofumpt`         | `true`                       | Enable `gofumpt` in treefmt programs                                 |
 | `enableGoimports`       | `true`                       | Enable `goimports` in treefmt programs                               |
+| `enableCompletions`     | `false`                      | Install shell completions for the default binary                     |
 | `buildFlags`            | `[]`                         | Extra build flags for `go build` (e.g. build tags)                   |
+| `packages`              | `{}`                         | Additional packages for monorepo support                             |
 | `deps`                  | `{}`                         | Private Go deps for `mkPreparedSource`                               |
 | `subModules`            | `{}`                         | Explicit sub-modules (merged with auto-discovered)                   |
 | `postPatchExtra`        | `""`                         | Extra `postPatch` commands for `mkPreparedSource`                    |
@@ -212,14 +236,94 @@ The function-based predecessor to `flakeModules.go-standard`. Kept for backwards
 
 ---
 
+## Architecture
+
+![Architecture](docs/architecture.svg)
+
+The consumer flake imports `go-standard`, which evaluates typed options and
+generates standard flake outputs. When `deps` is set, `mkPreparedSource`
+handles private-dependency injection automatically.
+
+---
+
+## Troubleshooting / FAQ
+
+### "go: module github.com/larsartmann/...: reading ... 410 Gone" or SSH errors
+
+The Nix sandbox has no network access. You need to add private deps as flake
+inputs and list them in `deps`:
+
+```nix
+go-standard = {
+  deps = {
+    "github.com/larsartmann/go-cqrs-lite" = inputs.go-cqrs-lite;
+  };
+};
+```
+
+And add the dep as a `flake = false` input:
+
+```nix
+go-cqrs-lite = {
+  url = "git+ssh://git@github.com/LarsArtmann/go-cqrs-lite?ref=master";
+  flake = false;
+};
+```
+
+### "private modules without local replace" build error
+
+This is the build-time validation catching a missing dep. Every private
+`require` in `go.mod` must have a matching entry in `deps`. Either add the
+missing dep, or set `validatePrivateDeps = false;` if the dep is actually
+public.
+
+### vendorHash mismatch after adding deps
+
+Run `nix build` once and copy the `got: sha256-...` hash from the error into
+`vendorHash`. The module changes how deps are prepared, so the hash differs
+from a plain `buildGoModule`.
+
+### "GOPRIVATE not set" / Go tries to reach the proxy for private modules
+
+The module auto-injects `GOPRIVATE = "github.com/larsartmann/*,github.com/LarsArtmann/*"`
+when `deps` is set. If you need a different pattern, override via:
+
+```nix
+go-standard.shellExtraEnv.GOPRIVATE = "your-pattern/*";
+```
+
+### How do I disable the Nix build check (go test)?
+
+```nix
+go-standard.enableCheck = false;
+```
+
+### How do I override the systems list?
+
+```nix
+go-standard.systems = [ "x86_64-linux" ];  # Linux only
+# Or use a systems input:
+# go-standard.systems = import inputs.systems;
+```
+
+### How do I add build tags?
+
+```nix
+go-standard.buildFlags = [ "-tags" "production" ];
+```
+
+---
+
 ## Development
 
 ```bash
-nix flake check                    # all checks (autoDiscovery, explicitOnly, verify, treefmt)
+nix flake check                    # all checks (autoDiscovery, explicitOnly, verify, moduleTest, treefmt)
 nix build .#verifyValidation       # build the validation test runner
 nix run .#verifyValidation         # run the negative-case validation outside the sandbox
 nix fmt                            # format all .nix files
 ```
+
+See [`CONTRIBUTING.md`](CONTRIBUTING.md) for the development guide.
 
 ---
 

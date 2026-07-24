@@ -156,6 +156,8 @@ let
     (assertCheck "enableGolangciLint default is true" (cfg.enableGolangciLint == true) "true")
     (assertCheck "enableGofumpt default is true" (cfg.enableGofumpt == true) "true")
     (assertCheck "enableGoimports default is true" (cfg.enableGoimports == true) "true")
+    (assertCheck "enableCompletions default is false" (cfg.enableCompletions == false) "false")
+    (assertCheck "packages default is empty" (cfg.packages == { }) "{}")
     (assertCheck "autoGoPrivate default is true" (cfg.autoGoPrivate == true) "true")
     (assertCheck "validatePrivateDeps default is true" (cfg.validatePrivateDeps == true) "true")
     (assertCheck "proxyVendor default is true" (cfg.proxyVendor == true) "true")

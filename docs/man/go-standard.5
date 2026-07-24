@@ -1,0 +1,158 @@
+.TH go-standard 5 "2026-07-24" "go-nix-helpers" "File Formats Manual"
+.SH NAME
+go-standard \- flake-parts module configuration options for Go projects
+.SH SYNOPSIS
+.nf
+flake-parts.lib.mkFlake { inherit inputs; } {
+  imports = [ inputs.go-nix-helpers.flakeModules.go-standard ];
+
+  go-standard = {
+    pname = "my-project";
+    vendorHash = "sha256-...";
+    description = "What it does";
+    \fI...\fR
+  };
+};
+.fi
+.SH DESCRIPTION
+The
+.B go-standard
+module is a
+.B flake-parts
+module that generates standard Nix flake outputs for Go projects.
+It bundles
+.B treefmt-nix
+internally, so consumers need only three flake inputs:
+.BR nixpkgs ,
+.BR flake-parts ,
+and
+.BR go-nix-helpers .
+.SH OPTIONS
+.TP
+.BR pname " (str, required)"
+Package name. Used as the overlay attribute and mainProgram.
+.TP
+.BR vendorHash " (null|str, default: null)"
+Vendor hash for buildGoModule. Use null for committed vendor directories.
+.TP
+.BR src " (path, default: self.outPath)"
+Source path for the Go module.
+.TP
+.BR version " (str, default: self.rev or self.dirtyRev or \"dev\")"
+Version string for the package.
+.TP
+.BR description " (str, default: \"A LarsArtmann Go project\")"
+Short description for package meta.
+.TP
+.BR systems " (list str, default: [\"x86_64-linux\" \"aarch64-linux\" \"x86_64-darwin\" \"aarch64-darwin\"])"
+Systems to build for. Override to restrict or extend.
+.TP
+.BR subPackages " (list str, default: [\".\"])"
+Go subPackages to build.
+.TP
+.BR packages " (attrs, default: {})"
+Additional packages for monorepo support. Each entry generates a separate
+buildGoModule with its own subPackages.
+.TP
+.BR goPkgAttr " (str, default: \"go_1_26\")"
+Go package attribute in nixpkgs.
+.TP
+.BR enableCheck " (bool, default: true)"
+Run go test during the Nix build (doCheck).
+.TP
+.BR enableOverlay " (bool, default: true)"
+Generate flake.overlays.default.
+.TP
+.BR enableTempl " (bool, default: false)"
+Include templ in devShells and treefmt.
+.TP
+.BR enableGovulncheck " (bool, default: true)"
+Include govulncheck in the default devShell.
+.TP
+.BR enableGopls " (bool, default: true)"
+Include gopls in the default devShell.
+.TP
+.BR enableGolangciLint " (bool, default: true)"
+Include golangci-lint in devShells and the lint app.
+.TP
+.BR enableGofumpt " (bool, default: true)"
+Enable gofumpt in treefmt programs.
+.TP
+.BR enableGoimports " (bool, default: true)"
+Enable goimports in treefmt programs.
+.TP
+.BR enableCompletions " (bool, default: false)"
+Install shell completions for the default binary.
+.TP
+.BR buildFlags " (list str, default: [])"
+Extra build flags passed to go build (e.g. build tags).
+.TP
+.BR deps " (attrs path, default: {})"
+Private Go deps for mkPreparedSource.
+.TP
+.BR subModules " (attrs, default: {})"
+Explicit sub-modules (merged with auto-discovered).
+.TP
+.BR autoGoPrivate " (bool, default: true)"
+Auto-inject GOPRIVATE when deps are set.
+.TP
+.BR validatePrivateDeps " (bool, default: true)"
+Fail build if a private require lacks a replace.
+.TP
+.BR proxyVendor " (bool, default: true)"
+Pass proxyVendor to buildGoModule.
+.TP
+.BR ldflags " (null|list str, default: null)"
+Custom ldflags. null = ["-s" "-w" "-X main.version=${version}"].
+.TP
+.BR extraMeta " (attrs, default: {})"
+Extra attributes merged into package meta.
+.TP
+.BR extraBuildAttrs " (attrs, default: {})"
+Extra attributes merged into buildGoModule.
+.TP
+.BR devShellExtraPackages " (function, default: _: [])"
+Function receiving pkgs, returns extra devShell packages.
+.TP
+.BR shellExtraEnv " (attrs, default: {})"
+Extra environment variables for devShells.
+.SH OUTPUTS
+.TP
+.BR packages.default
+The compiled binary.
+.TP
+.BR packages.\\fIpname\\fR
+Same package under its own name.
+.TP
+.BR apps.default
+nix run support.
+.TP
+.BR apps.test
+go test -race -v ./...
+.TP
+.BR apps.lint
+golangci-lint run ./...
+.TP
+.BR apps.fmt
+treefmt wrapper.
+.TP
+.BR devShells.default
+Full dev shell with go, gopls, linter, etc.
+.TP
+.BR devShells.ci
+Minimal CI shell.
+.TP
+.BR checks.format
+Treefmt formatting check.
+.TP
+.BR checks.build
+Package build verification.
+.TP
+.BR overlays.default
+Exposes pkgs.\\fIpname\\fR to other flakes.
+.SH SEE ALSO
+.BR mkPreparedSource (5),
+.BR nix (1),
+.BR nix-build (1)
+.SH AUTHOR
+Lars Artmann <https://github.com/LarsArtmann>
