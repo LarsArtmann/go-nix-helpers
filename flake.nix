@@ -65,7 +65,14 @@
           # Integration-test derivations from test.nix, wired as flake checks.
           tests = import ./test.nix { inherit pkgs; };
           # Module-level tests for go-standard options and outputs.
-          moduleTests = import ./test-module.nix { inherit pkgs lib self inputs; };
+          moduleTests = import ./test-module.nix {
+            inherit
+              pkgs
+              lib
+              self
+              inputs
+              ;
+          };
         in
         {
           # -- Checks (nix flake check) -------------------------------------------

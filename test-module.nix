@@ -21,16 +21,17 @@ let
     module github.com/larsartmann/mock-go-project
     go 1.26
     EOF
-    mkdir -p $out
     cat > $out/main.go <<'EOF'
     package main
     func main() {}
     EOF
   '';
 
-  # Minimal flake-parts infrastructure stubs for testing module evaluation.
-  # The real flake-parts module defines `systems`, `perSystem`, `flake`, etc.
-  # We provide freeform versions so the go-standard module evaluates correctly.
+  mockSelf = {
+    outPath = mockSrc;
+  };
+
+  # Minimal flake-parts infrastructure stubs for module evaluation.
   flakePartsStub = {
     options = {
       systems = lib.mkOption {
@@ -48,8 +49,49 @@ let
     };
   };
 
-  # Evaluate just the module's options using lib.evalModules
-  # This lets us verify option definitions, types, and defaults
+  # PerSystem stub options (packages, apps, devShells, checks, treefmt)
+  perSystemStubOptions = {
+    options = {
+      packages = lib.mkOption {
+        type = lib.types.attrs;
+        default = { };
+      };
+      apps = lib.mkOption {
+        type = lib.types.attrs;
+        default = { };
+      };
+      devShells = lib.mkOption {
+        type = lib.types.attrs;
+        default = { };
+      };
+      checks = lib.mkOption {
+        type = lib.types.attrs;
+        default = { };
+      };
+      treefmt = {
+        projectRootFile = lib.mkOption {
+          type = lib.types.str;
+          default = "flake.nix";
+        };
+        programs = lib.mkOption {
+          type = lib.types.attrsOf (lib.types.attrsOf lib.types.anything);
+          default = { };
+        };
+        build = {
+          wrapper = lib.mkOption {
+            type = lib.types.package;
+            default = pkgs.hello;
+          };
+          check = lib.mkOption {
+            type = lib.types.anything;
+            default = _: pkgs.emptyDirectory;
+          };
+        };
+      };
+    };
+  };
+
+  # Evaluate the go-standard module to extract options and the perSystem function
   moduleEval = lib.evalModules {
     modules = [
       flakePartsStub
@@ -64,41 +106,35 @@ let
     ];
     specialArgs = {
       inputs = inputs;
-      self = {
-        outPath = mockSrc;
-      };
+      self = mockSelf;
     };
   };
 
   cfg = moduleEval.config.go-standard;
 
-  # Simulate calling the perSystem function with mock perSystem args
-  # We extract the perSystem value from the evaluated config
+  # The perSystem function from go-standard, evaluated as a proper module
   perSystemFn = moduleEval.config.perSystem;
 
-  # Mock perSystem arguments
-  mockPkgs = pkgs;
-  mockPerSystemArgs = {
-    config = moduleEval.config;
-    pkgs = mockPkgs;
-    lib = mockPkgs.lib;
-    system = "x86_64-linux";
+  perSystemEval = lib.evalModules {
+    modules = [
+      perSystemStubOptions
+      (if builtins.isFunction perSystemFn then perSystemFn else { config, ... }: perSystemFn)
+    ];
+    specialArgs = {
+      inherit pkgs lib;
+      config = perSystemEval.config or { };
+    };
   };
 
-  # Evaluate perSystem outputs
-  perSystemOutput =
-    if builtins.isFunction perSystemFn then
-      perSystemFn mockPerSystemArgs
-    else
-      perSystemFn;
+  psCfg = perSystemEval.config;
 
   # Check helper: assert a condition and return a message
   assertCheck =
     name: condition: expected:
     if condition then
-      "PASS: ${name}"
+      "echo 'PASS: ${name}'"
     else
-      throw "FAIL: ${name} — expected ${expected}";
+      "echo 'FAIL: ${name} — expected ${expected}' && exit 1";
 
   # All option checks
   optionChecks = [
@@ -123,51 +159,48 @@ let
     (assertCheck "autoGoPrivate default is true" (cfg.autoGoPrivate == true) "true")
     (assertCheck "validatePrivateDeps default is true" (cfg.validatePrivateDeps == true) "true")
     (assertCheck "proxyVendor default is true" (cfg.proxyVendor == true) "true")
-    (assertCheck "systems default is 4-element list" (
-      builtins.length cfg.systems == 4
-    ) "4 systems")
-    (assertCheck "systems includes x86_64-linux" (
-      builtins.elem "x86_64-linux" cfg.systems
-    ) "x86_64-linux in list")
+    (assertCheck "systems default is 4-element list" (builtins.length cfg.systems == 4) "4 systems")
+    (assertCheck "systems includes x86_64-linux" (builtins.elem "x86_64-linux" cfg.systems)
+      "x86_64-linux in list"
+    )
     (assertCheck "ldflags default is null" (cfg.ldflags == null) "null")
     (assertCheck "extraMeta default is empty" (cfg.extraMeta == { }) "{}")
     (assertCheck "extraBuildAttrs default is empty" (cfg.extraBuildAttrs == { }) "{}")
     (assertCheck "shellExtraEnv default is empty" (cfg.shellExtraEnv == { }) "{}")
   ];
 
-  perSystemChecks =
-    let
-      has = path: builtins.hasAttrByPath path perSystemOutput;
-    in
-    [
-      (assertCheck "packages.default exists" (has [ "packages" "default" ]) "packages.default")
-      (assertCheck "packages.test-project exists" (
-        has [ "packages" "test-project" ]
-      ) "packages.test-project")
-      (assertCheck "apps.default exists" (has [ "apps" "default" ]) "apps.default")
-      (assertCheck "apps.test exists" (has [ "apps" "test" ]) "apps.test")
-      (assertCheck "apps.lint exists" (has [ "apps" "lint" ]) "apps.lint")
-      (assertCheck "apps.fmt exists" (has [ "apps" "fmt" ]) "apps.fmt")
-      (assertCheck "devShells.default exists" (has [ "devShells" "default" ]) "devShells.default")
-      (assertCheck "devShells.ci exists" (has [ "devShells" "ci" ]) "devShells.ci")
-      (assertCheck "checks.format exists" (has [ "checks" "format" ]) "checks.format")
-      (assertCheck "checks.build exists" (has [ "checks" "build" ]) "checks.build")
-      (assertCheck "treefmt exists" (has [ "treefmt" ]) "treefmt")
-      (assertCheck "treefmt.programs.gofumpt.enabled" (
-        has [ "treefmt" "programs" "gofumpt" "enable" ]
-      ) "gofumpt.enable")
-      (assertCheck "treefmt.programs.goimports.enabled" (
-        has [ "treefmt" "programs" "goimports" "enable" ]
-      ) "goimports.enable")
-      (assertCheck "treefmt.programs.nixfmt.enabled" (
-        has [ "treefmt" "programs" "nixfmt" "enable" ]
-      ) "nixfmt.enable")
-    ];
+  perSystemChecks = [
+    (assertCheck "packages.default exists" (psCfg.packages ? default) "packages.default")
+    (assertCheck "packages.test-project exists" (psCfg.packages ? test-project) "packages.test-project")
+    (assertCheck "apps.default exists" (psCfg.apps ? default) "apps.default")
+    (assertCheck "apps.test exists" (psCfg.apps ? test) "apps.test")
+    (assertCheck "apps.lint exists" (psCfg.apps ? lint) "apps.lint")
+    (assertCheck "apps.fmt exists" (psCfg.apps ? fmt) "apps.fmt")
+    (assertCheck "devShells.default exists" (psCfg.devShells ? default) "devShells.default")
+    (assertCheck "devShells.ci exists" (psCfg.devShells ? ci) "devShells.ci")
+    (assertCheck "checks.format exists" (psCfg.checks ? format) "checks.format")
+    (assertCheck "checks.build exists" (psCfg.checks ? build) "checks.build")
+    (assertCheck "treefmt.programs.gofumpt.enabled" (
+      psCfg.treefmt.programs.gofumpt.enable or false == true
+    ) "gofumpt.enable = true")
+    (assertCheck "treefmt.programs.goimports.enabled" (
+      psCfg.treefmt.programs.goimports.enable or false == true
+    ) "goimports.enable = true")
+    (assertCheck "treefmt.programs.nixfmt.enabled" (
+      psCfg.treefmt.programs.nixfmt.enable or false == true
+    ) "nixfmt.enable = true")
+  ];
 
   overlayCheck =
     let
-      overlay = moduleEval.config.flake.overlays.default;
-      isOverlay = builtins.isFunction overlay;
+      rawOverlay = moduleEval.config.flake.overlays.default or null;
+      # lib.mkIf wraps the value in { _type = "if"; condition = true; content = fn; }
+      overlay =
+        if rawOverlay ? _type && rawOverlay._type == "if" then
+          (if rawOverlay.condition then rawOverlay.content else null)
+        else
+          rawOverlay;
+      isOverlay = overlay != null && builtins.isFunction overlay;
     in
     assertCheck "flake.overlays.default exists" isOverlay "function";
 
@@ -192,6 +225,7 @@ in
     let
       eval = lib.evalModules {
         modules = [
+          flakePartsStub
           ./modules/go-standard.nix
           {
             go-standard = {
@@ -203,16 +237,21 @@ in
         ];
         specialArgs = {
           inputs = inputs;
-          self = { outPath = mockSrc; };
+          self = mockSelf;
         };
       };
+      rawOverlay = eval.config.flake.overlays.default or null;
+      # When enableOverlay=false, mkIf wraps with condition=false
+      # The overlay attr still exists but condition is false
+      hasOverlay =
+        if rawOverlay ? _type && rawOverlay._type == "if" then rawOverlay.condition else rawOverlay != null;
     in
     pkgs.runCommand "test-module-no-overlay" { } ''
       ${
-        if !eval.config.flake ? overlays then
+        if !hasOverlay then
           "echo 'PASS: overlay not generated when enableOverlay=false'"
         else
-          throw "FAIL: overlay still generated when enableOverlay=false"
+          "echo 'FAIL: overlay still generated when enableOverlay=false' && exit 1"
       }
 
       echo "PASS: enableOverlay=false test passed"
