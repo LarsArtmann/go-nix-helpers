@@ -28,10 +28,31 @@ let
     EOF
   '';
 
+  # Minimal flake-parts infrastructure stubs for testing module evaluation.
+  # The real flake-parts module defines `systems`, `perSystem`, `flake`, etc.
+  # We provide freeform versions so the go-standard module evaluates correctly.
+  flakePartsStub = {
+    options = {
+      systems = lib.mkOption {
+        type = lib.types.anything;
+        default = [ ];
+      };
+      perSystem = lib.mkOption {
+        type = lib.types.anything;
+        default = { };
+      };
+      flake = lib.mkOption {
+        type = lib.types.attrs;
+        default = { };
+      };
+    };
+  };
+
   # Evaluate just the module's options using lib.evalModules
   # This lets us verify option definitions, types, and defaults
   moduleEval = lib.evalModules {
     modules = [
+      flakePartsStub
       ./modules/go-standard.nix
       {
         go-standard = {
