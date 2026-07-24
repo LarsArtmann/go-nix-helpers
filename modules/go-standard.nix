@@ -103,6 +103,71 @@ in
       description = "Include gopls in the default devShell";
     };
 
+    systems = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      default = defaultSystems;
+      defaultText = lib.literalExpression ''
+        [
+          "x86_64-linux"
+          "aarch64-linux"
+          "x86_64-darwin"
+          "aarch64-darwin"
+        ]
+      '';
+      description = ''
+        Systems to build for. Defaults to the standard set from
+        github:nix-systems/default. Override to restrict or extend.
+        Alternatively, use a `systems` flake input and set
+        `go-standard.systems = import inputs.systems;`.
+      '';
+    };
+
+    enableCheck = lib.mkOption {
+      type = lib.types.bool;
+      default = true;
+      description = "Whether to run `go test` during the Nix build (doCheck)";
+    };
+
+    enableOverlay = lib.mkOption {
+      type = lib.types.bool;
+      default = true;
+      description = "Whether to generate flake.overlays.default";
+    };
+
+    buildFlags = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      default = [ ];
+      description = "Extra build flags passed to `go build` (e.g. build tags)";
+    };
+
+    version = lib.mkOption {
+      type = lib.types.str;
+      default = self.rev or self.dirtyRev or "dev";
+      defaultText = lib.literalExpression "self.rev or self.dirtyRev or \"dev\"";
+      description = ''
+        Version string for the package. Defaults to the git revision.
+        Override for custom versioning.
+      '';
+    };
+
+    enableGolangciLint = lib.mkOption {
+      type = lib.types.bool;
+      default = true;
+      description = "Include golangci-lint in devShells and the lint app";
+    };
+
+    enableGofumpt = lib.mkOption {
+      type = lib.types.bool;
+      default = true;
+      description = "Enable gofumpt in treefmt programs";
+    };
+
+    enableGoimports = lib.mkOption {
+      type = lib.types.bool;
+      default = true;
+      description = "Enable goimports in treefmt programs";
+    };
+
     deps = lib.mkOption {
       type = lib.types.attrsOf lib.types.path;
       default = { };
@@ -187,7 +252,7 @@ in
   };
 
   config = {
-    systems = lib.mkDefault defaultSystems;
+    systems = cfg.systems;
 
     perSystem =
       {
