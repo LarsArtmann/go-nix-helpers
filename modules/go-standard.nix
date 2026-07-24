@@ -173,7 +173,9 @@ in
       default = false;
       description = ''
         Install shell completions (bash, zsh, fish) for the default binary.
-        Requires `installShellFiles` in nativeBuildInputs (auto-wired when enabled).
+        Requires the binary to support `--completion <shell>` subcommand
+        (e.g. cobra, urfave/cli). Silently does nothing if the binary
+        doesn't support completions.
       '';
     };
 
