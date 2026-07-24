@@ -99,9 +99,9 @@ if [ "$USE_TEMPL" = true ] && [ "$TEMPLATE" = "go-flake-parts" ]; then
   sed -i '/golangci-lint$/a\                templ,' "$TARGET"
 fi
 
-# For go-standard template, set enableTempl
+# For go-standard template, uncomment the enableTempl line
 if [ "$USE_TEMPL" = true ] && [ "$TEMPLATE" = "go-standard" ]; then
-  sed -i 's/enableTempl = false/enableTempl = true/' "$TARGET"
+  sed -i 's/# *enableTempl = true;/enableTempl = true;/' "$TARGET"
 fi
 
 # Remove private deps section if not requested (go-flake-parts template only)

@@ -73,6 +73,16 @@
               inputs
               ;
           };
+          # Man pages for go-standard and mkPreparedSource
+          manPages = pkgs.stdenv.mkDerivation {
+            name = "go-nix-helpers-manpages";
+            dontUnpack = true;
+            installPhase = ''
+              mkdir -p $out/share/man/man5
+              cp ${./docs/man/go-standard.5} $out/share/man/man5/
+              cp ${./docs/man/mkPreparedSource.5} $out/share/man/man5/
+            '';
+          };
         in
         {
           # -- Checks (nix flake check) -------------------------------------------
@@ -127,9 +137,12 @@
               nixfmt
               nix
               git
+              man
+              manPages
             ];
             shellHook = ''
               echo "go-nix-helpers dev shell — nix $(nix --version)"
+              echo "Man pages: man go-standard / man mkPreparedSource"
             '';
           };
 

@@ -206,7 +206,143 @@ let
     in
     assertCheck "flake.overlays.default exists" isOverlay "function";
 
-  allChecks = optionChecks ++ perSystemChecks ++ [ overlayCheck ];
+  # Helper: evaluate perSystem output with a custom go-standard config.
+  mkPerSystemConfig =
+    extraConfig:
+    let
+      modEval = lib.evalModules {
+        modules = [
+          flakePartsStub
+          ./modules/go-standard.nix
+          {
+            go-standard = {
+              pname = "test-project";
+              vendorHash = null;
+            }
+            // extraConfig;
+          }
+        ];
+        specialArgs = {
+          inherit inputs;
+          self = mockSelf;
+        };
+      };
+      perSysEval = lib.evalModules {
+        modules = [
+          perSystemStubOptions
+          (
+            let
+              fn = modEval.config.perSystem;
+            in
+            if builtins.isFunction fn then fn else { config, ... }: fn
+          )
+        ];
+        specialArgs = {
+          inherit pkgs lib;
+          config = perSysEval.config or { };
+        };
+      };
+    in
+    perSysEval.config;
+
+  # --- Monorepo tests ------------------------------------------------------
+  monorepoCfg = mkPerSystemConfig {
+    packages.worker.subPackages = [ "cmd/worker" ];
+    packages.worker.description = "Worker binary";
+  };
+
+  # --- No-lint tests -------------------------------------------------------
+  noLintCfg = mkPerSystemConfig { enableGolangciLint = false; };
+
+  # --- Formatter toggle tests ----------------------------------------------
+  noFmtCfg = mkPerSystemConfig {
+    enableGofumpt = false;
+    enableGoimports = false;
+  };
+
+  # --- Version override test -----------------------------------------------
+  versionCfg = mkPerSystemConfig { version = "1.0.0-test"; };
+
+  # --- Completions test ----------------------------------------------------
+  completionsCfg = mkPerSystemConfig { enableCompletions = true; };
+
+  # --- buildFlags test -----------------------------------------------------
+  buildFlagsCfg = mkPerSystemConfig {
+    buildFlags = [
+      "-tags"
+      "integration"
+    ];
+  };
+
+  # --- Monorepo overlay test (verifies D1 fix) -----------------------------
+  monorepoOverlayCheck =
+    let
+      mockSelfMono = {
+        outPath = mockSrc;
+        packages.x86_64-linux = {
+          default = "mock-default-derivation";
+          test-project = "mock-default-derivation";
+          worker = "mock-worker-derivation";
+        };
+      };
+      modEval = lib.evalModules {
+        modules = [
+          flakePartsStub
+          ./modules/go-standard.nix
+          {
+            go-standard = {
+              pname = "test-project";
+              vendorHash = null;
+              packages.worker.subPackages = [ "cmd/worker" ];
+              packages.worker.description = "Worker binary";
+            };
+          }
+        ];
+        specialArgs = {
+          inherit inputs;
+          self = mockSelfMono;
+        };
+      };
+      rawOverlay = modEval.config.flake.overlays.default or null;
+      overlay =
+        if rawOverlay ? _type && rawOverlay._type == "if" then
+          (if rawOverlay.condition then rawOverlay.content else null)
+        else
+          rawOverlay;
+      overlayResult =
+        if overlay != null && builtins.isFunction overlay then
+          overlay { stdenv.system = "x86_64-linux"; } { }
+        else
+          null;
+      workerMapsCorrectly =
+        overlayResult != null && overlayResult ? worker && overlayResult.worker == "mock-worker-derivation";
+    in
+    assertCheck "monorepo overlay maps worker to its own derivation" workerMapsCorrectly
+      "overlayResult.worker = mock-worker-derivation";
+
+  additionalChecks = [
+    (assertCheck "monorepo: packages.worker exists" (monorepoCfg.packages ? worker) "packages.worker")
+    (assertCheck "monorepo: apps.worker exists" (monorepoCfg.apps ? worker) "apps.worker")
+    (assertCheck "enableGolangciLint=false removes lint app" (!(noLintCfg.apps ? lint)) "no apps.lint")
+    (assertCheck "enableGofumpt=false disables gofumpt" (
+      noFmtCfg.treefmt.programs.gofumpt.enable or true == false
+    ) "gofumpt.enable = false")
+    (assertCheck "enableGoimports=false disables goimports" (
+      noFmtCfg.treefmt.programs.goimports.enable or true == false
+    ) "goimports.enable = false")
+    (assertCheck "version override propagates to package name" (
+      versionCfg.packages.default ? name && lib.hasInfix "1.0.0-test" versionCfg.packages.default.name
+    ) "version in package name")
+    (assertCheck "enableCompletions=true evaluates successfully" (
+      completionsCfg.packages ? default
+    ) "packages.default with completions")
+    (assertCheck "buildFlags accepts custom flags" (
+      buildFlagsCfg.packages ? default
+    ) "packages.default with custom buildFlags")
+    monorepoOverlayCheck
+  ];
+
+  allChecks = optionChecks ++ perSystemChecks ++ [ overlayCheck ] ++ additionalChecks;
 in
 {
   # Run all checks in a single derivation

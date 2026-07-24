@@ -50,44 +50,8 @@ This project has not made a tagged release yet; all changes below are in
   documenting all options and parameters.
 - Dynamic CI badge in README (replaces static shields.io badge).
 - MIT license badge in README.
-
-### Changed
-
-- `modules/go-standard.nix`: Refactored package building into reusable
-  `mkGoPackage` function to support monorepo (multiple packages per repo).
-- `modules/go-standard.nix`: `config.systems` now uses `cfg.systems` instead
-  of hardcoded `lib.mkDefault defaultSystems`.
-- `modules/go-standard.nix`: `version` derivation now uses `cfg.version`
-  instead of hardcoded `self.rev or self.dirtyRev or "dev"`.
-- `flake.nix`: `lib.mkGoFlake` export now wraps with `builtins.trace`
-  deprecation warning.
-- `scripts/generate-flake.sh`: Fully rewritten with `--dir`, `--template`,
-  `--no-push` (default), proper `--help`, configurable `PROJECTS_DIR`,
-  and support for both `go-standard` and `go-flake-parts` templates.
-- README: Options table expanded with all new options.
-- README: Templates section marks go-flake-parts as deprecated.
-
-### Deprecated
-
-- `mkGoFlake.nix` now emits `builtins.trace` warning directing to migration
-  guide. Will be removed in a future release.
-- `templates/go-flake-parts/` marked deprecated with banner in README.md
-  and deprecation comment in flake.nix header.
-
-### Previous changes
-
-### Added
-
 - `FEATURES.md`, `TODO_LIST.md`, `ROADMAP.md`, and `CHANGELOG.md` to document
   feature inventory, actionable work, long-term direction, and release history.
-
-### Fixed
-
-- Removed committed `test-result` symlink from git tracking and added it to
-  `.gitignore`.
-
-### Added
-
 - `mkPreparedSource.nix` — shared helper that copies flake-input Go deps into
   `_local_deps/` and injects `replace` directives for Nix sandbox builds
   (`775a540`).
@@ -130,6 +94,25 @@ This project has not made a tagged release yet; all changes below are in
 
 ### Changed
 
+- `modules/go-standard.nix`: Refactored package building into reusable
+  `mkGoPackage` function to support monorepo (multiple packages per repo).
+- `modules/go-standard.nix`: `config.systems` now uses `cfg.systems` instead
+  of hardcoded `lib.mkDefault defaultSystems`.
+- `modules/go-standard.nix`: `version` derivation now uses `cfg.version`
+  instead of hardcoded `self.rev or self.dirtyRev or "dev"`.
+- `modules/go-standard.nix`: Wired `enableCompletions` `postInstall` properly
+  into `mkGoPackage` using per-package name (was dead code).
+- `modules/go-standard.nix`: Fixed monorepo overlay to map each package to its
+  own derivation instead of the default.
+- `flake.nix`: `lib.mkGoFlake` export now wraps with `builtins.trace`
+  deprecation warning.
+- `scripts/generate-flake.sh`: Fully rewritten with `--dir`, `--template`,
+  `--no-push` (default), proper `--help`, configurable `PROJECTS_DIR`,
+  and support for both `go-standard` and `go-flake-parts` templates.
+- `scripts/generate-flake.sh`: Fixed `--templ` flag for go-standard template
+  (was a no-op; now uncomments the `enableTempl` line).
+- README: Options table expanded with all new options.
+- README: Templates section marks go-flake-parts as deprecated.
 - README rewritten as a product-style quickstart with badges, copy-paste
   `flake.nix`, feature tables, and before/after comparison (`0ef8c34`).
 - `go-standard` forwarding into `mkPreparedSource` changed from
@@ -140,11 +123,15 @@ This project has not made a tagged release yet; all changes below are in
 
 ### Deprecated
 
-- `mkGoFlake.nix` function-based predecessor superseded by the `go-standard`
-  flake-parts module (`ee8c5b3`).
+- `mkGoFlake.nix` now emits `builtins.trace` warning directing to migration
+  guide. Will be removed in a future release.
+- `templates/go-flake-parts/` marked deprecated with banner in README.md
+  and deprecation comment in flake.nix header.
 
 ### Fixed
 
+- Removed committed `test-result` symlink from git tracking and added it to
+  `.gitignore`.
 - `repoName` extraction for versioned deps to avoid `_local_deps/v2` collisions
   (`532752a`).
 - `subModuleReplace` local directory path for versioned sub-modules such as
