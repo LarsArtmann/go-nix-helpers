@@ -42,17 +42,17 @@ nix run .#verifyValidation    # negative-case test (run outside sandbox)
 
 ## Project structure
 
-| Path                          | Purpose                                               |
-| ----------------------------- | ----------------------------------------------------- |
-| `modules/go-standard.nix`     | The main flake-parts module                           |
-| `mkPreparedSource.nix`        | Core private-dep injection helper                     |
-| `mkGoFlake.nix`               | Deprecated function-based predecessor                 |
-| `flake.nix`                   | Self-hosting flake: checks, formatter, devShell, lib  |
-| `test.nix`                    | Integration tests for mkPreparedSource                |
-| `test-module.nix`             | Module-level tests for go-standard options/outputs    |
-| `templates/`                  | Consumer-facing templates                             |
-| `scripts/`                    | Helper scripts (lint, dashboard, generate-flake)     |
-| `docs/`                       | Documentation and reference material                  |
+| Path                      | Purpose                                              |
+| ------------------------- | ---------------------------------------------------- |
+| `modules/go-standard.nix` | The main flake-parts module                          |
+| `mkPreparedSource.nix`    | Core private-dep injection helper                    |
+| `mkGoFlake.nix`           | Deprecated function-based predecessor                |
+| `flake.nix`               | Self-hosting flake: checks, formatter, devShell, lib |
+| `test.nix`                | Integration tests for mkPreparedSource               |
+| `test-module.nix`         | Module-level tests for go-standard options/outputs   |
+| `templates/`              | Consumer-facing templates                            |
+| `scripts/`                | Helper scripts (lint, dashboard, generate-flake)     |
+| `docs/`                   | Documentation and reference material                 |
 
 ## Making changes
 
@@ -86,6 +86,7 @@ nix run .#verifyValidation    # negative-case test (run outside sandbox)
 
 Use the [GitHub issue tracker](https://github.com/LarsArtmann/go-nix-helpers/issues).
 Include:
+
 - Your `flake.nix` (or relevant snippet)
 - The exact error message
 - Output of `nix flake check` or `nix build`

@@ -105,7 +105,7 @@ let
       }
     ];
     specialArgs = {
-      inputs = inputs;
+      inherit inputs;
       self = mockSelf;
     };
   };
@@ -238,7 +238,7 @@ in
           }
         ];
         specialArgs = {
-          inputs = inputs;
+          inherit inputs;
           self = mockSelf;
         };
       };

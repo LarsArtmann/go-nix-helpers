@@ -8,15 +8,15 @@ recommended `flakeModules.go-standard` module.
 
 ## Why migrate?
 
-| Before (mkGoFlake / manual)     | After (go-standard module)             |
-| ------------------------------- | -------------------------------------- |
-| 5 flake inputs required         | 3 flake inputs required                |
-| ~80-120 lines of flake.nix      | ~20 lines                              |
-| Manual `treefmt-nix` wiring     | Bundled internally                     |
-| Manual `systems` input          | Hardcoded defaults (overridable)       |
-| Manual `mkPreparedSource` wiring | `deps` attrset — auto-wired            |
-| Sub-module discovery by hand    | Recursive auto-discovery at any depth  |
-| Cryptic SSH errors at build     | Clear pre-build validation             |
+| Before (mkGoFlake / manual)      | After (go-standard module)            |
+| -------------------------------- | ------------------------------------- |
+| 5 flake inputs required          | 3 flake inputs required               |
+| ~80-120 lines of flake.nix       | ~20 lines                             |
+| Manual `treefmt-nix` wiring      | Bundled internally                    |
+| Manual `systems` input           | Hardcoded defaults (overridable)      |
+| Manual `mkPreparedSource` wiring | `deps` attrset — auto-wired           |
+| Sub-module discovery by hand     | Recursive auto-discovery at any depth |
+| Cryptic SSH errors at build      | Clear pre-build validation            |
 
 ---
 
@@ -91,24 +91,24 @@ recommended `flakeModules.go-standard` module.
 
 ### Parameter mapping
 
-| mkGoFlake parameter        | go-standard option          | Notes                                            |
-| -------------------------- | --------------------------- | ------------------------------------------------ |
-| `pname`                    | `go-standard.pname`         | Same                                             |
-| `version`                  | `go-standard.version`       | Defaults to `self.rev or "dev"` — usually omit   |
-| `vendorHash`               | `go-standard.vendorHash`    | Same                                             |
-| `description`              | `go-standard.description`   | Same                                             |
-| `src`                      | `go-standard.src`           | Defaults to `self.outPath` — usually omit        |
-| `deps`                     | `go-standard.deps`          | Same                                             |
-| `subModules`               | `go-standard.subModules`    | Rarely needed — auto-discovery handles it        |
-| `doCheck`                  | `go-standard.enableCheck`   | Renamed, default `true`                          |
-| `ldflags`                  | `go-standard.ldflags`       | Same                                             |
-| `goPkgAttr`                | `go-standard.goPkgAttr`     | Same                                             |
-| `buildGoModuleOverrides`   | `go-standard.extraBuildAttrs` | Renamed                                        |
-| `devShellExtraPackages`    | `go-standard.devShellExtraPackages` | Same                                     |
-| `shellExtraEnv`            | `go-standard.shellExtraEnv` | Same                                             |
-| `extraApps`                | (add in consumer flake)     | No equivalent — add apps directly in your flake  |
-| `extraChecks`              | (add in consumer flake)     | No equivalent — add checks directly in your flake |
-| `extraFlake`               | (add in consumer flake)     | No equivalent — add flake attrs directly         |
+| mkGoFlake parameter      | go-standard option                  | Notes                                             |
+| ------------------------ | ----------------------------------- | ------------------------------------------------- |
+| `pname`                  | `go-standard.pname`                 | Same                                              |
+| `version`                | `go-standard.version`               | Defaults to `self.rev or "dev"` — usually omit    |
+| `vendorHash`             | `go-standard.vendorHash`            | Same                                              |
+| `description`            | `go-standard.description`           | Same                                              |
+| `src`                    | `go-standard.src`                   | Defaults to `self.outPath` — usually omit         |
+| `deps`                   | `go-standard.deps`                  | Same                                              |
+| `subModules`             | `go-standard.subModules`            | Rarely needed — auto-discovery handles it         |
+| `doCheck`                | `go-standard.enableCheck`           | Renamed, default `true`                           |
+| `ldflags`                | `go-standard.ldflags`               | Same                                              |
+| `goPkgAttr`              | `go-standard.goPkgAttr`             | Same                                              |
+| `buildGoModuleOverrides` | `go-standard.extraBuildAttrs`       | Renamed                                           |
+| `devShellExtraPackages`  | `go-standard.devShellExtraPackages` | Same                                              |
+| `shellExtraEnv`          | `go-standard.shellExtraEnv`         | Same                                              |
+| `extraApps`              | (add in consumer flake)             | No equivalent — add apps directly in your flake   |
+| `extraChecks`            | (add in consumer flake)             | No equivalent — add checks directly in your flake |
+| `extraFlake`             | (add in consumer flake)             | No equivalent — add flake attrs directly          |
 
 ---
 

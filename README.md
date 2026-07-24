@@ -229,9 +229,9 @@ The function-based predecessor to `flakeModules.go-standard`. Kept for backwards
 
 ## Templates
 
-| Template                                                                   | Use when...                                                          |
-| -------------------------------------------------------------------------- | -------------------------------------------------------------------- |
-| [`templates/go-standard/flake.nix`](templates/go-standard/flake.nix)       | Starting a new project — recommended, minimal setup                  |
+| Template                                                                   | Use when...                                                              |
+| -------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| [`templates/go-standard/flake.nix`](templates/go-standard/flake.nix)       | Starting a new project — recommended, minimal setup                      |
 | [`templates/go-flake-parts/flake.nix`](templates/go-flake-parts/flake.nix) | ⚠️ **Deprecated.** Old 5-input manual pattern. Migrate to `go-standard`. |
 
 ---

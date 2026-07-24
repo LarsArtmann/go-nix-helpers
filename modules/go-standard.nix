@@ -294,7 +294,7 @@ in
   };
 
   config = {
-    systems = cfg.systems;
+    inherit (cfg) systems;
 
     perSystem =
       {
@@ -400,7 +400,7 @@ in
               proxyVendor = if usePreparedSource then false else cfg.proxyVendor;
               subPackages = subPkgs;
               doCheck = cfg.enableCheck;
-              buildFlags = cfg.buildFlags;
+              inherit (cfg) buildFlags;
               ldflags = finalLdflags;
               preBuild = mergedPreBuild;
               nativeBuildInputs =
