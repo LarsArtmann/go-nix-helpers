@@ -28,23 +28,25 @@
       systems = import inputs.systems;
       imports = [ inputs.treefmt-nix.flakeModule ];
 
-      # Public library API — system-independent pure functions.
-      # Consumers can use either:
-      #   (a) raw import (works with flake = false):
-      #       mkPreparedSource = import (go-nix-helpers + "/mkPreparedSource.nix") { inherit pkgs lib; goPkg = pkgs.go_1_26; };
-      #   (b) flake lib (works when imported as a real flake):
-      #       mkPreparedSource = go-nix-helpers.lib.mkPreparedSource { inherit pkgs lib; goPkg = pkgs.go_1_26; };
-      flake.lib.mkPreparedSource = import ./mkPreparedSource.nix;
-      flake.lib.mkGoFlake = import ./mkGoFlake.nix;
+      flake = {
+        # Public library API — system-independent pure functions.
+        # Consumers can use either:
+        #   (a) raw import (works with flake = false):
+        #       mkPreparedSource = import (go-nix-helpers + "/mkPreparedSource.nix") { inherit pkgs lib; goPkg = pkgs.go_1_26; };
+        #   (b) flake lib (works when imported as a real flake):
+        #       mkPreparedSource = go-nix-helpers.lib.mkPreparedSource { inherit pkgs lib; goPkg = pkgs.go_1_26; };
+        lib.mkPreparedSource = import ./mkPreparedSource.nix;
+        lib.mkGoFlake = import ./mkGoFlake.nix;
 
-      # go-standard is a composite module that bundles treefmt-nix internally,
-      # so consumers do NOT need to declare treefmt-nix or systems as inputs.
-      # Consumer needs only: nixpkgs, flake-parts, go-nix-helpers.
-      flake.flakeModules.go-standard = {
-        imports = [
-          inputs.treefmt-nix.flakeModule
-          ./modules/go-standard.nix
-        ];
+        # go-standard is a composite module that bundles treefmt-nix internally,
+        # so consumers do NOT need to declare treefmt-nix or systems as inputs.
+        # Consumer needs only: nixpkgs, flake-parts, go-nix-helpers.
+        flakeModules.go-standard = {
+          imports = [
+            inputs.treefmt-nix.flakeModule
+            ./modules/go-standard.nix
+          ];
+        };
       };
 
       perSystem =
