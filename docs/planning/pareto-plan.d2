@@ -1,0 +1,214 @@
+direction: down
+
+# Phase containers
+P1: Phase 1 — Legal & Correctness (1% → 51%) {
+  style.fill: "#1a3a1a"
+  style.font-color: "#6eb5ff"
+}
+P2: Phase 2 — CI & Cleanup (4% → 64%) {
+  style.fill: "#1a2a3a"
+  style.font-color: "#6eb5ff"
+}
+P3: Phase 3 — Module Options (4% → 64%) {
+  style.fill: "#1a2a3a"
+  style.font-color: "#6eb5ff"
+}
+P4: Phase 4 — Testing & Reliability (20% → 80%) {
+  style.fill: "#3a2a1a"
+  style.font-color: "#f4d35e"
+}
+P5: Phase 5 — Documentation & Community (20% → 80%) {
+  style.fill: "#3a2a1a"
+  style.font-color: "#f4d35e"
+}
+P6: Phase 6 — Advanced & Polish (80% → 100%) {
+  style.fill: "#3a1a1a"
+  style.font-color: "#ff6b6b"
+}
+
+# Phase 1 tasks
+license: "LICENSE file\n(MIT)" {
+  style.fill: "#0e0e10"
+  style.font-color: "#f4f4f0"
+  shape: rectangle
+}
+systems_fix: "Fix defaultSystems\nhardcoding" {
+  style.fill: "#0e0e10"
+  style.font-color: "#f4f4f0"
+  shape: rectangle
+}
+
+# Phase 2 tasks
+ci: "GitHub Actions\nCI workflow" {
+  style.fill: "#0e0e10"
+  style.font-color: "#f4f4f0"
+  shape: rectangle
+}
+badge: "Dynamic CI\nbadge" {
+  style.fill: "#0e0e10"
+  style.font-color: "#f4f4f0"
+  shape: rectangle
+}
+deprecate_mkflake: "Deprecate\nmkGoFlake.nix" {
+  style.fill: "#0e0e10"
+  style.font-color: "#f4f4f0"
+  shape: rectangle
+}
+legacy_template: "Mark go-flake-parts\nas legacy" {
+  style.fill: "#0e0e10"
+  style.font-color: "#f4f4f0"
+  shape: rectangle
+}
+
+# Phase 3 tasks
+opt_check: "enableCheck\noption" {
+  style.fill: "#0e0e10"
+  style.font-color: "#f4f4f0"
+  shape: rectangle
+}
+opt_overlay: "enableOverlay\noption" {
+  style.fill: "#0e0e10"
+  style.font-color: "#f4f4f0"
+  shape: rectangle
+}
+opt_buildflags: "buildFlags\noption" {
+  style.fill: "#0e0e10"
+  style.font-color: "#f4f4f0"
+  shape: rectangle
+}
+opt_version: "version\noption" {
+  style.fill: "#0e0e10"
+  style.font-color: "#f4f4f0"
+  shape: rectangle
+}
+
+# Phase 4 tasks
+module_tests: "go-standard\nmodule tests" {
+  style.fill: "#0e0e10"
+  style.font-color: "#f4f4f0"
+  shape: rectangle
+}
+e2e_test: "Downstream\nconsumer e2e test" {
+  style.fill: "#0e0e10"
+  style.font-color: "#f4f4f0"
+  shape: rectangle
+}
+genflake_fix: "Fix generate-\nflake.sh" {
+  style.fill: "#0e0e10"
+  style.font-color: "#f4f4f0"
+  shape: rectangle
+}
+
+# Phase 5 tasks
+migration: "Migration\nguide" {
+  style.fill: "#0e0e10"
+  style.font-color: "#f4f4f0"
+  shape: rectangle
+}
+contributing: "CONTRIBUTING\n.md" {
+  style.fill: "#0e0e10"
+  style.font-color: "#f4f4f0"
+  shape: rectangle
+}
+github_meta: ".github\ntemplates" {
+  style.fill: "#0e0e10"
+  style.font-color: "#f4f4f0"
+  shape: rectangle
+}
+arch_diagram: "Architecture\ndiagram" {
+  style.fill: "#0e0e10"
+  style.font-color: "#f4f4f0"
+  shape: rectangle
+}
+faq: "Troubleshooting\n/ FAQ" {
+  style.fill: "#0e0e10"
+  style.font-color: "#f4f4f0"
+  shape: rectangle
+}
+
+# Phase 6 tasks
+monorepo: "Multi-package\n(mono repo)" {
+  style.fill: "#0e0e10"
+  style.font-color: "#f4f4f0"
+  shape: rectangle
+}
+audit: "Audit downstream\nconsumers" {
+  style.fill: "#0e0e10"
+  style.font-color: "#f4f4f0"
+  shape: rectangle
+}
+priv_ci: "Private-repo\nCI test" {
+  style.fill: "#0e0e10"
+  style.font-color: "#f4f4f0"
+  shape: rectangle
+}
+opt_lint: "enableGolangciLint\ntoggle" {
+  style.fill: "#0e0e10"
+  style.font-color: "#f4f4f0"
+  shape: rectangle
+}
+opt_fmt: "enableGofumpt /\ngoimports toggles" {
+  style.fill: "#0e0e10"
+  style.font-color: "#f4f4f0"
+  shape: rectangle
+}
+fmt_alias: "nix run .#fmt\nalias app" {
+  style.fill: "#0e0e10"
+  style.font-color: "#f4f4f0"
+  shape: rectangle
+}
+nixpkgs: "Register in\nnixpkgs" {
+  style.fill: "#0e0e10"
+  style.font-color: "#f4f4f0"
+  shape: rectangle
+}
+completions: "Shell\ncompletions" {
+  style.fill: "#0e0e10"
+  style.font-color: "#f4f4f0"
+  shape: rectangle
+}
+manpages: "Man pages" {
+  style.fill: "#0e0e10"
+  style.font-color: "#f4f4f0"
+  shape: rectangle
+}
+
+# Dependencies
+license -> P1
+systems_fix -> P1
+
+P1 -> ci
+ci -> badge
+P1 -> deprecate_mkflake
+P1 -> legacy_template
+
+ci -> P4
+deprecate_mkflake -> migration
+P2 -> P3
+
+opt_check -> P3
+opt_overlay -> P3
+opt_buildflags -> P3
+opt_version -> P3
+
+P3 -> module_tests
+module_tests -> e2e_test
+P2 -> genflake_fix
+
+P4 -> migration
+P4 -> contributing
+contributing -> github_meta
+P4 -> arch_diagram
+P4 -> faq
+
+P5 -> monorepo
+P5 -> audit
+ci -> priv_ci
+P5 -> opt_lint
+P5 -> opt_fmt
+P5 -> fmt_alias
+P5 -> nixpkgs
+P5 -> completions
+P5 -> manpages
+
+P6

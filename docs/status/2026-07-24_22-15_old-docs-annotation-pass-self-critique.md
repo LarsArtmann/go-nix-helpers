@@ -40,15 +40,15 @@ The session produced two kinds of artefact:
    list, not a blanket script.
 4. **7 annotations applied**, each file-specific with real commit hashes:
 
-| File | Placement | Resolution cited |
-| --- | --- | --- |
-| `2026-06-08` v2-fix | appendix | infra gaps closed (`3c22ce4`, `befd406`, `a31fec9`); `/v2` shipped `532752a` |
-| `2026-06-09` subModules | inline + appendix | "uncommitted" → `7b69382`; deepened by `7fdb95c` |
-| `2026-06-22` self-hosting | inline + appendix | header "6 files staged" → `3c22ce4` |
-| `2026-06-23` mkGoFlake | appendix | superseded by `go-standard` (`927c924`); deprecated `ee8c5b3` |
-| `2026-07-23` brutal-review | inline cell + appendix | resolves all 4 "fucked up" items; flags `defaultSystems` + zero-consumer still open |
-| `2026-07-23` skill-updates | inline cell + appendix | `test-result` resolved; confirms 5 critical issues still open |
-| `2026-06-19` review **HTML** | surgical `<section>` | resolves 5 of 10 "open findings"; lists the 5 still open — **no inline styles**, existing CSS classes only |
+| File                         | Placement              | Resolution cited                                                                                           |
+| ---------------------------- | ---------------------- | ---------------------------------------------------------------------------------------------------------- |
+| `2026-06-08` v2-fix          | appendix               | infra gaps closed (`3c22ce4`, `befd406`, `a31fec9`); `/v2` shipped `532752a`                               |
+| `2026-06-09` subModules      | inline + appendix      | "uncommitted" → `7b69382`; deepened by `7fdb95c`                                                           |
+| `2026-06-22` self-hosting    | inline + appendix      | header "6 files staged" → `3c22ce4`                                                                        |
+| `2026-06-23` mkGoFlake       | appendix               | superseded by `go-standard` (`927c924`); deprecated `ee8c5b3`                                              |
+| `2026-07-23` brutal-review   | inline cell + appendix | resolves all 4 "fucked up" items; flags `defaultSystems` + zero-consumer still open                        |
+| `2026-07-23` skill-updates   | inline cell + appendix | `test-result` resolved; confirms 5 critical issues still open                                              |
+| `2026-06-19` review **HTML** | surgical `<section>`   | resolves 5 of 10 "open findings"; lists the 5 still open — **no inline styles**, existing CSS classes only |
 
 5. **3 files correctly left untouched** — the postpatch-completion report, the
    README-refresh report (recent + accurate), and the postpatch plan
@@ -147,8 +147,9 @@ auto-commits. My edits may be committed out from under me mid-pass. Proceed?"_
 This is a reversibility/blast-radius concern I should have surfaced BEFORE the
 first edit. Instead I noticed it only when `git diff --stat` showed 2 files
 instead of 7. A sharper engineer connects "the reports warned about auto-commits"
-+ "diff shows fewer files than I edited" instantly. I took three verification
-greps to get there.
+
+- "diff shows fewer files than I edited" instantly. I took three verification
+  greps to get there.
 
 ### 3. Slow to diagnose the diff discrepancy (LOW)
 
@@ -310,18 +311,18 @@ this annotation task?**
 
 ## File Inventory (this session)
 
-| File | Action | In working tree? |
-| --- | --- | --- |
-| `docs/status/2026-06-08_*.md` | appendix | auto-committed in `7418028` |
-| `docs/status/2026-06-09_*.md` | inline + appendix | auto-committed in `7418028` |
-| `docs/status/2026-06-22_*.md` | inline + appendix | auto-committed in `7418028` |
-| `docs/status/2026-06-23_*.md` | appendix | auto-committed in `7418028` |
+| File                                | Action                 | In working tree?            |
+| ----------------------------------- | ---------------------- | --------------------------- |
+| `docs/status/2026-06-08_*.md`       | appendix               | auto-committed in `7418028` |
+| `docs/status/2026-06-09_*.md`       | inline + appendix      | auto-committed in `7418028` |
+| `docs/status/2026-06-22_*.md`       | inline + appendix      | auto-committed in `7418028` |
+| `docs/status/2026-06-23_*.md`       | appendix               | auto-committed in `7418028` |
 | `docs/status/2026-07-23_16-15_*.md` | inline cell + appendix | auto-committed in `7418028` |
-| `docs/status/2026-07-23_17-10_*.md` | inline cell + appendix | **modified (uncommitted)** |
-| `docs/reviews/2026-06-19_*.html` | surgical `<section>` | **modified (uncommitted)** |
-| `docs/status/2026-06-29_*.md` | LEAVE ALONE | untouched |
-| `docs/status/2026-07-24_21-31_*.md` | LEAVE ALONE | untouched |
-| `docs/planning/2026-06-29_*.md` | LEAVE ALONE | untouched |
+| `docs/status/2026-07-23_17-10_*.md` | inline cell + appendix | **modified (uncommitted)**  |
+| `docs/reviews/2026-06-19_*.html`    | surgical `<section>`   | **modified (uncommitted)**  |
+| `docs/status/2026-06-29_*.md`       | LEAVE ALONE            | untouched                   |
+| `docs/status/2026-07-24_21-31_*.md` | LEAVE ALONE            | untouched                   |
+| `docs/planning/2026-06-29_*.md`     | LEAVE ALONE            | untouched                   |
 
 ## Verification Status
 
