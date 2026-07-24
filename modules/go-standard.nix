@@ -211,7 +211,7 @@ in
               {
                 name = cfg.pname;
                 inherit version;
-                src = cfg.src;
+                inherit (cfg) src;
                 inherit (cfg)
                   deps
                   subModules

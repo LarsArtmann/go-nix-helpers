@@ -15,54 +15,54 @@ The session achieved its primary goal: consumer flake.nix dropped from **5 requi
 
 ## a) FULLY DONE
 
-| # | Item | Evidence |
-|---|------|----------|
-| 1 | Composite module bundles treefmt-nix | `nix eval .#flakeModules.go-standard --apply 'm: m.imports'` returns 2 paths (treefmt flake-module + go-standard.nix) |
-| 2 | `systems` input eliminated for consumers | `defaultSystems` hardcoded in `modules/go-standard.nix` matching `nix-systems/default` |
-| 3 | `subModules` option added to go-standard | `modules/go-standard.nix:116-123` |
-| 4 | `postPatchExtra` option added to go-standard | `modules/go-standard.nix:125-129` |
-| 5 | `GOTOOLCHAIN = "local"` in both devShells | `modules/go-standard.nix:348,361` |
-| 6 | mkPreparedSource call passes subModules + postPatchExtra | `modules/go-standard.nix:215-220` |
-| 7 | Template updated to 3-input minimal pattern | `templates/go-standard/flake.nix` |
-| 8 | README rewritten with go-standard as primary API | `README.md` |
-| 9 | AGENTS.md updated | Consumption pattern, architecture notes, gotchas, key files |
-| 10 | docs/flake-standard.md updated | Standard stack table now shows 3 inputs |
-| 11 | docs/flake-patterns.md updated | References updated |
-| 12 | `nix flake check` passes | All 4 checks + treefmt check pass |
-| 13 | `nix fmt` clean | No formatting violations |
+| #   | Item                                                     | Evidence                                                                                                              |
+| --- | -------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| 1   | Composite module bundles treefmt-nix                     | `nix eval .#flakeModules.go-standard --apply 'm: m.imports'` returns 2 paths (treefmt flake-module + go-standard.nix) |
+| 2   | `systems` input eliminated for consumers                 | `defaultSystems` hardcoded in `modules/go-standard.nix` matching `nix-systems/default`                                |
+| 3   | `subModules` option added to go-standard                 | `modules/go-standard.nix:116-123`                                                                                     |
+| 4   | `postPatchExtra` option added to go-standard             | `modules/go-standard.nix:125-129`                                                                                     |
+| 5   | `GOTOOLCHAIN = "local"` in both devShells                | `modules/go-standard.nix:348,361`                                                                                     |
+| 6   | mkPreparedSource call passes subModules + postPatchExtra | `modules/go-standard.nix:215-220`                                                                                     |
+| 7   | Template updated to 3-input minimal pattern              | `templates/go-standard/flake.nix`                                                                                     |
+| 8   | README rewritten with go-standard as primary API         | `README.md`                                                                                                           |
+| 9   | AGENTS.md updated                                        | Consumption pattern, architecture notes, gotchas, key files                                                           |
+| 10  | docs/flake-standard.md updated                           | Standard stack table now shows 3 inputs                                                                               |
+| 11  | docs/flake-patterns.md updated                           | References updated                                                                                                    |
+| 12  | `nix flake check` passes                                 | All 4 checks + treefmt check pass                                                                                     |
+| 13  | `nix fmt` clean                                          | No formatting violations                                                                                              |
 
 ---
 
 ## b) PARTIALLY DONE
 
-| # | Item | What's done | What's missing |
-|---|------|-------------|----------------|
-| 1 | **Composite module validation** | Structural eval passes, imports resolve to store paths | No real consumer test — never built a downstream project with `imports = [ go-nix-helpers.flakeModules.go-standard ]` |
-| 2 | **Backward compatibility** | Verified existing consumers use `flake = false` (unaffected) | Didn't verify what happens when a consumer has BOTH `treefmt-nix` input AND the composite module (potential double-import conflict) |
-| 3 | **Documentation accuracy** | README/AGENTS/docs all updated | The `flake.lock` still contains `systems` and `treefmt-nix` as go-nix-helpers's own inputs — not mentioned anywhere that go-nix-helpers itself still needs them |
+| #   | Item                            | What's done                                                  | What's missing                                                                                                                                                  |
+| --- | ------------------------------- | ------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | **Composite module validation** | Structural eval passes, imports resolve to store paths       | No real consumer test — never built a downstream project with `imports = [ go-nix-helpers.flakeModules.go-standard ]`                                           |
+| 2   | **Backward compatibility**      | Verified existing consumers use `flake = false` (unaffected) | Didn't verify what happens when a consumer has BOTH `treefmt-nix` input AND the composite module (potential double-import conflict)                             |
+| 3   | **Documentation accuracy**      | README/AGENTS/docs all updated                               | The `flake.lock` still contains `systems` and `treefmt-nix` as go-nix-helpers's own inputs — not mentioned anywhere that go-nix-helpers itself still needs them |
 
 ---
 
 ## c) NOT STARTED
 
-| # | Item | Why it matters |
-|---|------|----------------|
-| 1 | **End-to-end consumer test** | The entire value proposition is unverified in practice. A 10-line test flake in a temp directory would prove the composite module works when consumed. |
-| 2 | **Consumer migration plan** | 7+ projects (BuildFlow, mr-sync, PMA, go-structure-linter, branching-flow, Standup-Killer, library-policy) all still use 5+ inputs. None migrated to the new 3-input pattern. |
-| 3 | **`git-hooks.nix` bundling** | The nix-flake-migration skill template includes `git-hooks.nix`. Could also be bundled into the composite module to get pre-commit hooks for free. Would reduce consumer inputs further (if they currently declare git-hooks separately). |
-| 4 | **flake-parts `follows` chain verification** | The composite module's treefmt-nix references go-nix-helpers's own treefmt-nix input. If the consumer's nixpkgs != go-nix-helpers's nixpkgs (e.g., consumer forgot `inputs.nixpkgs.follows`), there could be two different nixpkgs versions in the closure. Not tested. |
-| 5 | **Automated test for the module itself** | `test.nix` only tests mkPreparedSource. No test verifies that `flakeModules.go-standard` produces correct outputs (packages, apps, devShells, checks). |
+| #   | Item                                         | Why it matters                                                                                                                                                                                                                                                          |
+| --- | -------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | **End-to-end consumer test**                 | The entire value proposition is unverified in practice. A 10-line test flake in a temp directory would prove the composite module works when consumed.                                                                                                                  |
+| 2   | **Consumer migration plan**                  | 7+ projects (BuildFlow, mr-sync, PMA, go-structure-linter, branching-flow, Standup-Killer, library-policy) all still use 5+ inputs. None migrated to the new 3-input pattern.                                                                                           |
+| 3   | **`git-hooks.nix` bundling**                 | The nix-flake-migration skill template includes `git-hooks.nix`. Could also be bundled into the composite module to get pre-commit hooks for free. Would reduce consumer inputs further (if they currently declare git-hooks separately).                               |
+| 4   | **flake-parts `follows` chain verification** | The composite module's treefmt-nix references go-nix-helpers's own treefmt-nix input. If the consumer's nixpkgs != go-nix-helpers's nixpkgs (e.g., consumer forgot `inputs.nixpkgs.follows`), there could be two different nixpkgs versions in the closure. Not tested. |
+| 5   | **Automated test for the module itself**     | `test.nix` only tests mkPreparedSource. No test verifies that `flakeModules.go-standard` produces correct outputs (packages, apps, devShells, checks).                                                                                                                  |
 
 ---
 
 ## d) TOTALLY FUCKED UP
 
-| # | Issue | Severity | Detail |
-|---|-------|----------|--------|
-| 1 | **Commits were auto-created without explicit user request** | HIGH | 4 commits (`927c924`, `0a3bf8b`, `9471741`, `bb3d782`) appeared at 15:25-15:34 during the session. I never ran `git commit`. The commit messages are AI-generated verbose garbage ("Modernize flake.nix to use latest Nix flake best practices..."). Unclear what mechanism created them (no git hooks, no Crush hooks visible). **The user's rule says "NEVER COMMIT unless user explicitly says commit."** |
-| 2 | **Hardcoded `defaultSystems` is architecturally worse than `inputs.systems`** | MEDIUM | go-nix-helpers already has `systems.url = "github:nix-systems/default"` in its own flake inputs. Instead of hardcoding the list, I should have used `import inputs.systems` from go-nix-helpers's own inputs in the composite module. This would preserve override-ability while eliminating the consumer's need for a `systems` input. |
-| 3 | **The `flakeModules.go-standard` change is technically a breaking change** | MEDIUM | Before: `flake.flakeModules.go-standard = import ./modules/go-standard.nix;` (a bare module). After: `flake.flakeModules.go-standard = { imports = [...]; };` (a composite). Any consumer who was importing the module AND separately importing treefmt-nix.flakeModule would now get a double-import. Flake-parts MAY deduplicate this (same store path if nixpkgs follows match), but this was NEVER tested. |
-| 4 | **`test-result` symlink is committed to git** | LOW | `91fa823` (pre-session) committed a symlink to `/nix/store/...`. This is a build artifact. `.gitignore` doesn't cover it. Not my commit, but I should have flagged it. |
+| #   | Issue                                                                         | Severity | Detail                                                                                                                                                                                                                                                                                                                                                                                                         |
+| --- | ----------------------------------------------------------------------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | **Commits were auto-created without explicit user request**                   | HIGH     | 4 commits (`927c924`, `0a3bf8b`, `9471741`, `bb3d782`) appeared at 15:25-15:34 during the session. I never ran `git commit`. The commit messages are AI-generated verbose garbage ("Modernize flake.nix to use latest Nix flake best practices..."). Unclear what mechanism created them (no git hooks, no Crush hooks visible). **The user's rule says "NEVER COMMIT unless user explicitly says commit."**   |
+| 2   | **Hardcoded `defaultSystems` is architecturally worse than `inputs.systems`** | MEDIUM   | go-nix-helpers already has `systems.url = "github:nix-systems/default"` in its own flake inputs. Instead of hardcoding the list, I should have used `import inputs.systems` from go-nix-helpers's own inputs in the composite module. This would preserve override-ability while eliminating the consumer's need for a `systems` input.                                                                        |
+| 3   | **The `flakeModules.go-standard` change is technically a breaking change**    | MEDIUM   | Before: `flake.flakeModules.go-standard = import ./modules/go-standard.nix;` (a bare module). After: `flake.flakeModules.go-standard = { imports = [...]; };` (a composite). Any consumer who was importing the module AND separately importing treefmt-nix.flakeModule would now get a double-import. Flake-parts MAY deduplicate this (same store path if nixpkgs follows match), but this was NEVER tested. |
+| 4   | **`test-result` symlink is committed to git**                                 | LOW      | `91fa823` (pre-session) committed a symlink to `/nix/store/...`. This is a build artifact. `.gitignore` doesn't cover it. Not my commit, but I should have flagged it.                                                                                                                                                                                                                                         |
 
 ---
 

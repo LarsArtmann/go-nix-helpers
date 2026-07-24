@@ -6,11 +6,11 @@ This document describes the standard flake.nix patterns used across all LarsArtm
 
 Every Go project should use:
 
-| Input                             | Purpose                                                                  |
-| --------------------------------- | ------------------------------------------------------------------------ |
-| `nixpkgs` (`nixos-unstable`)      | Package set — always `nixos-unstable`, never `nixpkgs-unstable`          |
-| `flake-parts`                     | Module system for flakes — with `inputs.nixpkgs-lib.follows = "nixpkgs"` |
-| `go-nix-helpers`                  | Shared module + private dep helpers — bundles treefmt-nix + systems      |
+| Input                        | Purpose                                                                  |
+| ---------------------------- | ------------------------------------------------------------------------ |
+| `nixpkgs` (`nixos-unstable`) | Package set — always `nixos-unstable`, never `nixpkgs-unstable`          |
+| `flake-parts`                | Module system for flakes — with `inputs.nixpkgs-lib.follows = "nixpkgs"` |
+| `go-nix-helpers`             | Shared module + private dep helpers — bundles treefmt-nix + systems      |
 
 > **Note:** When using `flakeModules.go-standard`, `treefmt-nix` and `systems` are bundled internally.
 > Only 3 inputs are needed. Declare them separately only for manual flake.nix files.

@@ -93,15 +93,15 @@ nix run .#verifyValidation         # negative-case validation test (run outside 
 
 ## Key files
 
-| File                                 | Purpose                                                                                                               |
-| ------------------------------------ | --------------------------------------------------------------------------------------------------------------------- |
-| `mkPreparedSource.nix`               | Core helper — solves private Go dep injection for Nix sandbox builds                                                  |
-| `mkGoFlake.nix`                      | DEPRECATED — function-based predecessor to go-standard module                          |
+| File                                 | Purpose                                                                                                                         |
+| ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------- |
+| `mkPreparedSource.nix`               | Core helper — solves private Go dep injection for Nix sandbox builds                                                            |
+| `mkGoFlake.nix`                      | DEPRECATED — function-based predecessor to go-standard module                                                                   |
 | `modules/go-standard.nix`            | Proper flake-parts module (exposed as `flakeModules.go-standard`) — one-line adoption, bundles treefmt-nix, 3-input consumption |
-| `flake.nix`                          | Self-hosting: checks, formatter, devShell, lib export, flakeModules export                                            |
-| `test.nix`                           | Integration tests (auto-discovery, explicit, validation)                                                              |
-| `templates/go-flake-parts/flake.nix` | Gold-standard template for new Go projects (manual approach)                                                          |
-| `templates/go-standard/flake.nix`    | Minimal template using go-standard module (recommended for new projects)                                              |
-| `scripts/nix-lint.sh`                | Lints flake.nix files across all projects for common errors                                                           |
-| `scripts/dashboard.sh`               | Overview of flake check status across all projects                                                                    |
-| `docs/flake-patterns.md`             | Reference: correct patterns and anti-patterns                                                                         |
+| `flake.nix`                          | Self-hosting: checks, formatter, devShell, lib export, flakeModules export                                                      |
+| `test.nix`                           | Integration tests (auto-discovery, explicit, validation)                                                                        |
+| `templates/go-flake-parts/flake.nix` | Gold-standard template for new Go projects (manual approach)                                                                    |
+| `templates/go-standard/flake.nix`    | Minimal template using go-standard module (recommended for new projects)                                                        |
+| `scripts/nix-lint.sh`                | Lints flake.nix files across all projects for common errors                                                                     |
+| `scripts/dashboard.sh`               | Overview of flake check status across all projects                                                                              |
+| `docs/flake-patterns.md`             | Reference: correct patterns and anti-patterns                                                                                   |
