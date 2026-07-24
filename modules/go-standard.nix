@@ -373,24 +373,26 @@ in
           fi
         '';
 
-        # Merge user's extraBuildAttrs, with special preBuild handling.
-        userExtraMinusPreBuild = builtins.removeAttrs cfg.extraBuildAttrs [ "preBuild" ];
+        # Merge user's extraBuildAttrs, with special preBuild/postInstall handling.
+        userExtraBuildAttrs = builtins.removeAttrs cfg.extraBuildAttrs [
+          "preBuild"
+          "postInstall"
+        ];
         mergedPreBuild = autoDepSyncPreBuild + (cfg.extraBuildAttrs.preBuild or "");
-
-        completionAttrs = lib.optionalAttrs cfg.enableCompletions {
-          nativeBuildInputs = [ pkgs.installShellFiles ];
-          postInstall = ''
-            installShellCompletion --cmd ${cfg.pname} \
-              --bash <($out/bin/${cfg.pname} --completion bash 2>/dev/null || true) \
-              --zsh <($out/bin/${cfg.pname} --completion zsh 2>/dev/null || true) \
-              --fish <($out/bin/${cfg.pname} --completion fish 2>/dev/null || true)
-          '';
-        };
 
         # Reusable package builder for monorepo support.
         # Builds one Go binary with the given name and subPackages.
         mkGoPackage =
           pkgName: subPkgs: pkgDesc:
+          let
+            completionPostInstall = lib.optionalString cfg.enableCompletions ''
+              installShellCompletion --cmd ${pkgName} \
+                --bash <($out/bin/${pkgName} --completion bash 2>/dev/null || true) \
+                --zsh <($out/bin/${pkgName} --completion zsh 2>/dev/null || true) \
+                --fish <($out/bin/${pkgName} --completion fish 2>/dev/null || true)
+            '';
+            mergedPostInstall = completionPostInstall + (cfg.extraBuildAttrs.postInstall or "");
+          in
           buildGoModule (
             {
               pname = pkgName;
@@ -403,6 +405,7 @@ in
               inherit (cfg) buildFlags;
               ldflags = finalLdflags;
               preBuild = mergedPreBuild;
+              postInstall = mergedPostInstall;
               nativeBuildInputs =
                 lib.optionals cfg.enableTempl [ pkgs.templ ]
                 ++ lib.optionals cfg.enableCompletions [ pkgs.installShellFiles ];
@@ -420,7 +423,7 @@ in
               // cfg.extraMeta;
             }
             // autoDepFodAttrs
-            // userExtraMinusPreBuild
+            // userExtraBuildAttrs
           );
 
         # Build the default package (always present)
@@ -537,7 +540,7 @@ in
       {
         ${cfg.pname} = self.packages.${final.stdenv.system}.default;
       }
-      // (builtins.mapAttrs (_name: _pkg: self.packages.${final.stdenv.system}.${cfg.pname}) cfg.packages)
+      // (builtins.mapAttrs (name: _pkg: self.packages.${final.stdenv.system}.${name}) cfg.packages)
     );
   };
 }
