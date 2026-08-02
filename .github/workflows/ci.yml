@@ -32,7 +32,7 @@ jobs:
 
   private-deps-test:
     runs-on: ubuntu-latest
-    if: false  # Enable when SSH key secret is configured
+    if: false # Enable when SSH key secret is configured
     steps:
       - uses: actions/checkout@v4
 

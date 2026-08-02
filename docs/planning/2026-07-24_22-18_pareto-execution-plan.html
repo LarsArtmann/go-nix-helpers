@@ -29,91 +29,470 @@
         --solution: var(--color-blue);
         --warning: var(--color-yellow);
         --radius: 0px;
-        --font-heading: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-        --font-body: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-        --font-mono: ui-monospace, "Cascadia Code", "Source Code Pro", "JetBrains Mono", Menlo, Consolas, monospace;
+        --font-heading:
+          ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Helvetica, Arial, sans-serif;
+        --font-body:
+          ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Helvetica, Arial, sans-serif;
+        --font-mono:
+          ui-monospace, "Cascadia Code", "Source Code Pro", "JetBrains Mono", Menlo, Consolas,
+          monospace;
       }
-      * { box-sizing: border-box; margin: 0; padding: 0; }
-      html { scroll-behavior: smooth; }
-      section[id], [id] { scroll-margin-top: 60px; }
-      body { background: var(--surface); color: var(--text); font-family: var(--font-body); font-size: 15px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
-      :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-      .top-bar { background: var(--text); color: var(--surface); padding: 0.6rem 2rem; font-family: var(--font-mono); font-size: 0.75rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; display: flex; justify-content: space-between; align-items: center; }
-      .layout { display: flex; gap: 2.5rem; padding: 2rem; }
-      .sidebar { width: 220px; flex-shrink: 0; position: sticky; top: 1rem; align-self: flex-start; height: calc(100vh - 2rem); overflow-y: auto; display: none; }
-      .sidebar nav { display: flex; flex-direction: column; gap: 0; }
-      .sidebar .label { font-family: var(--font-mono); font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; color: var(--accent); margin-bottom: 0.75rem; padding-bottom: 0.4rem; border-bottom: 2px solid var(--border-strong); }
-      .sidebar a { font-size: 0.85rem; color: var(--text-muted); text-decoration: none; padding: 0.45rem 0.75rem; border-left: 2px solid transparent; transition: all 0.15s ease; line-height: 1.4; font-weight: 500; }
-      .sidebar a:hover, .sidebar a.active { color: var(--accent); border-left-color: var(--accent); background: color-mix(in srgb, var(--accent) 8%, transparent); }
-      .main { flex: 1; min-width: 0; }
-      h1, h2, h3, h4 { font-family: var(--font-heading); font-weight: 800; letter-spacing: -0.02em; }
-      h1 { font-size: clamp(1.8rem, 4vw, 2.6rem); line-height: 1.1; margin: 0 0 0.6rem; }
-      h2 { font-size: 1.4rem; margin: 2.5rem 0 1rem; padding-bottom: 0.4rem; border-bottom: 2px solid var(--border-strong); display: flex; align-items: baseline; gap: 0.6rem; }
-      h2 .num { font-family: var(--font-mono); font-size: 0.78rem; color: var(--accent); font-weight: 700; letter-spacing: 0.06em; }
-      h3 { font-size: 1.1rem; margin: 0 0 0.4rem; font-weight: 700; }
-      h4 { font-size: 0.98rem; margin: 0 0 0.3rem; font-weight: 700; }
-      p { margin: 0 0 1rem; }
-      .hero { padding: 1.5rem 0 1.5rem; margin-bottom: 1.5rem; border-bottom: 2px solid var(--border-strong); }
-      .hero-badge { display: inline-block; font-family: var(--font-mono); font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; color: var(--surface); background: var(--accent); padding: 0.3rem 0.7rem; margin-bottom: 0.9rem; }
-      .hero-subtitle { font-size: 1.05rem; color: var(--text-muted); max-width: 70ch; margin: 0; }
-      .hero-shapes { position: relative; height: 80px; margin-bottom: 1rem; }
-      .hero-shapes .circle { position: absolute; top: 0; left: 0; width: 56px; height: 56px; background: var(--problem); border-radius: 50%; }
-      .hero-shapes .square { position: absolute; top: 24px; left: 72px; width: 48px; height: 48px; background: var(--solution); }
-      .hero-shapes .tri { position: absolute; top: 8px; left: 140px; width: 0; height: 0; border-left: 28px solid transparent; border-right: 28px solid transparent; border-bottom: 48px solid var(--warning); }
-      .card { background: var(--surface-raised); border: 1px solid var(--border); padding: 1.1rem 1.3rem; margin-bottom: 1rem; border-left: 4px solid var(--border-strong); }
-      .card-problem { border-left-color: var(--problem); background: color-mix(in srgb, var(--problem) 8%, var(--surface-raised)); }
-      .card-solution { border-left-color: var(--solution); background: color-mix(in srgb, var(--solution) 8%, var(--surface-raised)); }
-      .card-warning { border-left-color: var(--warning); background: color-mix(in srgb, var(--warning) 8%, var(--surface-raised)); }
-      .badge { display: inline-block; font-family: var(--font-mono); font-size: 0.62rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; padding: 0.18rem 0.5rem; border: 1px solid var(--border-strong); color: var(--text-muted); }
-      .badge-critical { color: var(--problem); border-color: var(--problem); }
-      .badge-high { color: var(--warning); border-color: var(--warning); }
-      .badge-medium { color: var(--accent); border-color: var(--accent); }
-      .badge-low { color: var(--text-muted); }
-      .badge-p1 { color: var(--problem); border-color: var(--problem); }
-      .badge-p2 { color: var(--accent); border-color: var(--accent); }
-      .badge-p3 { color: var(--warning); border-color: var(--warning); }
-      .badge-p4 { color: var(--text-muted); }
-      .stat-grid, .scorecard { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0.75rem; margin: 1rem 0 1.5rem; }
-      .stat-card { background: var(--surface-raised); border: 1px solid var(--border); padding: 1.1rem 1rem; position: relative; }
-      .stat-card::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--border-strong); }
-      .stat-good::before { background: var(--solution); }
-      .stat-warn::before { background: var(--warning); }
-      .stat-bad::before { background: var(--problem); }
-      .stat-value { font-family: var(--font-heading); font-size: 2rem; font-weight: 800; line-height: 1; letter-spacing: -0.03em; color: var(--text); }
-      .stat-good .stat-value { color: var(--solution); }
-      .stat-warn .stat-value { color: var(--warning); }
-      .stat-label { font-family: var(--font-mono); font-size: 0.65rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-faint); margin-top: 0.5rem; }
-      .table-wrap { overflow-x: auto; }
-      table { width: 100%; border-collapse: collapse; margin: 1rem 0 1.5rem; font-size: 0.9rem; }
-      th { text-align: left; padding: 0.6rem 0.9rem; background: var(--surface-raised); color: var(--text-faint); font-family: var(--font-mono); font-size: 0.66rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; border-bottom: 1px solid var(--border-strong); }
-      td { padding: 0.55rem 0.9rem; border-bottom: 1px solid var(--border); }
-      tr:hover td { background: var(--surface-raised); }
-      .callout { margin: 0.8rem 0 0; padding: 0.7rem 0.9rem; border-left: 3px solid var(--border-strong); background: color-mix(in srgb, var(--text) 5%, transparent); font-size: 0.9rem; }
-      .callout-solution { border-left-color: var(--solution); background: color-mix(in srgb, var(--solution) 10%, transparent); }
-      .callout-warning { border-left-color: var(--warning); background: color-mix(in srgb, var(--warning) 10%, transparent); }
-      .toc { background: var(--surface-raised); border: 1px solid var(--border); border-left: 3px solid var(--accent); padding: 1rem 1.3rem; margin: 1rem 0 1.5rem; }
-      .toc h3 { margin-bottom: 0.5rem; }
-      .toc ul { list-style: none; padding: 0; }
-      .toc li { margin: 0.25rem 0; }
-      .toc a { color: var(--text-muted); text-decoration: none; font-size: 0.9rem; }
-      .toc a:hover { color: var(--accent); }
-      .svg-container { background: var(--surface-raised); border: 1px solid var(--border); padding: 1rem; margin: 1rem 0 1.5rem; overflow-x: auto; }
-      .svg-container svg { max-width: 100%; height: auto; }
-      .footer { margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--border); font-size: 0.8rem; color: var(--text-faint); font-family: var(--font-mono); }
-      .pareto-tier { display: grid; grid-template-columns: auto 1fr; gap: 1rem; align-items: start; padding: 1rem; margin-bottom: 1rem; background: var(--surface-raised); border: 1px solid var(--border); border-left: 3px solid var(--border-strong); }
-      .pareto-tier.t1 { border-left-color: var(--problem); }
-      .pareto-tier.t2 { border-left-color: var(--accent); }
-      .pareto-tier.t3 { border-left-color: var(--warning); }
-      .pareto-tier.t4 { border-left-color: var(--text-muted); }
-      .pareto-pct { font-family: var(--font-heading); font-size: 1.8rem; font-weight: 800; line-height: 1; letter-spacing: -0.03em; }
-      .t1 .pareto-pct { color: var(--problem); }
-      .t2 .pareto-pct { color: var(--accent); }
-      .t3 .pareto-pct { color: var(--warning); }
-      .t4 .pareto-pct { color: var(--text-muted); }
-      .pareto-desc { color: var(--text-muted); font-size: 0.92rem; }
-      .pareto-desc strong { color: var(--text); }
-      @media (min-width: 1024px) { .sidebar { display: block; } }
-      @media (max-width: 768px) { .layout { flex-direction: column; padding: 1rem; } .top-bar { padding: 0.6rem 1rem; flex-wrap: wrap; gap: 0.3rem; } .pareto-tier { grid-template-columns: 1fr; } }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      section[id],
+      [id] {
+        scroll-margin-top: 60px;
+      }
+      body {
+        background: var(--surface);
+        color: var(--text);
+        font-family: var(--font-body);
+        font-size: 15px;
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+      }
+      :focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 2px;
+      }
+      .top-bar {
+        background: var(--text);
+        color: var(--surface);
+        padding: 0.6rem 2rem;
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .layout {
+        display: flex;
+        gap: 2.5rem;
+        padding: 2rem;
+      }
+      .sidebar {
+        width: 220px;
+        flex-shrink: 0;
+        position: sticky;
+        top: 1rem;
+        align-self: flex-start;
+        height: calc(100vh - 2rem);
+        overflow-y: auto;
+        display: none;
+      }
+      .sidebar nav {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+      }
+      .sidebar .label {
+        font-family: var(--font-mono);
+        font-size: 0.68rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.14em;
+        color: var(--accent);
+        margin-bottom: 0.75rem;
+        padding-bottom: 0.4rem;
+        border-bottom: 2px solid var(--border-strong);
+      }
+      .sidebar a {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        text-decoration: none;
+        padding: 0.45rem 0.75rem;
+        border-left: 2px solid transparent;
+        transition: all 0.15s ease;
+        line-height: 1.4;
+        font-weight: 500;
+      }
+      .sidebar a:hover,
+      .sidebar a.active {
+        color: var(--accent);
+        border-left-color: var(--accent);
+        background: color-mix(in srgb, var(--accent) 8%, transparent);
+      }
+      .main {
+        flex: 1;
+        min-width: 0;
+      }
+      h1,
+      h2,
+      h3,
+      h4 {
+        font-family: var(--font-heading);
+        font-weight: 800;
+        letter-spacing: -0.02em;
+      }
+      h1 {
+        font-size: clamp(1.8rem, 4vw, 2.6rem);
+        line-height: 1.1;
+        margin: 0 0 0.6rem;
+      }
+      h2 {
+        font-size: 1.4rem;
+        margin: 2.5rem 0 1rem;
+        padding-bottom: 0.4rem;
+        border-bottom: 2px solid var(--border-strong);
+        display: flex;
+        align-items: baseline;
+        gap: 0.6rem;
+      }
+      h2 .num {
+        font-family: var(--font-mono);
+        font-size: 0.78rem;
+        color: var(--accent);
+        font-weight: 700;
+        letter-spacing: 0.06em;
+      }
+      h3 {
+        font-size: 1.1rem;
+        margin: 0 0 0.4rem;
+        font-weight: 700;
+      }
+      h4 {
+        font-size: 0.98rem;
+        margin: 0 0 0.3rem;
+        font-weight: 700;
+      }
+      p {
+        margin: 0 0 1rem;
+      }
+      .hero {
+        padding: 1.5rem 0 1.5rem;
+        margin-bottom: 1.5rem;
+        border-bottom: 2px solid var(--border-strong);
+      }
+      .hero-badge {
+        display: inline-block;
+        font-family: var(--font-mono);
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.14em;
+        color: var(--surface);
+        background: var(--accent);
+        padding: 0.3rem 0.7rem;
+        margin-bottom: 0.9rem;
+      }
+      .hero-subtitle {
+        font-size: 1.05rem;
+        color: var(--text-muted);
+        max-width: 70ch;
+        margin: 0;
+      }
+      .hero-shapes {
+        position: relative;
+        height: 80px;
+        margin-bottom: 1rem;
+      }
+      .hero-shapes .circle {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 56px;
+        height: 56px;
+        background: var(--problem);
+        border-radius: 50%;
+      }
+      .hero-shapes .square {
+        position: absolute;
+        top: 24px;
+        left: 72px;
+        width: 48px;
+        height: 48px;
+        background: var(--solution);
+      }
+      .hero-shapes .tri {
+        position: absolute;
+        top: 8px;
+        left: 140px;
+        width: 0;
+        height: 0;
+        border-left: 28px solid transparent;
+        border-right: 28px solid transparent;
+        border-bottom: 48px solid var(--warning);
+      }
+      .card {
+        background: var(--surface-raised);
+        border: 1px solid var(--border);
+        padding: 1.1rem 1.3rem;
+        margin-bottom: 1rem;
+        border-left: 4px solid var(--border-strong);
+      }
+      .card-problem {
+        border-left-color: var(--problem);
+        background: color-mix(in srgb, var(--problem) 8%, var(--surface-raised));
+      }
+      .card-solution {
+        border-left-color: var(--solution);
+        background: color-mix(in srgb, var(--solution) 8%, var(--surface-raised));
+      }
+      .card-warning {
+        border-left-color: var(--warning);
+        background: color-mix(in srgb, var(--warning) 8%, var(--surface-raised));
+      }
+      .badge {
+        display: inline-block;
+        font-family: var(--font-mono);
+        font-size: 0.62rem;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        padding: 0.18rem 0.5rem;
+        border: 1px solid var(--border-strong);
+        color: var(--text-muted);
+      }
+      .badge-critical {
+        color: var(--problem);
+        border-color: var(--problem);
+      }
+      .badge-high {
+        color: var(--warning);
+        border-color: var(--warning);
+      }
+      .badge-medium {
+        color: var(--accent);
+        border-color: var(--accent);
+      }
+      .badge-low {
+        color: var(--text-muted);
+      }
+      .badge-p1 {
+        color: var(--problem);
+        border-color: var(--problem);
+      }
+      .badge-p2 {
+        color: var(--accent);
+        border-color: var(--accent);
+      }
+      .badge-p3 {
+        color: var(--warning);
+        border-color: var(--warning);
+      }
+      .badge-p4 {
+        color: var(--text-muted);
+      }
+      .stat-grid,
+      .scorecard {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 0.75rem;
+        margin: 1rem 0 1.5rem;
+      }
+      .stat-card {
+        background: var(--surface-raised);
+        border: 1px solid var(--border);
+        padding: 1.1rem 1rem;
+        position: relative;
+      }
+      .stat-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: var(--border-strong);
+      }
+      .stat-good::before {
+        background: var(--solution);
+      }
+      .stat-warn::before {
+        background: var(--warning);
+      }
+      .stat-bad::before {
+        background: var(--problem);
+      }
+      .stat-value {
+        font-family: var(--font-heading);
+        font-size: 2rem;
+        font-weight: 800;
+        line-height: 1;
+        letter-spacing: -0.03em;
+        color: var(--text);
+      }
+      .stat-good .stat-value {
+        color: var(--solution);
+      }
+      .stat-warn .stat-value {
+        color: var(--warning);
+      }
+      .stat-label {
+        font-family: var(--font-mono);
+        font-size: 0.65rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: var(--text-faint);
+        margin-top: 0.5rem;
+      }
+      .table-wrap {
+        overflow-x: auto;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 1rem 0 1.5rem;
+        font-size: 0.9rem;
+      }
+      th {
+        text-align: left;
+        padding: 0.6rem 0.9rem;
+        background: var(--surface-raised);
+        color: var(--text-faint);
+        font-family: var(--font-mono);
+        font-size: 0.66rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        border-bottom: 1px solid var(--border-strong);
+      }
+      td {
+        padding: 0.55rem 0.9rem;
+        border-bottom: 1px solid var(--border);
+      }
+      tr:hover td {
+        background: var(--surface-raised);
+      }
+      .callout {
+        margin: 0.8rem 0 0;
+        padding: 0.7rem 0.9rem;
+        border-left: 3px solid var(--border-strong);
+        background: color-mix(in srgb, var(--text) 5%, transparent);
+        font-size: 0.9rem;
+      }
+      .callout-solution {
+        border-left-color: var(--solution);
+        background: color-mix(in srgb, var(--solution) 10%, transparent);
+      }
+      .callout-warning {
+        border-left-color: var(--warning);
+        background: color-mix(in srgb, var(--warning) 10%, transparent);
+      }
+      .toc {
+        background: var(--surface-raised);
+        border: 1px solid var(--border);
+        border-left: 3px solid var(--accent);
+        padding: 1rem 1.3rem;
+        margin: 1rem 0 1.5rem;
+      }
+      .toc h3 {
+        margin-bottom: 0.5rem;
+      }
+      .toc ul {
+        list-style: none;
+        padding: 0;
+      }
+      .toc li {
+        margin: 0.25rem 0;
+      }
+      .toc a {
+        color: var(--text-muted);
+        text-decoration: none;
+        font-size: 0.9rem;
+      }
+      .toc a:hover {
+        color: var(--accent);
+      }
+      .svg-container {
+        background: var(--surface-raised);
+        border: 1px solid var(--border);
+        padding: 1rem;
+        margin: 1rem 0 1.5rem;
+        overflow-x: auto;
+      }
+      .svg-container svg {
+        max-width: 100%;
+        height: auto;
+      }
+      .footer {
+        margin-top: 2rem;
+        padding-top: 1rem;
+        border-top: 1px solid var(--border);
+        font-size: 0.8rem;
+        color: var(--text-faint);
+        font-family: var(--font-mono);
+      }
+      .pareto-tier {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 1rem;
+        align-items: start;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        background: var(--surface-raised);
+        border: 1px solid var(--border);
+        border-left: 3px solid var(--border-strong);
+      }
+      .pareto-tier.t1 {
+        border-left-color: var(--problem);
+      }
+      .pareto-tier.t2 {
+        border-left-color: var(--accent);
+      }
+      .pareto-tier.t3 {
+        border-left-color: var(--warning);
+      }
+      .pareto-tier.t4 {
+        border-left-color: var(--text-muted);
+      }
+      .pareto-pct {
+        font-family: var(--font-heading);
+        font-size: 1.8rem;
+        font-weight: 800;
+        line-height: 1;
+        letter-spacing: -0.03em;
+      }
+      .t1 .pareto-pct {
+        color: var(--problem);
+      }
+      .t2 .pareto-pct {
+        color: var(--accent);
+      }
+      .t3 .pareto-pct {
+        color: var(--warning);
+      }
+      .t4 .pareto-pct {
+        color: var(--text-muted);
+      }
+      .pareto-desc {
+        color: var(--text-muted);
+        font-size: 0.92rem;
+      }
+      .pareto-desc strong {
+        color: var(--text);
+      }
+      @media (min-width: 1024px) {
+        .sidebar {
+          display: block;
+        }
+      }
+      @media (max-width: 768px) {
+        .layout {
+          flex-direction: column;
+          padding: 1rem;
+        }
+        .top-bar {
+          padding: 0.6rem 1rem;
+          flex-wrap: wrap;
+          gap: 0.3rem;
+        }
+        .pareto-tier {
+          grid-template-columns: 1fr;
+        }
+      }
     </style>
   </head>
   <body>
@@ -149,7 +528,10 @@
           </div>
           <div class="hero-badge">Pareto Execution Plan</div>
           <h1>go-nix-helpers TODO Breakdown</h1>
-          <p class="hero-subtitle">All 27 TODOs from TODO_LIST.md broken into 105 sub-tasks (max 12min each), sorted by impact, effort, and customer value across 6 execution phases.</p>
+          <p class="hero-subtitle">
+            All 27 TODOs from TODO_LIST.md broken into 105 sub-tasks (max 12min each), sorted by
+            impact, effort, and customer value across 6 execution phases.
+          </p>
         </div>
 
         <nav class="toc">
@@ -191,7 +573,12 @@
 
         <div class="card card-problem">
           <h4>What this plan solves</h4>
-          <p>The TODO_LIST.md has 27 unsorted, un-prioritized items ranging from 5min LICENSE creation to 4h monorepo support. This plan breaks every TODO into actionable sub-tasks (max 12min each), sorts them by impact/effort/customer-value, and sequences them into 6 phases following the Pareto principle.</p>
+          <p>
+            The TODO_LIST.md has 27 unsorted, un-prioritized items ranging from 5min LICENSE
+            creation to 4h monorepo support. This plan breaks every TODO into actionable sub-tasks
+            (max 12min each), sorts them by impact/effort/customer-value, and sequences them into 6
+            phases following the Pareto principle.
+          </p>
         </div>
 
         <!-- ========== PARETO BREAKDOWN ========== -->
@@ -200,49 +587,100 @@
         <div class="pareto-tier t1">
           <div class="pareto-pct">1% &rarr; 51%</div>
           <div class="pareto-desc">
-            <strong>Phase 1: Legal &amp; Correctness</strong> &mdash; Add LICENSE file (MIT) and fix defaultSystems hardcoding. Two tasks, ~25min combined. Unblocks legal usage and fixes a correctness bug affecting every consumer. <strong>Do these first.</strong>
+            <strong>Phase 1: Legal &amp; Correctness</strong> &mdash; Add LICENSE file (MIT) and fix
+            defaultSystems hardcoding. Two tasks, ~25min combined. Unblocks legal usage and fixes a
+            correctness bug affecting every consumer. <strong>Do these first.</strong>
           </div>
         </div>
 
         <div class="pareto-tier t2">
           <div class="pareto-pct">4% &rarr; 64%</div>
           <div class="pareto-desc">
-            <strong>Phases 2-3: CI &amp; Cleanup + Module Options</strong> &mdash; GitHub Actions CI, deprecate mkGoFlake.nix, mark legacy template, add enableCheck/enableOverlay/buildFlags/version options. ~4h combined. Professionalizes the repo and adds flexibility consumers need.
+            <strong>Phases 2-3: CI &amp; Cleanup + Module Options</strong> &mdash; GitHub Actions
+            CI, deprecate mkGoFlake.nix, mark legacy template, add
+            enableCheck/enableOverlay/buildFlags/version options. ~4h combined. Professionalizes the
+            repo and adds flexibility consumers need.
           </div>
         </div>
 
         <div class="pareto-tier t3">
           <div class="pareto-pct">20% &rarr; 80%</div>
           <div class="pareto-desc">
-            <strong>Phases 4-5: Testing &amp; Documentation</strong> &mdash; Module tests, e2e consumer test, migration guide, CONTRIBUTING.md, .github templates, architecture diagram, FAQ, generate-flake.sh fix. ~8h combined. Makes the module trustworthy and adoptable.
+            <strong>Phases 4-5: Testing &amp; Documentation</strong> &mdash; Module tests, e2e
+            consumer test, migration guide, CONTRIBUTING.md, .github templates, architecture
+            diagram, FAQ, generate-flake.sh fix. ~8h combined. Makes the module trustworthy and
+            adoptable.
           </div>
         </div>
 
         <div class="pareto-tier t4">
           <div class="pareto-pct">80% &rarr; 100%</div>
           <div class="pareto-desc">
-            <strong>Phase 6: Advanced &amp; Polish</strong> &mdash; Monorepo support, downstream audit, private-repo CI test, lint/fmt toggles, nixpkgs registration, shell completions, man pages. ~10h combined. Completeness and ecosystem polish.
+            <strong>Phase 6: Advanced &amp; Polish</strong> &mdash; Monorepo support, downstream
+            audit, private-repo CI test, lint/fmt toggles, nixpkgs registration, shell completions,
+            man pages. ~10h combined. Completeness and ecosystem polish.
           </div>
         </div>
 
         <!-- ========== PHASE 1 ========== -->
-        <h2 id="phase1"><span class="num">02</span>Phase 1: Legal &amp; Correctness (1% &rarr; 51%)</h2>
+        <h2 id="phase1">
+          <span class="num">02</span>Phase 1: Legal &amp; Correctness (1% &rarr; 51%)
+        </h2>
         <div class="card card-solution">
           <h4>Quick wins &mdash; unblock adoption and fix correctness</h4>
           <p>6 sub-tasks, ~25min total. Do these immediately.</p>
         </div>
         <div class="table-wrap">
-        <table>
-          <thead><tr><th>#</th><th>Sub-task</th><th>Est</th><th>TODO Ref</th></tr></thead>
-          <tbody>
-            <tr><td>1.1</td><td>Create LICENSE file (MIT text, copyright Lars Artmann)</td><td>5min</td><td><span class="badge badge-critical">LICENSE</span></td></tr>
-            <tr><td>1.2</td><td>Add MIT license badge to README.md header</td><td>3min</td><td><span class="badge badge-critical">LICENSE</span></td></tr>
-            <tr><td>1.3</td><td>Read go-standard.nix:41-48 defaultSystems + flake.nix:28 pattern</td><td>2min</td><td><span class="badge badge-critical">systems</span></td></tr>
-            <tr><td>1.4</td><td>Add <code>systems</code> option to go-standard module (default = hardcoded list)</td><td>5min</td><td><span class="badge badge-critical">systems</span></td></tr>
-            <tr><td>1.5</td><td>Change config.systems to use cfg.systems</td><td>3min</td><td><span class="badge badge-critical">systems</span></td></tr>
-            <tr><td>1.6</td><td>Run <code>nix flake check</code> to verify no regression</td><td>5min</td><td><span class="badge badge-critical">systems</span></td></tr>
-          </tbody>
-        </table>
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Sub-task</th>
+                <th>Est</th>
+                <th>TODO Ref</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1.1</td>
+                <td>Create LICENSE file (MIT text, copyright Lars Artmann)</td>
+                <td>5min</td>
+                <td><span class="badge badge-critical">LICENSE</span></td>
+              </tr>
+              <tr>
+                <td>1.2</td>
+                <td>Add MIT license badge to README.md header</td>
+                <td>3min</td>
+                <td><span class="badge badge-critical">LICENSE</span></td>
+              </tr>
+              <tr>
+                <td>1.3</td>
+                <td>Read go-standard.nix:41-48 defaultSystems + flake.nix:28 pattern</td>
+                <td>2min</td>
+                <td><span class="badge badge-critical">systems</span></td>
+              </tr>
+              <tr>
+                <td>1.4</td>
+                <td>
+                  Add <code>systems</code> option to go-standard module (default = hardcoded list)
+                </td>
+                <td>5min</td>
+                <td><span class="badge badge-critical">systems</span></td>
+              </tr>
+              <tr>
+                <td>1.5</td>
+                <td>Change config.systems to use cfg.systems</td>
+                <td>3min</td>
+                <td><span class="badge badge-critical">systems</span></td>
+              </tr>
+              <tr>
+                <td>1.6</td>
+                <td>Run <code>nix flake check</code> to verify no regression</td>
+                <td>5min</td>
+                <td><span class="badge badge-critical">systems</span></td>
+              </tr>
+            </tbody>
+          </table>
         </div>
 
         <!-- ========== PHASE 2 ========== -->
@@ -252,25 +690,102 @@
           <p>14 sub-tasks, ~2.5h total. Depends on Phase 1.</p>
         </div>
         <div class="table-wrap">
-        <table>
-          <thead><tr><th>#</th><th>Sub-task</th><th>Est</th><th>TODO Ref</th></tr></thead>
-          <tbody>
-            <tr><td>2.1</td><td>Read docs/ci-workflow.yml for existing template</td><td>2min</td><td><span class="badge badge-high">CI</span></td></tr>
-            <tr><td>2.2</td><td>Create .github/workflows/ci.yml adapted for go-nix-helpers</td><td>10min</td><td><span class="badge badge-high">CI</span></td></tr>
-            <tr><td>2.3</td><td>Add Cachix action for faster CI builds</td><td>5min</td><td><span class="badge badge-high">CI</span></td></tr>
-            <tr><td>2.4</td><td>Test workflow YAML syntax</td><td>3min</td><td><span class="badge badge-high">CI</span></td></tr>
-            <tr><td>2.5</td><td>Replace static README badge with dynamic CI badge</td><td>5min</td><td><span class="badge badge-high">badge</span></td></tr>
-            <tr><td>2.6</td><td>Search for any consumers still using flake.lib.mkGoFlake</td><td>5min</td><td><span class="badge badge-high">deprecate</span></td></tr>
-            <tr><td>2.7</td><td>Add deprecation warning (lib.warn) to mkGoFlake.nix</td><td>5min</td><td><span class="badge badge-high">deprecate</span></td></tr>
-            <tr><td>2.8</td><td>Update README.md mkGoFlake section with prominent deprecation</td><td>5min</td><td><span class="badge badge-high">deprecate</span></td></tr>
-            <tr><td>2.9</td><td>Read templates/go-flake-parts/README.md</td><td>2min</td><td><span class="badge badge-high">legacy</span></td></tr>
-            <tr><td>2.10</td><td>Add "DEPRECATED &mdash; use go-standard" banner to template README</td><td>5min</td><td><span class="badge badge-high">legacy</span></td></tr>
-            <tr><td>2.11</td><td>Add deprecation comment to go-flake-parts/flake.nix header</td><td>3min</td><td><span class="badge badge-high">legacy</span></td></tr>
-            <tr><td>2.12</td><td>Update README.md templates section to mark as legacy</td><td>3min</td><td><span class="badge badge-high">legacy</span></td></tr>
-            <tr><td>2.13</td><td>Update FEATURES.md and CHANGELOG.md for deprecation changes</td><td>5min</td><td><span class="badge badge-high">docs</span></td></tr>
-            <tr><td>2.14</td><td>Run <code>nix flake check</code> after cleanup changes</td><td>5min</td><td><span class="badge badge-high">verify</span></td></tr>
-          </tbody>
-        </table>
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Sub-task</th>
+                <th>Est</th>
+                <th>TODO Ref</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>2.1</td>
+                <td>Read docs/ci-workflow.yml for existing template</td>
+                <td>2min</td>
+                <td><span class="badge badge-high">CI</span></td>
+              </tr>
+              <tr>
+                <td>2.2</td>
+                <td>Create .github/workflows/ci.yml adapted for go-nix-helpers</td>
+                <td>10min</td>
+                <td><span class="badge badge-high">CI</span></td>
+              </tr>
+              <tr>
+                <td>2.3</td>
+                <td>Add Cachix action for faster CI builds</td>
+                <td>5min</td>
+                <td><span class="badge badge-high">CI</span></td>
+              </tr>
+              <tr>
+                <td>2.4</td>
+                <td>Test workflow YAML syntax</td>
+                <td>3min</td>
+                <td><span class="badge badge-high">CI</span></td>
+              </tr>
+              <tr>
+                <td>2.5</td>
+                <td>Replace static README badge with dynamic CI badge</td>
+                <td>5min</td>
+                <td><span class="badge badge-high">badge</span></td>
+              </tr>
+              <tr>
+                <td>2.6</td>
+                <td>Search for any consumers still using flake.lib.mkGoFlake</td>
+                <td>5min</td>
+                <td><span class="badge badge-high">deprecate</span></td>
+              </tr>
+              <tr>
+                <td>2.7</td>
+                <td>Add deprecation warning (lib.warn) to mkGoFlake.nix</td>
+                <td>5min</td>
+                <td><span class="badge badge-high">deprecate</span></td>
+              </tr>
+              <tr>
+                <td>2.8</td>
+                <td>Update README.md mkGoFlake section with prominent deprecation</td>
+                <td>5min</td>
+                <td><span class="badge badge-high">deprecate</span></td>
+              </tr>
+              <tr>
+                <td>2.9</td>
+                <td>Read templates/go-flake-parts/README.md</td>
+                <td>2min</td>
+                <td><span class="badge badge-high">legacy</span></td>
+              </tr>
+              <tr>
+                <td>2.10</td>
+                <td>Add "DEPRECATED &mdash; use go-standard" banner to template README</td>
+                <td>5min</td>
+                <td><span class="badge badge-high">legacy</span></td>
+              </tr>
+              <tr>
+                <td>2.11</td>
+                <td>Add deprecation comment to go-flake-parts/flake.nix header</td>
+                <td>3min</td>
+                <td><span class="badge badge-high">legacy</span></td>
+              </tr>
+              <tr>
+                <td>2.12</td>
+                <td>Update README.md templates section to mark as legacy</td>
+                <td>3min</td>
+                <td><span class="badge badge-high">legacy</span></td>
+              </tr>
+              <tr>
+                <td>2.13</td>
+                <td>Update FEATURES.md and CHANGELOG.md for deprecation changes</td>
+                <td>5min</td>
+                <td><span class="badge badge-high">docs</span></td>
+              </tr>
+              <tr>
+                <td>2.14</td>
+                <td>Run <code>nix flake check</code> after cleanup changes</td>
+                <td>5min</td>
+                <td><span class="badge badge-high">verify</span></td>
+              </tr>
+            </tbody>
+          </table>
         </div>
 
         <!-- ========== PHASE 3 ========== -->
@@ -280,305 +795,2195 @@
           <p>10 sub-tasks, ~1.5h total. Can run in parallel with Phase 2.</p>
         </div>
         <div class="table-wrap">
-        <table>
-          <thead><tr><th>#</th><th>Sub-task</th><th>Est</th><th>TODO Ref</th></tr></thead>
-          <tbody>
-            <tr><td>3.1</td><td>Add <code>enableCheck</code> option to go-standard.nix (default true)</td><td>5min</td><td><span class="badge badge-medium">enableCheck</span></td></tr>
-            <tr><td>3.2</td><td>Conditionally set doCheck in buildGoModule</td><td>3min</td><td><span class="badge badge-medium">enableCheck</span></td></tr>
-            <tr><td>3.3</td><td>Add <code>enableOverlay</code> option to go-standard.nix (default true)</td><td>5min</td><td><span class="badge badge-medium">enableOverlay</span></td></tr>
-            <tr><td>3.4</td><td>Wrap flake.overlays.default in lib.optionalAttrs</td><td>5min</td><td><span class="badge badge-medium">enableOverlay</span></td></tr>
-            <tr><td>3.5</td><td>Add <code>buildFlags</code> option to go-standard.nix</td><td>5min</td><td><span class="badge badge-medium">buildFlags</span></td></tr>
-            <tr><td>3.6</td><td>Wire buildFlags into buildGoModule via tags/buildFlags</td><td>5min</td><td><span class="badge badge-medium">buildFlags</span></td></tr>
-            <tr><td>3.7</td><td>Add <code>version</code> option with default = self.rev or self.dirtyRev</td><td>5min</td><td><span class="badge badge-medium">version</span></td></tr>
-            <tr><td>3.8</td><td>Replace hardcoded version derivation with cfg.version</td><td>3min</td><td><span class="badge badge-medium">version</span></td></tr>
-            <tr><td>3.9</td><td>Update README.md options table with all 4 new options</td><td>5min</td><td><span class="badge badge-medium">docs</span></td></tr>
-            <tr><td>3.10</td><td>Run <code>nix flake check</code> after all option additions</td><td>5min</td><td><span class="badge badge-medium">verify</span></td></tr>
-          </tbody>
-        </table>
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Sub-task</th>
+                <th>Est</th>
+                <th>TODO Ref</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>3.1</td>
+                <td>Add <code>enableCheck</code> option to go-standard.nix (default true)</td>
+                <td>5min</td>
+                <td><span class="badge badge-medium">enableCheck</span></td>
+              </tr>
+              <tr>
+                <td>3.2</td>
+                <td>Conditionally set doCheck in buildGoModule</td>
+                <td>3min</td>
+                <td><span class="badge badge-medium">enableCheck</span></td>
+              </tr>
+              <tr>
+                <td>3.3</td>
+                <td>Add <code>enableOverlay</code> option to go-standard.nix (default true)</td>
+                <td>5min</td>
+                <td><span class="badge badge-medium">enableOverlay</span></td>
+              </tr>
+              <tr>
+                <td>3.4</td>
+                <td>Wrap flake.overlays.default in lib.optionalAttrs</td>
+                <td>5min</td>
+                <td><span class="badge badge-medium">enableOverlay</span></td>
+              </tr>
+              <tr>
+                <td>3.5</td>
+                <td>Add <code>buildFlags</code> option to go-standard.nix</td>
+                <td>5min</td>
+                <td><span class="badge badge-medium">buildFlags</span></td>
+              </tr>
+              <tr>
+                <td>3.6</td>
+                <td>Wire buildFlags into buildGoModule via tags/buildFlags</td>
+                <td>5min</td>
+                <td><span class="badge badge-medium">buildFlags</span></td>
+              </tr>
+              <tr>
+                <td>3.7</td>
+                <td>Add <code>version</code> option with default = self.rev or self.dirtyRev</td>
+                <td>5min</td>
+                <td><span class="badge badge-medium">version</span></td>
+              </tr>
+              <tr>
+                <td>3.8</td>
+                <td>Replace hardcoded version derivation with cfg.version</td>
+                <td>3min</td>
+                <td><span class="badge badge-medium">version</span></td>
+              </tr>
+              <tr>
+                <td>3.9</td>
+                <td>Update README.md options table with all 4 new options</td>
+                <td>5min</td>
+                <td><span class="badge badge-medium">docs</span></td>
+              </tr>
+              <tr>
+                <td>3.10</td>
+                <td>Run <code>nix flake check</code> after all option additions</td>
+                <td>5min</td>
+                <td><span class="badge badge-medium">verify</span></td>
+              </tr>
+            </tbody>
+          </table>
         </div>
 
         <!-- ========== PHASE 4 ========== -->
-        <h2 id="phase4"><span class="num">05</span>Phase 4: Testing &amp; Reliability (20% &rarr; 80%)</h2>
+        <h2 id="phase4">
+          <span class="num">05</span>Phase 4: Testing &amp; Reliability (20% &rarr; 80%)
+        </h2>
         <div class="card card-warning">
           <h4>Make the module trustworthy &mdash; tests for module outputs + e2e consumer test</h4>
           <p>23 sub-tasks, ~4h total. Depends on Phases 2-3.</p>
         </div>
         <div class="table-wrap">
-        <table>
-          <thead><tr><th>#</th><th>Sub-task</th><th>Est</th><th>TODO Ref</th></tr></thead>
-          <tbody>
-            <tr><td>4.1</td><td>Design test approach: flake-parts evalModules for module tests</td><td>10min</td><td><span class="badge badge-medium">module tests</span></td></tr>
-            <tr><td>4.2</td><td>Create test mock: minimal Go project (go.mod, main.go)</td><td>5min</td><td><span class="badge badge-medium">module tests</span></td></tr>
-            <tr><td>4.3</td><td>Write module-eval test checking packages.default exists</td><td>10min</td><td><span class="badge badge-medium">module tests</span></td></tr>
-            <tr><td>4.4</td><td>Write test checking apps.default/test/lint exist</td><td>5min</td><td><span class="badge badge-medium">module tests</span></td></tr>
-            <tr><td>4.5</td><td>Write test checking devShells.default/ci exist</td><td>5min</td><td><span class="badge badge-medium">module tests</span></td></tr>
-            <tr><td>4.6</td><td>Write test checking checks.format/build exist</td><td>5min</td><td><span class="badge badge-medium">module tests</span></td></tr>
-            <tr><td>4.7</td><td>Write test checking treefmt programs configured</td><td>5min</td><td><span class="badge badge-medium">module tests</span></td></tr>
-            <tr><td>4.8</td><td>Write test checking overlay.default exists</td><td>5min</td><td><span class="badge badge-medium">module tests</span></td></tr>
-            <tr><td>4.9</td><td>Wire new module tests into test.nix</td><td>5min</td><td><span class="badge badge-medium">module tests</span></td></tr>
-            <tr><td>4.10</td><td>Wire into flake.nix checks</td><td>5min</td><td><span class="badge badge-medium">module tests</span></td></tr>
-            <tr><td>4.11</td><td>Run and debug module tests</td><td>10min</td><td><span class="badge badge-medium">module tests</span></td></tr>
-            <tr><td>4.12</td><td>Design e2e test: mock consumer flake using go-standard</td><td>10min</td><td><span class="badge badge-medium">e2e test</span></td></tr>
-            <tr><td>4.13</td><td>Create consumer test fixture (go.mod, main.go, flake.nix)</td><td>10min</td><td><span class="badge badge-medium">e2e test</span></td></tr>
-            <tr><td>4.14</td><td>Write nix eval test checking consumer flake outputs</td><td>10min</td><td><span class="badge badge-medium">e2e test</span></td></tr>
-            <tr><td>4.15</td><td>Add deps-enabled config test case</td><td>10min</td><td><span class="badge badge-medium">e2e test</span></td></tr>
-            <tr><td>4.16</td><td>Wire e2e test into CI workflow</td><td>5min</td><td><span class="badge badge-medium">e2e test</span></td></tr>
-            <tr><td>4.17</td><td>Run and debug e2e test</td><td>10min</td><td><span class="badge badge-medium">e2e test</span></td></tr>
-            <tr><td>4.18</td><td>Read scripts/generate-flake.sh fully</td><td>5min</td><td><span class="badge badge-medium">genflake</span></td></tr>
-            <tr><td>4.19</td><td>Add --no-push flag to generate-flake.sh</td><td>5min</td><td><span class="badge badge-medium">genflake</span></td></tr>
-            <tr><td>4.20</td><td>Make project root configurable via --dir flag</td><td>5min</td><td><span class="badge badge-medium">genflake</span></td></tr>
-            <tr><td>4.21</td><td>Replace hardcoded sed --templ with parameterized approach</td><td>10min</td><td><span class="badge badge-medium">genflake</span></td></tr>
-            <tr><td>4.22</td><td>Add --help usage text to generate-flake.sh</td><td>5min</td><td><span class="badge badge-medium">genflake</span></td></tr>
-            <tr><td>4.23</td><td>Update FEATURES.md for all testing changes</td><td>5min</td><td><span class="badge badge-medium">docs</span></td></tr>
-          </tbody>
-        </table>
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Sub-task</th>
+                <th>Est</th>
+                <th>TODO Ref</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>4.1</td>
+                <td>Design test approach: flake-parts evalModules for module tests</td>
+                <td>10min</td>
+                <td><span class="badge badge-medium">module tests</span></td>
+              </tr>
+              <tr>
+                <td>4.2</td>
+                <td>Create test mock: minimal Go project (go.mod, main.go)</td>
+                <td>5min</td>
+                <td><span class="badge badge-medium">module tests</span></td>
+              </tr>
+              <tr>
+                <td>4.3</td>
+                <td>Write module-eval test checking packages.default exists</td>
+                <td>10min</td>
+                <td><span class="badge badge-medium">module tests</span></td>
+              </tr>
+              <tr>
+                <td>4.4</td>
+                <td>Write test checking apps.default/test/lint exist</td>
+                <td>5min</td>
+                <td><span class="badge badge-medium">module tests</span></td>
+              </tr>
+              <tr>
+                <td>4.5</td>
+                <td>Write test checking devShells.default/ci exist</td>
+                <td>5min</td>
+                <td><span class="badge badge-medium">module tests</span></td>
+              </tr>
+              <tr>
+                <td>4.6</td>
+                <td>Write test checking checks.format/build exist</td>
+                <td>5min</td>
+                <td><span class="badge badge-medium">module tests</span></td>
+              </tr>
+              <tr>
+                <td>4.7</td>
+                <td>Write test checking treefmt programs configured</td>
+                <td>5min</td>
+                <td><span class="badge badge-medium">module tests</span></td>
+              </tr>
+              <tr>
+                <td>4.8</td>
+                <td>Write test checking overlay.default exists</td>
+                <td>5min</td>
+                <td><span class="badge badge-medium">module tests</span></td>
+              </tr>
+              <tr>
+                <td>4.9</td>
+                <td>Wire new module tests into test.nix</td>
+                <td>5min</td>
+                <td><span class="badge badge-medium">module tests</span></td>
+              </tr>
+              <tr>
+                <td>4.10</td>
+                <td>Wire into flake.nix checks</td>
+                <td>5min</td>
+                <td><span class="badge badge-medium">module tests</span></td>
+              </tr>
+              <tr>
+                <td>4.11</td>
+                <td>Run and debug module tests</td>
+                <td>10min</td>
+                <td><span class="badge badge-medium">module tests</span></td>
+              </tr>
+              <tr>
+                <td>4.12</td>
+                <td>Design e2e test: mock consumer flake using go-standard</td>
+                <td>10min</td>
+                <td><span class="badge badge-medium">e2e test</span></td>
+              </tr>
+              <tr>
+                <td>4.13</td>
+                <td>Create consumer test fixture (go.mod, main.go, flake.nix)</td>
+                <td>10min</td>
+                <td><span class="badge badge-medium">e2e test</span></td>
+              </tr>
+              <tr>
+                <td>4.14</td>
+                <td>Write nix eval test checking consumer flake outputs</td>
+                <td>10min</td>
+                <td><span class="badge badge-medium">e2e test</span></td>
+              </tr>
+              <tr>
+                <td>4.15</td>
+                <td>Add deps-enabled config test case</td>
+                <td>10min</td>
+                <td><span class="badge badge-medium">e2e test</span></td>
+              </tr>
+              <tr>
+                <td>4.16</td>
+                <td>Wire e2e test into CI workflow</td>
+                <td>5min</td>
+                <td><span class="badge badge-medium">e2e test</span></td>
+              </tr>
+              <tr>
+                <td>4.17</td>
+                <td>Run and debug e2e test</td>
+                <td>10min</td>
+                <td><span class="badge badge-medium">e2e test</span></td>
+              </tr>
+              <tr>
+                <td>4.18</td>
+                <td>Read scripts/generate-flake.sh fully</td>
+                <td>5min</td>
+                <td><span class="badge badge-medium">genflake</span></td>
+              </tr>
+              <tr>
+                <td>4.19</td>
+                <td>Add --no-push flag to generate-flake.sh</td>
+                <td>5min</td>
+                <td><span class="badge badge-medium">genflake</span></td>
+              </tr>
+              <tr>
+                <td>4.20</td>
+                <td>Make project root configurable via --dir flag</td>
+                <td>5min</td>
+                <td><span class="badge badge-medium">genflake</span></td>
+              </tr>
+              <tr>
+                <td>4.21</td>
+                <td>Replace hardcoded sed --templ with parameterized approach</td>
+                <td>10min</td>
+                <td><span class="badge badge-medium">genflake</span></td>
+              </tr>
+              <tr>
+                <td>4.22</td>
+                <td>Add --help usage text to generate-flake.sh</td>
+                <td>5min</td>
+                <td><span class="badge badge-medium">genflake</span></td>
+              </tr>
+              <tr>
+                <td>4.23</td>
+                <td>Update FEATURES.md for all testing changes</td>
+                <td>5min</td>
+                <td><span class="badge badge-medium">docs</span></td>
+              </tr>
+            </tbody>
+          </table>
         </div>
 
         <!-- ========== PHASE 5 ========== -->
-        <h2 id="phase5"><span class="num">06</span>Phase 5: Documentation &amp; Community (20% &rarr; 80%)</h2>
+        <h2 id="phase5">
+          <span class="num">06</span>Phase 5: Documentation &amp; Community (20% &rarr; 80%)
+        </h2>
         <div class="card card-warning">
           <h4>Adoption enablers &mdash; migration guide, contributing, community files</h4>
           <p>20 sub-tasks, ~4h total. Can run in parallel with Phase 4.</p>
         </div>
         <div class="table-wrap">
-        <table>
-          <thead><tr><th>#</th><th>Sub-task</th><th>Est</th><th>TODO Ref</th></tr></thead>
-          <tbody>
-            <tr><td>5.1</td><td>Read mkGoFlake.nix API and go-standard.nix options for mapping</td><td>5min</td><td><span class="badge badge-medium">migration</span></td></tr>
-            <tr><td>5.2</td><td>Write docs/migration-guide.md: mkGoFlake &rarr; go-standard</td><td>10min</td><td><span class="badge badge-medium">migration</span></td></tr>
-            <tr><td>5.3</td><td>Add section: manual mkPreparedSource &rarr; go-standard</td><td>10min</td><td><span class="badge badge-medium">migration</span></td></tr>
-            <tr><td>5.4</td><td>Add section: go-flake-parts template &rarr; go-standard</td><td>5min</td><td><span class="badge badge-medium">migration</span></td></tr>
-            <tr><td>5.5</td><td>Add migration guide link from README.md</td><td>3min</td><td><span class="badge badge-medium">migration</span></td></tr>
-            <tr><td>5.6</td><td>Read AGENTS.md, flake-patterns.md for CONTRIBUTING context</td><td>5min</td><td><span class="badge badge-medium">contributing</span></td></tr>
-            <tr><td>5.7</td><td>Write CONTRIBUTING.md with dev setup, testing, formatting</td><td>10min</td><td><span class="badge badge-medium">contributing</span></td></tr>
-            <tr><td>5.8</td><td>Add CONTRIBUTING.md link from README.md</td><td>3min</td><td><span class="badge badge-medium">contributing</span></td></tr>
-            <tr><td>5.9</td><td>Create .github/ISSUE_TEMPLATE/bug_report.md</td><td>5min</td><td><span class="badge badge-medium">.github</span></td></tr>
-            <tr><td>5.10</td><td>Create .github/ISSUE_TEMPLATE/feature_request.md</td><td>5min</td><td><span class="badge badge-medium">.github</span></td></tr>
-            <tr><td>5.11</td><td>Create .github/PULL_REQUEST_TEMPLATE.md</td><td>5min</td><td><span class="badge badge-medium">.github</span></td></tr>
-            <tr><td>5.12</td><td>Create .github/CODEOWNERS</td><td>2min</td><td><span class="badge badge-medium">.github</span></td></tr>
-            <tr><td>5.13</td><td>Design architecture diagram: inputs &rarr; module &rarr; outputs</td><td>10min</td><td><span class="badge badge-medium">arch diagram</span></td></tr>
-            <tr><td>5.14</td><td>Write D2 source for architecture diagram</td><td>10min</td><td><span class="badge badge-medium">arch diagram</span></td></tr>
-            <tr><td>5.15</td><td>Render to SVG and inline in README</td><td>5min</td><td><span class="badge badge-medium">arch diagram</span></td></tr>
-            <tr><td>5.16</td><td>Collect common errors from AGENTS.md gotchas</td><td>5min</td><td><span class="badge badge-medium">FAQ</span></td></tr>
-            <tr><td>5.17</td><td>Write FAQ section with Q&amp;A format in README</td><td>10min</td><td><span class="badge badge-medium">FAQ</span></td></tr>
-            <tr><td>5.18</td><td>Add troubleshooting for SSH/proxy errors</td><td>5min</td><td><span class="badge badge-medium">FAQ</span></td></tr>
-            <tr><td>5.19</td><td>Add troubleshooting for vendorHash errors</td><td>5min</td><td><span class="badge badge-medium">FAQ</span></td></tr>
-            <tr><td>5.20</td><td>Add troubleshooting for GOPRIVATE errors</td><td>5min</td><td><span class="badge badge-medium">FAQ</span></td></tr>
-          </tbody>
-        </table>
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Sub-task</th>
+                <th>Est</th>
+                <th>TODO Ref</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>5.1</td>
+                <td>Read mkGoFlake.nix API and go-standard.nix options for mapping</td>
+                <td>5min</td>
+                <td><span class="badge badge-medium">migration</span></td>
+              </tr>
+              <tr>
+                <td>5.2</td>
+                <td>Write docs/migration-guide.md: mkGoFlake &rarr; go-standard</td>
+                <td>10min</td>
+                <td><span class="badge badge-medium">migration</span></td>
+              </tr>
+              <tr>
+                <td>5.3</td>
+                <td>Add section: manual mkPreparedSource &rarr; go-standard</td>
+                <td>10min</td>
+                <td><span class="badge badge-medium">migration</span></td>
+              </tr>
+              <tr>
+                <td>5.4</td>
+                <td>Add section: go-flake-parts template &rarr; go-standard</td>
+                <td>5min</td>
+                <td><span class="badge badge-medium">migration</span></td>
+              </tr>
+              <tr>
+                <td>5.5</td>
+                <td>Add migration guide link from README.md</td>
+                <td>3min</td>
+                <td><span class="badge badge-medium">migration</span></td>
+              </tr>
+              <tr>
+                <td>5.6</td>
+                <td>Read AGENTS.md, flake-patterns.md for CONTRIBUTING context</td>
+                <td>5min</td>
+                <td><span class="badge badge-medium">contributing</span></td>
+              </tr>
+              <tr>
+                <td>5.7</td>
+                <td>Write CONTRIBUTING.md with dev setup, testing, formatting</td>
+                <td>10min</td>
+                <td><span class="badge badge-medium">contributing</span></td>
+              </tr>
+              <tr>
+                <td>5.8</td>
+                <td>Add CONTRIBUTING.md link from README.md</td>
+                <td>3min</td>
+                <td><span class="badge badge-medium">contributing</span></td>
+              </tr>
+              <tr>
+                <td>5.9</td>
+                <td>Create .github/ISSUE_TEMPLATE/bug_report.md</td>
+                <td>5min</td>
+                <td><span class="badge badge-medium">.github</span></td>
+              </tr>
+              <tr>
+                <td>5.10</td>
+                <td>Create .github/ISSUE_TEMPLATE/feature_request.md</td>
+                <td>5min</td>
+                <td><span class="badge badge-medium">.github</span></td>
+              </tr>
+              <tr>
+                <td>5.11</td>
+                <td>Create .github/PULL_REQUEST_TEMPLATE.md</td>
+                <td>5min</td>
+                <td><span class="badge badge-medium">.github</span></td>
+              </tr>
+              <tr>
+                <td>5.12</td>
+                <td>Create .github/CODEOWNERS</td>
+                <td>2min</td>
+                <td><span class="badge badge-medium">.github</span></td>
+              </tr>
+              <tr>
+                <td>5.13</td>
+                <td>Design architecture diagram: inputs &rarr; module &rarr; outputs</td>
+                <td>10min</td>
+                <td><span class="badge badge-medium">arch diagram</span></td>
+              </tr>
+              <tr>
+                <td>5.14</td>
+                <td>Write D2 source for architecture diagram</td>
+                <td>10min</td>
+                <td><span class="badge badge-medium">arch diagram</span></td>
+              </tr>
+              <tr>
+                <td>5.15</td>
+                <td>Render to SVG and inline in README</td>
+                <td>5min</td>
+                <td><span class="badge badge-medium">arch diagram</span></td>
+              </tr>
+              <tr>
+                <td>5.16</td>
+                <td>Collect common errors from AGENTS.md gotchas</td>
+                <td>5min</td>
+                <td><span class="badge badge-medium">FAQ</span></td>
+              </tr>
+              <tr>
+                <td>5.17</td>
+                <td>Write FAQ section with Q&amp;A format in README</td>
+                <td>10min</td>
+                <td><span class="badge badge-medium">FAQ</span></td>
+              </tr>
+              <tr>
+                <td>5.18</td>
+                <td>Add troubleshooting for SSH/proxy errors</td>
+                <td>5min</td>
+                <td><span class="badge badge-medium">FAQ</span></td>
+              </tr>
+              <tr>
+                <td>5.19</td>
+                <td>Add troubleshooting for vendorHash errors</td>
+                <td>5min</td>
+                <td><span class="badge badge-medium">FAQ</span></td>
+              </tr>
+              <tr>
+                <td>5.20</td>
+                <td>Add troubleshooting for GOPRIVATE errors</td>
+                <td>5min</td>
+                <td><span class="badge badge-medium">FAQ</span></td>
+              </tr>
+            </tbody>
+          </table>
         </div>
 
         <!-- ========== PHASE 6 ========== -->
-        <h2 id="phase6"><span class="num">07</span>Phase 6: Advanced &amp; Polish (80% &rarr; 100%)</h2>
+        <h2 id="phase6">
+          <span class="num">07</span>Phase 6: Advanced &amp; Polish (80% &rarr; 100%)
+        </h2>
         <div class="card">
           <h4>Ecosystem completeness &mdash; monorepo, audits, toggles, extras</h4>
           <p>32 sub-tasks, ~10h total. Do after core value is shipped.</p>
         </div>
         <div class="table-wrap">
-        <table>
-          <thead><tr><th>#</th><th>Sub-task</th><th>Est</th><th>TODO Ref</th></tr></thead>
-          <tbody>
-            <tr><td>6.1</td><td>Design <code>packages</code> option type: attrsOf submodule</td><td>10min</td><td><span class="badge badge-low">monorepo</span></td></tr>
-            <tr><td>6.2</td><td>Refactor package derivation to map over packages config</td><td>10min</td><td><span class="badge badge-low">monorepo</span></td></tr>
-            <tr><td>6.3</td><td>Generate apps for each package</td><td>10min</td><td><span class="badge badge-low">monorepo</span></td></tr>
-            <tr><td>6.4</td><td>Generate overlays for each package</td><td>10min</td><td><span class="badge badge-low">monorepo</span></td></tr>
-            <tr><td>6.5</td><td>Backward compat: single package still works unchanged</td><td>10min</td><td><span class="badge badge-low">monorepo</span></td></tr>
-            <tr><td>6.6</td><td>Write tests for multi-package config</td><td>10min</td><td><span class="badge badge-low">monorepo</span></td></tr>
-            <tr><td>6.7</td><td>Update README.md with monorepo example</td><td>10min</td><td><span class="badge badge-low">monorepo</span></td></tr>
-            <tr><td>6.8</td><td>List all projects using go-nix-helpers (grep flake.lock)</td><td>5min</td><td><span class="badge badge-low">audit</span></td></tr>
-            <tr><td>6.9</td><td>Check each for _local_deps/ manual workarounds</td><td>10min</td><td><span class="badge badge-low">audit</span></td></tr>
-            <tr><td>6.10</td><td>Check each for postPatchExtra workarounds</td><td>10min</td><td><span class="badge badge-low">audit</span></td></tr>
-            <tr><td>6.11</td><td>Document audit findings in report</td><td>10min</td><td><span class="badge badge-low">audit</span></td></tr>
-            <tr><td>6.12</td><td>Design CI test using GitHub SSH key secret</td><td>10min</td><td><span class="badge badge-low">priv CI</span></td></tr>
-            <tr><td>6.13</td><td>Add private-repo test job to CI workflow</td><td>10min</td><td><span class="badge badge-low">priv CI</span></td></tr>
-            <tr><td>6.14</td><td>Add SSH key setup step in CI</td><td>5min</td><td><span class="badge badge-low">priv CI</span></td></tr>
-            <tr><td>6.15</td><td>Add <code>enableGolangciLint</code> option (default true)</td><td>5min</td><td><span class="badge badge-low">lint toggle</span></td></tr>
-            <tr><td>6.16</td><td>Conditionally add golangci-lint to devShells and lint app</td><td>5min</td><td><span class="badge badge-low">lint toggle</span></td></tr>
-            <tr><td>6.17</td><td>Add <code>enableGofumpt</code> and <code>enableGoimports</code> options</td><td>5min</td><td><span class="badge badge-low">fmt toggles</span></td></tr>
-            <tr><td>6.18</td><td>Conditionally enable in treefmt programs</td><td>5min</td><td><span class="badge badge-low">fmt toggles</span></td></tr>
-            <tr><td>6.19</td><td>Add <code>fmt</code> app to go-standard apps (wrapper for treefmt)</td><td>5min</td><td><span class="badge badge-low">fmt alias</span></td></tr>
-            <tr><td>6.20</td><td>Wire fmt app to treefmt build wrapper</td><td>5min</td><td><span class="badge badge-low">fmt alias</span></td></tr>
-            <tr><td>6.21</td><td>Prepare nixpkgs maintainer PR (add to lib/maintainers.nix)</td><td>10min</td><td><span class="badge badge-low">nixpkgs</span></td></tr>
-            <tr><td>6.22</td><td>Submit PR to nixpkgs</td><td>5min</td><td><span class="badge badge-low">nixpkgs</span></td></tr>
-            <tr><td>6.23</td><td>Update AGENTS.md note once merged</td><td>2min</td><td><span class="badge badge-low">nixpkgs</span></td></tr>
-            <tr><td>6.24</td><td>Research how buildGoModule supports completions</td><td>5min</td><td><span class="badge badge-low">completions</span></td></tr>
-            <tr><td>6.25</td><td>Add completion generation to package build</td><td>10min</td><td><span class="badge badge-low">completions</span></td></tr>
-            <tr><td>6.26</td><td>Install completions in package output</td><td>5min</td><td><span class="badge badge-low">completions</span></td></tr>
-            <tr><td>6.27</td><td>Design man page format and content</td><td>10min</td><td><span class="badge badge-low">man pages</span></td></tr>
-            <tr><td>6.28</td><td>Write go-standard.5 man page documenting options</td><td>10min</td><td><span class="badge badge-low">man pages</span></td></tr>
-            <tr><td>6.29</td><td>Write mkPreparedSource.5 man page documenting params</td><td>10min</td><td><span class="badge badge-low">man pages</span></td></tr>
-            <tr><td>6.30</td><td>Install man pages in devShell</td><td>5min</td><td><span class="badge badge-low">man pages</span></td></tr>
-            <tr><td>6.31</td><td>Update README.md options table for all new toggles</td><td>5min</td><td><span class="badge badge-low">docs</span></td></tr>
-            <tr><td>6.32</td><td>Run <code>nix flake check</code> after all module changes</td><td>5min</td><td><span class="badge badge-low">verify</span></td></tr>
-          </tbody>
-        </table>
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Sub-task</th>
+                <th>Est</th>
+                <th>TODO Ref</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>6.1</td>
+                <td>Design <code>packages</code> option type: attrsOf submodule</td>
+                <td>10min</td>
+                <td><span class="badge badge-low">monorepo</span></td>
+              </tr>
+              <tr>
+                <td>6.2</td>
+                <td>Refactor package derivation to map over packages config</td>
+                <td>10min</td>
+                <td><span class="badge badge-low">monorepo</span></td>
+              </tr>
+              <tr>
+                <td>6.3</td>
+                <td>Generate apps for each package</td>
+                <td>10min</td>
+                <td><span class="badge badge-low">monorepo</span></td>
+              </tr>
+              <tr>
+                <td>6.4</td>
+                <td>Generate overlays for each package</td>
+                <td>10min</td>
+                <td><span class="badge badge-low">monorepo</span></td>
+              </tr>
+              <tr>
+                <td>6.5</td>
+                <td>Backward compat: single package still works unchanged</td>
+                <td>10min</td>
+                <td><span class="badge badge-low">monorepo</span></td>
+              </tr>
+              <tr>
+                <td>6.6</td>
+                <td>Write tests for multi-package config</td>
+                <td>10min</td>
+                <td><span class="badge badge-low">monorepo</span></td>
+              </tr>
+              <tr>
+                <td>6.7</td>
+                <td>Update README.md with monorepo example</td>
+                <td>10min</td>
+                <td><span class="badge badge-low">monorepo</span></td>
+              </tr>
+              <tr>
+                <td>6.8</td>
+                <td>List all projects using go-nix-helpers (grep flake.lock)</td>
+                <td>5min</td>
+                <td><span class="badge badge-low">audit</span></td>
+              </tr>
+              <tr>
+                <td>6.9</td>
+                <td>Check each for _local_deps/ manual workarounds</td>
+                <td>10min</td>
+                <td><span class="badge badge-low">audit</span></td>
+              </tr>
+              <tr>
+                <td>6.10</td>
+                <td>Check each for postPatchExtra workarounds</td>
+                <td>10min</td>
+                <td><span class="badge badge-low">audit</span></td>
+              </tr>
+              <tr>
+                <td>6.11</td>
+                <td>Document audit findings in report</td>
+                <td>10min</td>
+                <td><span class="badge badge-low">audit</span></td>
+              </tr>
+              <tr>
+                <td>6.12</td>
+                <td>Design CI test using GitHub SSH key secret</td>
+                <td>10min</td>
+                <td><span class="badge badge-low">priv CI</span></td>
+              </tr>
+              <tr>
+                <td>6.13</td>
+                <td>Add private-repo test job to CI workflow</td>
+                <td>10min</td>
+                <td><span class="badge badge-low">priv CI</span></td>
+              </tr>
+              <tr>
+                <td>6.14</td>
+                <td>Add SSH key setup step in CI</td>
+                <td>5min</td>
+                <td><span class="badge badge-low">priv CI</span></td>
+              </tr>
+              <tr>
+                <td>6.15</td>
+                <td>Add <code>enableGolangciLint</code> option (default true)</td>
+                <td>5min</td>
+                <td><span class="badge badge-low">lint toggle</span></td>
+              </tr>
+              <tr>
+                <td>6.16</td>
+                <td>Conditionally add golangci-lint to devShells and lint app</td>
+                <td>5min</td>
+                <td><span class="badge badge-low">lint toggle</span></td>
+              </tr>
+              <tr>
+                <td>6.17</td>
+                <td>Add <code>enableGofumpt</code> and <code>enableGoimports</code> options</td>
+                <td>5min</td>
+                <td><span class="badge badge-low">fmt toggles</span></td>
+              </tr>
+              <tr>
+                <td>6.18</td>
+                <td>Conditionally enable in treefmt programs</td>
+                <td>5min</td>
+                <td><span class="badge badge-low">fmt toggles</span></td>
+              </tr>
+              <tr>
+                <td>6.19</td>
+                <td>Add <code>fmt</code> app to go-standard apps (wrapper for treefmt)</td>
+                <td>5min</td>
+                <td><span class="badge badge-low">fmt alias</span></td>
+              </tr>
+              <tr>
+                <td>6.20</td>
+                <td>Wire fmt app to treefmt build wrapper</td>
+                <td>5min</td>
+                <td><span class="badge badge-low">fmt alias</span></td>
+              </tr>
+              <tr>
+                <td>6.21</td>
+                <td>Prepare nixpkgs maintainer PR (add to lib/maintainers.nix)</td>
+                <td>10min</td>
+                <td><span class="badge badge-low">nixpkgs</span></td>
+              </tr>
+              <tr>
+                <td>6.22</td>
+                <td>Submit PR to nixpkgs</td>
+                <td>5min</td>
+                <td><span class="badge badge-low">nixpkgs</span></td>
+              </tr>
+              <tr>
+                <td>6.23</td>
+                <td>Update AGENTS.md note once merged</td>
+                <td>2min</td>
+                <td><span class="badge badge-low">nixpkgs</span></td>
+              </tr>
+              <tr>
+                <td>6.24</td>
+                <td>Research how buildGoModule supports completions</td>
+                <td>5min</td>
+                <td><span class="badge badge-low">completions</span></td>
+              </tr>
+              <tr>
+                <td>6.25</td>
+                <td>Add completion generation to package build</td>
+                <td>10min</td>
+                <td><span class="badge badge-low">completions</span></td>
+              </tr>
+              <tr>
+                <td>6.26</td>
+                <td>Install completions in package output</td>
+                <td>5min</td>
+                <td><span class="badge badge-low">completions</span></td>
+              </tr>
+              <tr>
+                <td>6.27</td>
+                <td>Design man page format and content</td>
+                <td>10min</td>
+                <td><span class="badge badge-low">man pages</span></td>
+              </tr>
+              <tr>
+                <td>6.28</td>
+                <td>Write go-standard.5 man page documenting options</td>
+                <td>10min</td>
+                <td><span class="badge badge-low">man pages</span></td>
+              </tr>
+              <tr>
+                <td>6.29</td>
+                <td>Write mkPreparedSource.5 man page documenting params</td>
+                <td>10min</td>
+                <td><span class="badge badge-low">man pages</span></td>
+              </tr>
+              <tr>
+                <td>6.30</td>
+                <td>Install man pages in devShell</td>
+                <td>5min</td>
+                <td><span class="badge badge-low">man pages</span></td>
+              </tr>
+              <tr>
+                <td>6.31</td>
+                <td>Update README.md options table for all new toggles</td>
+                <td>5min</td>
+                <td><span class="badge badge-low">docs</span></td>
+              </tr>
+              <tr>
+                <td>6.32</td>
+                <td>Run <code>nix flake check</code> after all module changes</td>
+                <td>5min</td>
+                <td><span class="badge badge-low">verify</span></td>
+              </tr>
+            </tbody>
+          </table>
         </div>
 
         <!-- ========== EXECUTION GRAPH ========== -->
         <h2 id="graph"><span class="num">08</span>Execution Graph (D2)</h2>
-        <p>Phase dependencies and execution order. Read top-to-bottom; arrows indicate dependencies.</p>
+        <p>
+          Phase dependencies and execution order. Read top-to-bottom; arrows indicate dependencies.
+        </p>
         <div class="svg-container">
-          <?xml version="1.0" encoding="utf-8"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" data-d2-version="v0.7.1" preserveAspectRatio="xMinYMin meet" viewBox="0 0 3749 1194"><svg class="d2-1400753603 d2-svg" width="3749" height="1194" viewBox="-101 -101 3749 1194"><rect x="-101.000000" y="-101.000000" width="3749.000000" height="1194.000000" rx="0.000000" fill="#FFFFFF" class=" fill-N7" stroke-width="0" /><style type="text/css"><![CDATA[
-.d2-1400753603 .text-bold {
-	font-family: "d2-1400753603-font-bold";
-}
-@font-face {
-	font-family: d2-1400753603-font-bold;
-	src: url("data:application/font-woff;base64,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");
-}]]></style><style type="text/css"><![CDATA[.shape {
-  shape-rendering: geometricPrecision;
-  stroke-linejoin: round;
-}
-.connection {
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-.blend {
-  mix-blend-mode: multiply;
-  opacity: 0.5;
-}
+          <?xml version="1.0" encoding="utf-8"?><svg
+            xmlns="http://www.w3.org/2000/svg"
+            xmlns:xlink="http://www.w3.org/1999/xlink"
+            data-d2-version="v0.7.1"
+            preserveAspectRatio="xMinYMin meet"
+            viewBox="0 0 3749 1194"
+          >
+            <svg
+              class="d2-1400753603 d2-svg"
+              width="3749"
+              height="1194"
+              viewBox="-101 -101 3749 1194"
+            >
+              <rect
+                x="-101.000000"
+                y="-101.000000"
+                width="3749.000000"
+                height="1194.000000"
+                rx="0.000000"
+                fill="#FFFFFF"
+                class="fill-N7"
+                stroke-width="0"
+              />
+              <style type="text/css">
+                <![CDATA[
+                .d2-1400753603 .text-bold {
+                	font-family: "d2-1400753603-font-bold";
+                }
+                @font-face {
+                	font-family: d2-1400753603-font-bold;
+                	src: url("data:application/font-woff;base64,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");
+                }]]>
+              </style>
+              <style type="text/css">
+                <![CDATA[.shape {
+                  shape-rendering: geometricPrecision;
+                  stroke-linejoin: round;
+                }
+                .connection {
+                  stroke-linecap: round;
+                  stroke-linejoin: round;
+                }
+                .blend {
+                  mix-blend-mode: multiply;
+                  opacity: 0.5;
+                }
 
-		.d2-1400753603 .fill-N1{fill:#0A0F25;}
-		.d2-1400753603 .fill-N2{fill:#676C7E;}
-		.d2-1400753603 .fill-N3{fill:#9499AB;}
-		.d2-1400753603 .fill-N4{fill:#CFD2DD;}
-		.d2-1400753603 .fill-N5{fill:#DEE1EB;}
-		.d2-1400753603 .fill-N6{fill:#EEF1F8;}
-		.d2-1400753603 .fill-N7{fill:#FFFFFF;}
-		.d2-1400753603 .fill-B1{fill:#0D32B2;}
-		.d2-1400753603 .fill-B2{fill:#0D32B2;}
-		.d2-1400753603 .fill-B3{fill:#E3E9FD;}
-		.d2-1400753603 .fill-B4{fill:#E3E9FD;}
-		.d2-1400753603 .fill-B5{fill:#EDF0FD;}
-		.d2-1400753603 .fill-B6{fill:#F7F8FE;}
-		.d2-1400753603 .fill-AA2{fill:#4A6FF3;}
-		.d2-1400753603 .fill-AA4{fill:#EDF0FD;}
-		.d2-1400753603 .fill-AA5{fill:#F7F8FE;}
-		.d2-1400753603 .fill-AB4{fill:#EDF0FD;}
-		.d2-1400753603 .fill-AB5{fill:#F7F8FE;}
-		.d2-1400753603 .stroke-N1{stroke:#0A0F25;}
-		.d2-1400753603 .stroke-N2{stroke:#676C7E;}
-		.d2-1400753603 .stroke-N3{stroke:#9499AB;}
-		.d2-1400753603 .stroke-N4{stroke:#CFD2DD;}
-		.d2-1400753603 .stroke-N5{stroke:#DEE1EB;}
-		.d2-1400753603 .stroke-N6{stroke:#EEF1F8;}
-		.d2-1400753603 .stroke-N7{stroke:#FFFFFF;}
-		.d2-1400753603 .stroke-B1{stroke:#0D32B2;}
-		.d2-1400753603 .stroke-B2{stroke:#0D32B2;}
-		.d2-1400753603 .stroke-B3{stroke:#E3E9FD;}
-		.d2-1400753603 .stroke-B4{stroke:#E3E9FD;}
-		.d2-1400753603 .stroke-B5{stroke:#EDF0FD;}
-		.d2-1400753603 .stroke-B6{stroke:#F7F8FE;}
-		.d2-1400753603 .stroke-AA2{stroke:#4A6FF3;}
-		.d2-1400753603 .stroke-AA4{stroke:#EDF0FD;}
-		.d2-1400753603 .stroke-AA5{stroke:#F7F8FE;}
-		.d2-1400753603 .stroke-AB4{stroke:#EDF0FD;}
-		.d2-1400753603 .stroke-AB5{stroke:#F7F8FE;}
-		.d2-1400753603 .background-color-N1{background-color:#0A0F25;}
-		.d2-1400753603 .background-color-N2{background-color:#676C7E;}
-		.d2-1400753603 .background-color-N3{background-color:#9499AB;}
-		.d2-1400753603 .background-color-N4{background-color:#CFD2DD;}
-		.d2-1400753603 .background-color-N5{background-color:#DEE1EB;}
-		.d2-1400753603 .background-color-N6{background-color:#EEF1F8;}
-		.d2-1400753603 .background-color-N7{background-color:#FFFFFF;}
-		.d2-1400753603 .background-color-B1{background-color:#0D32B2;}
-		.d2-1400753603 .background-color-B2{background-color:#0D32B2;}
-		.d2-1400753603 .background-color-B3{background-color:#E3E9FD;}
-		.d2-1400753603 .background-color-B4{background-color:#E3E9FD;}
-		.d2-1400753603 .background-color-B5{background-color:#EDF0FD;}
-		.d2-1400753603 .background-color-B6{background-color:#F7F8FE;}
-		.d2-1400753603 .background-color-AA2{background-color:#4A6FF3;}
-		.d2-1400753603 .background-color-AA4{background-color:#EDF0FD;}
-		.d2-1400753603 .background-color-AA5{background-color:#F7F8FE;}
-		.d2-1400753603 .background-color-AB4{background-color:#EDF0FD;}
-		.d2-1400753603 .background-color-AB5{background-color:#F7F8FE;}
-		.d2-1400753603 .color-N1{color:#0A0F25;}
-		.d2-1400753603 .color-N2{color:#676C7E;}
-		.d2-1400753603 .color-N3{color:#9499AB;}
-		.d2-1400753603 .color-N4{color:#CFD2DD;}
-		.d2-1400753603 .color-N5{color:#DEE1EB;}
-		.d2-1400753603 .color-N6{color:#EEF1F8;}
-		.d2-1400753603 .color-N7{color:#FFFFFF;}
-		.d2-1400753603 .color-B1{color:#0D32B2;}
-		.d2-1400753603 .color-B2{color:#0D32B2;}
-		.d2-1400753603 .color-B3{color:#E3E9FD;}
-		.d2-1400753603 .color-B4{color:#E3E9FD;}
-		.d2-1400753603 .color-B5{color:#EDF0FD;}
-		.d2-1400753603 .color-B6{color:#F7F8FE;}
-		.d2-1400753603 .color-AA2{color:#4A6FF3;}
-		.d2-1400753603 .color-AA4{color:#EDF0FD;}
-		.d2-1400753603 .color-AA5{color:#F7F8FE;}
-		.d2-1400753603 .color-AB4{color:#EDF0FD;}
-		.d2-1400753603 .color-AB5{color:#F7F8FE;}.appendix text.text{fill:#0A0F25}.md{--color-fg-default:#0A0F25;--color-fg-muted:#676C7E;--color-fg-subtle:#9499AB;--color-canvas-default:#FFFFFF;--color-canvas-subtle:#EEF1F8;--color-border-default:#0D32B2;--color-border-muted:#0D32B2;--color-neutral-muted:#EEF1F8;--color-accent-fg:#0D32B2;--color-accent-emphasis:#0D32B2;--color-attention-subtle:#676C7E;--color-danger-fg:red;}.sketch-overlay-B1{fill:url(#streaks-darker-d2-1400753603);mix-blend-mode:lighten}.sketch-overlay-B2{fill:url(#streaks-darker-d2-1400753603);mix-blend-mode:lighten}.sketch-overlay-B3{fill:url(#streaks-bright-d2-1400753603);mix-blend-mode:darken}.sketch-overlay-B4{fill:url(#streaks-bright-d2-1400753603);mix-blend-mode:darken}.sketch-overlay-B5{fill:url(#streaks-bright-d2-1400753603);mix-blend-mode:darken}.sketch-overlay-B6{fill:url(#streaks-bright-d2-1400753603);mix-blend-mode:darken}.sketch-overlay-AA2{fill:url(#streaks-dark-d2-1400753603);mix-blend-mode:overlay}.sketch-overlay-AA4{fill:url(#streaks-bright-d2-1400753603);mix-blend-mode:darken}.sketch-overlay-AA5{fill:url(#streaks-bright-d2-1400753603);mix-blend-mode:darken}.sketch-overlay-AB4{fill:url(#streaks-bright-d2-1400753603);mix-blend-mode:darken}.sketch-overlay-AB5{fill:url(#streaks-bright-d2-1400753603);mix-blend-mode:darken}.sketch-overlay-N1{fill:url(#streaks-darker-d2-1400753603);mix-blend-mode:lighten}.sketch-overlay-N2{fill:url(#streaks-dark-d2-1400753603);mix-blend-mode:overlay}.sketch-overlay-N3{fill:url(#streaks-normal-d2-1400753603);mix-blend-mode:color-burn}.sketch-overlay-N4{fill:url(#streaks-normal-d2-1400753603);mix-blend-mode:color-burn}.sketch-overlay-N5{fill:url(#streaks-bright-d2-1400753603);mix-blend-mode:darken}.sketch-overlay-N6{fill:url(#streaks-bright-d2-1400753603);mix-blend-mode:darken}.sketch-overlay-N7{fill:url(#streaks-bright-d2-1400753603);mix-blend-mode:darken}.light-code{display: block}.dark-code{display: none}]]></style><g class="UDE="><g class="shape" ><rect x="87.000000" y="190.000000" width="340.000000" height="66.000000" stroke="#0D32B2" fill="#1a3a1a" class=" stroke-B1" style="stroke-width:2;" /></g><text x="257.000000" y="228.500000" fill="#6eb5ff" class="text-bold" style="text-anchor:middle;font-size:16px">Phase 1 — Legal &amp; Correctness (1% → 51%)</text></g><g class="UDI="><g class="shape" ><rect x="1595.000000" y="8.000000" width="289.000000" height="66.000000" stroke="#0D32B2" fill="#1a2a3a" class=" stroke-B1" style="stroke-width:2;" /></g><text x="1739.500000" y="46.500000" fill="#6eb5ff" class="text-bold" style="text-anchor:middle;font-size:16px">Phase 2 — CI &amp; Cleanup (4% → 64%)</text></g><g class="UDM="><g class="shape" ><rect x="1092.000000" y="190.000000" width="311.000000" height="66.000000" stroke="#0D32B2" fill="#1a2a3a" class=" stroke-B1" style="stroke-width:2;" /></g><text x="1247.500000" y="228.500000" fill="#6eb5ff" class="text-bold" style="text-anchor:middle;font-size:16px">Phase 3 — Module Options (4% → 64%)</text></g><g class="UDQ="><g class="shape" ><rect x="443.000000" y="554.000000" width="351.000000" height="66.000000" stroke="#0D32B2" fill="#3a2a1a" class=" stroke-B1" style="stroke-width:2;" /></g><text x="618.500000" y="592.500000" fill="#f4d35e" class="text-bold" style="text-anchor:middle;font-size:16px">Phase 4 — Testing &amp; Reliability (20% → 80%)</text></g><g class="UDU="><g class="shape" ><rect x="2610.000000" y="8.000000" width="418.000000" height="66.000000" stroke="#0D32B2" fill="#3a2a1a" class=" stroke-B1" style="stroke-width:2;" /></g><text x="2819.000000" y="46.500000" fill="#f4d35e" class="text-bold" style="text-anchor:middle;font-size:16px">Phase 5 — Documentation &amp; Community (20% → 80%)</text></g><g class="UDY="><g class="shape" ><rect x="429.000000" y="8.000000" width="347.000000" height="66.000000" stroke="#0D32B2" fill="#3a1a1a" class=" stroke-B1" style="stroke-width:2;" /></g><text x="602.500000" y="46.500000" fill="#ff6b6b" class="text-bold" style="text-anchor:middle;font-size:16px">Phase 6 — Advanced &amp; Polish (80% → 100%)</text></g><g class="bGljZW5zZQ=="><g class="shape" ><rect x="239.000000" y="0.000000" width="130.000000" height="82.000000" stroke="#0D32B2" fill="#0e0e10" class=" stroke-B1" style="stroke-width:2;" /></g><text x="304.000000" y="38.500000" fill="#f4f4f0" class="text-bold" style="text-anchor:middle;font-size:16px"><tspan x="304.000000" dy="0.000000">LICENSE file</tspan><tspan x="304.000000" dy="18.500000">(MIT)</tspan></text></g><g class="c3lzdGVtc19maXg="><g class="shape" ><rect x="0.000000" y="0.000000" width="179.000000" height="82.000000" stroke="#0D32B2" fill="#0e0e10" class=" stroke-B1" style="stroke-width:2;" /></g><text x="89.500000" y="38.500000" fill="#f4f4f0" class="text-bold" style="text-anchor:middle;font-size:16px"><tspan x="89.500000" dy="0.000000">Fix defaultSystems</tspan><tspan x="89.500000" dy="18.500000">hardcoding</tspan></text></g><g class="Y2k="><g class="shape" ><rect x="436.000000" y="364.000000" width="151.000000" height="82.000000" stroke="#0D32B2" fill="#0e0e10" class=" stroke-B1" style="stroke-width:2;" /></g><text x="511.500000" y="402.500000" fill="#f4f4f0" class="text-bold" style="text-anchor:middle;font-size:16px"><tspan x="511.500000" dy="0.000000">GitHub Actions</tspan><tspan x="511.500000" dy="18.500000">CI workflow</tspan></text></g><g class="YmFkZ2U="><g class="shape" ><rect x="260.000000" y="546.000000" width="123.000000" height="82.000000" stroke="#0D32B2" fill="#0e0e10" class=" stroke-B1" style="stroke-width:2;" /></g><text x="321.500000" y="584.500000" fill="#f4f4f0" class="text-bold" style="text-anchor:middle;font-size:16px"><tspan x="321.500000" dy="0.000000">Dynamic CI</tspan><tspan x="321.500000" dy="18.500000">badge</tspan></text></g><g class="ZGVwcmVjYXRlX21rZmxha2U="><g class="shape" ><rect x="8.000000" y="546.000000" width="151.000000" height="82.000000" stroke="#0D32B2" fill="#0e0e10" class=" stroke-B1" style="stroke-width:2;" /></g><text x="83.500000" y="584.500000" fill="#f4f4f0" class="text-bold" style="text-anchor:middle;font-size:16px"><tspan x="83.500000" dy="0.000000">Deprecate</tspan><tspan x="83.500000" dy="18.500000">mkGoFlake.nix</tspan></text></g><g class="bGVnYWN5X3RlbXBsYXRl"><g class="shape" ><rect x="124.000000" y="364.000000" width="185.000000" height="82.000000" stroke="#0D32B2" fill="#0e0e10" class=" stroke-B1" style="stroke-width:2;" /></g><text x="216.500000" y="402.500000" fill="#f4f4f0" class="text-bold" style="text-anchor:middle;font-size:16px"><tspan x="216.500000" dy="0.000000">Mark go-flake-parts</tspan><tspan x="216.500000" dy="18.500000">as legacy</tspan></text></g><g class="b3B0X2NoZWNr"><g class="shape" ><rect x="1382.000000" y="0.000000" width="137.000000" height="82.000000" stroke="#0D32B2" fill="#0e0e10" class=" stroke-B1" style="stroke-width:2;" /></g><text x="1450.500000" y="38.500000" fill="#f4f4f0" class="text-bold" style="text-anchor:middle;font-size:16px"><tspan x="1450.500000" dy="0.000000">enableCheck</tspan><tspan x="1450.500000" dy="18.500000">option</tspan></text></g><g class="b3B0X292ZXJsYXk="><g class="shape" ><rect x="1173.000000" y="0.000000" width="149.000000" height="82.000000" stroke="#0D32B2" fill="#0e0e10" class=" stroke-B1" style="stroke-width:2;" /></g><text x="1247.500000" y="38.500000" fill="#f4f4f0" class="text-bold" style="text-anchor:middle;font-size:16px"><tspan x="1247.500000" dy="0.000000">enableOverlay</tspan><tspan x="1247.500000" dy="18.500000">option</tspan></text></g><g class="b3B0X2J1aWxkZmxhZ3M="><g class="shape" ><rect x="994.000000" y="0.000000" width="119.000000" height="82.000000" stroke="#0D32B2" fill="#0e0e10" class=" stroke-B1" style="stroke-width:2;" /></g><text x="1053.500000" y="38.500000" fill="#f4f4f0" class="text-bold" style="text-anchor:middle;font-size:16px"><tspan x="1053.500000" dy="0.000000">buildFlags</tspan><tspan x="1053.500000" dy="18.500000">option</tspan></text></g><g class="b3B0X3ZlcnNpb24="><g class="shape" ><rect x="836.000000" y="0.000000" width="98.000000" height="82.000000" stroke="#0D32B2" fill="#0e0e10" class=" stroke-B1" style="stroke-width:2;" /></g><text x="885.000000" y="38.500000" fill="#f4f4f0" class="text-bold" style="text-anchor:middle;font-size:16px"><tspan x="885.000000" dy="0.000000">version</tspan><tspan x="885.000000" dy="18.500000">option</tspan></text></g><g class="bW9kdWxlX3Rlc3Rz"><g class="shape" ><rect x="1179.000000" y="364.000000" width="137.000000" height="82.000000" stroke="#0D32B2" fill="#0e0e10" class=" stroke-B1" style="stroke-width:2;" /></g><text x="1247.500000" y="402.500000" fill="#f4f4f0" class="text-bold" style="text-anchor:middle;font-size:16px"><tspan x="1247.500000" dy="0.000000">go-standard</tspan><tspan x="1247.500000" dy="18.500000">module tests</tspan></text></g><g class="ZTJlX3Rlc3Q="><g class="shape" ><rect x="1040.000000" y="546.000000" width="174.000000" height="82.000000" stroke="#0D32B2" fill="#0e0e10" class=" stroke-B1" style="stroke-width:2;" /></g><text x="1127.000000" y="584.500000" fill="#f4f4f0" class="text-bold" style="text-anchor:middle;font-size:16px"><tspan x="1127.000000" dy="0.000000">Downstream</tspan><tspan x="1127.000000" dy="18.500000">consumer e2e test</tspan></text></g><g class="Z2VuZmxha2VfZml4"><g class="shape" ><rect x="1741.000000" y="182.000000" width="138.000000" height="82.000000" stroke="#0D32B2" fill="#0e0e10" class=" stroke-B1" style="stroke-width:2;" /></g><text x="1810.000000" y="220.500000" fill="#f4f4f0" class="text-bold" style="text-anchor:middle;font-size:16px"><tspan x="1810.000000" dy="0.000000">Fix generate-</tspan><tspan x="1810.000000" dy="18.500000">flake.sh</tspan></text></g><g class="bWlncmF0aW9u"><g class="shape" ><rect x="58.000000" y="728.000000" width="114.000000" height="82.000000" stroke="#0D32B2" fill="#0e0e10" class=" stroke-B1" style="stroke-width:2;" /></g><text x="115.000000" y="766.500000" fill="#f4f4f0" class="text-bold" style="text-anchor:middle;font-size:16px"><tspan x="115.000000" dy="0.000000">Migration</tspan><tspan x="115.000000" dy="18.500000">guide</tspan></text></g><g class="Y29udHJpYnV0aW5n"><g class="shape" ><rect x="392.000000" y="728.000000" width="155.000000" height="82.000000" stroke="#0D32B2" fill="#0e0e10" class=" stroke-B1" style="stroke-width:2;" /></g><text x="469.500000" y="766.500000" fill="#f4f4f0" class="text-bold" style="text-anchor:middle;font-size:16px"><tspan x="469.500000" dy="0.000000">CONTRIBUTING</tspan><tspan x="469.500000" dy="18.500000">.md</tspan></text></g><g class="Z2l0aHViX21ldGE="><g class="shape" ><rect x="411.000000" y="910.000000" width="117.000000" height="82.000000" stroke="#0D32B2" fill="#0e0e10" class=" stroke-B1" style="stroke-width:2;" /></g><text x="469.500000" y="948.500000" fill="#f4f4f0" class="text-bold" style="text-anchor:middle;font-size:16px"><tspan x="469.500000" dy="0.000000">.github</tspan><tspan x="469.500000" dy="18.500000">templates</tspan></text></g><g class="YXJjaF9kaWFncmFt"><g class="shape" ><rect x="654.000000" y="728.000000" width="135.000000" height="82.000000" stroke="#0D32B2" fill="#0e0e10" class=" stroke-B1" style="stroke-width:2;" /></g><text x="721.500000" y="766.500000" fill="#f4f4f0" class="text-bold" style="text-anchor:middle;font-size:16px"><tspan x="721.500000" dy="0.000000">Architecture</tspan><tspan x="721.500000" dy="18.500000">diagram</tspan></text></g><g class="ZmFx"><g class="shape" ><rect x="849.000000" y="728.000000" width="163.000000" height="82.000000" stroke="#0D32B2" fill="#0e0e10" class=" stroke-B1" style="stroke-width:2;" /></g><text x="930.500000" y="766.500000" fill="#f4f4f0" class="text-bold" style="text-anchor:middle;font-size:16px"><tspan x="930.500000" dy="0.000000">Troubleshooting</tspan><tspan x="930.500000" dy="18.500000">/ FAQ</tspan></text></g><g class="bW9ub3JlcG8="><g class="shape" ><rect x="1939.000000" y="182.000000" width="145.000000" height="82.000000" stroke="#0D32B2" fill="#0e0e10" class=" stroke-B1" style="stroke-width:2;" /></g><text x="2011.500000" y="220.500000" fill="#f4f4f0" class="text-bold" style="text-anchor:middle;font-size:16px"><tspan x="2011.500000" dy="0.000000">Multi-package</tspan><tspan x="2011.500000" dy="18.500000">(mono repo)</tspan></text></g><g class="YXVkaXQ="><g class="shape" ><rect x="2144.000000" y="182.000000" width="177.000000" height="82.000000" stroke="#0D32B2" fill="#0e0e10" class=" stroke-B1" style="stroke-width:2;" /></g><text x="2232.500000" y="220.500000" fill="#f4f4f0" class="text-bold" style="text-anchor:middle;font-size:16px"><tspan x="2232.500000" dy="0.000000">Audit downstream</tspan><tspan x="2232.500000" dy="18.500000">consumers</tspan></text></g><g class="cHJpdl9jaQ=="><g class="shape" ><rect x="1274.000000" y="546.000000" width="135.000000" height="82.000000" stroke="#0D32B2" fill="#0e0e10" class=" stroke-B1" style="stroke-width:2;" /></g><text x="1341.500000" y="584.500000" fill="#f4f4f0" class="text-bold" style="text-anchor:middle;font-size:16px"><tspan x="1341.500000" dy="0.000000">Private-repo</tspan><tspan x="1341.500000" dy="18.500000">CI test</tspan></text></g><g class="b3B0X2xpbnQ="><g class="shape" ><rect x="2381.000000" y="182.000000" width="183.000000" height="82.000000" stroke="#0D32B2" fill="#0e0e10" class=" stroke-B1" style="stroke-width:2;" /></g><text x="2472.500000" y="220.500000" fill="#f4f4f0" class="text-bold" style="text-anchor:middle;font-size:16px"><tspan x="2472.500000" dy="0.000000">enableGolangciLint</tspan><tspan x="2472.500000" dy="18.500000">toggle</tspan></text></g><g class="b3B0X2ZtdA=="><g class="shape" ><rect x="2624.000000" y="182.000000" width="174.000000" height="82.000000" stroke="#0D32B2" fill="#0e0e10" class=" stroke-B1" style="stroke-width:2;" /></g><text x="2711.000000" y="220.500000" fill="#f4f4f0" class="text-bold" style="text-anchor:middle;font-size:16px"><tspan x="2711.000000" dy="0.000000">enableGofumpt /</tspan><tspan x="2711.000000" dy="18.500000">goimports toggles</tspan></text></g><g class="Zm10X2FsaWFz"><g class="shape" ><rect x="2858.000000" y="182.000000" width="137.000000" height="82.000000" stroke="#0D32B2" fill="#0e0e10" class=" stroke-B1" style="stroke-width:2;" /></g><text x="2926.500000" y="220.500000" fill="#f4f4f0" class="text-bold" style="text-anchor:middle;font-size:16px"><tspan x="2926.500000" dy="0.000000">nix run .#fmt</tspan><tspan x="2926.500000" dy="18.500000">alias app</tspan></text></g><g class="bml4cGtncw=="><g class="shape" ><rect x="3055.000000" y="182.000000" width="120.000000" height="82.000000" stroke="#0D32B2" fill="#0e0e10" class=" stroke-B1" style="stroke-width:2;" /></g><text x="3115.000000" y="220.500000" fill="#f4f4f0" class="text-bold" style="text-anchor:middle;font-size:16px"><tspan x="3115.000000" dy="0.000000">Register in</tspan><tspan x="3115.000000" dy="18.500000">nixpkgs</tspan></text></g><g class="Y29tcGxldGlvbnM="><g class="shape" ><rect x="3235.000000" y="182.000000" width="133.000000" height="82.000000" stroke="#0D32B2" fill="#0e0e10" class=" stroke-B1" style="stroke-width:2;" /></g><text x="3301.500000" y="220.500000" fill="#f4f4f0" class="text-bold" style="text-anchor:middle;font-size:16px"><tspan x="3301.500000" dy="0.000000">Shell</tspan><tspan x="3301.500000" dy="18.500000">completions</tspan></text></g><g class="bWFucGFnZXM="><g class="shape" ><rect x="3428.000000" y="190.000000" width="119.000000" height="66.000000" stroke="#0D32B2" fill="#0e0e10" class=" stroke-B1" style="stroke-width:2;" /></g><text x="3487.500000" y="228.500000" fill="#f4f4f0" class="text-bold" style="text-anchor:middle;font-size:16px">Man pages</text></g><g class="KGxpY2Vuc2UgLSZndDsgUDEpWzBd"><marker id="mk-d2-1400753603-3488378134" markerWidth="10.000000" markerHeight="12.000000" refX="7.000000" refY="6.000000" viewBox="0.000000 0.000000 10.000000 12.000000" orient="auto" markerUnits="userSpaceOnUse"> <polygon points="0.000000,0.000000 10.000000,6.000000 0.000000,12.000000" fill="#0D32B2" class="connection fill-B1" stroke-width="2" /> </marker><path d="M 304.000000 84.000000 C 304.000000 122.000000 298.000000 143.600006 275.837692 186.447130" stroke="#0D32B2" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-d2-1400753603-3488378134)" mask="url(#d2-1400753603)" /></g><g class="KHN5c3RlbXNfZml4IC0mZ3Q7IFAxKVswXQ=="><path d="M 89.500000 84.000000 C 89.500000 122.000000 110.900002 143.600006 192.983406 188.093809" stroke="#0D32B2" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-d2-1400753603-3488378134)" mask="url(#d2-1400753603)" /></g><g class="KFAxIC0mZ3Q7IGNpKVswXQ=="><path d="M 350.882957 256.674145 C 478.600006 302.399994 511.000000 324.000000 511.000000 360.000000" stroke="#0D32B2" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-d2-1400753603-3488378134)" mask="url(#d2-1400753603)" /></g><g class="KGNpIC0mZ3Q7IGJhZGdlKVswXQ=="><path d="M 433.697549 442.169710 C 344.500000 485.059998 321.750000 506.000000 321.750000 542.000000" stroke="#0D32B2" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-d2-1400753603-3488378134)" mask="url(#d2-1400753603)" /></g><g class="KFAxIC0mZ3Q7IGRlcHJlY2F0ZV9ta2ZsYWtlKVswXQ=="><path d="M 192.977396 256.926215 C 105.948997 302.399994 83.750000 332.200012 83.750000 359.500000 C 83.750000 386.799988 83.750000 506.000000 83.750000 542.000000" stroke="#0D32B2" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-d2-1400753603-3488378134)" mask="url(#d2-1400753603)" /></g><g class="KFAxIC0mZ3Q7IGxlZ2FjeV90ZW1wbGF0ZSlbMF0="><path d="M 241.431888 257.825019 C 221.449997 302.399994 216.250000 324.000000 216.250000 360.000000" stroke="#0D32B2" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-d2-1400753603-3488378134)" mask="url(#d2-1400753603)" /></g><g class="KGNpIC0mZ3Q7IFA0KVswXQ=="><path d="M 561.275791 447.293043 C 606.950012 486.000000 618.750000 507.600006 618.750000 550.000000" stroke="#0D32B2" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-d2-1400753603-3488378134)" mask="url(#d2-1400753603)" /></g><g class="KGRlcHJlY2F0ZV9ta2ZsYWtlIC0mZ3Q7IG1pZ3JhdGlvbilbMF0="><path d="M 102.585811 629.816981 C 120.150002 668.000000 123.750000 688.000000 120.148015 724.019851" stroke="#0D32B2" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-d2-1400753603-3488378134)" mask="url(#d2-1400753603)" /></g><g class="KFAyIC0mZ3Q7IFAzKVswXQ=="><path d="M 1686.313440 75.074949 C 1615.199951 120.400002 1552.400024 143.600006 1377.871206 188.993140" stroke="#0D32B2" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-d2-1400753603-3488378134)" mask="url(#d2-1400753603)" /></g><g class="KG9wdF9jaGVjayAtJmd0OyBQMylbMF0="><path d="M 1450.500000 84.000000 C 1450.500000 122.000000 1424.699951 143.600006 1325.148215 188.359717" stroke="#0D32B2" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-d2-1400753603-3488378134)" mask="url(#d2-1400753603)" /></g><g class="KG9wdF9vdmVybGF5IC0mZ3Q7IFAzKVswXQ=="><path d="M 1247.500000 84.000000 C 1247.500000 122.000000 1247.500000 143.600006 1247.500000 186.000000" stroke="#0D32B2" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-d2-1400753603-3488378134)" mask="url(#d2-1400753603)" /></g><g class="KG9wdF9idWlsZGZsYWdzIC0mZ3Q7IFAzKVswXQ=="><path d="M 1053.500000 84.000000 C 1053.500000 122.000000 1078.300049 143.600006 1173.876762 188.305259" stroke="#0D32B2" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-d2-1400753603-3488378134)" mask="url(#d2-1400753603)" /></g><g class="KG9wdF92ZXJzaW9uIC0mZ3Q7IFAzKVswXQ=="><path d="M 885.000000 84.000000 C 885.000000 122.000000 931.200012 143.600006 1112.120420 189.025906" stroke="#0D32B2" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-d2-1400753603-3488378134)" mask="url(#d2-1400753603)" /></g><g class="KFAzIC0mZ3Q7IG1vZHVsZV90ZXN0cylbMF0="><path d="M 1247.500000 258.000000 C 1247.500000 302.399994 1247.500000 324.000000 1247.500000 360.000000" stroke="#0D32B2" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-d2-1400753603-3488378134)" mask="url(#d2-1400753603)" /></g><g class="KG1vZHVsZV90ZXN0cyAtJmd0OyBlMmVfdGVzdClbMF0="><path d="M 1191.155815 447.207715 C 1139.949951 486.000000 1126.750000 506.000000 1126.750000 542.000000" stroke="#0D32B2" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-d2-1400753603-3488378134)" mask="url(#d2-1400753603)" /></g><g class="KFAyIC0mZ3Q7IGdlbmZsYWtlX2ZpeClbMF0="><path d="M 1765.975994 75.580170 C 1800.750000 120.400002 1809.750000 142.000000 1809.750000 178.000000" stroke="#0D32B2" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-d2-1400753603-3488378134)" mask="url(#d2-1400753603)" /></g><g class="KFA0IC0mZ3Q7IG1pZ3JhdGlvbilbMF0="><path d="M 440.780786 618.349563 C 172.348999 666.000000 105.750000 688.000000 109.351985 724.019851" stroke="#0D32B2" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-d2-1400753603-3488378134)" mask="url(#d2-1400753603)" /></g><g class="KFA0IC0mZ3Q7IGNvbnRyaWJ1dGluZylbMF0="><path d="M 562.292993 621.042174 C 488.000000 666.400024 469.000000 688.000000 469.000000 724.000000" stroke="#0D32B2" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-d2-1400753603-3488378134)" mask="url(#d2-1400753603)" /></g><g class="KGNvbnRyaWJ1dGluZyAtJmd0OyBnaXRodWJfbWV0YSlbMF0="><path d="M 469.000000 812.000000 C 469.000000 850.000000 469.000000 870.000000 469.000000 906.000000" stroke="#0D32B2" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-d2-1400753603-3488378134)" mask="url(#d2-1400753603)" /></g><g class="KFA0IC0mZ3Q7IGFyY2hfZGlhZ3JhbSlbMF0="><path d="M 657.742282 621.331576 C 708.250000 666.400024 721.250000 688.000000 721.250000 724.000000" stroke="#0D32B2" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-d2-1400753603-3488378134)" mask="url(#d2-1400753603)" /></g><g class="KFA0IC0mZ3Q7IGZhcSlbMF0="><path d="M 733.170108 620.559630 C 890.450012 666.400024 930.250000 688.000000 930.250000 724.000000" stroke="#0D32B2" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-d2-1400753603-3488378134)" mask="url(#d2-1400753603)" /></g><g class="KFA1IC0mZ3Q7IG1vbm9yZXBvKVswXQ=="><path d="M 2607.512588 64.784036 C 2130.899902 118.512001 2011.250000 142.000000 2011.250000 178.000000" stroke="#0D32B2" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-d2-1400753603-3488378134)" mask="url(#d2-1400753603)" /></g><g class="KFA1IC0mZ3Q7IGF1ZGl0KVswXQ=="><path d="M 2607.523668 73.747779 C 2307.699951 120.288002 2232.250000 142.000000 2232.250000 178.000000" stroke="#0D32B2" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-d2-1400753603-3488378134)" mask="url(#d2-1400753603)" /></g><g class="KGNpIC0mZ3Q7IHByaXZfY2kpWzBd"><path d="M 589.488062 413.493186 C 1190.500000 479.454987 1341.250000 506.000000 1341.250000 542.000000" stroke="#0D32B2" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-d2-1400753603-3488378134)" mask="url(#d2-1400753603)" /></g><g class="KFA1IC0mZ3Q7IG9wdF9saW50KVswXQ=="><path d="M 2691.315511 74.507694 C 2516.449951 120.400002 2472.250000 142.000000 2472.250000 178.000000" stroke="#0D32B2" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-d2-1400753603-3488378134)" mask="url(#d2-1400753603)" /></g><g class="KFA1IC0mZ3Q7IG9wdF9mbXQpWzBd"><path d="M 2778.219028 75.286905 C 2724.550049 120.400002 2710.750000 142.000000 2710.750000 178.000000" stroke="#0D32B2" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-d2-1400753603-3488378134)" mask="url(#d2-1400753603)" /></g><g class="KFA1IC0mZ3Q7IGZtdF9hbGlhcylbMF0="><path d="M 2858.780972 75.286905 C 2912.449951 120.400002 2926.250000 142.000000 2926.250000 178.000000" stroke="#0D32B2" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-d2-1400753603-3488378134)" mask="url(#d2-1400753603)" /></g><g class="KFA1IC0mZ3Q7IG5peHBrZ3MpWzBd"><path d="M 2927.661995 74.586750 C 3076.949951 120.400002 3114.750000 142.000000 3114.750000 178.000000" stroke="#0D32B2" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-d2-1400753603-3488378134)" mask="url(#d2-1400753603)" /></g><g class="KFA1IC0mZ3Q7IGNvbXBsZXRpb25zKVswXQ=="><path d="M 2995.215455 74.370118 C 3239.649902 120.400002 3301.250000 142.000000 3301.250000 178.000000" stroke="#0D32B2" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-d2-1400753603-3488378134)" mask="url(#d2-1400753603)" /></g><g class="KFA1IC0mZ3Q7IG1hbnBhZ2VzKVswXQ=="><path d="M 3030.232000 70.267721 C 3395.449951 119.599998 3487.250000 143.600006 3487.250000 186.000000" stroke="#0D32B2" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-d2-1400753603-3488378134)" mask="url(#d2-1400753603)" /></g><mask id="d2-1400753603" maskUnits="userSpaceOnUse" x="-101" y="-101" width="3749" height="1194">
-<rect x="-101" y="-101" width="3749" height="1194" fill="white"></rect>
-
-</mask></svg></svg>
-
+                		.d2-1400753603 .fill-N1{fill:#0A0F25;}
+                		.d2-1400753603 .fill-N2{fill:#676C7E;}
+                		.d2-1400753603 .fill-N3{fill:#9499AB;}
+                		.d2-1400753603 .fill-N4{fill:#CFD2DD;}
+                		.d2-1400753603 .fill-N5{fill:#DEE1EB;}
+                		.d2-1400753603 .fill-N6{fill:#EEF1F8;}
+                		.d2-1400753603 .fill-N7{fill:#FFFFFF;}
+                		.d2-1400753603 .fill-B1{fill:#0D32B2;}
+                		.d2-1400753603 .fill-B2{fill:#0D32B2;}
+                		.d2-1400753603 .fill-B3{fill:#E3E9FD;}
+                		.d2-1400753603 .fill-B4{fill:#E3E9FD;}
+                		.d2-1400753603 .fill-B5{fill:#EDF0FD;}
+                		.d2-1400753603 .fill-B6{fill:#F7F8FE;}
+                		.d2-1400753603 .fill-AA2{fill:#4A6FF3;}
+                		.d2-1400753603 .fill-AA4{fill:#EDF0FD;}
+                		.d2-1400753603 .fill-AA5{fill:#F7F8FE;}
+                		.d2-1400753603 .fill-AB4{fill:#EDF0FD;}
+                		.d2-1400753603 .fill-AB5{fill:#F7F8FE;}
+                		.d2-1400753603 .stroke-N1{stroke:#0A0F25;}
+                		.d2-1400753603 .stroke-N2{stroke:#676C7E;}
+                		.d2-1400753603 .stroke-N3{stroke:#9499AB;}
+                		.d2-1400753603 .stroke-N4{stroke:#CFD2DD;}
+                		.d2-1400753603 .stroke-N5{stroke:#DEE1EB;}
+                		.d2-1400753603 .stroke-N6{stroke:#EEF1F8;}
+                		.d2-1400753603 .stroke-N7{stroke:#FFFFFF;}
+                		.d2-1400753603 .stroke-B1{stroke:#0D32B2;}
+                		.d2-1400753603 .stroke-B2{stroke:#0D32B2;}
+                		.d2-1400753603 .stroke-B3{stroke:#E3E9FD;}
+                		.d2-1400753603 .stroke-B4{stroke:#E3E9FD;}
+                		.d2-1400753603 .stroke-B5{stroke:#EDF0FD;}
+                		.d2-1400753603 .stroke-B6{stroke:#F7F8FE;}
+                		.d2-1400753603 .stroke-AA2{stroke:#4A6FF3;}
+                		.d2-1400753603 .stroke-AA4{stroke:#EDF0FD;}
+                		.d2-1400753603 .stroke-AA5{stroke:#F7F8FE;}
+                		.d2-1400753603 .stroke-AB4{stroke:#EDF0FD;}
+                		.d2-1400753603 .stroke-AB5{stroke:#F7F8FE;}
+                		.d2-1400753603 .background-color-N1{background-color:#0A0F25;}
+                		.d2-1400753603 .background-color-N2{background-color:#676C7E;}
+                		.d2-1400753603 .background-color-N3{background-color:#9499AB;}
+                		.d2-1400753603 .background-color-N4{background-color:#CFD2DD;}
+                		.d2-1400753603 .background-color-N5{background-color:#DEE1EB;}
+                		.d2-1400753603 .background-color-N6{background-color:#EEF1F8;}
+                		.d2-1400753603 .background-color-N7{background-color:#FFFFFF;}
+                		.d2-1400753603 .background-color-B1{background-color:#0D32B2;}
+                		.d2-1400753603 .background-color-B2{background-color:#0D32B2;}
+                		.d2-1400753603 .background-color-B3{background-color:#E3E9FD;}
+                		.d2-1400753603 .background-color-B4{background-color:#E3E9FD;}
+                		.d2-1400753603 .background-color-B5{background-color:#EDF0FD;}
+                		.d2-1400753603 .background-color-B6{background-color:#F7F8FE;}
+                		.d2-1400753603 .background-color-AA2{background-color:#4A6FF3;}
+                		.d2-1400753603 .background-color-AA4{background-color:#EDF0FD;}
+                		.d2-1400753603 .background-color-AA5{background-color:#F7F8FE;}
+                		.d2-1400753603 .background-color-AB4{background-color:#EDF0FD;}
+                		.d2-1400753603 .background-color-AB5{background-color:#F7F8FE;}
+                		.d2-1400753603 .color-N1{color:#0A0F25;}
+                		.d2-1400753603 .color-N2{color:#676C7E;}
+                		.d2-1400753603 .color-N3{color:#9499AB;}
+                		.d2-1400753603 .color-N4{color:#CFD2DD;}
+                		.d2-1400753603 .color-N5{color:#DEE1EB;}
+                		.d2-1400753603 .color-N6{color:#EEF1F8;}
+                		.d2-1400753603 .color-N7{color:#FFFFFF;}
+                		.d2-1400753603 .color-B1{color:#0D32B2;}
+                		.d2-1400753603 .color-B2{color:#0D32B2;}
+                		.d2-1400753603 .color-B3{color:#E3E9FD;}
+                		.d2-1400753603 .color-B4{color:#E3E9FD;}
+                		.d2-1400753603 .color-B5{color:#EDF0FD;}
+                		.d2-1400753603 .color-B6{color:#F7F8FE;}
+                		.d2-1400753603 .color-AA2{color:#4A6FF3;}
+                		.d2-1400753603 .color-AA4{color:#EDF0FD;}
+                		.d2-1400753603 .color-AA5{color:#F7F8FE;}
+                		.d2-1400753603 .color-AB4{color:#EDF0FD;}
+                		.d2-1400753603 .color-AB5{color:#F7F8FE;}.appendix text.text{fill:#0A0F25}.md{--color-fg-default:#0A0F25;--color-fg-muted:#676C7E;--color-fg-subtle:#9499AB;--color-canvas-default:#FFFFFF;--color-canvas-subtle:#EEF1F8;--color-border-default:#0D32B2;--color-border-muted:#0D32B2;--color-neutral-muted:#EEF1F8;--color-accent-fg:#0D32B2;--color-accent-emphasis:#0D32B2;--color-attention-subtle:#676C7E;--color-danger-fg:red;}.sketch-overlay-B1{fill:url(#streaks-darker-d2-1400753603);mix-blend-mode:lighten}.sketch-overlay-B2{fill:url(#streaks-darker-d2-1400753603);mix-blend-mode:lighten}.sketch-overlay-B3{fill:url(#streaks-bright-d2-1400753603);mix-blend-mode:darken}.sketch-overlay-B4{fill:url(#streaks-bright-d2-1400753603);mix-blend-mode:darken}.sketch-overlay-B5{fill:url(#streaks-bright-d2-1400753603);mix-blend-mode:darken}.sketch-overlay-B6{fill:url(#streaks-bright-d2-1400753603);mix-blend-mode:darken}.sketch-overlay-AA2{fill:url(#streaks-dark-d2-1400753603);mix-blend-mode:overlay}.sketch-overlay-AA4{fill:url(#streaks-bright-d2-1400753603);mix-blend-mode:darken}.sketch-overlay-AA5{fill:url(#streaks-bright-d2-1400753603);mix-blend-mode:darken}.sketch-overlay-AB4{fill:url(#streaks-bright-d2-1400753603);mix-blend-mode:darken}.sketch-overlay-AB5{fill:url(#streaks-bright-d2-1400753603);mix-blend-mode:darken}.sketch-overlay-N1{fill:url(#streaks-darker-d2-1400753603);mix-blend-mode:lighten}.sketch-overlay-N2{fill:url(#streaks-dark-d2-1400753603);mix-blend-mode:overlay}.sketch-overlay-N3{fill:url(#streaks-normal-d2-1400753603);mix-blend-mode:color-burn}.sketch-overlay-N4{fill:url(#streaks-normal-d2-1400753603);mix-blend-mode:color-burn}.sketch-overlay-N5{fill:url(#streaks-bright-d2-1400753603);mix-blend-mode:darken}.sketch-overlay-N6{fill:url(#streaks-bright-d2-1400753603);mix-blend-mode:darken}.sketch-overlay-N7{fill:url(#streaks-bright-d2-1400753603);mix-blend-mode:darken}.light-code{display: block}.dark-code{display: none}]]>
+              </style>
+              <g class="UDE=">
+                <g class="shape">
+                  <rect
+                    x="87.000000"
+                    y="190.000000"
+                    width="340.000000"
+                    height="66.000000"
+                    stroke="#0D32B2"
+                    fill="#1a3a1a"
+                    class="stroke-B1"
+                    style="stroke-width: 2"
+                  />
+                </g>
+                <text
+                  x="257.000000"
+                  y="228.500000"
+                  fill="#6eb5ff"
+                  class="text-bold"
+                  style="text-anchor: middle; font-size: 16px"
+                >
+                  Phase 1 — Legal &amp; Correctness (1% → 51%)
+                </text>
+              </g>
+              <g class="UDI=">
+                <g class="shape">
+                  <rect
+                    x="1595.000000"
+                    y="8.000000"
+                    width="289.000000"
+                    height="66.000000"
+                    stroke="#0D32B2"
+                    fill="#1a2a3a"
+                    class="stroke-B1"
+                    style="stroke-width: 2"
+                  />
+                </g>
+                <text
+                  x="1739.500000"
+                  y="46.500000"
+                  fill="#6eb5ff"
+                  class="text-bold"
+                  style="text-anchor: middle; font-size: 16px"
+                >
+                  Phase 2 — CI &amp; Cleanup (4% → 64%)
+                </text>
+              </g>
+              <g class="UDM=">
+                <g class="shape">
+                  <rect
+                    x="1092.000000"
+                    y="190.000000"
+                    width="311.000000"
+                    height="66.000000"
+                    stroke="#0D32B2"
+                    fill="#1a2a3a"
+                    class="stroke-B1"
+                    style="stroke-width: 2"
+                  />
+                </g>
+                <text
+                  x="1247.500000"
+                  y="228.500000"
+                  fill="#6eb5ff"
+                  class="text-bold"
+                  style="text-anchor: middle; font-size: 16px"
+                >
+                  Phase 3 — Module Options (4% → 64%)
+                </text>
+              </g>
+              <g class="UDQ=">
+                <g class="shape">
+                  <rect
+                    x="443.000000"
+                    y="554.000000"
+                    width="351.000000"
+                    height="66.000000"
+                    stroke="#0D32B2"
+                    fill="#3a2a1a"
+                    class="stroke-B1"
+                    style="stroke-width: 2"
+                  />
+                </g>
+                <text
+                  x="618.500000"
+                  y="592.500000"
+                  fill="#f4d35e"
+                  class="text-bold"
+                  style="text-anchor: middle; font-size: 16px"
+                >
+                  Phase 4 — Testing &amp; Reliability (20% → 80%)
+                </text>
+              </g>
+              <g class="UDU=">
+                <g class="shape">
+                  <rect
+                    x="2610.000000"
+                    y="8.000000"
+                    width="418.000000"
+                    height="66.000000"
+                    stroke="#0D32B2"
+                    fill="#3a2a1a"
+                    class="stroke-B1"
+                    style="stroke-width: 2"
+                  />
+                </g>
+                <text
+                  x="2819.000000"
+                  y="46.500000"
+                  fill="#f4d35e"
+                  class="text-bold"
+                  style="text-anchor: middle; font-size: 16px"
+                >
+                  Phase 5 — Documentation &amp; Community (20% → 80%)
+                </text>
+              </g>
+              <g class="UDY=">
+                <g class="shape">
+                  <rect
+                    x="429.000000"
+                    y="8.000000"
+                    width="347.000000"
+                    height="66.000000"
+                    stroke="#0D32B2"
+                    fill="#3a1a1a"
+                    class="stroke-B1"
+                    style="stroke-width: 2"
+                  />
+                </g>
+                <text
+                  x="602.500000"
+                  y="46.500000"
+                  fill="#ff6b6b"
+                  class="text-bold"
+                  style="text-anchor: middle; font-size: 16px"
+                >
+                  Phase 6 — Advanced &amp; Polish (80% → 100%)
+                </text>
+              </g>
+              <g class="bGljZW5zZQ==">
+                <g class="shape">
+                  <rect
+                    x="239.000000"
+                    y="0.000000"
+                    width="130.000000"
+                    height="82.000000"
+                    stroke="#0D32B2"
+                    fill="#0e0e10"
+                    class="stroke-B1"
+                    style="stroke-width: 2"
+                  />
+                </g>
+                <text
+                  x="304.000000"
+                  y="38.500000"
+                  fill="#f4f4f0"
+                  class="text-bold"
+                  style="text-anchor: middle; font-size: 16px"
+                >
+                  <tspan x="304.000000" dy="0.000000">LICENSE file</tspan>
+                  <tspan x="304.000000" dy="18.500000">(MIT)</tspan>
+                </text>
+              </g>
+              <g class="c3lzdGVtc19maXg=">
+                <g class="shape">
+                  <rect
+                    x="0.000000"
+                    y="0.000000"
+                    width="179.000000"
+                    height="82.000000"
+                    stroke="#0D32B2"
+                    fill="#0e0e10"
+                    class="stroke-B1"
+                    style="stroke-width: 2"
+                  />
+                </g>
+                <text
+                  x="89.500000"
+                  y="38.500000"
+                  fill="#f4f4f0"
+                  class="text-bold"
+                  style="text-anchor: middle; font-size: 16px"
+                >
+                  <tspan x="89.500000" dy="0.000000">Fix defaultSystems</tspan>
+                  <tspan x="89.500000" dy="18.500000">hardcoding</tspan>
+                </text>
+              </g>
+              <g class="Y2k=">
+                <g class="shape">
+                  <rect
+                    x="436.000000"
+                    y="364.000000"
+                    width="151.000000"
+                    height="82.000000"
+                    stroke="#0D32B2"
+                    fill="#0e0e10"
+                    class="stroke-B1"
+                    style="stroke-width: 2"
+                  />
+                </g>
+                <text
+                  x="511.500000"
+                  y="402.500000"
+                  fill="#f4f4f0"
+                  class="text-bold"
+                  style="text-anchor: middle; font-size: 16px"
+                >
+                  <tspan x="511.500000" dy="0.000000">GitHub Actions</tspan>
+                  <tspan x="511.500000" dy="18.500000">CI workflow</tspan>
+                </text>
+              </g>
+              <g class="YmFkZ2U=">
+                <g class="shape">
+                  <rect
+                    x="260.000000"
+                    y="546.000000"
+                    width="123.000000"
+                    height="82.000000"
+                    stroke="#0D32B2"
+                    fill="#0e0e10"
+                    class="stroke-B1"
+                    style="stroke-width: 2"
+                  />
+                </g>
+                <text
+                  x="321.500000"
+                  y="584.500000"
+                  fill="#f4f4f0"
+                  class="text-bold"
+                  style="text-anchor: middle; font-size: 16px"
+                >
+                  <tspan x="321.500000" dy="0.000000">Dynamic CI</tspan>
+                  <tspan x="321.500000" dy="18.500000">badge</tspan>
+                </text>
+              </g>
+              <g class="ZGVwcmVjYXRlX21rZmxha2U=">
+                <g class="shape">
+                  <rect
+                    x="8.000000"
+                    y="546.000000"
+                    width="151.000000"
+                    height="82.000000"
+                    stroke="#0D32B2"
+                    fill="#0e0e10"
+                    class="stroke-B1"
+                    style="stroke-width: 2"
+                  />
+                </g>
+                <text
+                  x="83.500000"
+                  y="584.500000"
+                  fill="#f4f4f0"
+                  class="text-bold"
+                  style="text-anchor: middle; font-size: 16px"
+                >
+                  <tspan x="83.500000" dy="0.000000">Deprecate</tspan>
+                  <tspan x="83.500000" dy="18.500000">mkGoFlake.nix</tspan>
+                </text>
+              </g>
+              <g class="bGVnYWN5X3RlbXBsYXRl">
+                <g class="shape">
+                  <rect
+                    x="124.000000"
+                    y="364.000000"
+                    width="185.000000"
+                    height="82.000000"
+                    stroke="#0D32B2"
+                    fill="#0e0e10"
+                    class="stroke-B1"
+                    style="stroke-width: 2"
+                  />
+                </g>
+                <text
+                  x="216.500000"
+                  y="402.500000"
+                  fill="#f4f4f0"
+                  class="text-bold"
+                  style="text-anchor: middle; font-size: 16px"
+                >
+                  <tspan x="216.500000" dy="0.000000">Mark go-flake-parts</tspan>
+                  <tspan x="216.500000" dy="18.500000">as legacy</tspan>
+                </text>
+              </g>
+              <g class="b3B0X2NoZWNr">
+                <g class="shape">
+                  <rect
+                    x="1382.000000"
+                    y="0.000000"
+                    width="137.000000"
+                    height="82.000000"
+                    stroke="#0D32B2"
+                    fill="#0e0e10"
+                    class="stroke-B1"
+                    style="stroke-width: 2"
+                  />
+                </g>
+                <text
+                  x="1450.500000"
+                  y="38.500000"
+                  fill="#f4f4f0"
+                  class="text-bold"
+                  style="text-anchor: middle; font-size: 16px"
+                >
+                  <tspan x="1450.500000" dy="0.000000">enableCheck</tspan>
+                  <tspan x="1450.500000" dy="18.500000">option</tspan>
+                </text>
+              </g>
+              <g class="b3B0X292ZXJsYXk=">
+                <g class="shape">
+                  <rect
+                    x="1173.000000"
+                    y="0.000000"
+                    width="149.000000"
+                    height="82.000000"
+                    stroke="#0D32B2"
+                    fill="#0e0e10"
+                    class="stroke-B1"
+                    style="stroke-width: 2"
+                  />
+                </g>
+                <text
+                  x="1247.500000"
+                  y="38.500000"
+                  fill="#f4f4f0"
+                  class="text-bold"
+                  style="text-anchor: middle; font-size: 16px"
+                >
+                  <tspan x="1247.500000" dy="0.000000">enableOverlay</tspan>
+                  <tspan x="1247.500000" dy="18.500000">option</tspan>
+                </text>
+              </g>
+              <g class="b3B0X2J1aWxkZmxhZ3M=">
+                <g class="shape">
+                  <rect
+                    x="994.000000"
+                    y="0.000000"
+                    width="119.000000"
+                    height="82.000000"
+                    stroke="#0D32B2"
+                    fill="#0e0e10"
+                    class="stroke-B1"
+                    style="stroke-width: 2"
+                  />
+                </g>
+                <text
+                  x="1053.500000"
+                  y="38.500000"
+                  fill="#f4f4f0"
+                  class="text-bold"
+                  style="text-anchor: middle; font-size: 16px"
+                >
+                  <tspan x="1053.500000" dy="0.000000">buildFlags</tspan>
+                  <tspan x="1053.500000" dy="18.500000">option</tspan>
+                </text>
+              </g>
+              <g class="b3B0X3ZlcnNpb24=">
+                <g class="shape">
+                  <rect
+                    x="836.000000"
+                    y="0.000000"
+                    width="98.000000"
+                    height="82.000000"
+                    stroke="#0D32B2"
+                    fill="#0e0e10"
+                    class="stroke-B1"
+                    style="stroke-width: 2"
+                  />
+                </g>
+                <text
+                  x="885.000000"
+                  y="38.500000"
+                  fill="#f4f4f0"
+                  class="text-bold"
+                  style="text-anchor: middle; font-size: 16px"
+                >
+                  <tspan x="885.000000" dy="0.000000">version</tspan>
+                  <tspan x="885.000000" dy="18.500000">option</tspan>
+                </text>
+              </g>
+              <g class="bW9kdWxlX3Rlc3Rz">
+                <g class="shape">
+                  <rect
+                    x="1179.000000"
+                    y="364.000000"
+                    width="137.000000"
+                    height="82.000000"
+                    stroke="#0D32B2"
+                    fill="#0e0e10"
+                    class="stroke-B1"
+                    style="stroke-width: 2"
+                  />
+                </g>
+                <text
+                  x="1247.500000"
+                  y="402.500000"
+                  fill="#f4f4f0"
+                  class="text-bold"
+                  style="text-anchor: middle; font-size: 16px"
+                >
+                  <tspan x="1247.500000" dy="0.000000">go-standard</tspan>
+                  <tspan x="1247.500000" dy="18.500000">module tests</tspan>
+                </text>
+              </g>
+              <g class="ZTJlX3Rlc3Q=">
+                <g class="shape">
+                  <rect
+                    x="1040.000000"
+                    y="546.000000"
+                    width="174.000000"
+                    height="82.000000"
+                    stroke="#0D32B2"
+                    fill="#0e0e10"
+                    class="stroke-B1"
+                    style="stroke-width: 2"
+                  />
+                </g>
+                <text
+                  x="1127.000000"
+                  y="584.500000"
+                  fill="#f4f4f0"
+                  class="text-bold"
+                  style="text-anchor: middle; font-size: 16px"
+                >
+                  <tspan x="1127.000000" dy="0.000000">Downstream</tspan>
+                  <tspan x="1127.000000" dy="18.500000">consumer e2e test</tspan>
+                </text>
+              </g>
+              <g class="Z2VuZmxha2VfZml4">
+                <g class="shape">
+                  <rect
+                    x="1741.000000"
+                    y="182.000000"
+                    width="138.000000"
+                    height="82.000000"
+                    stroke="#0D32B2"
+                    fill="#0e0e10"
+                    class="stroke-B1"
+                    style="stroke-width: 2"
+                  />
+                </g>
+                <text
+                  x="1810.000000"
+                  y="220.500000"
+                  fill="#f4f4f0"
+                  class="text-bold"
+                  style="text-anchor: middle; font-size: 16px"
+                >
+                  <tspan x="1810.000000" dy="0.000000">Fix generate-</tspan>
+                  <tspan x="1810.000000" dy="18.500000">flake.sh</tspan>
+                </text>
+              </g>
+              <g class="bWlncmF0aW9u">
+                <g class="shape">
+                  <rect
+                    x="58.000000"
+                    y="728.000000"
+                    width="114.000000"
+                    height="82.000000"
+                    stroke="#0D32B2"
+                    fill="#0e0e10"
+                    class="stroke-B1"
+                    style="stroke-width: 2"
+                  />
+                </g>
+                <text
+                  x="115.000000"
+                  y="766.500000"
+                  fill="#f4f4f0"
+                  class="text-bold"
+                  style="text-anchor: middle; font-size: 16px"
+                >
+                  <tspan x="115.000000" dy="0.000000">Migration</tspan>
+                  <tspan x="115.000000" dy="18.500000">guide</tspan>
+                </text>
+              </g>
+              <g class="Y29udHJpYnV0aW5n">
+                <g class="shape">
+                  <rect
+                    x="392.000000"
+                    y="728.000000"
+                    width="155.000000"
+                    height="82.000000"
+                    stroke="#0D32B2"
+                    fill="#0e0e10"
+                    class="stroke-B1"
+                    style="stroke-width: 2"
+                  />
+                </g>
+                <text
+                  x="469.500000"
+                  y="766.500000"
+                  fill="#f4f4f0"
+                  class="text-bold"
+                  style="text-anchor: middle; font-size: 16px"
+                >
+                  <tspan x="469.500000" dy="0.000000">CONTRIBUTING</tspan>
+                  <tspan x="469.500000" dy="18.500000">.md</tspan>
+                </text>
+              </g>
+              <g class="Z2l0aHViX21ldGE=">
+                <g class="shape">
+                  <rect
+                    x="411.000000"
+                    y="910.000000"
+                    width="117.000000"
+                    height="82.000000"
+                    stroke="#0D32B2"
+                    fill="#0e0e10"
+                    class="stroke-B1"
+                    style="stroke-width: 2"
+                  />
+                </g>
+                <text
+                  x="469.500000"
+                  y="948.500000"
+                  fill="#f4f4f0"
+                  class="text-bold"
+                  style="text-anchor: middle; font-size: 16px"
+                >
+                  <tspan x="469.500000" dy="0.000000">.github</tspan>
+                  <tspan x="469.500000" dy="18.500000">templates</tspan>
+                </text>
+              </g>
+              <g class="YXJjaF9kaWFncmFt">
+                <g class="shape">
+                  <rect
+                    x="654.000000"
+                    y="728.000000"
+                    width="135.000000"
+                    height="82.000000"
+                    stroke="#0D32B2"
+                    fill="#0e0e10"
+                    class="stroke-B1"
+                    style="stroke-width: 2"
+                  />
+                </g>
+                <text
+                  x="721.500000"
+                  y="766.500000"
+                  fill="#f4f4f0"
+                  class="text-bold"
+                  style="text-anchor: middle; font-size: 16px"
+                >
+                  <tspan x="721.500000" dy="0.000000">Architecture</tspan>
+                  <tspan x="721.500000" dy="18.500000">diagram</tspan>
+                </text>
+              </g>
+              <g class="ZmFx">
+                <g class="shape">
+                  <rect
+                    x="849.000000"
+                    y="728.000000"
+                    width="163.000000"
+                    height="82.000000"
+                    stroke="#0D32B2"
+                    fill="#0e0e10"
+                    class="stroke-B1"
+                    style="stroke-width: 2"
+                  />
+                </g>
+                <text
+                  x="930.500000"
+                  y="766.500000"
+                  fill="#f4f4f0"
+                  class="text-bold"
+                  style="text-anchor: middle; font-size: 16px"
+                >
+                  <tspan x="930.500000" dy="0.000000">Troubleshooting</tspan>
+                  <tspan x="930.500000" dy="18.500000">/ FAQ</tspan>
+                </text>
+              </g>
+              <g class="bW9ub3JlcG8=">
+                <g class="shape">
+                  <rect
+                    x="1939.000000"
+                    y="182.000000"
+                    width="145.000000"
+                    height="82.000000"
+                    stroke="#0D32B2"
+                    fill="#0e0e10"
+                    class="stroke-B1"
+                    style="stroke-width: 2"
+                  />
+                </g>
+                <text
+                  x="2011.500000"
+                  y="220.500000"
+                  fill="#f4f4f0"
+                  class="text-bold"
+                  style="text-anchor: middle; font-size: 16px"
+                >
+                  <tspan x="2011.500000" dy="0.000000">Multi-package</tspan>
+                  <tspan x="2011.500000" dy="18.500000">(mono repo)</tspan>
+                </text>
+              </g>
+              <g class="YXVkaXQ=">
+                <g class="shape">
+                  <rect
+                    x="2144.000000"
+                    y="182.000000"
+                    width="177.000000"
+                    height="82.000000"
+                    stroke="#0D32B2"
+                    fill="#0e0e10"
+                    class="stroke-B1"
+                    style="stroke-width: 2"
+                  />
+                </g>
+                <text
+                  x="2232.500000"
+                  y="220.500000"
+                  fill="#f4f4f0"
+                  class="text-bold"
+                  style="text-anchor: middle; font-size: 16px"
+                >
+                  <tspan x="2232.500000" dy="0.000000">Audit downstream</tspan>
+                  <tspan x="2232.500000" dy="18.500000">consumers</tspan>
+                </text>
+              </g>
+              <g class="cHJpdl9jaQ==">
+                <g class="shape">
+                  <rect
+                    x="1274.000000"
+                    y="546.000000"
+                    width="135.000000"
+                    height="82.000000"
+                    stroke="#0D32B2"
+                    fill="#0e0e10"
+                    class="stroke-B1"
+                    style="stroke-width: 2"
+                  />
+                </g>
+                <text
+                  x="1341.500000"
+                  y="584.500000"
+                  fill="#f4f4f0"
+                  class="text-bold"
+                  style="text-anchor: middle; font-size: 16px"
+                >
+                  <tspan x="1341.500000" dy="0.000000">Private-repo</tspan>
+                  <tspan x="1341.500000" dy="18.500000">CI test</tspan>
+                </text>
+              </g>
+              <g class="b3B0X2xpbnQ=">
+                <g class="shape">
+                  <rect
+                    x="2381.000000"
+                    y="182.000000"
+                    width="183.000000"
+                    height="82.000000"
+                    stroke="#0D32B2"
+                    fill="#0e0e10"
+                    class="stroke-B1"
+                    style="stroke-width: 2"
+                  />
+                </g>
+                <text
+                  x="2472.500000"
+                  y="220.500000"
+                  fill="#f4f4f0"
+                  class="text-bold"
+                  style="text-anchor: middle; font-size: 16px"
+                >
+                  <tspan x="2472.500000" dy="0.000000">enableGolangciLint</tspan>
+                  <tspan x="2472.500000" dy="18.500000">toggle</tspan>
+                </text>
+              </g>
+              <g class="b3B0X2ZtdA==">
+                <g class="shape">
+                  <rect
+                    x="2624.000000"
+                    y="182.000000"
+                    width="174.000000"
+                    height="82.000000"
+                    stroke="#0D32B2"
+                    fill="#0e0e10"
+                    class="stroke-B1"
+                    style="stroke-width: 2"
+                  />
+                </g>
+                <text
+                  x="2711.000000"
+                  y="220.500000"
+                  fill="#f4f4f0"
+                  class="text-bold"
+                  style="text-anchor: middle; font-size: 16px"
+                >
+                  <tspan x="2711.000000" dy="0.000000">enableGofumpt /</tspan>
+                  <tspan x="2711.000000" dy="18.500000">goimports toggles</tspan>
+                </text>
+              </g>
+              <g class="Zm10X2FsaWFz">
+                <g class="shape">
+                  <rect
+                    x="2858.000000"
+                    y="182.000000"
+                    width="137.000000"
+                    height="82.000000"
+                    stroke="#0D32B2"
+                    fill="#0e0e10"
+                    class="stroke-B1"
+                    style="stroke-width: 2"
+                  />
+                </g>
+                <text
+                  x="2926.500000"
+                  y="220.500000"
+                  fill="#f4f4f0"
+                  class="text-bold"
+                  style="text-anchor: middle; font-size: 16px"
+                >
+                  <tspan x="2926.500000" dy="0.000000">nix run .#fmt</tspan>
+                  <tspan x="2926.500000" dy="18.500000">alias app</tspan>
+                </text>
+              </g>
+              <g class="bml4cGtncw==">
+                <g class="shape">
+                  <rect
+                    x="3055.000000"
+                    y="182.000000"
+                    width="120.000000"
+                    height="82.000000"
+                    stroke="#0D32B2"
+                    fill="#0e0e10"
+                    class="stroke-B1"
+                    style="stroke-width: 2"
+                  />
+                </g>
+                <text
+                  x="3115.000000"
+                  y="220.500000"
+                  fill="#f4f4f0"
+                  class="text-bold"
+                  style="text-anchor: middle; font-size: 16px"
+                >
+                  <tspan x="3115.000000" dy="0.000000">Register in</tspan>
+                  <tspan x="3115.000000" dy="18.500000">nixpkgs</tspan>
+                </text>
+              </g>
+              <g class="Y29tcGxldGlvbnM=">
+                <g class="shape">
+                  <rect
+                    x="3235.000000"
+                    y="182.000000"
+                    width="133.000000"
+                    height="82.000000"
+                    stroke="#0D32B2"
+                    fill="#0e0e10"
+                    class="stroke-B1"
+                    style="stroke-width: 2"
+                  />
+                </g>
+                <text
+                  x="3301.500000"
+                  y="220.500000"
+                  fill="#f4f4f0"
+                  class="text-bold"
+                  style="text-anchor: middle; font-size: 16px"
+                >
+                  <tspan x="3301.500000" dy="0.000000">Shell</tspan>
+                  <tspan x="3301.500000" dy="18.500000">completions</tspan>
+                </text>
+              </g>
+              <g class="bWFucGFnZXM=">
+                <g class="shape">
+                  <rect
+                    x="3428.000000"
+                    y="190.000000"
+                    width="119.000000"
+                    height="66.000000"
+                    stroke="#0D32B2"
+                    fill="#0e0e10"
+                    class="stroke-B1"
+                    style="stroke-width: 2"
+                  />
+                </g>
+                <text
+                  x="3487.500000"
+                  y="228.500000"
+                  fill="#f4f4f0"
+                  class="text-bold"
+                  style="text-anchor: middle; font-size: 16px"
+                >
+                  Man pages
+                </text>
+              </g>
+              <g class="KGxpY2Vuc2UgLSZndDsgUDEpWzBd">
+                <marker
+                  id="mk-d2-1400753603-3488378134"
+                  markerWidth="10.000000"
+                  markerHeight="12.000000"
+                  refX="7.000000"
+                  refY="6.000000"
+                  viewBox="0.000000 0.000000 10.000000 12.000000"
+                  orient="auto"
+                  markerUnits="userSpaceOnUse"
+                >
+                  <polygon
+                    points="0.000000,0.000000 10.000000,6.000000 0.000000,12.000000"
+                    fill="#0D32B2"
+                    class="connection fill-B1"
+                    stroke-width="2"
+                  />
+                </marker>
+                <path
+                  d="M 304.000000 84.000000 C 304.000000 122.000000 298.000000 143.600006 275.837692 186.447130"
+                  stroke="#0D32B2"
+                  fill="none"
+                  class="connection stroke-B1"
+                  style="stroke-width: 2"
+                  marker-end="url(#mk-d2-1400753603-3488378134)"
+                  mask="url(#d2-1400753603)"
+                />
+              </g>
+              <g class="KHN5c3RlbXNfZml4IC0mZ3Q7IFAxKVswXQ==">
+                <path
+                  d="M 89.500000 84.000000 C 89.500000 122.000000 110.900002 143.600006 192.983406 188.093809"
+                  stroke="#0D32B2"
+                  fill="none"
+                  class="connection stroke-B1"
+                  style="stroke-width: 2"
+                  marker-end="url(#mk-d2-1400753603-3488378134)"
+                  mask="url(#d2-1400753603)"
+                />
+              </g>
+              <g class="KFAxIC0mZ3Q7IGNpKVswXQ==">
+                <path
+                  d="M 350.882957 256.674145 C 478.600006 302.399994 511.000000 324.000000 511.000000 360.000000"
+                  stroke="#0D32B2"
+                  fill="none"
+                  class="connection stroke-B1"
+                  style="stroke-width: 2"
+                  marker-end="url(#mk-d2-1400753603-3488378134)"
+                  mask="url(#d2-1400753603)"
+                />
+              </g>
+              <g class="KGNpIC0mZ3Q7IGJhZGdlKVswXQ==">
+                <path
+                  d="M 433.697549 442.169710 C 344.500000 485.059998 321.750000 506.000000 321.750000 542.000000"
+                  stroke="#0D32B2"
+                  fill="none"
+                  class="connection stroke-B1"
+                  style="stroke-width: 2"
+                  marker-end="url(#mk-d2-1400753603-3488378134)"
+                  mask="url(#d2-1400753603)"
+                />
+              </g>
+              <g class="KFAxIC0mZ3Q7IGRlcHJlY2F0ZV9ta2ZsYWtlKVswXQ==">
+                <path
+                  d="M 192.977396 256.926215 C 105.948997 302.399994 83.750000 332.200012 83.750000 359.500000 C 83.750000 386.799988 83.750000 506.000000 83.750000 542.000000"
+                  stroke="#0D32B2"
+                  fill="none"
+                  class="connection stroke-B1"
+                  style="stroke-width: 2"
+                  marker-end="url(#mk-d2-1400753603-3488378134)"
+                  mask="url(#d2-1400753603)"
+                />
+              </g>
+              <g class="KFAxIC0mZ3Q7IGxlZ2FjeV90ZW1wbGF0ZSlbMF0=">
+                <path
+                  d="M 241.431888 257.825019 C 221.449997 302.399994 216.250000 324.000000 216.250000 360.000000"
+                  stroke="#0D32B2"
+                  fill="none"
+                  class="connection stroke-B1"
+                  style="stroke-width: 2"
+                  marker-end="url(#mk-d2-1400753603-3488378134)"
+                  mask="url(#d2-1400753603)"
+                />
+              </g>
+              <g class="KGNpIC0mZ3Q7IFA0KVswXQ==">
+                <path
+                  d="M 561.275791 447.293043 C 606.950012 486.000000 618.750000 507.600006 618.750000 550.000000"
+                  stroke="#0D32B2"
+                  fill="none"
+                  class="connection stroke-B1"
+                  style="stroke-width: 2"
+                  marker-end="url(#mk-d2-1400753603-3488378134)"
+                  mask="url(#d2-1400753603)"
+                />
+              </g>
+              <g class="KGRlcHJlY2F0ZV9ta2ZsYWtlIC0mZ3Q7IG1pZ3JhdGlvbilbMF0=">
+                <path
+                  d="M 102.585811 629.816981 C 120.150002 668.000000 123.750000 688.000000 120.148015 724.019851"
+                  stroke="#0D32B2"
+                  fill="none"
+                  class="connection stroke-B1"
+                  style="stroke-width: 2"
+                  marker-end="url(#mk-d2-1400753603-3488378134)"
+                  mask="url(#d2-1400753603)"
+                />
+              </g>
+              <g class="KFAyIC0mZ3Q7IFAzKVswXQ==">
+                <path
+                  d="M 1686.313440 75.074949 C 1615.199951 120.400002 1552.400024 143.600006 1377.871206 188.993140"
+                  stroke="#0D32B2"
+                  fill="none"
+                  class="connection stroke-B1"
+                  style="stroke-width: 2"
+                  marker-end="url(#mk-d2-1400753603-3488378134)"
+                  mask="url(#d2-1400753603)"
+                />
+              </g>
+              <g class="KG9wdF9jaGVjayAtJmd0OyBQMylbMF0=">
+                <path
+                  d="M 1450.500000 84.000000 C 1450.500000 122.000000 1424.699951 143.600006 1325.148215 188.359717"
+                  stroke="#0D32B2"
+                  fill="none"
+                  class="connection stroke-B1"
+                  style="stroke-width: 2"
+                  marker-end="url(#mk-d2-1400753603-3488378134)"
+                  mask="url(#d2-1400753603)"
+                />
+              </g>
+              <g class="KG9wdF9vdmVybGF5IC0mZ3Q7IFAzKVswXQ==">
+                <path
+                  d="M 1247.500000 84.000000 C 1247.500000 122.000000 1247.500000 143.600006 1247.500000 186.000000"
+                  stroke="#0D32B2"
+                  fill="none"
+                  class="connection stroke-B1"
+                  style="stroke-width: 2"
+                  marker-end="url(#mk-d2-1400753603-3488378134)"
+                  mask="url(#d2-1400753603)"
+                />
+              </g>
+              <g class="KG9wdF9idWlsZGZsYWdzIC0mZ3Q7IFAzKVswXQ==">
+                <path
+                  d="M 1053.500000 84.000000 C 1053.500000 122.000000 1078.300049 143.600006 1173.876762 188.305259"
+                  stroke="#0D32B2"
+                  fill="none"
+                  class="connection stroke-B1"
+                  style="stroke-width: 2"
+                  marker-end="url(#mk-d2-1400753603-3488378134)"
+                  mask="url(#d2-1400753603)"
+                />
+              </g>
+              <g class="KG9wdF92ZXJzaW9uIC0mZ3Q7IFAzKVswXQ==">
+                <path
+                  d="M 885.000000 84.000000 C 885.000000 122.000000 931.200012 143.600006 1112.120420 189.025906"
+                  stroke="#0D32B2"
+                  fill="none"
+                  class="connection stroke-B1"
+                  style="stroke-width: 2"
+                  marker-end="url(#mk-d2-1400753603-3488378134)"
+                  mask="url(#d2-1400753603)"
+                />
+              </g>
+              <g class="KFAzIC0mZ3Q7IG1vZHVsZV90ZXN0cylbMF0=">
+                <path
+                  d="M 1247.500000 258.000000 C 1247.500000 302.399994 1247.500000 324.000000 1247.500000 360.000000"
+                  stroke="#0D32B2"
+                  fill="none"
+                  class="connection stroke-B1"
+                  style="stroke-width: 2"
+                  marker-end="url(#mk-d2-1400753603-3488378134)"
+                  mask="url(#d2-1400753603)"
+                />
+              </g>
+              <g class="KG1vZHVsZV90ZXN0cyAtJmd0OyBlMmVfdGVzdClbMF0=">
+                <path
+                  d="M 1191.155815 447.207715 C 1139.949951 486.000000 1126.750000 506.000000 1126.750000 542.000000"
+                  stroke="#0D32B2"
+                  fill="none"
+                  class="connection stroke-B1"
+                  style="stroke-width: 2"
+                  marker-end="url(#mk-d2-1400753603-3488378134)"
+                  mask="url(#d2-1400753603)"
+                />
+              </g>
+              <g class="KFAyIC0mZ3Q7IGdlbmZsYWtlX2ZpeClbMF0=">
+                <path
+                  d="M 1765.975994 75.580170 C 1800.750000 120.400002 1809.750000 142.000000 1809.750000 178.000000"
+                  stroke="#0D32B2"
+                  fill="none"
+                  class="connection stroke-B1"
+                  style="stroke-width: 2"
+                  marker-end="url(#mk-d2-1400753603-3488378134)"
+                  mask="url(#d2-1400753603)"
+                />
+              </g>
+              <g class="KFA0IC0mZ3Q7IG1pZ3JhdGlvbilbMF0=">
+                <path
+                  d="M 440.780786 618.349563 C 172.348999 666.000000 105.750000 688.000000 109.351985 724.019851"
+                  stroke="#0D32B2"
+                  fill="none"
+                  class="connection stroke-B1"
+                  style="stroke-width: 2"
+                  marker-end="url(#mk-d2-1400753603-3488378134)"
+                  mask="url(#d2-1400753603)"
+                />
+              </g>
+              <g class="KFA0IC0mZ3Q7IGNvbnRyaWJ1dGluZylbMF0=">
+                <path
+                  d="M 562.292993 621.042174 C 488.000000 666.400024 469.000000 688.000000 469.000000 724.000000"
+                  stroke="#0D32B2"
+                  fill="none"
+                  class="connection stroke-B1"
+                  style="stroke-width: 2"
+                  marker-end="url(#mk-d2-1400753603-3488378134)"
+                  mask="url(#d2-1400753603)"
+                />
+              </g>
+              <g class="KGNvbnRyaWJ1dGluZyAtJmd0OyBnaXRodWJfbWV0YSlbMF0=">
+                <path
+                  d="M 469.000000 812.000000 C 469.000000 850.000000 469.000000 870.000000 469.000000 906.000000"
+                  stroke="#0D32B2"
+                  fill="none"
+                  class="connection stroke-B1"
+                  style="stroke-width: 2"
+                  marker-end="url(#mk-d2-1400753603-3488378134)"
+                  mask="url(#d2-1400753603)"
+                />
+              </g>
+              <g class="KFA0IC0mZ3Q7IGFyY2hfZGlhZ3JhbSlbMF0=">
+                <path
+                  d="M 657.742282 621.331576 C 708.250000 666.400024 721.250000 688.000000 721.250000 724.000000"
+                  stroke="#0D32B2"
+                  fill="none"
+                  class="connection stroke-B1"
+                  style="stroke-width: 2"
+                  marker-end="url(#mk-d2-1400753603-3488378134)"
+                  mask="url(#d2-1400753603)"
+                />
+              </g>
+              <g class="KFA0IC0mZ3Q7IGZhcSlbMF0=">
+                <path
+                  d="M 733.170108 620.559630 C 890.450012 666.400024 930.250000 688.000000 930.250000 724.000000"
+                  stroke="#0D32B2"
+                  fill="none"
+                  class="connection stroke-B1"
+                  style="stroke-width: 2"
+                  marker-end="url(#mk-d2-1400753603-3488378134)"
+                  mask="url(#d2-1400753603)"
+                />
+              </g>
+              <g class="KFA1IC0mZ3Q7IG1vbm9yZXBvKVswXQ==">
+                <path
+                  d="M 2607.512588 64.784036 C 2130.899902 118.512001 2011.250000 142.000000 2011.250000 178.000000"
+                  stroke="#0D32B2"
+                  fill="none"
+                  class="connection stroke-B1"
+                  style="stroke-width: 2"
+                  marker-end="url(#mk-d2-1400753603-3488378134)"
+                  mask="url(#d2-1400753603)"
+                />
+              </g>
+              <g class="KFA1IC0mZ3Q7IGF1ZGl0KVswXQ==">
+                <path
+                  d="M 2607.523668 73.747779 C 2307.699951 120.288002 2232.250000 142.000000 2232.250000 178.000000"
+                  stroke="#0D32B2"
+                  fill="none"
+                  class="connection stroke-B1"
+                  style="stroke-width: 2"
+                  marker-end="url(#mk-d2-1400753603-3488378134)"
+                  mask="url(#d2-1400753603)"
+                />
+              </g>
+              <g class="KGNpIC0mZ3Q7IHByaXZfY2kpWzBd">
+                <path
+                  d="M 589.488062 413.493186 C 1190.500000 479.454987 1341.250000 506.000000 1341.250000 542.000000"
+                  stroke="#0D32B2"
+                  fill="none"
+                  class="connection stroke-B1"
+                  style="stroke-width: 2"
+                  marker-end="url(#mk-d2-1400753603-3488378134)"
+                  mask="url(#d2-1400753603)"
+                />
+              </g>
+              <g class="KFA1IC0mZ3Q7IG9wdF9saW50KVswXQ==">
+                <path
+                  d="M 2691.315511 74.507694 C 2516.449951 120.400002 2472.250000 142.000000 2472.250000 178.000000"
+                  stroke="#0D32B2"
+                  fill="none"
+                  class="connection stroke-B1"
+                  style="stroke-width: 2"
+                  marker-end="url(#mk-d2-1400753603-3488378134)"
+                  mask="url(#d2-1400753603)"
+                />
+              </g>
+              <g class="KFA1IC0mZ3Q7IG9wdF9mbXQpWzBd">
+                <path
+                  d="M 2778.219028 75.286905 C 2724.550049 120.400002 2710.750000 142.000000 2710.750000 178.000000"
+                  stroke="#0D32B2"
+                  fill="none"
+                  class="connection stroke-B1"
+                  style="stroke-width: 2"
+                  marker-end="url(#mk-d2-1400753603-3488378134)"
+                  mask="url(#d2-1400753603)"
+                />
+              </g>
+              <g class="KFA1IC0mZ3Q7IGZtdF9hbGlhcylbMF0=">
+                <path
+                  d="M 2858.780972 75.286905 C 2912.449951 120.400002 2926.250000 142.000000 2926.250000 178.000000"
+                  stroke="#0D32B2"
+                  fill="none"
+                  class="connection stroke-B1"
+                  style="stroke-width: 2"
+                  marker-end="url(#mk-d2-1400753603-3488378134)"
+                  mask="url(#d2-1400753603)"
+                />
+              </g>
+              <g class="KFA1IC0mZ3Q7IG5peHBrZ3MpWzBd">
+                <path
+                  d="M 2927.661995 74.586750 C 3076.949951 120.400002 3114.750000 142.000000 3114.750000 178.000000"
+                  stroke="#0D32B2"
+                  fill="none"
+                  class="connection stroke-B1"
+                  style="stroke-width: 2"
+                  marker-end="url(#mk-d2-1400753603-3488378134)"
+                  mask="url(#d2-1400753603)"
+                />
+              </g>
+              <g class="KFA1IC0mZ3Q7IGNvbXBsZXRpb25zKVswXQ==">
+                <path
+                  d="M 2995.215455 74.370118 C 3239.649902 120.400002 3301.250000 142.000000 3301.250000 178.000000"
+                  stroke="#0D32B2"
+                  fill="none"
+                  class="connection stroke-B1"
+                  style="stroke-width: 2"
+                  marker-end="url(#mk-d2-1400753603-3488378134)"
+                  mask="url(#d2-1400753603)"
+                />
+              </g>
+              <g class="KFA1IC0mZ3Q7IG1hbnBhZ2VzKVswXQ==">
+                <path
+                  d="M 3030.232000 70.267721 C 3395.449951 119.599998 3487.250000 143.600006 3487.250000 186.000000"
+                  stroke="#0D32B2"
+                  fill="none"
+                  class="connection stroke-B1"
+                  style="stroke-width: 2"
+                  marker-end="url(#mk-d2-1400753603-3488378134)"
+                  mask="url(#d2-1400753603)"
+                />
+              </g>
+              <mask
+                id="d2-1400753603"
+                maskUnits="userSpaceOnUse"
+                x="-101"
+                y="-101"
+                width="3749"
+                height="1194"
+              >
+                <rect x="-101" y="-101" width="3749" height="1194" fill="white"></rect>
+              </mask>
+            </svg>
+          </svg>
         </div>
 
         <!-- ========== MASTER TABLE ========== -->
-        <h2 id="master"><span class="num">09</span>Master Table (all 105 tasks sorted by priority)</h2>
+        <h2 id="master">
+          <span class="num">09</span>Master Table (all 105 tasks sorted by priority)
+        </h2>
         <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Seq</th>
-              <th>Phase</th>
-              <th>Task</th>
-              <th>Est</th>
-              <th>Priority</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr><td>1</td><td><span class="badge badge-p1">P1</span></td><td>Create LICENSE file (MIT)</td><td>5min</td><td><span class="badge badge-critical">Critical</span></td></tr>
-            <tr><td>2</td><td><span class="badge badge-p1">P1</span></td><td>Add MIT license badge to README</td><td>3min</td><td><span class="badge badge-critical">Critical</span></td></tr>
-            <tr><td>3</td><td><span class="badge badge-p1">P1</span></td><td>Read defaultSystems pattern</td><td>2min</td><td><span class="badge badge-critical">Critical</span></td></tr>
-            <tr><td>4</td><td><span class="badge badge-p1">P1</span></td><td>Add systems option to go-standard</td><td>5min</td><td><span class="badge badge-critical">Critical</span></td></tr>
-            <tr><td>5</td><td><span class="badge badge-p1">P1</span></td><td>Wire cfg.systems into config</td><td>3min</td><td><span class="badge badge-critical">Critical</span></td></tr>
-            <tr><td>6</td><td><span class="badge badge-p1">P1</span></td><td>nix flake check verify</td><td>5min</td><td><span class="badge badge-critical">Critical</span></td></tr>
-            <tr><td>7</td><td><span class="badge badge-p2">P2</span></td><td>Read ci-workflow.yml template</td><td>2min</td><td><span class="badge badge-high">High</span></td></tr>
-            <tr><td>8</td><td><span class="badge badge-p2">P2</span></td><td>Create .github/workflows/ci.yml</td><td>10min</td><td><span class="badge badge-high">High</span></td></tr>
-            <tr><td>9</td><td><span class="badge badge-p2">P2</span></td><td>Add Cachix action</td><td>5min</td><td><span class="badge badge-high">High</span></td></tr>
-            <tr><td>10</td><td><span class="badge badge-p2">P2</span></td><td>Test workflow YAML syntax</td><td>3min</td><td><span class="badge badge-high">High</span></td></tr>
-            <tr><td>11</td><td><span class="badge badge-p2">P2</span></td><td>Replace static badge with dynamic CI badge</td><td>5min</td><td><span class="badge badge-high">High</span></td></tr>
-            <tr><td>12</td><td><span class="badge badge-p2">P2</span></td><td>Search for mkGoFlake consumers</td><td>5min</td><td><span class="badge badge-high">High</span></td></tr>
-            <tr><td>13</td><td><span class="badge badge-p2">P2</span></td><td>Add lib.warn deprecation to mkGoFlake.nix</td><td>5min</td><td><span class="badge badge-high">High</span></td></tr>
-            <tr><td>14</td><td><span class="badge badge-p2">P2</span></td><td>Update README mkGoFlake deprecation</td><td>5min</td><td><span class="badge badge-high">High</span></td></tr>
-            <tr><td>15</td><td><span class="badge badge-p2">P2</span></td><td>Read go-flake-parts/README.md</td><td>2min</td><td><span class="badge badge-high">High</span></td></tr>
-            <tr><td>16</td><td><span class="badge badge-p2">P2</span></td><td>Add deprecation banner to template README</td><td>5min</td><td><span class="badge badge-high">High</span></td></tr>
-            <tr><td>17</td><td><span class="badge badge-p2">P2</span></td><td>Add deprecation comment to template flake.nix</td><td>3min</td><td><span class="badge badge-high">High</span></td></tr>
-            <tr><td>18</td><td><span class="badge badge-p2">P2</span></td><td>Update README templates section</td><td>3min</td><td><span class="badge badge-high">High</span></td></tr>
-            <tr><td>19</td><td><span class="badge badge-p2">P2</span></td><td>Update FEATURES.md + CHANGELOG.md</td><td>5min</td><td><span class="badge badge-high">High</span></td></tr>
-            <tr><td>20</td><td><span class="badge badge-p2">P2</span></td><td>nix flake check after cleanup</td><td>5min</td><td><span class="badge badge-high">High</span></td></tr>
-            <tr><td>21</td><td><span class="badge badge-p2">P3</span></td><td>Add enableCheck option</td><td>5min</td><td><span class="badge badge-medium">Medium</span></td></tr>
-            <tr><td>22</td><td><span class="badge badge-p2">P3</span></td><td>Wire doCheck conditionally</td><td>3min</td><td><span class="badge badge-medium">Medium</span></td></tr>
-            <tr><td>23</td><td><span class="badge badge-p2">P3</span></td><td>Add enableOverlay option</td><td>5min</td><td><span class="badge badge-medium">Medium</span></td></tr>
-            <tr><td>24</td><td><span class="badge badge-p2">P3</span></td><td>Wrap overlay in optionalAttrs</td><td>5min</td><td><span class="badge badge-medium">Medium</span></td></tr>
-            <tr><td>25</td><td><span class="badge badge-p2">P3</span></td><td>Add buildFlags option</td><td>5min</td><td><span class="badge badge-medium">Medium</span></td></tr>
-            <tr><td>26</td><td><span class="badge badge-p2">P3</span></td><td>Wire buildFlags into buildGoModule</td><td>5min</td><td><span class="badge badge-medium">Medium</span></td></tr>
-            <tr><td>27</td><td><span class="badge badge-p2">P3</span></td><td>Add version option</td><td>5min</td><td><span class="badge badge-medium">Medium</span></td></tr>
-            <tr><td>28</td><td><span class="badge badge-p2">P3</span></td><td>Replace version derivation with cfg.version</td><td>3min</td><td><span class="badge badge-medium">Medium</span></td></tr>
-            <tr><td>29</td><td><span class="badge badge-p2">P3</span></td><td>Update README options table</td><td>5min</td><td><span class="badge badge-medium">Medium</span></td></tr>
-            <tr><td>30</td><td><span class="badge badge-p2">P3</span></td><td>nix flake check after options</td><td>5min</td><td><span class="badge badge-medium">Medium</span></td></tr>
-            <tr><td>31-43</td><td><span class="badge badge-p3">P4</span></td><td>Module tests (design, mock, 6 assertions, wire, debug)</td><td>~1.5h</td><td><span class="badge badge-medium">Medium</span></td></tr>
-            <tr><td>44-50</td><td><span class="badge badge-p3">P4</span></td><td>E2e consumer test (design, fixture, eval, deps, wire, debug)</td><td>~1h</td><td><span class="badge badge-medium">Medium</span></td></tr>
-            <tr><td>51-56</td><td><span class="badge badge-p3">P4</span></td><td>generate-flake.sh improvements</td><td>~35min</td><td><span class="badge badge-medium">Medium</span></td></tr>
-            <tr><td>57-76</td><td><span class="badge badge-p3">P5</span></td><td>Migration guide + CONTRIBUTING + .github + diagram + FAQ</td><td>~4h</td><td><span class="badge badge-medium">Medium</span></td></tr>
-            <tr><td>77-83</td><td><span class="badge badge-p4">P6</span></td><td>Monorepo multi-package support</td><td>~1h</td><td><span class="badge badge-low">Low</span></td></tr>
-            <tr><td>84-87</td><td><span class="badge badge-p4">P6</span></td><td>Downstream consumer audit</td><td>~35min</td><td><span class="badge badge-low">Low</span></td></tr>
-            <tr><td>88-90</td><td><span class="badge badge-p4">P6</span></td><td>Private-repo CI integration test</td><td>~25min</td><td><span class="badge badge-low">Low</span></td></tr>
-            <tr><td>91-94</td><td><span class="badge badge-p4">P6</span></td><td>Lint/fmt/treefmt toggles</td><td>~20min</td><td><span class="badge badge-low">Low</span></td></tr>
-            <tr><td>95-96</td><td><span class="badge badge-p4">P6</span></td><td>nix run .#fmt alias app</td><td>~10min</td><td><span class="badge badge-low">Low</span></td></tr>
-            <tr><td>97-99</td><td><span class="badge badge-p4">P6</span></td><td>Register maintainers.larsartmann in nixpkgs</td><td>~17min</td><td><span class="badge badge-low">Low</span></td></tr>
-            <tr><td>100-102</td><td><span class="badge badge-p4">P6</span></td><td>Shell completions</td><td>~20min</td><td><span class="badge badge-low">Low</span></td></tr>
-            <tr><td>103-106</td><td><span class="badge badge-p4">P6</span></td><td>Man pages</td><td>~35min</td><td><span class="badge badge-low">Low</span></td></tr>
-            <tr><td>107-108</td><td><span class="badge badge-p4">P6</span></td><td>Final docs update + nix flake check</td><td>~10min</td><td><span class="badge badge-low">Low</span></td></tr>
-          </tbody>
-        </table>
+          <table>
+            <thead>
+              <tr>
+                <th>Seq</th>
+                <th>Phase</th>
+                <th>Task</th>
+                <th>Est</th>
+                <th>Priority</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1</td>
+                <td><span class="badge badge-p1">P1</span></td>
+                <td>Create LICENSE file (MIT)</td>
+                <td>5min</td>
+                <td><span class="badge badge-critical">Critical</span></td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td><span class="badge badge-p1">P1</span></td>
+                <td>Add MIT license badge to README</td>
+                <td>3min</td>
+                <td><span class="badge badge-critical">Critical</span></td>
+              </tr>
+              <tr>
+                <td>3</td>
+                <td><span class="badge badge-p1">P1</span></td>
+                <td>Read defaultSystems pattern</td>
+                <td>2min</td>
+                <td><span class="badge badge-critical">Critical</span></td>
+              </tr>
+              <tr>
+                <td>4</td>
+                <td><span class="badge badge-p1">P1</span></td>
+                <td>Add systems option to go-standard</td>
+                <td>5min</td>
+                <td><span class="badge badge-critical">Critical</span></td>
+              </tr>
+              <tr>
+                <td>5</td>
+                <td><span class="badge badge-p1">P1</span></td>
+                <td>Wire cfg.systems into config</td>
+                <td>3min</td>
+                <td><span class="badge badge-critical">Critical</span></td>
+              </tr>
+              <tr>
+                <td>6</td>
+                <td><span class="badge badge-p1">P1</span></td>
+                <td>nix flake check verify</td>
+                <td>5min</td>
+                <td><span class="badge badge-critical">Critical</span></td>
+              </tr>
+              <tr>
+                <td>7</td>
+                <td><span class="badge badge-p2">P2</span></td>
+                <td>Read ci-workflow.yml template</td>
+                <td>2min</td>
+                <td><span class="badge badge-high">High</span></td>
+              </tr>
+              <tr>
+                <td>8</td>
+                <td><span class="badge badge-p2">P2</span></td>
+                <td>Create .github/workflows/ci.yml</td>
+                <td>10min</td>
+                <td><span class="badge badge-high">High</span></td>
+              </tr>
+              <tr>
+                <td>9</td>
+                <td><span class="badge badge-p2">P2</span></td>
+                <td>Add Cachix action</td>
+                <td>5min</td>
+                <td><span class="badge badge-high">High</span></td>
+              </tr>
+              <tr>
+                <td>10</td>
+                <td><span class="badge badge-p2">P2</span></td>
+                <td>Test workflow YAML syntax</td>
+                <td>3min</td>
+                <td><span class="badge badge-high">High</span></td>
+              </tr>
+              <tr>
+                <td>11</td>
+                <td><span class="badge badge-p2">P2</span></td>
+                <td>Replace static badge with dynamic CI badge</td>
+                <td>5min</td>
+                <td><span class="badge badge-high">High</span></td>
+              </tr>
+              <tr>
+                <td>12</td>
+                <td><span class="badge badge-p2">P2</span></td>
+                <td>Search for mkGoFlake consumers</td>
+                <td>5min</td>
+                <td><span class="badge badge-high">High</span></td>
+              </tr>
+              <tr>
+                <td>13</td>
+                <td><span class="badge badge-p2">P2</span></td>
+                <td>Add lib.warn deprecation to mkGoFlake.nix</td>
+                <td>5min</td>
+                <td><span class="badge badge-high">High</span></td>
+              </tr>
+              <tr>
+                <td>14</td>
+                <td><span class="badge badge-p2">P2</span></td>
+                <td>Update README mkGoFlake deprecation</td>
+                <td>5min</td>
+                <td><span class="badge badge-high">High</span></td>
+              </tr>
+              <tr>
+                <td>15</td>
+                <td><span class="badge badge-p2">P2</span></td>
+                <td>Read go-flake-parts/README.md</td>
+                <td>2min</td>
+                <td><span class="badge badge-high">High</span></td>
+              </tr>
+              <tr>
+                <td>16</td>
+                <td><span class="badge badge-p2">P2</span></td>
+                <td>Add deprecation banner to template README</td>
+                <td>5min</td>
+                <td><span class="badge badge-high">High</span></td>
+              </tr>
+              <tr>
+                <td>17</td>
+                <td><span class="badge badge-p2">P2</span></td>
+                <td>Add deprecation comment to template flake.nix</td>
+                <td>3min</td>
+                <td><span class="badge badge-high">High</span></td>
+              </tr>
+              <tr>
+                <td>18</td>
+                <td><span class="badge badge-p2">P2</span></td>
+                <td>Update README templates section</td>
+                <td>3min</td>
+                <td><span class="badge badge-high">High</span></td>
+              </tr>
+              <tr>
+                <td>19</td>
+                <td><span class="badge badge-p2">P2</span></td>
+                <td>Update FEATURES.md + CHANGELOG.md</td>
+                <td>5min</td>
+                <td><span class="badge badge-high">High</span></td>
+              </tr>
+              <tr>
+                <td>20</td>
+                <td><span class="badge badge-p2">P2</span></td>
+                <td>nix flake check after cleanup</td>
+                <td>5min</td>
+                <td><span class="badge badge-high">High</span></td>
+              </tr>
+              <tr>
+                <td>21</td>
+                <td><span class="badge badge-p2">P3</span></td>
+                <td>Add enableCheck option</td>
+                <td>5min</td>
+                <td><span class="badge badge-medium">Medium</span></td>
+              </tr>
+              <tr>
+                <td>22</td>
+                <td><span class="badge badge-p2">P3</span></td>
+                <td>Wire doCheck conditionally</td>
+                <td>3min</td>
+                <td><span class="badge badge-medium">Medium</span></td>
+              </tr>
+              <tr>
+                <td>23</td>
+                <td><span class="badge badge-p2">P3</span></td>
+                <td>Add enableOverlay option</td>
+                <td>5min</td>
+                <td><span class="badge badge-medium">Medium</span></td>
+              </tr>
+              <tr>
+                <td>24</td>
+                <td><span class="badge badge-p2">P3</span></td>
+                <td>Wrap overlay in optionalAttrs</td>
+                <td>5min</td>
+                <td><span class="badge badge-medium">Medium</span></td>
+              </tr>
+              <tr>
+                <td>25</td>
+                <td><span class="badge badge-p2">P3</span></td>
+                <td>Add buildFlags option</td>
+                <td>5min</td>
+                <td><span class="badge badge-medium">Medium</span></td>
+              </tr>
+              <tr>
+                <td>26</td>
+                <td><span class="badge badge-p2">P3</span></td>
+                <td>Wire buildFlags into buildGoModule</td>
+                <td>5min</td>
+                <td><span class="badge badge-medium">Medium</span></td>
+              </tr>
+              <tr>
+                <td>27</td>
+                <td><span class="badge badge-p2">P3</span></td>
+                <td>Add version option</td>
+                <td>5min</td>
+                <td><span class="badge badge-medium">Medium</span></td>
+              </tr>
+              <tr>
+                <td>28</td>
+                <td><span class="badge badge-p2">P3</span></td>
+                <td>Replace version derivation with cfg.version</td>
+                <td>3min</td>
+                <td><span class="badge badge-medium">Medium</span></td>
+              </tr>
+              <tr>
+                <td>29</td>
+                <td><span class="badge badge-p2">P3</span></td>
+                <td>Update README options table</td>
+                <td>5min</td>
+                <td><span class="badge badge-medium">Medium</span></td>
+              </tr>
+              <tr>
+                <td>30</td>
+                <td><span class="badge badge-p2">P3</span></td>
+                <td>nix flake check after options</td>
+                <td>5min</td>
+                <td><span class="badge badge-medium">Medium</span></td>
+              </tr>
+              <tr>
+                <td>31-43</td>
+                <td><span class="badge badge-p3">P4</span></td>
+                <td>Module tests (design, mock, 6 assertions, wire, debug)</td>
+                <td>~1.5h</td>
+                <td><span class="badge badge-medium">Medium</span></td>
+              </tr>
+              <tr>
+                <td>44-50</td>
+                <td><span class="badge badge-p3">P4</span></td>
+                <td>E2e consumer test (design, fixture, eval, deps, wire, debug)</td>
+                <td>~1h</td>
+                <td><span class="badge badge-medium">Medium</span></td>
+              </tr>
+              <tr>
+                <td>51-56</td>
+                <td><span class="badge badge-p3">P4</span></td>
+                <td>generate-flake.sh improvements</td>
+                <td>~35min</td>
+                <td><span class="badge badge-medium">Medium</span></td>
+              </tr>
+              <tr>
+                <td>57-76</td>
+                <td><span class="badge badge-p3">P5</span></td>
+                <td>Migration guide + CONTRIBUTING + .github + diagram + FAQ</td>
+                <td>~4h</td>
+                <td><span class="badge badge-medium">Medium</span></td>
+              </tr>
+              <tr>
+                <td>77-83</td>
+                <td><span class="badge badge-p4">P6</span></td>
+                <td>Monorepo multi-package support</td>
+                <td>~1h</td>
+                <td><span class="badge badge-low">Low</span></td>
+              </tr>
+              <tr>
+                <td>84-87</td>
+                <td><span class="badge badge-p4">P6</span></td>
+                <td>Downstream consumer audit</td>
+                <td>~35min</td>
+                <td><span class="badge badge-low">Low</span></td>
+              </tr>
+              <tr>
+                <td>88-90</td>
+                <td><span class="badge badge-p4">P6</span></td>
+                <td>Private-repo CI integration test</td>
+                <td>~25min</td>
+                <td><span class="badge badge-low">Low</span></td>
+              </tr>
+              <tr>
+                <td>91-94</td>
+                <td><span class="badge badge-p4">P6</span></td>
+                <td>Lint/fmt/treefmt toggles</td>
+                <td>~20min</td>
+                <td><span class="badge badge-low">Low</span></td>
+              </tr>
+              <tr>
+                <td>95-96</td>
+                <td><span class="badge badge-p4">P6</span></td>
+                <td>nix run .#fmt alias app</td>
+                <td>~10min</td>
+                <td><span class="badge badge-low">Low</span></td>
+              </tr>
+              <tr>
+                <td>97-99</td>
+                <td><span class="badge badge-p4">P6</span></td>
+                <td>Register maintainers.larsartmann in nixpkgs</td>
+                <td>~17min</td>
+                <td><span class="badge badge-low">Low</span></td>
+              </tr>
+              <tr>
+                <td>100-102</td>
+                <td><span class="badge badge-p4">P6</span></td>
+                <td>Shell completions</td>
+                <td>~20min</td>
+                <td><span class="badge badge-low">Low</span></td>
+              </tr>
+              <tr>
+                <td>103-106</td>
+                <td><span class="badge badge-p4">P6</span></td>
+                <td>Man pages</td>
+                <td>~35min</td>
+                <td><span class="badge badge-low">Low</span></td>
+              </tr>
+              <tr>
+                <td>107-108</td>
+                <td><span class="badge badge-p4">P6</span></td>
+                <td>Final docs update + nix flake check</td>
+                <td>~10min</td>
+                <td><span class="badge badge-low">Low</span></td>
+              </tr>
+            </tbody>
+          </table>
         </div>
 
         <footer class="footer">
-          Generated 2026-07-24 &middot; Pareto Planning skill &middot; 27 TODOs &rarr; 105 sub-tasks across 6 phases
+          Generated 2026-07-24 &middot; Pareto Planning skill &middot; 27 TODOs &rarr; 105 sub-tasks
+          across 6 phases
         </footer>
       </main>
     </div>
@@ -593,7 +2998,9 @@
           return l.getAttribute("href").slice(1);
         });
         var sections = ids
-          .map(function (id) { return document.getElementById(id); })
+          .map(function (id) {
+            return document.getElementById(id);
+          })
           .filter(Boolean);
         if (!sections.length) return;
         var observer = new IntersectionObserver(
@@ -611,7 +3018,9 @@
           },
           { rootMargin: "-80px 0px -60% 0px", threshold: 0 },
         );
-        sections.forEach(function (s) { observer.observe(s); });
+        sections.forEach(function (s) {
+          observer.observe(s);
+        });
       })();
     </script>
   </body>
