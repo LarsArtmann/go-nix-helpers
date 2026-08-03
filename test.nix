@@ -196,6 +196,47 @@ let
     };
     publicDeps = [ "github.com/larsartmann/mock-public-lib" ];
   };
+
+  # ---------------------------------------------------------------------------
+  # Test 6: Multiple deps (monorepo simulation) — verifies mkPreparedSource
+  # handles two different private dep repos with sub-modules simultaneously.
+  # ---------------------------------------------------------------------------
+  mockSecondDep = pkgs.runCommandLocal "mock-second-dep" { } ''
+    mkdir -p $out
+    cat > $out/go.mod <<'EOF'
+    module github.com/larsartmann/mock-second
+    go 1.26
+    EOF
+    mkdir -p $out/logging/v3
+    cat > $out/logging/v3/go.mod <<'EOF'
+    module github.com/larsartmann/mock-second/logging/v3
+    go 1.26
+    EOF
+  '';
+
+  mockMultiDepsSrc = pkgs.writeTextDir "go.mod" ''
+    module github.com/larsartmann/mock-multi-deps
+
+    go 1.26
+
+    require (
+      github.com/larsartmann/mock-dep/codec/v2 v0.0.0
+      github.com/larsartmann/mock-dep/storage/v2 v0.0.0
+      github.com/larsartmann/mock-second v0.0.0
+      github.com/larsartmann/mock-second/logging/v3 v0.0.0
+    )
+  '';
+
+  multiDepsTest = mkPreparedSource {
+    name = "test-multi-deps";
+    version = "test";
+    src = mockMultiDepsSrc;
+    deps = {
+      "github.com/larsartmann/mock-dep" = mockDep;
+      "github.com/larsartmann/mock-second" = mockSecondDep;
+    };
+    # subModules omitted — auto-discovery should find sub-modules in both deps
+  };
 in
 {
   # nix-build test.nix -A autoDiscovery -o result-auto
@@ -205,6 +246,7 @@ in
     validationTest
     publicDepsTest
     requireDedupTest
+    multiDepsTest
     ;
 
   # Verification script: checks the success-path test outputs.

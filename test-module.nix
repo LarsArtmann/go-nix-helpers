@@ -430,6 +430,29 @@ let
     (assertCheck "publicDeps accepts list of module paths" (
       publicDepsCfg.packages ? default
     ) "packages.default with publicDeps")
+    (assertCheck "privateGlobPattern accepts custom value" (
+      customGlobCfg.packages ? default
+    ) "packages.default with custom privateGlobPattern")
+    # --- Behavioral: nativeBuildInputs concatenation (D5) ------------------
+    # Verify that BOTH module inputs (templ) AND user inputs (git) appear
+    # in the final derivation's nativeBuildInputs, proving concatenation
+    # rather than silent override.
+    (assertCheck "nativeBuildInputs merge: templ present in derivation" (
+      let
+        pkg = nativeBuildInputsMergeCfg.packages.default;
+        inputs = pkg.nativeBuildInputs or pkg.drvAttrs.nativeBuildInputs or [ ];
+        hasTempl = builtins.any (x: x.pname or x.name or "" == "templ" || lib.hasInfix "templ" (x.name or "")) inputs;
+      in
+      hasTempl
+    ) "templ in nativeBuildInputs")
+    (assertCheck "nativeBuildInputs merge: git present in derivation" (
+      let
+        pkg = nativeBuildInputsMergeCfg.packages.default;
+        inputs = pkg.nativeBuildInputs or pkg.drvAttrs.nativeBuildInputs or [ ];
+        hasGit = builtins.any (x: x.pname or x.name or "" == "git" || lib.hasInfix "git" (x.name or "")) inputs;
+      in
+      hasGit
+    ) "git in nativeBuildInputs")
     # --- Behavioral: meta propagation (H2) ---------------------------------
     (assertCheck "meta.description matches config" (
       psCfg.packages.default ? meta && psCfg.packages.default.meta.description == "Test project"
