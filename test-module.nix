@@ -311,12 +311,16 @@ let
 
   # --- Extra meta propagation test ------------------------------------------
   extraMetaCfg = mkPerSystemConfig {
-    extraMeta = { homepage = "https://example.com"; };
+    extraMeta = {
+      homepage = "https://example.com";
+    };
   };
 
   # --- Custom shellExtraEnv test --------------------------------------------
   customEnvCfg = mkPerSystemConfig {
-    shellExtraEnv = { CUSTOM_ENV = "test-value"; };
+    shellExtraEnv = {
+      CUSTOM_ENV = "test-value";
+    };
   };
 
   # --- Systems override test (module-level) ---------------------------------
@@ -433,7 +437,8 @@ let
       extraMetaCfg.packages.default ? meta && extraMetaCfg.packages.default.meta ? homepage
     ) "homepage in meta from extraMeta")
     (assertCheck "monorepo: worker has correct description in meta" (
-      monorepoCfg.packages.worker ? meta && monorepoCfg.packages.worker.meta.description == "Worker binary"
+      monorepoCfg.packages.worker ? meta
+      && monorepoCfg.packages.worker.meta.description == "Worker binary"
     ) "worker description='Worker binary'")
     # --- Toggle and conditional tests (L1) ---------------------------------
     (assertCheck "enableNixfmt=false disables nixfmt" (

@@ -96,6 +96,7 @@ cp "$TEMPLATE_FILE" "$TARGET"
 
 # Replace placeholders (works with both templates)
 sed -i "s/REPLACE_ME/$PROJECT/g" "$TARGET"
+sed -i "s/YOUR-PROJECT-NAME/$PROJECT/g" "$TARGET"
 
 # Add templ support if requested (only relevant for go-flake-parts template)
 if [ "$USE_TEMPL" = true ] && [ "$TEMPLATE" = "go-flake-parts" ]; then

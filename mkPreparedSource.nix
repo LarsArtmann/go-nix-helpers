@@ -133,10 +133,7 @@ let
       stripped = stripVersionSuffix path;
       parts = lib.splitString "/" stripped;
     in
-    if lib.length parts >= 3 then
-      "${lib.elemAt parts 1}-${lib.elemAt parts 2}"
-    else
-      lib.last parts;
+    if lib.length parts >= 3 then "${lib.elemAt parts 1}-${lib.elemAt parts 2}" else lib.last parts;
 
   # Read the module path from the first non-empty line of a go.mod file.
   # go.mod line 1 is always: "module <import-path>"
@@ -253,10 +250,10 @@ let
   # duplicate entries which would make the file invalid.
   checkRequireLines = lib.concatStringsSep "\n" (
     lib.mapAttrsToList (path: ver: ''
-      if ! grep -qF '${path} ' go.mod; then
-        NEW_REQUIRES="''${NEW_REQUIRES}	${path} ${ver}
-"
-      fi
+            if ! grep -qF '${path} ' go.mod; then
+              NEW_REQUIRES="''${NEW_REQUIRES}	${path} ${ver}
+      "
+            fi
     '') requireDeps
   );
 

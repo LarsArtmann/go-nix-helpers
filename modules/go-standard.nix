@@ -512,7 +512,9 @@ in
                 # "github.com/org/repo" also matches "github.com/org/repo/sub".
                 privateDepPaths = lib.mapAttrsToList (path: _: path) cfg.deps;
               in
-              { GOPRIVATE = lib.concatStringsSep "," privateDepPaths; }
+              {
+                GOPRIVATE = lib.concatStringsSep "," privateDepPaths;
+              }
           else
             { };
 
@@ -538,20 +540,20 @@ in
             pkgs.golangci-lint
           ] "golangci-lint run ./...";
         }
-        // lib.optionalAttrs (
-          cfg.enableGofumpt || cfg.enableGoimports || cfg.enableNixfmt || cfg.enableTempl
-        ) {
-          fmt = {
-            type = "app";
-            program = lib.getExe (
-              pkgs.writeShellApplication {
-                name = "run-fmt";
-                runtimeInputs = [ config.treefmt.build.wrapper ];
-                text = "treefmt";
-              }
-            );
-          };
-        }
+        //
+          lib.optionalAttrs (cfg.enableGofumpt || cfg.enableGoimports || cfg.enableNixfmt || cfg.enableTempl)
+            {
+              fmt = {
+                type = "app";
+                program = lib.getExe (
+                  pkgs.writeShellApplication {
+                    name = "run-fmt";
+                    runtimeInputs = [ config.treefmt.build.wrapper ];
+                    text = "treefmt";
+                  }
+                );
+              };
+            }
         // lib.mapAttrs' (
           name: pkg:
           lib.nameValuePair name {
