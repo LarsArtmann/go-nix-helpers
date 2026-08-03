@@ -502,19 +502,7 @@ in
 
         autoGoPrivateEnv =
           if cfg.deps != { } && cfg.autoGoPrivate then
-            if cfg.publicDeps == [ ] then
-              { GOPRIVATE = "github.com/larsartmann/*,github.com/LarsArtmann/*"; }
-            else
-              let
-                # When publicDeps is set, use specific dep paths instead of the
-                # broad glob so public repos aren't marked as private.
-                # Go's path matching treats literal patterns as prefixes, so
-                # "github.com/org/repo" also matches "github.com/org/repo/sub".
-                privateDepPaths = lib.mapAttrsToList (path: _: path) cfg.deps;
-              in
-              {
-                GOPRIVATE = lib.concatStringsSep "," privateDepPaths;
-              }
+            { GOPRIVATE = "github.com/larsartmann/*,github.com/LarsArtmann/*"; }
           else
             { };
 

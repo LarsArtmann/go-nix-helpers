@@ -122,18 +122,16 @@ let
     lib.concatStringsSep "/" (lib.filter (p: builtins.match "v[0-9]+" p == null) parts);
 
   # Extract a unique directory name from a Go import path, stripping any
-  # /vN major version suffix. Includes the owner to prevent same-name
-  # different-owner collisions (e.g. two forks named go-cqrs-lite).
-  # "github.com/larsartmann/go-cqrs-lite" → "larsartmann-go-cqrs-lite"
-  # "github.com/larsartmann/go-filewatcher/v2" → "larsartmann-go-filewatcher"
-  # "github.com/otherorg/go-cqrs-lite" → "otherorg-go-cqrs-lite"
+  # /vN major version suffix.
+  # "github.com/larsartmann/go-cqrs-lite" → "go-cqrs-lite"
+  # "github.com/larsartmann/go-filewatcher/v2" → "go-filewatcher"
   repoName =
     path:
     let
       stripped = stripVersionSuffix path;
       parts = lib.splitString "/" stripped;
     in
-    if lib.length parts >= 3 then "${lib.elemAt parts 1}-${lib.elemAt parts 2}" else lib.last parts;
+    if lib.length parts >= 3 then lib.elemAt parts 2 else lib.last parts;
 
   # Read the module path from the first non-empty line of a go.mod file.
   # go.mod line 1 is always: "module <import-path>"
@@ -156,9 +154,9 @@ let
   # Discover sub-modules by recursively scanning a dep source for go.mod files
   # at ANY depth (not just top-level). Returns: [ { modulePath, localDir; } ]
   # Example for go-cqrs-lite:
-  #   [ { modulePath = ".../catalog/v2";           localDir = "./_local_deps/larsartmann-go-cqrs-lite/catalog"; }
-  #     { modulePath = ".../event/v3/eventtest";   localDir = "./_local_deps/larsartmann-go-cqrs-lite/event/eventtest"; }
-  #     { modulePath = ".../storage/memory/v3";    localDir = "./_local_deps/larsartmann-go-cqrs-lite/storage/memory"; }
+  #   [ { modulePath = ".../catalog/v2";           localDir = "./_local_deps/go-cqrs-lite/catalog"; }
+  #     { modulePath = ".../event/v3/eventtest";   localDir = "./_local_deps/go-cqrs-lite/event/eventtest"; }
+  #     { modulePath = ".../storage/memory/v3";    localDir = "./_local_deps/go-cqrs-lite/storage/memory"; }
   #     ... ]
   discoverSubModules =
     depPath: depSrc:
@@ -211,7 +209,7 @@ let
   );
 
   # Replace directives for main deps:
-  # "github.com/.../go-cqrs-lite" => ./_local_deps/larsartmann-go-cqrs-lite
+  # "github.com/.../go-cqrs-lite" => ./_local_deps/go-cqrs-lite
   replaceLines = lib.concatStringsSep "\n" (
     lib.mapAttrsToList (
       path: _:
@@ -240,7 +238,7 @@ let
   allSubModules = lib.unique (explicitSubModules ++ allDiscovered);
 
   # Single replace-directive generator for ALL sub-modules (explicit + auto).
-  # "github.com/.../codec/v2" => ./_local_deps/larsartmann-go-cqrs-lite/codec
+  # "github.com/.../codec/v2" => ./_local_deps/go-cqrs-lite/codec
   allSubModuleReplace = lib.concatStringsSep "\n" (
     map (sm: ''echo "  ${sm.modulePath} => ${sm.localDir}" >> go.mod'') allSubModules
   );
