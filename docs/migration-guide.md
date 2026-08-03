@@ -110,6 +110,37 @@ recommended `flakeModules.go-standard` module.
 | `extraChecks`            | (add in consumer flake)             | No equivalent — add checks directly in your flake |
 | `extraFlake`             | (add in consumer flake)             | No equivalent — add flake attrs directly          |
 
+### Migrating `extraApps`, `extraChecks`, `extraFlake`
+
+`go-standard` intentionally does not provide these options. Add extra
+outputs directly in your flake alongside the module import:
+
+```nix
+outputs = inputs@{ self, ... }:
+  flake-parts.lib.mkFlake { inherit inputs; } {
+    imports = [ inputs.go-nix-helpers.flakeModules.go-standard ];
+
+    go-standard = { /* ... */ };
+
+    # Replace extraApps: add perSystem apps directly
+    perSystem = { pkgs, ... }: {
+      apps.deploy = {
+        type = "app";
+        program = "${pkgs.writeShellScriptBin "deploy" "kubectl deploy"}/bin/deploy";
+      };
+    };
+
+    # Replace extraChecks: add perSystem checks directly
+    # (already merged with go-standard's checks via flake-parts)
+
+    # Replace extraFlake: add top-level flake attrs directly
+    flake.lib = { myHelper = import ./my-helper.nix; };
+  };
+```
+
+flake-parts merges `perSystem` and `flake` from all modules, so your
+additions coexist with go-standard's outputs seamlessly.
+
 ---
 
 ## From the go-flake-parts template

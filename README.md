@@ -164,7 +164,8 @@ See the full option table below, or copy one of the [templates](#templates).
 | `enableGolangciLint`    | `true`                       | Include `golangci-lint` in devShells and the lint app                |
 | `enableGofumpt`         | `true`                       | Enable `gofumpt` in treefmt programs                                 |
 | `enableGoimports`       | `true`                       | Enable `goimports` in treefmt programs                               |
-| `enableCompletions`     | `false`                      | Install shell completions for the default binary                     |
+| `enableNixfmt`          | `true`                       | Enable `nixfmt` in treefmt programs                                  |
+| `enableCompletions`     | `false`                      | Install shell completions (requires cobra/urfave/cli; warns if unsupported) |
 | `buildFlags`            | `[]`                         | Extra build flags for `go build` (e.g. build tags)                   |
 | `packages`              | `{}`                         | Additional packages for monorepo support                             |
 | `deps`                  | `{}`                         | Private Go deps for `mkPreparedSource`                               |
@@ -216,6 +217,7 @@ preparedSrc = mkPreparedSource {
 | `stripLocalReplaces`  | `true`                              | Strip stale `replace X => /home/...` directives     |
 | `validatePrivateDeps` | `true`                              | Verify every private `require` has a `replace`      |
 | `privateDepPattern`   | `"github\\.com/[Ll]ars[Aa]rtmann/"` | ERE regex matching private module paths to validate |
+| `publicDeps`          | `[]`                                | Module paths excluded from private validation (exact match, incl. `/vN`) |
 | `postPatchExtra`      | `""`                                | Additional shell commands appended to `postPatch`   |
 
 ### `mkGoFlake.nix` (deprecated)
@@ -270,12 +272,24 @@ go-cqrs-lite = {
 };
 ```
 
-### "private modules without local replace" build error
+### "modules without local replace" build error
 
 This is the build-time validation catching a missing dep. Every private
-`require` in `go.mod` must have a matching entry in `deps`. Either add the
-missing dep, or set `validatePrivateDeps = false;` if the dep is actually
-public.
+`require` in `go.mod` that matches `privateDepPattern` must have a matching
+entry in `deps`. Options:
+
+1. **Add the missing dep** as a flake input and list it in `deps` (if private)
+2. **Set `validatePrivateDeps = false`** (if all matching deps are public)
+3. **Add the module path to `publicDeps`** (if some are public, others private)
+
+```nix
+go-standard = {
+  publicDeps = [ "github.com/larsartmann/go-atomic-write" ];
+};
+```
+
+Note: `publicDeps` uses exact path matching (including any `/vN` suffix).
+`github.com/larsartmann/go-atomic-write` will NOT match `github.com/larsartmann/go-atomic-write/v2`.
 
 ### vendorHash mismatch after adding deps
 
@@ -285,11 +299,43 @@ from a plain `buildGoModule`.
 
 ### "GOPRIVATE not set" / Go tries to reach the proxy for private modules
 
-The module auto-injects `GOPRIVATE = "github.com/larsartmann/*,github.com/LarsArtmann/*"`
-when `deps` is set. If you need a different pattern, override via:
+The module auto-injects `GOPRIVATE` when `deps` is set. By default (when
+`publicDeps` is empty), it uses the broad glob
+`github.com/larsartmann/*,github.com/LarsArtmann/*`. When `publicDeps` is
+set, it switches to specific dep paths so public repos fetch via the proxy.
+If you need a different pattern, override via:
 
 ```nix
 go-standard.shellExtraEnv.GOPRIVATE = "your-pattern/*";
+```
+
+### How do I use a committed `vendor/` directory?
+
+Set `vendorHash = null` (which is the default). This tells `buildGoModule`
+that you have a committed `vendor/` directory and it should not compute a
+hash. Make sure `vendor/` is up to date (`go mod vendor`) and not
+`.gitignore`-d.
+
+```nix
+go-standard = {
+  vendorHash = null;  # committed vendor/
+};
+```
+
+### How does vendorHash work with monorepos?
+
+All packages in the `packages` option share a single `vendorHash`. This is
+correct because they share the same `go.mod` and vendor directory. If you
+update dependencies, run `nix build` once to recompute the hash, then update
+`vendorHash` for all packages.
+
+### How do I use a different Go toolchain?
+
+`GOTOOLCHAIN = "local"` is set by default in all devShells to prevent Go
+from downloading newer toolchains. To allow Go toolchain downloads:
+
+```nix
+go-standard.shellExtraEnv.GOTOOLCHAIN = "auto";  # or a specific version
 ```
 
 ### How do I disable the Nix build check (go test)?

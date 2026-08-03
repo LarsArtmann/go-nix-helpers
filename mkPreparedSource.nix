@@ -352,10 +352,14 @@ pkgs.stdenv.mkDerivation {
     ${subModuleVersionNormalize}
 
     ${lib.optionalString hasRequires ''
-      echo "" >> go.mod
-      echo 'require (' >> go.mod
-      ${extraRequireLines}
-      echo ')' >> go.mod
+      NEW_REQUIRES=""
+      ${checkRequireLines}
+      if [ -n "''${NEW_REQUIRES%"$'''\n'''"}" ]; then
+        echo "" >> go.mod
+        echo 'require (' >> go.mod
+        printf '%s' "$NEW_REQUIRES" >> go.mod
+        echo ')' >> go.mod
+      fi
     ''}
 
     if [ -n "$(cat go.mod | tr -d '\n')" ]; then
