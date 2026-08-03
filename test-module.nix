@@ -293,6 +293,11 @@ let
     ];
   };
 
+  # --- privateGlobPattern custom value test ---------------------------------
+  customGlobCfg = mkPerSystemConfig {
+    privateGlobPattern = "github.com/myorg/*,github.com/MyOrg/*";
+  };
+
   # --- enableNixfmt toggle test ---------------------------------------------
   noNixfmtCfg = mkPerSystemConfig { enableNixfmt = false; };
 
