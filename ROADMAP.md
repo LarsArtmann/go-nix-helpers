@@ -58,20 +58,18 @@ Raw ideas:
 
 ### 5. Smart private-dep detection
 
-`mkPreparedSource` currently treats every `github.com/larsartmann/*` repo as
-private. Some are public and served by `proxy.golang.org`. The validation
-then demands unnecessary SSH flake inputs for repos that don't need them.
+`mkPreparedSource` previously treated every `github.com/larsartmann/*` repo as
+private. The `publicDeps` exclusion list and forwarded escape hatches
+(`validatePrivateDeps`, `privateDepPattern`) are now shipped. The remaining
+vision is full automation.
 
 Raw ideas:
 
 - Auto-detect whether a repo is public by querying `proxy.golang.org` before
-  requiring a local `replace` directive
-- Add a `publicDeps` exclusion list so consumers can mark specific repos as
-  public while keeping validation active for genuinely private repos
-- Forward `validatePrivateDeps` and `privateDepPattern` through `mkGoFlake.nix`
-  so consumers using the deprecated module can toggle validation
-- Improve the error message to offer multiple resolution paths (add as dep,
-  set `validatePrivateDeps = false`, or add to `publicDeps`)
+  requiring a local `replace` directive (eliminates the need for manual
+  `publicDeps` configuration)
+- Curate a default `publicDeps` list of known-public LarsArtmann repos so
+  consumers don't need to discover them individually
 
 ## Non-goals
 

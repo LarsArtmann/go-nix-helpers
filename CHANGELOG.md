@@ -39,14 +39,21 @@ This project has not made a tagged release yet; all changes below are in
 - `enableCompletions` option to install shell completions for the default
   binary (default: false). Requires cobra/urfave/cli — silently does nothing
   if the binary does not support `--completion`.
+- `publicDeps` parameter to `mkPreparedSource` — list of module paths to
+  exclude from private validation, solving the false-positive where public
+  LarsArtmann repos are served by `proxy.golang.org` but match the private
+  dep pattern. Forwarded through `go-standard` and `mkGoFlake.nix`.
+- `publicDepsTest` in `test.nix` — integration test verifying that a public
+  repo listed in `publicDeps` is not flagged as missing by validation.
 - Monorepo support via `packages` option — generates separate `buildGoModule`
   per entry with shared source/vendor hash, separate apps and overlay entries.
 - `fmt` app (`nix run .#fmt`) as a treefmt wrapper convenience.
 - `systems` option to the go-standard module — no longer hardcoded; defaults
   to the standard 4-system list but can be overridden per consumer.
-- `test-module.nix` — module-level test suite with 54 assertions covering
+- `test-module.nix` — module-level test suite with 57 assertions covering
   option existence, types, defaults, perSystem outputs, overlay conditional
-  generation, monorepo packages/apps, toggle defaults, and version override.
+  generation, monorepo packages/apps, toggle defaults, version override,
+  `publicDeps` exclusion, and `privateDepPattern` default.
   Wired as `checks.moduleTest` and `checks.moduleTestNoOverlay`.
 - Man pages: `docs/man/go-standard.5` and `docs/man/mkPreparedSource.5`
   documenting all options and parameters. Wired into `devShells.default` via
@@ -111,6 +118,13 @@ This project has not made a tagged release yet; all changes below are in
   own derivation instead of the default.
 - `modules/go-standard.nix`: `userExtraBuildAttrs` now strips both `preBuild`
   and `postInstall` to avoid double-application when merging consumer overrides.
+- `mkPreparedSource.nix`: Validation error message improved — now says
+  "modules without local replace" (not "private modules") and offers three
+  resolution paths (add as dep, set `validatePrivateDeps = false`, or add
+  to `publicDeps`).
+- `mkGoFlake.nix`: Now forwards `validatePrivateDeps`, `privateDepPattern`,
+  and `publicDeps` to `mkPreparedSource` (previously these escape hatches
+  were unreachable through `mkGoFlake`).
 - `flake.nix`: `lib.mkGoFlake` export now wraps with `builtins.trace`
   deprecation warning.
 - `scripts/generate-flake.sh`: Fully rewritten with `--dir`, `--template`,

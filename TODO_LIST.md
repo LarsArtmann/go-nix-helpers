@@ -15,8 +15,7 @@
 
 | Task                                                                                                            | Status  | Impact | Effort | Evidence                                                                              |
 | --------------------------------------------------------------------------------------------------------------- | ------- | ------ | ------ | ------------------------------------------------------------------------------------- |
-| Fix `mkPreparedSource` false-positive on public LarsArtmann repos — forward `validatePrivateDeps`/`privateDepPattern` through `mkGoFlake.nix` and improve the error message to not assume all matching modules are private | TODO    | High   | 1h     | Feedback `docs/feedback/new/2026-08-03_mkpreparedsource-false-positive-on-public-repos.md`; `mkGoFlake.nix` does not forward these params |
-| Deepen module tests from eval-only to behavioral — verify `buildFlags`, `ldflags`, `nativeBuildInputs` actually reach `buildGoModule` | TODO    | High   | 3h     | `test-module.nix` — current 54 assertions check evaluation succeeds but not attribute values |
+| Deepen module tests from eval-only to behavioral — verify `buildFlags`, `ldflags`, `nativeBuildInputs` actually reach `buildGoModule` | TODO    | High   | 3h     | `test-module.nix` — current 57 assertions check evaluation succeeds but not attribute values |
 | Improve `enableCompletions` UX — fail loudly or warn when binary doesn't support `--completion` instead of silent no-op | TODO    | High   | 1h     | `modules/go-standard.nix` — `\|\| true` in `installShellCompletion` silently swallows failures |
 
 ## Medium impact
@@ -39,7 +38,7 @@
 
 | Task                                                                                                                                 | Status  | Impact | Effort | Evidence                                                            |
 | ------------------------------------------------------------------------------------------------------------------------------------ | ------- | ------ | ------ | ------------------------------------------------------------------- |
-| Add remaining module option tests — `proxyVendor`, `ldflags` custom, `devShellExtraPackages`, `shellExtraEnv`/`autoGoPrivate`, `enableTempl`, `enableGopls`/`enableGovulncheck`, `systems` override | TODO    | Low    | 2h     | `test-module.nix` — 7 options untested                              |
+| Add remaining module option tests — `proxyVendor`, `ldflags` custom, `devShellExtraPackages`, `shellExtraEnv`/`autoGoPrivate`, `enableTempl`, `enableGopls`/`enableGovulncheck`, `systems` override | TODO    | Low    | 2h     | `test-module.nix` — 6 options untested                              |
 | Add `generate-flake.sh` option to create `go.mod` skeleton                                                                            | TODO    | Low    | 15min  | `scripts/generate-flake.sh` — generates only `flake.nix`            |
 | Add `generate-flake.sh` `--private-deps` support for go-standard template                                                              | TODO    | Low    | 20min  | `scripts/generate-flake.sh` — only handles `--private-deps` for `go-flake-parts` |
 | Document `GOTOOLCHAIN = "local"` behavior and override in README                                                                      | TODO    | Low    | 10min  | `AGENTS.md` documents it; README does not                            |

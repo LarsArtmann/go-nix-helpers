@@ -23,7 +23,8 @@
 | `/vN` major-version suffix handling               | 🟢 `FULLY_FUNCTIONAL` | `mkPreparedSource.nix:111-126`; strips `/vN` from local dir, keeps in module path |
 | Strip stale absolute/relative local replaces      | 🟢 `FULLY_FUNCTIONAL` | `mkPreparedSource.nix:260-264`; covers `/...`, `./...`, `../...`                  |
 | Pseudo-version normalization                      | 🟢 `FULLY_FUNCTIONAL` | `mkPreparedSource.nix:247-251`                                                    |
-| Build-time validation of private `require`        | 🟡 `PARTIALLY_FUNCTIONAL` | `mkPreparedSource.nix:269-301`; tested by `nix run .#verifyValidation`; false-positive on public LarsArtmann repos (see `docs/feedback/new/`) |
+| Build-time validation of private `require`        | 🟢 `FULLY_FUNCTIONAL` | `mkPreparedSource.nix:269-301`; tested by `nix run .#verifyValidation`; `publicDeps` exclusion list available for public repos |
+| `publicDeps` exclusion list                       | 🟢 `FULLY_FUNCTIONAL` | List of module paths excluded from private validation; forwarded through go-standard and mkGoFlake |
 | Manual `requireDeps` injection                    | 🟢 `FULLY_FUNCTIONAL` | `mkPreparedSource.nix:239-242`                                                    |
 
 ## Flake-parts module: `go-standard`
@@ -46,7 +47,7 @@
 | `enableCompletions` option                                     | 🟡 `PARTIALLY_FUNCTIONAL` | Requires cobra/urfave/cli; silently does nothing if binary doesn't support `--completion` |
 | Monorepo support (`packages` option)                           | 🟢 `FULLY_FUNCTIONAL` | Multiple `buildGoModule` per repo; separate apps/overlays per package |
 | `fmt` app (`nix run .#fmt`)                                    | 🟢 `FULLY_FUNCTIONAL` | Wrapper around treefmt                                                |
-| Module-level tests (options, types, outputs)                   | 🟡 `PARTIALLY_FUNCTIONAL` | `test-module.nix` with 54 assertions; eval-only, not behavioral (see TODO_LIST) |
+| Module-level tests (options, types, outputs)                   | 🟡 `PARTIALLY_FUNCTIONAL` | `test-module.nix` with 57 assertions; eval-only, not behavioral (see TODO_LIST) |
 | Real downstream consumer end-to-end test                       | ⚪ `PLANNED`          | Requires a real private-repo CI test job with SSH key secret          |
 
 ## Templates
@@ -70,7 +71,7 @@
 | ---------------------------------------------------- | ------------------------- | ------------------------------------------------------------------------ |
 | `flake.nix` with `nix flake check` / `nix fmt`       | 🟢 `FULLY_FUNCTIONAL`     | Checks wired to `test.nix`, `test-module.nix`, formatter uses nixfmt     |
 | Integration test suite (`test.nix`)                  | 🟢 `FULLY_FUNCTIONAL`     | `autoDiscovery`, `explicitOnly`, `verify`, `validationTest`              |
-| Module test suite (`test-module.nix`)                | 🟡 `PARTIALLY_FUNCTIONAL` | 54 assertions; options, types, defaults, perSystem outputs, overlay; eval-only — do not verify attributes reach `buildGoModule` |
+| Module test suite (`test-module.nix`)                | 🟡 `PARTIALLY_FUNCTIONAL` | 57 assertions; options, types, defaults, perSystem outputs, overlay; eval-only — do not verify attributes reach `buildGoModule` |
 | Negative-case validation runner (`verifyValidation`) | 🟢 `FULLY_FUNCTIONAL`     | Run outside sandbox via `nix run .#verifyValidation`                     |
 | GitHub Actions CI workflow for the repo itself       | 🟢 `FULLY_FUNCTIONAL`     | `.github/workflows/ci.yml` with format check, integration + module tests |
 | Private-repo CI test job                             | 🟡 `PARTIALLY_FUNCTIONAL` | Scaffolded in CI workflow; disabled until SSH key secret is configured   |
