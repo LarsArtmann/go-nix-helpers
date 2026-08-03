@@ -159,9 +159,9 @@ let
   # Discover sub-modules by recursively scanning a dep source for go.mod files
   # at ANY depth (not just top-level). Returns: [ { modulePath, localDir; } ]
   # Example for go-cqrs-lite:
-  #   [ { modulePath = ".../catalog/v2";           localDir = "./_local_deps/go-cqrs-lite/catalog"; }
-  #     { modulePath = ".../event/v3/eventtest";   localDir = "./_local_deps/go-cqrs-lite/event/eventtest"; }
-  #     { modulePath = ".../storage/memory/v3";    localDir = "./_local_deps/go-cqrs-lite/storage/memory"; }
+  #   [ { modulePath = ".../catalog/v2";           localDir = "./_local_deps/larsartmann-go-cqrs-lite/catalog"; }
+  #     { modulePath = ".../event/v3/eventtest";   localDir = "./_local_deps/larsartmann-go-cqrs-lite/event/eventtest"; }
+  #     { modulePath = ".../storage/memory/v3";    localDir = "./_local_deps/larsartmann-go-cqrs-lite/storage/memory"; }
   #     ... ]
   discoverSubModules =
     depPath: depSrc:
@@ -214,7 +214,7 @@ let
   );
 
   # Replace directives for main deps:
-  # "github.com/.../go-cqrs-lite" => ./_local_deps/go-cqrs-lite
+  # "github.com/.../go-cqrs-lite" => ./_local_deps/larsartmann-go-cqrs-lite
   replaceLines = lib.concatStringsSep "\n" (
     lib.mapAttrsToList (
       path: _:
@@ -243,14 +243,21 @@ let
   allSubModules = lib.unique (explicitSubModules ++ allDiscovered);
 
   # Single replace-directive generator for ALL sub-modules (explicit + auto).
-  # "github.com/.../codec/v2" => ./_local_deps/go-cqrs-lite/codec
+  # "github.com/.../codec/v2" => ./_local_deps/larsartmann-go-cqrs-lite/codec
   allSubModuleReplace = lib.concatStringsSep "\n" (
     map (sm: ''echo "  ${sm.modulePath} => ${sm.localDir}" >> go.mod'') allSubModules
   );
 
   # Require lines for manually injected deps (rarely needed).
-  extraRequireLines = lib.concatStringsSep "\n" (
-    lib.mapAttrsToList (path: ver: ''echo "	${path} ${ver}" >> go.mod'') requireDeps
+  # Deduped against existing require lines in go.mod at build time to avoid
+  # duplicate entries which would make the file invalid.
+  checkRequireLines = lib.concatStringsSep "\n" (
+    lib.mapAttrsToList (path: ver: ''
+      if ! grep -qF '${path} ' go.mod; then
+        NEW_REQUIRES="''${NEW_REQUIRES}	${path} ${ver}
+"
+      fi
+    '') requireDeps
   );
 
   hasRequires = requireDeps != { };

@@ -168,6 +168,12 @@ in
       description = "Enable goimports in treefmt programs";
     };
 
+    enableNixfmt = lib.mkOption {
+      type = lib.types.bool;
+      default = true;
+      description = "Enable nixfmt in treefmt programs";
+    };
+
     enableCompletions = lib.mkOption {
       type = lib.types.bool;
       default = false;
@@ -532,7 +538,9 @@ in
             pkgs.golangci-lint
           ] "golangci-lint run ./...";
         }
-        // {
+        // lib.optionalAttrs (
+          cfg.enableGofumpt || cfg.enableGoimports || cfg.enableNixfmt || cfg.enableTempl
+        ) {
           fmt = {
             type = "app";
             program = lib.getExe (
@@ -589,7 +597,7 @@ in
           programs = {
             gofumpt.enable = cfg.enableGofumpt;
             goimports.enable = cfg.enableGoimports;
-            nixfmt.enable = true;
+            nixfmt.enable = cfg.enableNixfmt;
             templ.enable = cfg.enableTempl;
           };
         };
