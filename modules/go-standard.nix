@@ -243,7 +243,10 @@ in
       description = ''
         When deps are set, auto-inject GOPRIVATE into devShells to prevent
         Go from trying to reach the public proxy for private repos.
-        Uses both casings: github.com/larsartmann/*,github.com/LarsArtmann/*.
+        When publicDeps is empty, uses the broad glob
+        `github.com/larsartmann/*,github.com/LarsArtmann/*`.
+        When publicDeps is set, uses specific dep paths instead so public
+        repos aren't marked as private.
         Can be overridden via shellExtraEnv.GOPRIVATE if needed.
       '';
     };
@@ -412,10 +415,24 @@ in
           pkgName: subPkgs: pkgDesc:
           let
             completionPostInstall = lib.optionalString cfg.enableCompletions ''
-              installShellCompletion --cmd ${pkgName} \
-                --bash <($out/bin/${pkgName} --completion bash 2>/dev/null || true) \
-                --zsh <($out/bin/${pkgName} --completion zsh 2>/dev/null || true) \
-                --fish <($out/bin/${pkgName} --completion fish 2>/dev/null || true)
+              # Check if the binary supports --completion before installing.
+              # Falls back to a clear warning instead of silently installing
+              # empty completion files.
+              if ! $out/bin/${pkgName} --completion bash >/dev/null 2>&1; then
+                echo "" >&2
+                echo "=======================================================" >&2
+                echo "go-standard: enableCompletions is enabled but ${pkgName}" >&2
+                echo "does not support the --completion subcommand." >&2
+                echo "Shell completions were NOT installed." >&2
+                echo "Either set enableCompletions = false or ensure the binary" >&2
+                echo "uses a framework that supports --completion (cobra, urfave/cli)." >&2
+                echo "=======================================================" >&2
+              else
+                installShellCompletion --cmd ${pkgName} \
+                  --bash <($out/bin/${pkgName} --completion bash 2>/dev/null || true) \
+                  --zsh <($out/bin/${pkgName} --completion zsh 2>/dev/null || true) \
+                  --fish <($out/bin/${pkgName} --completion fish 2>/dev/null || true)
+              fi
             '';
             mergedPostInstall = completionPostInstall + (cfg.extraBuildAttrs.postInstall or "");
           in
@@ -472,7 +489,17 @@ in
 
         autoGoPrivateEnv =
           if cfg.deps != { } && cfg.autoGoPrivate then
-            { GOPRIVATE = "github.com/larsartmann/*,github.com/LarsArtmann/*"; }
+            if cfg.publicDeps == [ ] then
+              { GOPRIVATE = "github.com/larsartmann/*,github.com/LarsArtmann/*"; }
+            else
+              let
+                # When publicDeps is set, use specific dep paths instead of the
+                # broad glob so public repos aren't marked as private.
+                # Go's path matching treats literal patterns as prefixes, so
+                # "github.com/org/repo" also matches "github.com/org/repo/sub".
+                privateDepPaths = lib.mapAttrsToList (path: _: path) cfg.deps;
+              in
+              { GOPRIVATE = lib.concatStringsSep "," privateDepPaths; }
           else
             { };
 
