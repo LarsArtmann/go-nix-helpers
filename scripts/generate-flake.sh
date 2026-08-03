@@ -114,6 +114,36 @@ if [ "$USE_PRIVATE_DEPS" = false ] && [ "$TEMPLATE" = "go-flake-parts" ]; then
   sed -i '/-- Private deps/,/^  };/s/^/# /' "$TARGET"
 fi
 
+# For go-standard template, add deps section when --private-deps is requested
+if [ "$USE_PRIVATE_DEPS" = true ] && [ "$TEMPLATE" = "go-standard" ]; then
+  sed -i '/description = "One-line description of the project";/a\
+\
+        # Private dependencies (add each as a flake = false input)\
+        deps = {\
+          # "github.com/larsartmann/go-cqrs-lite" = inputs.go-cqrs-lite;\
+        };' "$TARGET"
+fi
+
+# Create go.mod + main.go skeleton if requested
+if [ "$CREATE_GO_MOD" = true ]; then
+  if [ ! -f "$TARGET_DIR/go.mod" ]; then
+    cat > "$TARGET_DIR/go.mod" <<EOF
+module github.com/larsartmann/$PROJECT
+
+go 1.26
+EOF
+    echo "Created $TARGET_DIR/go.mod"
+  fi
+  if [ ! -f "$TARGET_DIR/main.go" ]; then
+    cat > "$TARGET_DIR/main.go" <<'EOF'
+package main
+
+func main() {}
+EOF
+    echo "Created $TARGET_DIR/main.go"
+  fi
+fi
+
 echo "Generated $TARGET"
 echo ""
 echo "Next steps:"

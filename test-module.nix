@@ -173,6 +173,10 @@ let
     (assertCheck "extraMeta default is empty" (cfg.extraMeta == { }) "{}")
     (assertCheck "extraBuildAttrs default is empty" (cfg.extraBuildAttrs == { }) "{}")
     (assertCheck "shellExtraEnv default is empty" (cfg.shellExtraEnv == { }) "{}")
+    (assertCheck "enableNixfmt default is true" (cfg.enableNixfmt == true) "true")
+    (assertCheck "devShellExtraPackages is a function" (
+      builtins.isFunction cfg.devShellExtraPackages
+    ) "function")
   ];
 
   perSystemChecks = [
