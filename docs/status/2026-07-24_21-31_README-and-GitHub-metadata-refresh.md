@@ -226,3 +226,46 @@ Sorted by a rough Pareto mix of impact, effort, and urgency.
 - **GitHub description:** set
 - **GitHub topics:** 10 topics added
 - **GitHub homepage URL:** empty
+
+---
+
+## Resolution (2026-08-03)
+
+The next session (2026-07-24 22:45, `7415763`) executed 24/27 TODOs from TODO_LIST.md, shipping many of the "NOT STARTED" items listed above. A subsequent session (23:04, `ef2361f`/`50fd2c3`) fixed 4 bugs found during execution and deepened tests to 54 assertions. A docs-health pass on 2026-08-03 rebuilt all living docs.
+
+### NOT STARTED items — resolved since this report
+
+| # | Item | Status | Evidence |
+| --- | --- | --- | --- |
+| 1 | LICENSE file + badge | ~~done~~ `ce35aa5` | MIT license in repo root, badge in README |
+| 2 | GitHub Actions CI | ~~done~~ `7415763` | `.github/workflows/ci.yml` |
+| 5 | CONTRIBUTING.md | ~~done~~ `7415763` | Full dev setup, testing, PR guide |
+| 6 | Issue/PR templates | ~~done~~ `7415763` | Bug report, feature request, PR checklist, CODEOWNERS |
+| 8 | Migration guide | ~~done~~ `7415763` | `docs/migration-guide.md` |
+| 9 | FAQ/troubleshooting | ~~done~~ `7415763` | SSH errors, vendorHash, GOPRIVATE, validation errors |
+| 18 | Shell completions | ~~done~~ `7415763` | `enableCompletions` option |
+| 19 | Man pages | ~~done~~ `d8574df`, wired into devShell `ef2361f` | `docs/man/go-standard.5`, `docs/man/mkPreparedSource.5` |
+
+### Top 50 next tasks — resolved since this report
+
+| # | Task | Status | Evidence |
+| --- | --- | --- | --- |
+| 1 | LICENSE file | ~~done~~ `ce35aa5` | See above |
+| 2 | GitHub Actions CI | ~~done~~ `7415763` | See above |
+| 3 | Dynamic CI badge | ~~done~~ `7415763` | GitHub Actions badge in README |
+| 4 | Issue templates | ~~done~~ `7415763` | See above |
+| 5 | PR template | ~~done~~ `7415763` | See above |
+| 6 | CONTRIBUTING.md | ~~done~~ `7415763` | See above |
+| 9 | Migration guide | ~~done~~ `7415763` | See above |
+| 10 | FAQ/troubleshooting | ~~done~~ `7415763` | See above |
+| 11 | Architecture diagram | ~~done~~ `d8574df` | `docs/architecture.svg` inlined in README |
+| 12 | Module tests | ~~done~~ `7415763`, deepened `50fd2c3` | `test-module.nix` with 54 assertions |
+| 17 | CHANGELOG.md | ~~done~~ `7415763` | Exists, consolidated `ef2361f` |
+| 22 | Man pages | ~~done~~ `d8574df` | See above |
+| 23 | Shell completions | ~~done~~ `7415763` | See above |
+| 30 | enableGolangciLint toggle | ~~done~~ `7415763` | Conditionally included in devShells and lint app |
+| 31 | enableGofumpt/Goimports toggles | ~~done~~ `7415763` | Conditionally enabled in treefmt |
+| 32 | nix run .#fmt app | ~~done~~ `7415763` | `apps.fmt` wraps treefmt |
+| 47 | ROADMAP.md | ~~done~~ `7415763` | Exists, cleaned 2026-08-03 |
+
+Items not listed above remain open — see TODO_LIST.md and ROADMAP.md for current state.

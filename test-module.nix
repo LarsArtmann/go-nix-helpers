@@ -160,7 +160,9 @@ let
     (assertCheck "packages default is empty" (cfg.packages == { }) "{}")
     (assertCheck "autoGoPrivate default is true" (cfg.autoGoPrivate == true) "true")
     (assertCheck "validatePrivateDeps default is true" (cfg.validatePrivateDeps == true) "true")
-    (assertCheck "privateDepPattern default is LarsArtmann regex" (cfg.privateDepPattern == "github\\.com/[Ll]ars[Aa]rtmann/") "LarsArtmann regex")
+    (assertCheck "privateDepPattern default is LarsArtmann regex" (
+      cfg.privateDepPattern == "github\\.com/[Ll]ars[Aa]rtmann/"
+    ) "LarsArtmann regex")
     (assertCheck "publicDeps default is empty" (cfg.publicDeps == [ ]) "[]")
     (assertCheck "proxyVendor default is true" (cfg.proxyVendor == true) "true")
     (assertCheck "systems default is 4-element list" (builtins.length cfg.systems == 4) "4 systems")

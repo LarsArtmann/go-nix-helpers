@@ -164,7 +164,12 @@ let
 in
 {
   # nix-build test.nix -A autoDiscovery -o result-auto
-  inherit autoDiscovery explicitOnly validationTest publicDepsTest;
+  inherit
+    autoDiscovery
+    explicitOnly
+    validationTest
+    publicDepsTest
+    ;
 
   # Verification script: checks the success-path test outputs.
   # nix-build test.nix -A verify -o result-verify && ./result-verify

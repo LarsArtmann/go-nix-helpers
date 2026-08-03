@@ -289,3 +289,29 @@ AGENTS.md, TODO_LIST.md, README.md, FEATURES.md, and docs/man/go-standard.5 all 
 - **(c)** Batch with the other documentation gaps (FAQ entries, migration guide updates) into one docs sprint
 
 This depends on whether you want incremental fixes or a comprehensive docs overhaul.
+
+---
+
+## Resolution (2026-08-03)
+
+**G3 answered:** Option (b) — a comprehensive `docs-health` pass was run on 2026-08-03. All 5 stale files updated: TODO_LIST.md rebuilt (DONE items removed, open work harvested), FEATURES.md fixed (`enableCompletions` → PARTIALLY_FUNCTIONAL, test count → 54), CHANGELOG.md updated (test count, man pages in devShell, userExtraBuildAttrs fix), ROADMAP.md cleaned (shipped ideas removed, smart private-dep detection theme added).
+
+**Test count:** Bumped from 52 (reported here) to 54 (`50fd2c3` added 2 more assertions).
+
+**G1 reframed:** The `mkPreparedSource` validation itself needs to distinguish public from private repos before a CI test design is meaningful. See `docs/feedback/new/2026-08-03_mkpreparedsource-false-positive-on-public-repos.md` — the validation treats ALL `github.com/larsartmann/*` repos as private, but several are public and served by `proxy.golang.org`. This is now the highest-priority TODO_LIST item.
+
+**G2 resolved:** `mkGoFlake.nix` kept with deprecation trace warning. Full removal deferred until all consumers migrate (ROADMAP Theme 2).
+
+### Section F "next tasks" — item-by-item status
+
+| Items | Status | Evidence |
+| --- | --- | --- |
+| F 1–8 (documentation sync) | ~~done~~ 2026-08-03 | This docs-health pass: TODO_LIST rebuilt, FEATURES fixed, CHANGELOG updated, ROADMAP cleaned, AGENTS.md current |
+| F 9–11 (deepen tests to behavioral) | Still open | TODO_LIST "Deepen module tests from eval-only to behavioral" |
+| F 12–20 (remaining test gaps) | Still open | TODO_LIST "Add remaining module option tests" |
+| F 21–22 (smoke-test generate-flake.sh) | Still open | TODO_LIST "Add generate-flake.sh smoke test to CI" |
+| F 23–28 (design improvements) | Still open | TODO_LIST high/medium impact |
+| F 29–33 (E2E / integration testing) | Still open — BLOCKED | TODO_LIST blocked items |
+| F 34–38 (CI improvements) | Still open | TODO_LIST medium impact |
+| F 39–45 (feature additions) | Still open — long-term | ROADMAP |
+| F 46–50 (ecosystem) | Still open — blocked/long-term | TODO_LIST (blocked) + ROADMAP |
