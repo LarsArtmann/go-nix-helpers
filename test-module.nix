@@ -159,6 +159,9 @@ let
     (assertCheck "enableCompletions default is false" (cfg.enableCompletions == false) "false")
     (assertCheck "packages default is empty" (cfg.packages == { }) "{}")
     (assertCheck "autoGoPrivate default is true" (cfg.autoGoPrivate == true) "true")
+    (assertCheck "privateGlobPattern default is LarsArtmann glob" (
+      cfg.privateGlobPattern == "github.com/larsartmann/*,github.com/LarsArtmann/*"
+    ) "LarsArtmann glob")
     (assertCheck "validatePrivateDeps default is true" (cfg.validatePrivateDeps == true) "true")
     (assertCheck "privateDepPattern default is LarsArtmann regex" (
       cfg.privateDepPattern == "github\\.com/[Ll]ars[Aa]rtmann/"

@@ -325,7 +325,14 @@ in
     extraBuildAttrs = lib.mkOption {
       type = lib.types.attrs;
       default = { };
-      description = "Extra attributes merged into buildGoModule";
+      description = ''
+        Extra attributes merged into buildGoModule.
+        Three attributes receive special concatenation handling:
+        - `nativeBuildInputs` — appended to module's list (templ, installShellFiles)
+        - `preBuild` — prepended to module-generated preBuild
+        - `postInstall` — prepended to module-generated postInstall
+        All other attributes override module defaults via the `//` operator.
+      '';
     };
 
     devShellExtraPackages = lib.mkOption {
@@ -445,7 +452,8 @@ in
               # Check if the binary supports --completion before installing.
               # Falls back to a clear warning instead of silently installing
               # empty completion files.
-              if ! $out/bin/${pkgName} --completion bash >/dev/null 2>&1; then
+              # timeout prevents a hanging binary from blocking the build.
+              if ! timeout 10 $out/bin/${pkgName} --completion bash >/dev/null 2>&1; then
                 echo "" >&2
                 echo "=======================================================" >&2
                 echo "go-standard: enableCompletions is enabled but ${pkgName}" >&2
@@ -456,9 +464,9 @@ in
                 echo "=======================================================" >&2
               else
                 installShellCompletion --cmd ${pkgName} \
-                  --bash <($out/bin/${pkgName} --completion bash 2>/dev/null || true) \
-                  --zsh <($out/bin/${pkgName} --completion zsh 2>/dev/null || true) \
-                  --fish <($out/bin/${pkgName} --completion fish 2>/dev/null || true)
+                  --bash <(timeout 10 $out/bin/${pkgName} --completion bash 2>/dev/null || true) \
+                  --zsh <(timeout 10 $out/bin/${pkgName} --completion zsh 2>/dev/null || true) \
+                  --fish <(timeout 10 $out/bin/${pkgName} --completion fish 2>/dev/null || true)
               fi
             '';
             mergedPostInstall = completionPostInstall + (cfg.extraBuildAttrs.postInstall or "");
