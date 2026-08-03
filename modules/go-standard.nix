@@ -249,10 +249,9 @@ in
       description = ''
         When deps are set, auto-inject GOPRIVATE into devShells to prevent
         Go from trying to reach the public proxy for private repos.
-        When publicDeps is empty, uses the broad glob
-        `github.com/larsartmann/*,github.com/LarsArtmann/*`.
-        When publicDeps is set, uses specific dep paths instead so public
-        repos aren't marked as private.
+        Uses the broad glob `github.com/larsartmann/*,github.com/LarsArtmann/*`
+        so all LarsArtmann repos are covered, including those not explicitly
+        listed in deps but resolvable via SSH in the devShell.
         Can be overridden via shellExtraEnv.GOPRIVATE if needed.
       '';
     };

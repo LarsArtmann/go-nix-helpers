@@ -50,7 +50,7 @@ This project has not made a tagged release yet; all changes below are in
 - `fmt` app (`nix run .#fmt`) as a treefmt wrapper convenience.
 - `systems` option to the go-standard module — no longer hardcoded; defaults
   to the standard 4-system list but can be overridden per consumer.
-- `test-module.nix` — module-level test suite with 57 assertions covering
+- `test-module.nix` — module-level test suite with 70 assertions covering
   option existence, types, defaults, perSystem outputs, overlay conditional
   generation, monorepo packages/apps, toggle defaults, version override,
   `publicDeps` exclusion, and `privateDepPattern` default.
