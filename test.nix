@@ -330,20 +330,20 @@ in
     GOMOD4=${requireDedupTest}/go.mod
     cat "$GOMOD4"
     echo ""
-    # codec/v2 should appear exactly ONCE (it was in go.mod AND requireDeps)
-    codec_count=$(grep -cF "github.com/larsartmann/mock-dep/codec/v2" "$GOMOD4")
+    # codec/v2 should appear exactly ONCE in requires (it was in go.mod AND requireDeps)
+    codec_count=$(grep -F "github.com/larsartmann/mock-dep/codec/v2" "$GOMOD4" | grep -cvF "=> ")
     if [ "$codec_count" -eq 1 ]; then
-      echo "PASS: codec/v2 appears exactly once (dedup worked)"
+      echo "PASS: codec/v2 appears exactly once in requires (dedup worked)"
     else
-      echo "FAIL: codec/v2 appears $codec_count times (expected 1)"
+      echo "FAIL: codec/v2 appears $codec_count times in requires (expected 1)"
       exit 1
     fi
-    # storage/v2 should appear exactly ONCE (injected by requireDeps)
-    storage_count=$(grep -cF "github.com/larsartmann/mock-dep/storage/v2" "$GOMOD4")
+    # storage/v2 should appear exactly ONCE in requires (injected by requireDeps)
+    storage_count=$(grep -F "github.com/larsartmann/mock-dep/storage/v2" "$GOMOD4" | grep -cvF "=> ")
     if [ "$storage_count" -eq 1 ]; then
-      echo "PASS: storage/v2 appears exactly once (injected correctly)"
+      echo "PASS: storage/v2 appears exactly once in requires (injected correctly)"
     else
-      echo "FAIL: storage/v2 appears $storage_count times (expected 1)"
+      echo "FAIL: storage/v2 appears $storage_count times in requires (expected 1)"
       exit 1
     fi
 

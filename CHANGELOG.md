@@ -106,6 +106,31 @@ This project has not made a tagged release yet; all changes below are in
 
 ### Changed
 
+- `modules/go-standard.nix`: New `enableNixfmt` option — controls whether
+  nixfmt is included in treefmt programs (default: true). Was previously
+  hardcoded.
+- `modules/go-standard.nix`: `apps.fmt` is now conditional — only generated
+  when at least one formatter is enabled (`enableGofumpt`, `enableGoimports`,
+  `enableNixfmt`, or `enableTempl`).
+- `modules/go-standard.nix`: `enableCompletions` now checks whether the binary
+  supports `--completion` before installing, emitting a clear stderr warning
+  with remediation options instead of silently doing nothing.
+- `modules/go-standard.nix`: `userExtraBuildAttrs.nativeBuildInputs` is now
+  concatenated to the module's list (templ, installShellFiles) rather than
+  overriding it.
+- `mkPreparedSource.nix`: `requireDeps` entries are now deduped against
+  existing `require` lines in go.mod to avoid duplicate entries.
+- `mkPreparedSource.nix`: Simplified requireDeps dedup escaping — uses a temp
+  file instead of shell variable string manipulation.
+- `mkGoFlake.nix`: Deprecation warning now states removal target (v1.0.0).
+- `.github/workflows/ci.yml`: Fixed format check to use `--ci` flag (treefmt
+  2.x) instead of unsupported `--check`.
+- `.github/workflows/ci.yml`: Added macOS runner to check matrix.
+- `.github/workflows/ci.yml`: Added smoke-test job for `generate-flake.sh`.
+- `.github/workflows/ci.yml`: Added `flake.lock` freshness check job.
+- `scripts/generate-flake.sh`: Added `--go-mod` flag (creates go.mod + main.go
+  skeleton) and `--private-deps` support for go-standard template. Fixed
+  placeholder mismatch bug (`YOUR-PROJECT-NAME` was never replaced).
 - `modules/go-standard.nix`: Refactored package building into reusable
   `mkGoPackage` function to support monorepo (multiple packages per repo).
 - `modules/go-standard.nix`: `config.systems` now uses `cfg.systems` instead

@@ -304,6 +304,12 @@ let
   # --- enableTempl test -----------------------------------------------------
   templCfg = mkPerSystemConfig { enableTempl = true; };
 
+  # --- nativeBuildInputs merge test (user inputs appended, not overridden) ---
+  nativeBuildInputsMergeCfg = mkPerSystemConfig {
+    enableTempl = true;
+    extraBuildAttrs.nativeBuildInputs = [ pkgs.git ];
+  };
+
   # --- Custom ldflags test --------------------------------------------------
   customLdflagsCfg = mkPerSystemConfig {
     ldflags = [ "-X main.version=custom" ];
@@ -450,6 +456,9 @@ let
     (assertCheck "enableTempl=true enables templ in treefmt" (
       templCfg.treefmt.programs.templ.enable or false == true
     ) "templ.enable = true")
+    (assertCheck "nativeBuildInputs merge: package evaluates with user inputs" (
+      nativeBuildInputsMergeCfg.packages ? default
+    ) "packages.default with merged nativeBuildInputs")
     (assertCheck "custom ldflags evaluate successfully" (
       customLdflagsCfg.packages ? default
     ) "packages.default with custom ldflags")
