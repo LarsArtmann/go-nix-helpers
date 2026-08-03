@@ -292,36 +292,36 @@ All 4 bugs (D1–D4) and both partially-done items (B5 man pages, B6 CHANGELOG) 
 
 ### Bugs (D1–D4) — all resolved
 
-| Bug | Resolution | Commits |
-| --- | ---------- | ------- |
-| D1 | Monorepo overlay maps each package to its own derivation; tested by `monorepoOverlayCheck` | `ef2361f`, `50fd2c3` |
-| D2 | Dead `completionAttrs` removed; `postInstall` wired into `mkGoPackage` via `completionPostInstall` | `ef2361f`, `50fd2c3` |
-| D3 | Formatting changes committed with this report | `689ac19` |
-| D4 | `generate-flake.sh --templ` sed now uncomments `# enableTempl = true;` | `ef2361f`, `50fd2c3` |
+| Bug | Resolution                                                                                         | Commits              |
+| --- | -------------------------------------------------------------------------------------------------- | -------------------- |
+| D1  | Monorepo overlay maps each package to its own derivation; tested by `monorepoOverlayCheck`         | `ef2361f`, `50fd2c3` |
+| D2  | Dead `completionAttrs` removed; `postInstall` wired into `mkGoPackage` via `completionPostInstall` | `ef2361f`, `50fd2c3` |
+| D3  | Formatting changes committed with this report                                                      | `689ac19`            |
+| D4  | `generate-flake.sh --templ` sed now uncomments `# enableTempl = true;`                             | `ef2361f`, `50fd2c3` |
 
 ### Section F "next tasks" — item-by-item status
 
-| # | Task | Status | Evidence |
-| --- | --- | --- | --- |
-| 1 | Fix monorepo overlay (D1) | ~~done~~ `ef2361f` | See table above |
-| 2 | Remove dead completionAttrs (D2) | ~~done~~ `ef2361f` | See table above |
-| 3 | Commit formatting (D3) | ~~done~~ `689ac19` | See table above |
-| 4 | Fix generate-flake.sh --templ (D4) | ~~done~~ `ef2361f` | See table above |
-| 5 | Consolidate CHANGELOG.md | ~~done~~ `ef2361f` | Merged 3 duplicate "Added" sections |
-| 6 | Monorepo `packages` test | ~~done~~ `50fd2c3` | `packages.worker` assertion in `test-module.nix` |
-| 7 | `enableCompletions` test | ~~done~~ `50fd2c3` | Asserts eval with completions enabled |
-| 8 | `enableGolangciLint=false` test | ~~done~~ `50fd2c3` | Asserts `apps.lint` disappears |
-| 9 | `enableGofumpt=false` / `enableGoimports=false` test | ~~done~~ `50fd2c3` | Asserts treefmt programs toggle |
-| 10 | `buildFlags` test | ~~done~~ `50fd2c3` | Asserts eval with custom buildFlags |
-| 11 | `version` override test | ~~done~~ `50fd2c3` | Asserts `1.0.0-test` in derivation name |
-| 12 | Real e2e consumer test | Still open — BLOCKED | TODO_LIST "Real e2e consumer test" |
-| 13 | Wire e2e test into CI | Still open — BLOCKED | Depends on #12 |
-| 14 | Test that `apps.fmt` exists | ~~done~~ `50fd2c3` | Covered by module eval test |
-| 15–20 | Design improvements (enableCompletions redesign, apps.fmt conditional, go.mod skeleton, man pages in devShell, extraApps) | #19 done `ef2361f`; rest still open | TODO_LIST + ROADMAP |
-| 21–26 | CI improvements (macOS, Cachix, flake.lock check, generate-flake.sh smoke test) | Still open | TODO_LIST |
-| 27–33 | Documentation polish (enableCompletions docs, extraApps migration, FAQ entries, GOTOOLCHAIN docs) | #33 done (architecture diagram shipped); rest still open | TODO_LIST |
-| 34–42 | Feature additions (enableGoVet, preCommitHooks, nixosModules, darwinModules, docker, cross-compilation) | Still open — long-term | ROADMAP |
-| 43–50 | Ecosystem (register maintainer, audit consumers, examples, benchmarks, publish) | Still open — blocked/long-term | TODO_LIST (blocked) + ROADMAP |
+| #     | Task                                                                                                                      | Status                                                   | Evidence                                         |
+| ----- | ------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------- | ------------------------------------------------ |
+| 1     | Fix monorepo overlay (D1)                                                                                                 | ~~done~~ `ef2361f`                                       | See table above                                  |
+| 2     | Remove dead completionAttrs (D2)                                                                                          | ~~done~~ `ef2361f`                                       | See table above                                  |
+| 3     | Commit formatting (D3)                                                                                                    | ~~done~~ `689ac19`                                       | See table above                                  |
+| 4     | Fix generate-flake.sh --templ (D4)                                                                                        | ~~done~~ `ef2361f`                                       | See table above                                  |
+| 5     | Consolidate CHANGELOG.md                                                                                                  | ~~done~~ `ef2361f`                                       | Merged 3 duplicate "Added" sections              |
+| 6     | Monorepo `packages` test                                                                                                  | ~~done~~ `50fd2c3`                                       | `packages.worker` assertion in `test-module.nix` |
+| 7     | `enableCompletions` test                                                                                                  | ~~done~~ `50fd2c3`                                       | Asserts eval with completions enabled            |
+| 8     | `enableGolangciLint=false` test                                                                                           | ~~done~~ `50fd2c3`                                       | Asserts `apps.lint` disappears                   |
+| 9     | `enableGofumpt=false` / `enableGoimports=false` test                                                                      | ~~done~~ `50fd2c3`                                       | Asserts treefmt programs toggle                  |
+| 10    | `buildFlags` test                                                                                                         | ~~done~~ `50fd2c3`                                       | Asserts eval with custom buildFlags              |
+| 11    | `version` override test                                                                                                   | ~~done~~ `50fd2c3`                                       | Asserts `1.0.0-test` in derivation name          |
+| 12    | Real e2e consumer test                                                                                                    | Still open — BLOCKED                                     | TODO_LIST "Real e2e consumer test"               |
+| 13    | Wire e2e test into CI                                                                                                     | Still open — BLOCKED                                     | Depends on #12                                   |
+| 14    | Test that `apps.fmt` exists                                                                                               | ~~done~~ `50fd2c3`                                       | Covered by module eval test                      |
+| 15–20 | Design improvements (enableCompletions redesign, apps.fmt conditional, go.mod skeleton, man pages in devShell, extraApps) | #19 done `ef2361f`; rest still open                      | TODO_LIST + ROADMAP                              |
+| 21–26 | CI improvements (macOS, Cachix, flake.lock check, generate-flake.sh smoke test)                                           | Still open                                               | TODO_LIST                                        |
+| 27–33 | Documentation polish (enableCompletions docs, extraApps migration, FAQ entries, GOTOOLCHAIN docs)                         | #33 done (architecture diagram shipped); rest still open | TODO_LIST                                        |
+| 34–42 | Feature additions (enableGoVet, preCommitHooks, nixosModules, darwinModules, docker, cross-compilation)                   | Still open — long-term                                   | ROADMAP                                          |
+| 43–50 | Ecosystem (register maintainer, audit consumers, examples, benchmarks, publish)                                           | Still open — blocked/long-term                           | TODO_LIST (blocked) + ROADMAP                    |
 
 ### Questions (G1–G3) — resolution
 

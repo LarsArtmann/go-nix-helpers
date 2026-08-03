@@ -14,41 +14,41 @@
 
 ## Core: private Go dependency injection
 
-| Feature                                           | Status                | Notes                                                                             |
-| ------------------------------------------------- | --------------------- | --------------------------------------------------------------------------------- |
-| Copy flake-input deps into `_local_deps/`         | 🟢 `FULLY_FUNCTIONAL` | `mkPreparedSource.nix:193-200`                                                    |
-| Inject `replace` directives into `go.mod`         | 🟢 `FULLY_FUNCTIONAL` | `mkPreparedSource.nix:205-213`, `234-236`                                         |
-| Recursive sub-module auto-discovery               | 🟢 `FULLY_FUNCTIONAL` | `mkPreparedSource.nix:153-181`; excludes `example`/`testdata`/`vendor`/etc.       |
-| Explicit `subModules` merged with auto-discovered | 🟢 `FULLY_FUNCTIONAL` | `mkPreparedSource.nix:219-230`, unified pipeline at `234-236`                     |
-| `/vN` major-version suffix handling               | 🟢 `FULLY_FUNCTIONAL` | `mkPreparedSource.nix:111-126`; strips `/vN` from local dir, keeps in module path |
-| Strip stale absolute/relative local replaces      | 🟢 `FULLY_FUNCTIONAL` | `mkPreparedSource.nix:260-264`; covers `/...`, `./...`, `../...`                  |
-| Pseudo-version normalization                      | 🟢 `FULLY_FUNCTIONAL` | `mkPreparedSource.nix:247-251`                                                    |
+| Feature                                           | Status                | Notes                                                                                                                          |
+| ------------------------------------------------- | --------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| Copy flake-input deps into `_local_deps/`         | 🟢 `FULLY_FUNCTIONAL` | `mkPreparedSource.nix:193-200`                                                                                                 |
+| Inject `replace` directives into `go.mod`         | 🟢 `FULLY_FUNCTIONAL` | `mkPreparedSource.nix:205-213`, `234-236`                                                                                      |
+| Recursive sub-module auto-discovery               | 🟢 `FULLY_FUNCTIONAL` | `mkPreparedSource.nix:153-181`; excludes `example`/`testdata`/`vendor`/etc.                                                    |
+| Explicit `subModules` merged with auto-discovered | 🟢 `FULLY_FUNCTIONAL` | `mkPreparedSource.nix:219-230`, unified pipeline at `234-236`                                                                  |
+| `/vN` major-version suffix handling               | 🟢 `FULLY_FUNCTIONAL` | `mkPreparedSource.nix:111-126`; strips `/vN` from local dir, keeps in module path                                              |
+| Strip stale absolute/relative local replaces      | 🟢 `FULLY_FUNCTIONAL` | `mkPreparedSource.nix:260-264`; covers `/...`, `./...`, `../...`                                                               |
+| Pseudo-version normalization                      | 🟢 `FULLY_FUNCTIONAL` | `mkPreparedSource.nix:247-251`                                                                                                 |
 | Build-time validation of private `require`        | 🟢 `FULLY_FUNCTIONAL` | `mkPreparedSource.nix:269-301`; tested by `nix run .#verifyValidation`; `publicDeps` exclusion list available for public repos |
-| `publicDeps` exclusion list                       | 🟢 `FULLY_FUNCTIONAL` | List of module paths excluded from private validation; forwarded through go-standard and mkGoFlake |
-| Manual `requireDeps` injection                    | 🟢 `FULLY_FUNCTIONAL` | `mkPreparedSource.nix:239-242`                                                    |
+| `publicDeps` exclusion list                       | 🟢 `FULLY_FUNCTIONAL` | List of module paths excluded from private validation; forwarded through go-standard and mkGoFlake                             |
+| Manual `requireDeps` injection                    | 🟢 `FULLY_FUNCTIONAL` | `mkPreparedSource.nix:239-242`                                                                                                 |
 
 ## Flake-parts module: `go-standard`
 
-| Feature                                                        | Status                | Notes                                                                 |
-| -------------------------------------------------------------- | --------------------- | --------------------------------------------------------------------- |
-| One-line adoption via `flakeModules.go-standard`               | 🟢 `FULLY_FUNCTIONAL` | `flake.nix:43-48`, `modules/go-standard.nix`                          |
-| Bundle `treefmt-nix` internally (3 inputs only)                | 🟢 `FULLY_FUNCTIONAL` | `flake.nix:43-48`                                                     |
-| Configurable `systems` option (no longer hardcoded)            | 🟢 `FULLY_FUNCTIONAL` | `go-standard.systems` option; defaults to `nix-systems/default`       |
-| Generate `packages`, `apps`, `devShells`, `checks`, `overlays` | 🟢 `FULLY_FUNCTIONAL` | `modules/go-standard.nix` perSystem config                            |
-| Private deps via `deps` option                                 | 🟢 `FULLY_FUNCTIONAL` | `modules/go-standard.nix` deps option                                 |
-| Auto-inject `GOPRIVATE` into devShells                         | 🟢 `FULLY_FUNCTIONAL` | `modules/go-standard.nix` autoGoPrivate                               |
-| Typed options for all config                                   | 🟢 `FULLY_FUNCTIONAL` | `modules/go-standard.nix` options block                               |
-| `enableCheck` option (control doCheck)                         | 🟢 `FULLY_FUNCTIONAL` | Defaults to `true`                                                    |
-| `enableOverlay` option (toggle overlay generation)             | 🟢 `FULLY_FUNCTIONAL` | Defaults to `true`; tested by `moduleTestNoOverlay`                   |
-| `buildFlags` option (Go build tags)                            | 🟢 `FULLY_FUNCTIONAL` | Passed to `buildGoModule.buildFlags`                                  |
-| `version` option (override git-derived version)                | 🟢 `FULLY_FUNCTIONAL` | Defaults to `self.rev or self.dirtyRev or "dev"`                      |
-| `enableGolangciLint` toggle                                    | 🟢 `FULLY_FUNCTIONAL` | Conditionally includes golangci-lint in devShells and lint app        |
-| `enableGofumpt` / `enableGoimports` toggles                    | 🟢 `FULLY_FUNCTIONAL` | Conditionally enabled in treefmt programs                             |
+| Feature                                                        | Status                    | Notes                                                                                     |
+| -------------------------------------------------------------- | ------------------------- | ----------------------------------------------------------------------------------------- |
+| One-line adoption via `flakeModules.go-standard`               | 🟢 `FULLY_FUNCTIONAL`     | `flake.nix:43-48`, `modules/go-standard.nix`                                              |
+| Bundle `treefmt-nix` internally (3 inputs only)                | 🟢 `FULLY_FUNCTIONAL`     | `flake.nix:43-48`                                                                         |
+| Configurable `systems` option (no longer hardcoded)            | 🟢 `FULLY_FUNCTIONAL`     | `go-standard.systems` option; defaults to `nix-systems/default`                           |
+| Generate `packages`, `apps`, `devShells`, `checks`, `overlays` | 🟢 `FULLY_FUNCTIONAL`     | `modules/go-standard.nix` perSystem config                                                |
+| Private deps via `deps` option                                 | 🟢 `FULLY_FUNCTIONAL`     | `modules/go-standard.nix` deps option                                                     |
+| Auto-inject `GOPRIVATE` into devShells                         | 🟢 `FULLY_FUNCTIONAL`     | `modules/go-standard.nix` autoGoPrivate                                                   |
+| Typed options for all config                                   | 🟢 `FULLY_FUNCTIONAL`     | `modules/go-standard.nix` options block                                                   |
+| `enableCheck` option (control doCheck)                         | 🟢 `FULLY_FUNCTIONAL`     | Defaults to `true`                                                                        |
+| `enableOverlay` option (toggle overlay generation)             | 🟢 `FULLY_FUNCTIONAL`     | Defaults to `true`; tested by `moduleTestNoOverlay`                                       |
+| `buildFlags` option (Go build tags)                            | 🟢 `FULLY_FUNCTIONAL`     | Passed to `buildGoModule.buildFlags`                                                      |
+| `version` option (override git-derived version)                | 🟢 `FULLY_FUNCTIONAL`     | Defaults to `self.rev or self.dirtyRev or "dev"`                                          |
+| `enableGolangciLint` toggle                                    | 🟢 `FULLY_FUNCTIONAL`     | Conditionally includes golangci-lint in devShells and lint app                            |
+| `enableGofumpt` / `enableGoimports` toggles                    | 🟢 `FULLY_FUNCTIONAL`     | Conditionally enabled in treefmt programs                                                 |
 | `enableCompletions` option                                     | 🟡 `PARTIALLY_FUNCTIONAL` | Requires cobra/urfave/cli; silently does nothing if binary doesn't support `--completion` |
-| Monorepo support (`packages` option)                           | 🟢 `FULLY_FUNCTIONAL` | Multiple `buildGoModule` per repo; separate apps/overlays per package |
-| `fmt` app (`nix run .#fmt`)                                    | 🟢 `FULLY_FUNCTIONAL` | Wrapper around treefmt                                                |
-| Module-level tests (options, types, outputs)                   | 🟡 `PARTIALLY_FUNCTIONAL` | `test-module.nix` with 57 assertions; eval-only, not behavioral (see TODO_LIST) |
-| Real downstream consumer end-to-end test                       | ⚪ `PLANNED`          | Requires a real private-repo CI test job with SSH key secret          |
+| Monorepo support (`packages` option)                           | 🟢 `FULLY_FUNCTIONAL`     | Multiple `buildGoModule` per repo; separate apps/overlays per package                     |
+| `fmt` app (`nix run .#fmt`)                                    | 🟢 `FULLY_FUNCTIONAL`     | Wrapper around treefmt                                                                    |
+| Module-level tests (options, types, outputs)                   | 🟡 `PARTIALLY_FUNCTIONAL` | `test-module.nix` with 57 assertions; eval-only, not behavioral (see TODO_LIST)           |
+| Real downstream consumer end-to-end test                       | ⚪ `PLANNED`              | Requires a real private-repo CI test job with SSH key secret                              |
 
 ## Templates
 
@@ -67,14 +67,14 @@
 
 ## Self-hosting and quality gates
 
-| Feature                                              | Status                    | Notes                                                                    |
-| ---------------------------------------------------- | ------------------------- | ------------------------------------------------------------------------ |
-| `flake.nix` with `nix flake check` / `nix fmt`       | 🟢 `FULLY_FUNCTIONAL`     | Checks wired to `test.nix`, `test-module.nix`, formatter uses nixfmt     |
-| Integration test suite (`test.nix`)                  | 🟢 `FULLY_FUNCTIONAL`     | `autoDiscovery`, `explicitOnly`, `verify`, `validationTest`              |
+| Feature                                              | Status                    | Notes                                                                                                                           |
+| ---------------------------------------------------- | ------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| `flake.nix` with `nix flake check` / `nix fmt`       | 🟢 `FULLY_FUNCTIONAL`     | Checks wired to `test.nix`, `test-module.nix`, formatter uses nixfmt                                                            |
+| Integration test suite (`test.nix`)                  | 🟢 `FULLY_FUNCTIONAL`     | `autoDiscovery`, `explicitOnly`, `verify`, `validationTest`                                                                     |
 | Module test suite (`test-module.nix`)                | 🟡 `PARTIALLY_FUNCTIONAL` | 57 assertions; options, types, defaults, perSystem outputs, overlay; eval-only — do not verify attributes reach `buildGoModule` |
-| Negative-case validation runner (`verifyValidation`) | 🟢 `FULLY_FUNCTIONAL`     | Run outside sandbox via `nix run .#verifyValidation`                     |
-| GitHub Actions CI workflow for the repo itself       | 🟢 `FULLY_FUNCTIONAL`     | `.github/workflows/ci.yml` with format check, integration + module tests |
-| Private-repo CI test job                             | 🟡 `PARTIALLY_FUNCTIONAL` | Scaffolded in CI workflow; disabled until SSH key secret is configured   |
+| Negative-case validation runner (`verifyValidation`) | 🟢 `FULLY_FUNCTIONAL`     | Run outside sandbox via `nix run .#verifyValidation`                                                                            |
+| GitHub Actions CI workflow for the repo itself       | 🟢 `FULLY_FUNCTIONAL`     | `.github/workflows/ci.yml` with format check, integration + module tests                                                        |
+| Private-repo CI test job                             | 🟡 `PARTIALLY_FUNCTIONAL` | Scaffolded in CI workflow; disabled until SSH key secret is configured                                                          |
 
 ## Documentation & Community
 
