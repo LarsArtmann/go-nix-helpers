@@ -249,10 +249,21 @@ in
       description = ''
         When deps are set, auto-inject GOPRIVATE into devShells to prevent
         Go from trying to reach the public proxy for private repos.
-        Uses the broad glob `github.com/larsartmann/*,github.com/LarsArtmann/*`
-        so all LarsArtmann repos are covered, including those not explicitly
+        Uses `privateGlobPattern` (default: LarsArtmann globs) so all repos
+        matching the pattern are covered, including those not explicitly
         listed in deps but resolvable via SSH in the devShell.
         Can be overridden via shellExtraEnv.GOPRIVATE if needed.
+      '';
+    };
+
+    privateGlobPattern = lib.mkOption {
+      type = lib.types.str;
+      default = "github.com/larsartmann/*,github.com/LarsArtmann/*";
+      description = ''
+        GOPRIVATE glob pattern used by `autoGoPrivate`.
+        Defaults to LarsArtmann repos. Override for other organizations,
+        e.g. `"github.com/myorg/*"` or `"github.com/myorg/*,github.com/MyOrg/*"`.
+        Only effective when `autoGoPrivate = true` and `deps` is non-empty.
       '';
     };
 
@@ -280,11 +291,16 @@ in
       type = lib.types.listOf lib.types.str;
       default = [ ];
       description = ''
-        Module paths to exclude from private dependency validation.
+        Module paths to exclude from private dependency validation only.
         Use for repos that match privateDepPattern but are actually public
         (served by proxy.golang.org). Entries must match the exact module
         path as it appears in go.mod.
         Example: [ "github.com/larsartmann/go-atomic-write" ]
+
+        NOTE: This does NOT affect GOPRIVATE. All modules matching
+        `privateGlobPattern` are always marked private in devShells.
+        This option only suppresses false-positive "missing dep" errors
+        during build-time validation.
       '';
     };
 
@@ -501,7 +517,7 @@ in
 
         autoGoPrivateEnv =
           if cfg.deps != { } && cfg.autoGoPrivate then
-            { GOPRIVATE = "github.com/larsartmann/*,github.com/LarsArtmann/*"; }
+            { GOPRIVATE = cfg.privateGlobPattern; }
           else
             { };
 
