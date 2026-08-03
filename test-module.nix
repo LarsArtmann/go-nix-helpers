@@ -174,9 +174,9 @@ let
     (assertCheck "extraBuildAttrs default is empty" (cfg.extraBuildAttrs == { }) "{}")
     (assertCheck "shellExtraEnv default is empty" (cfg.shellExtraEnv == { }) "{}")
     (assertCheck "enableNixfmt default is true" (cfg.enableNixfmt == true) "true")
-    (assertCheck "devShellExtraPackages is a function" (
-      builtins.isFunction cfg.devShellExtraPackages
-    ) "function")
+    (assertCheck "devShellExtraPackages default returns empty list" (
+      builtins.length (cfg.devShellExtraPackages pkgs) == 0
+    ) "empty list when called")
   ];
 
   perSystemChecks = [
@@ -290,6 +290,60 @@ let
     ];
   };
 
+  # --- enableNixfmt toggle test ---------------------------------------------
+  noNixfmtCfg = mkPerSystemConfig { enableNixfmt = false; };
+
+  # --- All formatters disabled (apps.fmt should disappear) ------------------
+  noAllFmtCfg = mkPerSystemConfig {
+    enableGofumpt = false;
+    enableGoimports = false;
+    enableNixfmt = false;
+    enableTempl = false;
+  };
+
+  # --- enableTempl test -----------------------------------------------------
+  templCfg = mkPerSystemConfig { enableTempl = true; };
+
+  # --- Custom ldflags test --------------------------------------------------
+  customLdflagsCfg = mkPerSystemConfig {
+    ldflags = [ "-X main.version=custom" ];
+  };
+
+  # --- Extra meta propagation test ------------------------------------------
+  extraMetaCfg = mkPerSystemConfig {
+    extraMeta = { homepage = "https://example.com"; };
+  };
+
+  # --- Custom shellExtraEnv test --------------------------------------------
+  customEnvCfg = mkPerSystemConfig {
+    shellExtraEnv = { CUSTOM_ENV = "test-value"; };
+  };
+
+  # --- Systems override test (module-level) ---------------------------------
+  systemsOverrideCheck =
+    let
+      sysEval = lib.evalModules {
+        modules = [
+          flakePartsStub
+          ./modules/go-standard.nix
+          {
+            go-standard = {
+              pname = "test-project";
+              vendorHash = null;
+              systems = [ "x86_64-linux" ];
+            };
+          }
+        ];
+        specialArgs = {
+          inherit inputs;
+          self = mockSelf;
+        };
+      };
+    in
+    assertCheck "systems override propagates to config.systems" (
+      sysEval.config.systems == [ "x86_64-linux" ]
+    ) "systems = [x86_64-linux]";
+
   # --- Monorepo overlay test (verifies D1 fix) -----------------------------
   monorepoOverlayCheck =
     let
@@ -358,6 +412,46 @@ let
     (assertCheck "publicDeps accepts list of module paths" (
       publicDepsCfg.packages ? default
     ) "packages.default with publicDeps")
+    # --- Behavioral: meta propagation (H2) ---------------------------------
+    (assertCheck "meta.description matches config" (
+      psCfg.packages.default ? meta && psCfg.packages.default.meta.description == "Test project"
+    ) "description='Test project' in meta")
+    (assertCheck "meta.mainProgram matches pname" (
+      psCfg.packages.default ? meta && psCfg.packages.default.meta.mainProgram == "test-project"
+    ) "mainProgram='test-project'")
+    (assertCheck "meta.license is MIT" (
+      psCfg.packages.default ? meta && psCfg.packages.default.meta.license.spdxId or "" == "MIT"
+    ) "MIT license")
+    (assertCheck "meta.maintainers includes LarsArtmann" (
+      let
+        maintainers = psCfg.packages.default.meta.maintainers or [ ];
+        hasLars = builtins.any (m: m.github or "" == "LarsArtmann") maintainers;
+      in
+      hasLars
+    ) "LarsArtmann in maintainers")
+    (assertCheck "extraMeta propagates to package meta" (
+      extraMetaCfg.packages.default ? meta && extraMetaCfg.packages.default.meta ? homepage
+    ) "homepage in meta from extraMeta")
+    (assertCheck "monorepo: worker has correct description in meta" (
+      monorepoCfg.packages.worker ? meta && monorepoCfg.packages.worker.meta.description == "Worker binary"
+    ) "worker description='Worker binary'")
+    # --- Toggle and conditional tests (L1) ---------------------------------
+    (assertCheck "enableNixfmt=false disables nixfmt" (
+      noNixfmtCfg.treefmt.programs.nixfmt.enable or true == false
+    ) "nixfmt.enable = false")
+    (assertCheck "apps.fmt removed when all formatters disabled" (
+      !(noAllFmtCfg.apps ? fmt)
+    ) "no apps.fmt when no formatters")
+    (assertCheck "enableTempl=true enables templ in treefmt" (
+      templCfg.treefmt.programs.templ.enable or false == true
+    ) "templ.enable = true")
+    (assertCheck "custom ldflags evaluate successfully" (
+      customLdflagsCfg.packages ? default
+    ) "packages.default with custom ldflags")
+    (assertCheck "shellExtraEnv evaluates with custom vars" (
+      customEnvCfg.devShells ? default
+    ) "devShell with custom env")
+    systemsOverrideCheck
     monorepoOverlayCheck
   ];
 
