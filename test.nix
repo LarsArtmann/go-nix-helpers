@@ -170,7 +170,10 @@ let
     };
     autoSubModules = false;
     subModules = {
-      "github.com/larsartmann/mock-dep" = [ "codec/v2" "storage/v2" ];
+      "github.com/larsartmann/mock-dep" = [
+        "codec/v2"
+        "storage/v2"
+      ];
     };
     # codec/v2 is already in go.mod (should be deduped).
     # storage/v2 is NOT in go.mod (should be injected).
