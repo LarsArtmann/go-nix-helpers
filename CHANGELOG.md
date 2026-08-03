@@ -38,11 +38,16 @@ This project has not made a tagged release yet; all changes below are in
   (default: true for both).
 - `enableCompletions` option to install shell completions for the default
   binary (default: false). Requires cobra/urfave/cli — emits a clear warning
-  if the binary does not support `--completion`.
+  if the binary does not support `--completion`. The completion check uses
+  `timeout 10` to prevent hanging binaries from blocking the build.
+- `privateGlobPattern` option to `go-standard` — makes the GOPRIVATE glob
+  pattern configurable for non-LarsArtmann consumers (default: LarsArtmann
+  globs). Backward compatible.
 - `publicDeps` parameter to `mkPreparedSource` — list of module paths to
   exclude from private validation, solving the false-positive where public
   LarsArtmann repos are served by `proxy.golang.org` but match the private
   dep pattern. Forwarded through `go-standard` and `mkGoFlake.nix`.
+  NOTE: `publicDeps` only affects validation, NOT GOPRIVATE.
 - `publicDepsTest` in `test.nix` — integration test verifying that a public
   repo listed in `publicDeps` is not flagged as missing by validation.
 - Monorepo support via `packages` option — generates separate `buildGoModule`
@@ -50,10 +55,12 @@ This project has not made a tagged release yet; all changes below are in
 - `fmt` app (`nix run .#fmt`) as a treefmt wrapper convenience.
 - `systems` option to the go-standard module — no longer hardcoded; defaults
   to the standard 4-system list but can be overridden per consumer.
-- `test-module.nix` — module-level test suite with 70 assertions covering
+- `test-module.nix` — module-level test suite with 74 assertions covering
   option existence, types, defaults, perSystem outputs, overlay conditional
   generation, monorepo packages/apps, toggle defaults, version override,
-  `publicDeps` exclusion, and `privateDepPattern` default.
+  `publicDeps` exclusion, `privateDepPattern` default, `privateGlobPattern`
+  default + custom value, nativeBuildInputs concatenation proof, and
+  `extraMeta` propagation.
   Wired as `checks.moduleTest` and `checks.moduleTestNoOverlay`.
 - Man pages: `docs/man/go-standard.5` and `docs/man/mkPreparedSource.5`
   documenting all options and parameters. Wired into `devShells.default` via
@@ -88,7 +95,8 @@ This project has not made a tagged release yet; all changes below are in
 - Self-hosting `flake.nix` with `nix flake check`, `nix fmt`, devShell, lint
   dashboard apps, and `flake.lib.mkPreparedSource` export (`3c22ce4`).
 - Integration test suite in `test.nix` covering auto-discovery, explicit-only
-  sub-modules, and validation of missing deps (`befd406`, `a31fec9`).
+  sub-modules, validation of missing deps, publicDeps exclusion, requireDeps
+  dedup, and multi-deps monorepo simulation (6 scenarios) (`befd406`, `a31fec9`).
 - `scripts/dashboard.sh` for flake-status overview across projects
   (`bc2dfb1`).
 - `scripts/nix-lint.sh` for linting `flake.nix` files (`dbb76a0`).
@@ -114,7 +122,14 @@ This project has not made a tagged release yet; all changes below are in
   `enableNixfmt`, or `enableTempl`).
 - `modules/go-standard.nix`: `enableCompletions` now checks whether the binary
   supports `--completion` before installing, emitting a clear stderr warning
-  with remediation options instead of silently doing nothing.
+  with remediation options instead of silently doing nothing. The check uses
+  `timeout 10` to prevent hanging binaries.
+- `modules/go-standard.nix`: `publicDeps` option description now explicitly
+  states it only affects validation, not GOPRIVATE.
+- `modules/go-standard.nix`: `extraBuildAttrs` option description now
+  documents which attributes concatenate vs override.
+- `modules/go-standard.nix`: `autoGoPrivateEnv` now uses `cfg.privateGlobPattern`
+  instead of a hardcoded glob string.
 - `modules/go-standard.nix`: `userExtraBuildAttrs.nativeBuildInputs` is now
   concatenated to the module's list (templ, installShellFiles) rather than
   overriding it.
@@ -157,7 +172,8 @@ This project has not made a tagged release yet; all changes below are in
   and support for both `go-standard` and `go-flake-parts` templates.
 - `scripts/generate-flake.sh`: Fixed `--templ` flag for go-standard template
   (was a no-op; now uncomments the `enableTempl` line).
-- README: Options table expanded with all new options.
+- README: Options table expanded with `privateGlobPattern`, `publicDeps`,
+  `privateDepPattern` and `extraBuildAttrs` merge rules documentation.
 - README: Templates section marks go-flake-parts as deprecated.
 - README rewritten as a product-style quickstart with badges, copy-paste
   `flake.nix`, feature tables, and before/after comparison (`0ef8c34`).

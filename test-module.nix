@@ -441,7 +441,9 @@ let
       let
         pkg = nativeBuildInputsMergeCfg.packages.default;
         inputs = pkg.nativeBuildInputs or pkg.drvAttrs.nativeBuildInputs or [ ];
-        hasTempl = builtins.any (x: x.pname or x.name or "" == "templ" || lib.hasInfix "templ" (x.name or "")) inputs;
+        hasTempl = builtins.any (
+          x: x.pname or x.name or "" == "templ" || lib.hasInfix "templ" (x.name or "")
+        ) inputs;
       in
       hasTempl
     ) "templ in nativeBuildInputs")
@@ -449,7 +451,9 @@ let
       let
         pkg = nativeBuildInputsMergeCfg.packages.default;
         inputs = pkg.nativeBuildInputs or pkg.drvAttrs.nativeBuildInputs or [ ];
-        hasGit = builtins.any (x: x.pname or x.name or "" == "git" || lib.hasInfix "git" (x.name or "")) inputs;
+        hasGit = builtins.any (
+          x: x.pname or x.name or "" == "git" || lib.hasInfix "git" (x.name or "")
+        ) inputs;
       in
       hasGit
     ) "git in nativeBuildInputs")

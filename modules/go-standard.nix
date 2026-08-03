@@ -524,10 +524,7 @@ in
         };
 
         autoGoPrivateEnv =
-          if cfg.deps != { } && cfg.autoGoPrivate then
-            { GOPRIVATE = cfg.privateGlobPattern; }
-          else
-            { };
+          if cfg.deps != { } && cfg.autoGoPrivate then { GOPRIVATE = cfg.privateGlobPattern; } else { };
 
         finalShellExtraEnv = autoGoPrivateEnv // cfg.shellExtraEnv;
       in

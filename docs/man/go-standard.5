@@ -99,6 +99,9 @@ Explicit sub-modules (merged with auto-discovered).
 .BR autoGoPrivate " (bool, default: true)"
 Auto-inject GOPRIVATE when deps are set.
 .TP
+.BR privateGlobPattern " (str, default: \"github.com/larsartmann/*,github.com/LarsArtmann/*\")"
+GOPRIVATE glob pattern used by autoGoPrivate. Override for other organizations.
+.TP
 .BR validatePrivateDeps " (bool, default: true)"
 Fail build if a private require lacks a replace.
 .TP
@@ -107,8 +110,9 @@ ERE regex matching module paths that must have a replace directive.
 Override for other organizations.
 .TP
 .BR publicDeps " (list str, default: [])"
-Module paths to exclude from private validation.
+Module paths to exclude from private validation only.
 Use for repos that match privateDepPattern but are actually public.
+Does NOT affect GOPRIVATE.
 .TP
 .BR proxyVendor " (bool, default: true)"
 Pass proxyVendor to buildGoModule.
@@ -121,6 +125,7 @@ Extra attributes merged into package meta.
 .TP
 .BR extraBuildAttrs " (attrs, default: {})"
 Extra attributes merged into buildGoModule.
+nativeBuildInputs, preBuild, postInstall are concatenated; all others override.
 .TP
 .BR devShellExtraPackages " (function, default: _: [])"
 Function receiving pkgs, returns extra devShell packages.
