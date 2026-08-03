@@ -214,7 +214,7 @@ in
       exit 1
     fi
     # Verify the local dir is event/eventtest (NOT event/v3/eventtest)
-    if grep -qF "event/v3/eventtest => ./_local_deps/mock-dep/event/eventtest" "$GOMOD"; then
+    if grep -qF "event/v3/eventtest => ./_local_deps/larsartmann-mock-dep/event/eventtest" "$GOMOD"; then
       echo "PASS: eventtest localDir correctly strips mid-path /v3"
     else
       echo "FAIL: eventtest localDir has wrong path (expected event/eventtest)"

@@ -174,8 +174,8 @@ in
       description = ''
         Install shell completions (bash, zsh, fish) for the default binary.
         Requires the binary to support `--completion <shell>` subcommand
-        (e.g. cobra, urfave/cli). Silently does nothing if the binary
-        doesn't support completions.
+        (e.g. cobra, urfave/cli). Emits a build-time warning if the binary
+        doesn't support completions instead of silently doing nothing.
       '';
     };
 
@@ -402,11 +402,17 @@ in
           fi
         '';
 
-        # Merge user's extraBuildAttrs, with special preBuild/postInstall handling.
+        # Merge user's extraBuildAttrs, with special handling for attrs
+        # that should be concatenated rather than overridden:
+        # - preBuild/postInstall: concatenated with module-generated values
+        # - nativeBuildInputs: concatenated (module adds templ, installShellFiles)
+        # All other attrs override the module defaults via the // operator.
         userExtraBuildAttrs = builtins.removeAttrs cfg.extraBuildAttrs [
           "preBuild"
           "postInstall"
+          "nativeBuildInputs"
         ];
+        userNativeBuildInputs = cfg.extraBuildAttrs.nativeBuildInputs or [ ];
         mergedPreBuild = autoDepSyncPreBuild + (cfg.extraBuildAttrs.preBuild or "");
 
         # Reusable package builder for monorepo support.
@@ -451,7 +457,8 @@ in
               postInstall = mergedPostInstall;
               nativeBuildInputs =
                 lib.optionals cfg.enableTempl [ pkgs.templ ]
-                ++ lib.optionals cfg.enableCompletions [ pkgs.installShellFiles ];
+                ++ lib.optionals cfg.enableCompletions [ pkgs.installShellFiles ]
+                ++ userNativeBuildInputs;
               meta = {
                 description = pkgDesc;
                 license = lib.licenses.mit;

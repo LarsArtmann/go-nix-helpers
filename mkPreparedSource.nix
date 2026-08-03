@@ -121,15 +121,22 @@ let
     in
     lib.concatStringsSep "/" (lib.filter (p: builtins.match "v[0-9]+" p == null) parts);
 
-  # Extract repo name from Go import path, stripping any /vN major version suffix.
-  # "github.com/larsartmann/go-cqrs-lite" → "go-cqrs-lite"
-  # "github.com/larsartmann/go-filewatcher/v2" → "go-filewatcher"
+  # Extract a unique directory name from a Go import path, stripping any
+  # /vN major version suffix. Includes the owner to prevent same-name
+  # different-owner collisions (e.g. two forks named go-cqrs-lite).
+  # "github.com/larsartmann/go-cqrs-lite" → "larsartmann-go-cqrs-lite"
+  # "github.com/larsartmann/go-filewatcher/v2" → "larsartmann-go-filewatcher"
+  # "github.com/otherorg/go-cqrs-lite" → "otherorg-go-cqrs-lite"
   repoName =
     path:
     let
       stripped = stripVersionSuffix path;
+      parts = lib.splitString "/" stripped;
     in
-    lib.last (lib.splitString "/" stripped);
+    if lib.length parts >= 3 then
+      "${lib.elemAt parts 1}-${lib.elemAt parts 2}"
+    else
+      lib.last parts;
 
   # Read the module path from the first non-empty line of a go.mod file.
   # go.mod line 1 is always: "module <import-path>"
