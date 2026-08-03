@@ -245,13 +245,13 @@ let
 
   # Require lines for manually injected deps (rarely needed).
   # Deduped against existing require lines in go.mod at build time to avoid
-  # duplicate entries which would make the file invalid.
-  checkRequireLines = lib.concatStringsSep "\n" (
+  # duplicate entries which would make the file invalid. Writes missing entries
+  # to a temp file so we can check whether any were added.
+  collectMissingRequires = lib.concatStringsSep "\n" (
     lib.mapAttrsToList (path: ver: ''
-            if ! grep -qF '${path} ' go.mod; then
-              NEW_REQUIRES="''${NEW_REQUIRES}	${path} ${ver}
-      "
-            fi
+      if ! grep -qF '${path} ' go.mod; then
+        printf '\t%s %s\n' '${path}' '${ver}' >> go.mod.requires.tmp
+      fi
     '') requireDeps
   );
 
@@ -347,14 +347,15 @@ pkgs.stdenv.mkDerivation {
     ${subModuleVersionNormalize}
 
     ${lib.optionalString hasRequires ''
-      NEW_REQUIRES=""
-      ${checkRequireLines}
-      if [ -n "''${NEW_REQUIRES%"$'''\n'''"}" ]; then
+      touch go.mod.requires.tmp
+      ${collectMissingRequires}
+      if [ -s go.mod.requires.tmp ]; then
         echo "" >> go.mod
         echo 'require (' >> go.mod
-        printf '%s' "$NEW_REQUIRES" >> go.mod
+        cat go.mod.requires.tmp >> go.mod
         echo ')' >> go.mod
       fi
+      rm -f go.mod.requires.tmp
     ''}
 
     if [ -n "$(cat go.mod | tr -d '\n')" ]; then

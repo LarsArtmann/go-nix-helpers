@@ -89,9 +89,7 @@ nix build .#checks.x86_64-linux.moduleTest  # module-level test (40+ assertions)
 - **`maintainers.larsartmann` is NOT registered in nixpkgs** — but works in `meta.maintainers` because Nix evaluation is lazy enough that `nix flake check` and builds pass. The attribute is never deeply evaluated during normal operations. Register in nixpkgs for full correctness (nix-env --maintainer queries).
 - **`goPkg` parameter is dead weight** — the derivation has `dontBuild = true` and never invokes `go`. Kept for API compatibility.
 - **`privateDepPattern` default is LarsArtmann-specific** — `validatePrivateDeps` only validates modules matching `github\.com/[Ll]ars[Aa]rtmann/` by default. Override for other orgs. Use `publicDeps` to exclude specific public repos that match the pattern but resolve via proxy.golang.org (e.g. go-atomic-write, go-ndjson, go-sse).
-- **`autoGoPrivate` uses specific paths when `publicDeps` is set** — when `publicDeps` is non-empty, GOPRIVATE switches from the broad glob `github.com/larsartmann/*` to specific dep paths so public repos fetch via the proxy.
 - **`nativeBuildInputs` in `extraBuildAttrs` is concatenated** — consumer values are appended to the module's list (templ, installShellFiles) rather than overriding.
-- **`repoName` includes owner** — `_local_deps/` directories use `<owner>-<repo>` format (e.g. `larsartmann-go-cqrs-lite`) to prevent same-name collisions across forks.
 - **`validationTest` is a deliberately-failing derivation** — it cannot be a Nix dependency of a passing derivation. The `verify` check only tests success paths; `verifyValidation` is a separate shell script run outside the sandbox.
 - **`apps.fmt` is conditional** — only generated when at least one treefmt program is enabled (`enableGofumpt`, `enableGoimports`, `enableNixfmt`, `enableTempl`).
 - **`enableCompletions` warns instead of silently no-op** — when the binary doesn't support `--completion`, a clear warning is printed to stderr during the build instead of silently installing empty completions.
@@ -110,7 +108,7 @@ nix build .#checks.x86_64-linux.moduleTest  # module-level test (40+ assertions)
 | ------------------------------------ | --------------------------------------------------------------------------------------------------------------------- |
 | `mkPreparedSource.nix`               | Core helper — solves private Go dep injection for Nix sandbox builds                                                  |
 | `mkGoFlake.nix`                      | DEPRECATED — function-based predecessor to go-standard module; emits trace warning                                    |
-| `modules/go-standard.nix`            | Proper flake-parts module (exposed as `flakeModules.go-standard`) — 30 options, monorepo support, bundles treefmt-nix |
+| `modules/go-standard.nix`            | Proper flake-parts module (exposed as `flakeModules.go-standard`) — 31 options, monorepo support, bundles treefmt-nix |
 | `flake.nix`                          | Self-hosting: checks, formatter, devShell, lib export, flakeModules export                                            |
 | `test.nix`                           | Integration tests (auto-discovery, explicit, validation)                                                              |
 | `test-module.nix`                    | Module-level tests for go-standard options and outputs (57 assertions)                                                |
