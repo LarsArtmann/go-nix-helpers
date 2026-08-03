@@ -217,3 +217,9 @@ I don't know which repos are actually private vs public in the LarsArtmann org, 
 ---
 
 _Arte in Aeternum_
+
+---
+
+## Resolution (2026-08-03)
+
+The core `postPatch` elimination work documented here shipped and is stable. The `validatePrivateDeps` question (sections E.3, F.4, and G) is now formally tracked: a feedback file (`docs/feedback/new/2026-08-03_mkpreparedsource-false-positive-on-public-repos.md`) documents the false-positive in detail with 5 confirmed public repos that trigger unnecessary validation failures. This is the highest-priority item in `TODO_LIST.md` and has its own theme in `ROADMAP.md` ("Smart private-dep detection"). The proposed fixes (forward `validatePrivateDeps` through `mkGoFlake.nix`, add `publicDeps` exclusion list, improve error message) are all actionable and bounded.

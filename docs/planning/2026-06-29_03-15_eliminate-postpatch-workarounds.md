@@ -376,3 +376,9 @@ discoverSubModules = depPath: depSrc:
 # Add one line:
 sed -i '/=> \.\.\//d' go.mod   # strip sibling-dir relative replaces
 ```
+
+---
+
+## Resolution (2026-08-03)
+
+**Status: FULLY EXECUTED.** All Level 1 tasks (1–24) were completed. The companion status report (`docs/status/2026-06-29_04-21_postpatch-elimination-complete.md`) documents the execution results: 10 of 15 `postPatch` instances eliminated via 3 root-cause fixes, 5 `postPatchExtra` blocks deleted across consumer repos, 4 projects migrated to `mkPreparedSource`. The `validatePrivateDeps` follow-up (task F.4) remains open — tracked in `TODO_LIST.md` and `ROADMAP.md` Theme 5.

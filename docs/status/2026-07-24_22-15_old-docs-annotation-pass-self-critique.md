@@ -350,3 +350,24 @@ reader question ("is this done? where is it now?") that the original snapshot
 could not answer on its own.
 
 _Arte in Aeternum_
+
+---
+
+## Resolution (2026-08-03)
+
+The annotation pass documented here was correct in its approach (7 files annotated, 3 left alone). Items from section F "next tasks" that have since been resolved:
+
+- #11 (fix `defaultSystems`): ~~done~~ `7415763` — `go-standard.systems` option added
+- #12 (e2e consumer test): Still open — BLOCKED (TODO_LIST)
+- #13 (deprecate mkGoFlake.nix): ~~done~~ `7415763` — trace warning added
+- #14 (mark go-flake-parts legacy): ~~done~~ `7415763` — banner + deprecation comment
+- #15 (LICENSE file): ~~done~~ `ce35aa5`
+- #16 (GitHub Actions CI): ~~done~~ `7415763`
+- #17 (dynamic CI badge): ~~done~~ `7415763`
+- #18 (CONTRIBUTING.md): ~~done~~ `7415763`
+- #19 (issue/PR templates): ~~done~~ `7415763`
+- #20 (module tests): ~~done~~ `7415763`, deepened `50fd2c3` (54 assertions)
+- #21 (migration guide): ~~done~~ `7415763`
+- #4 (replace generic TODO_LIST citations with specific item text): Partially addressed in the 2026-08-03 docs-health pass — TODO_LIST was rebuilt with specific evidence columns
+
+The `buildflow` auto-commit finding (#7, AGENTS.md gotcha) was noted in the global AGENTS.md ("An auto-git commit daemon runs continuously"). The inline `~~item~~ DONE:` list-strike pattern (#1–3) was applied in the 2026-08-03 update-old-docs re-run on the 22:45 and 23:04 reports.
