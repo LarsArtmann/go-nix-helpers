@@ -104,10 +104,10 @@ nix build .#checks.x86_64-linux.moduleTest  # module-level test (40+ assertions)
 | ------------------------------------ | --------------------------------------------------------------------------------------------------------------------- |
 | `mkPreparedSource.nix`               | Core helper — solves private Go dep injection for Nix sandbox builds                                                  |
 | `mkGoFlake.nix`                      | DEPRECATED — function-based predecessor to go-standard module; emits trace warning                                    |
-| `modules/go-standard.nix`            | Proper flake-parts module (exposed as `flakeModules.go-standard`) — 28 options, monorepo support, bundles treefmt-nix |
+| `modules/go-standard.nix`            | Proper flake-parts module (exposed as `flakeModules.go-standard`) — 30 options, monorepo support, bundles treefmt-nix |
 | `flake.nix`                          | Self-hosting: checks, formatter, devShell, lib export, flakeModules export                                            |
 | `test.nix`                           | Integration tests (auto-discovery, explicit, validation)                                                              |
-| `test-module.nix`                    | Module-level tests for go-standard options and outputs (40+ assertions)                                               |
+| `test-module.nix`                    | Module-level tests for go-standard options and outputs (57 assertions)                                               |
 | `templates/go-flake-parts/flake.nix` | DEPRECATED — old manual template; marked with deprecation banner                                                      |
 | `templates/go-standard/flake.nix`    | Minimal template using go-standard module (recommended for new projects)                                              |
 | `scripts/nix-lint.sh`                | Lints flake.nix files across all projects for common errors                                                           |
