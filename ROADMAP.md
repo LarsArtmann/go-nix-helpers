@@ -26,9 +26,9 @@ Raw ideas:
 
 - Migrate all 7+ downstream consumers from raw `mkPreparedSource` import or `mkGoFlake.nix` to `flakeModules.go-standard`
 - Add a migration script that rewrites a 5-input manual flake.nix to the 3-input module
-- Deprecate and eventually remove `mkGoFlake.nix`
-- Mark `templates/go-flake-parts/` as legacy or remove it once consumers no longer need it
-- Provide a shared overlay surface so projects can compose each other’s packages cleanly
+- Fully remove `mkGoFlake.nix` once all consumers have migrated (currently emits deprecation trace warning)
+- Remove `templates/go-flake-parts/` once consumers no longer need it (currently marked deprecated with banner)
+- Provide a shared overlay surface so projects can compose each other's packages cleanly
 
 ### 3. Testing and reliability
 
@@ -37,10 +37,12 @@ Make the module trustworthy enough that a consumer can adopt it without manual e
 Raw ideas:
 
 - Property-based tests for `repoName`, `stripVersionSuffix`, and `discoverSubModules`
+- Behavioral module tests that verify option values actually reach `buildGoModule` (not just evaluation)
 - CI matrix that evaluates `go-standard` with common consumer configurations (with deps, without deps, with templ, with overlays, monorepo)
 - Real private-dependency integration test using an actual GitHub private repo or a local mock with SSH semantics
 - Nix-level checks that assert the composite module produces expected output structure
 - Dry-run mode for `mkPreparedSource` so consumers can inspect generated replaces without building
+- Smoke test for `generate-flake.sh` in CI to catch script regressions
 
 ### 4. Distribution and discoverability
 
@@ -53,6 +55,23 @@ Raw ideas:
 - Public documentation site (GitHub Pages / Astro / Starlight) generated from the repo
 - Short demo video or animated GIF for the README
 - Register `maintainers.larsartmann` in nixpkgs
+
+### 5. Smart private-dep detection
+
+`mkPreparedSource` currently treats every `github.com/larsartmann/*` repo as
+private. Some are public and served by `proxy.golang.org`. The validation
+then demands unnecessary SSH flake inputs for repos that don't need them.
+
+Raw ideas:
+
+- Auto-detect whether a repo is public by querying `proxy.golang.org` before
+  requiring a local `replace` directive
+- Add a `publicDeps` exclusion list so consumers can mark specific repos as
+  public while keeping validation active for genuinely private repos
+- Forward `validatePrivateDeps` and `privateDepPattern` through `mkGoFlake.nix`
+  so consumers using the deprecated module can toggle validation
+- Improve the error message to offer multiple resolution paths (add as dep,
+  set `validatePrivateDeps = false`, or add to `publicDeps`)
 
 ## Non-goals
 

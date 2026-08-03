@@ -132,10 +132,39 @@ let
     autoSubModules = false;
     validatePrivateDeps = true;
   };
+
+  # ---------------------------------------------------------------------------
+  # Test 4: publicDeps exclusion — a public LarsArtmann repo listed in
+  # publicDeps should NOT be flagged as missing by validation.
+  # ---------------------------------------------------------------------------
+  mockMixedSrc = pkgs.writeTextDir "go.mod" ''
+    module github.com/larsartmann/mock-mixed
+
+    go 1.26
+
+    require (
+      github.com/larsartmann/mock-dep/codec/v2 v0.0.0
+      github.com/larsartmann/mock-public-lib v1.0.0
+    )
+  '';
+
+  publicDepsTest = mkPreparedSource {
+    name = "test-public-deps";
+    version = "test";
+    src = mockMixedSrc;
+    deps = {
+      "github.com/larsartmann/mock-dep" = mockDep;
+    };
+    autoSubModules = false;
+    subModules = {
+      "github.com/larsartmann/mock-dep" = [ "codec/v2" ];
+    };
+    publicDeps = [ "github.com/larsartmann/mock-public-lib" ];
+  };
 in
 {
   # nix-build test.nix -A autoDiscovery -o result-auto
-  inherit autoDiscovery explicitOnly validationTest;
+  inherit autoDiscovery explicitOnly validationTest publicDepsTest;
 
   # Verification script: checks the success-path test outputs.
   # nix-build test.nix -A verify -o result-verify && ./result-verify
@@ -238,6 +267,27 @@ in
     fi
 
     echo ""
+    echo "=== Test 4: publicDeps exclusion ==="
+    GOMOD3=${publicDepsTest}/go.mod
+    cat "$GOMOD3"
+    echo ""
+    # Build succeeded (we got here), so validation passed.
+    # Verify the public dep has NO replace (it's not in deps).
+    if grep -qF "mock-public-lib => " "$GOMOD3"; then
+      echo "FAIL: public dep should not have a replace directive"
+      exit 1
+    else
+      echo "PASS: public dep correctly has no replace"
+    fi
+    # Verify the private dep still has its replace.
+    if grep -qF "codec/v2 => " "$GOMOD3"; then
+      echo "PASS: private dep still has replace"
+    else
+      echo "FAIL: private dep missing replace"
+      exit 1
+    fi
+
+    echo ""
     echo "==========================================="
     echo "SUCCESS-PATH TESTS PASSED"
     echo "==========================================="
@@ -245,7 +295,7 @@ in
     echo "Test 3 (validation) is a deliberately-failing derivation."
     echo "Verify it separately; it MUST fail with the validation message:"
     echo "  nix-build test.nix -A validationTest  # expect: exit 1 +"
-    echo "    'private modules without local replace'"
+    echo "    'modules without local replace'"
 
     mkdir $out
     echo "all success-path tests passed" > $out/result.txt
@@ -267,7 +317,7 @@ in
     text = ''
       set +e
       log=$(nix-store -r ${builtins.unsafeDiscardStringContext validationTest.drvPath} 2>&1)
-      if echo "$log" | grep -q "private modules without local replace"; then
+      if echo "$log" | grep -q "modules without local replace"; then
         echo "PASS: validation caught missing dep with clear error"
       else
         echo "FAIL: validation did not emit the expected error"

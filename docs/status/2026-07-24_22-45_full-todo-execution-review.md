@@ -3,7 +3,7 @@
 **Date:** 2026-07-24 22:45
 **Session:** Execute all 27 TODOs from TODO_LIST.md across 6 Pareto phases
 **Branch:** master (8 commits ahead of origin)
-**Result:** 24/27 TODOs completed, 3 blocked on external dependencies, **4 bugs found in shipped code**
+**Result:** 24/27 TODOs completed, 3 blocked on external dependencies, **4 bugs found in shipped code** (all 4 fixed in the next session — see [Resolution](#resolution-2026-08-03) below)
 
 ---
 
@@ -70,13 +70,9 @@ CI job `private-deps-test` exists in `.github/workflows/ci.yml` but has `if: fal
 
 The plan called for a real consumer `flake.nix` that imports `go-standard` and exercises the full build pipeline. What shipped instead is module-level tests using `lib.evalModules` with stub options. This tests option types and output structure but NOT actual `buildGoModule` execution through the module.
 
-### B5. Man pages — created but not wired into devShell
+### B5. Man pages — created but not wired into devShell ~~(fixed: `manPages` derivation wired into devShell at `flake.nix:77`)~~ done at `ef2361f`, `50fd2c3`
 
-The `.5` files exist in `docs/man/` but are NOT installed in `devShells.default`. Consumers can't access them via `man go-standard` from the dev shell.
-
-### B6. CHANGELOG.md — duplicate "Added" sections
-
-The file now has 3 "Added" headers — the new one from this session and 2 from the original content. Should be consolidated.
+### B6. CHANGELOG.md — duplicate "Added" sections ~~(fixed: consolidated into one clean set under `[Unreleased]`)~~ done at `ef2361f`
 
 ---
 
@@ -92,7 +88,7 @@ The file now has 3 "Added" headers — the new one from this session and 2 from 
 
 ## D) TOTALLY FUCKED UP (bugs in shipped code)
 
-### D1. CRITICAL: Monorepo overlay maps ALL packages to the DEFAULT package
+### ~~D1. CRITICAL: Monorepo overlay maps ALL packages to the DEFAULT package~~ done at `ef2361f`, `50fd2c3`
 
 **File:** `modules/go-standard.nix:540`
 
@@ -104,7 +100,7 @@ This maps every monorepo package to `packages.${cfg.pname}` (the default), not t
 
 **Fix:** Should be `(_name: pkg: pkg)` or better yet reference the per-system package: `(_name: pkg: self.packages.${final.stdenv.system}.${_name})`.
 
-### D2. DEAD CODE: `completionAttrs` defined but never used
+### ~~D2. DEAD CODE: `completionAttrs` defined but never used~~ done at `ef2361f`, `50fd2c3`
 
 **File:** `modules/go-standard.nix:380-388`
 
@@ -117,16 +113,16 @@ completionAttrs = lib.optionalAttrs cfg.enableCompletions {
 
 This binding is never referenced anywhere. The completion installation logic was duplicated inline in `mkGoPackage` instead, making this dead code that confuses readers.
 
-### D3. Uncommitted formatting changes after last commit
+### ~~D3. Uncommitted formatting changes after last commit~~ done at `689ac19`
 
-8 files were reformatted by `nix fmt` AFTER the last git commit. The diff is purely whitespace/style (e.g., `systems = cfg.systems` → `inherit (cfg) systems`), but the working tree is dirty:
+~~8 files were reformatted~~ done at `689ac19`
 
 - `AGENTS.md`, `CONTRIBUTING.md`, `FEATURES.md`, `README.md`, `TODO_LIST.md`
 - `docs/migration-guide.md`
 - `modules/go-standard.nix`
 - `test-module.nix`
 
-### D4. `generate-flake.sh` --templ flag broken for go-standard template
+### ~~D4. `generate-flake.sh` --templ flag broken for go-standard template~~ done at `ef2361f`, `50fd2c3`
 
 The script has:
 
@@ -287,3 +283,48 @@ I don't know the migration status of all 7+ downstream consumers, so I can't ass
 Currently it's `attrsOf (submodule { options = { subPackages; description; }; })` — which gives type checking but is rigid. An alternative is to let each package entry be a full `buildGoModule` override (more flexible, but loses type safety and shared config). This is a design decision about how much consumers should be able to customize individual packages vs. how much the module should enforce consistency.
 
 I cannot resolve this without knowing whether any downstream consumer actually needs per-package build customization (different ldflags, different vendor hashes, etc.).
+
+---
+
+## Resolution (2026-08-03)
+
+All 4 bugs (D1–D4) and both partially-done items (B5 man pages, B6 CHANGELOG) were fixed in the next session (commits `ef2361f`, `50fd2c3`). The "next tasks" list below resolves the 50 items from section F against current state.
+
+### Bugs (D1–D4) — all resolved
+
+| Bug | Resolution | Commits |
+| --- | ---------- | ------- |
+| D1 | Monorepo overlay maps each package to its own derivation; tested by `monorepoOverlayCheck` | `ef2361f`, `50fd2c3` |
+| D2 | Dead `completionAttrs` removed; `postInstall` wired into `mkGoPackage` via `completionPostInstall` | `ef2361f`, `50fd2c3` |
+| D3 | Formatting changes committed with this report | `689ac19` |
+| D4 | `generate-flake.sh --templ` sed now uncomments `# enableTempl = true;` | `ef2361f`, `50fd2c3` |
+
+### Section F "next tasks" — item-by-item status
+
+| # | Task | Status | Evidence |
+| --- | --- | --- | --- |
+| 1 | Fix monorepo overlay (D1) | ~~done~~ `ef2361f` | See table above |
+| 2 | Remove dead completionAttrs (D2) | ~~done~~ `ef2361f` | See table above |
+| 3 | Commit formatting (D3) | ~~done~~ `689ac19` | See table above |
+| 4 | Fix generate-flake.sh --templ (D4) | ~~done~~ `ef2361f` | See table above |
+| 5 | Consolidate CHANGELOG.md | ~~done~~ `ef2361f` | Merged 3 duplicate "Added" sections |
+| 6 | Monorepo `packages` test | ~~done~~ `50fd2c3` | `packages.worker` assertion in `test-module.nix` |
+| 7 | `enableCompletions` test | ~~done~~ `50fd2c3` | Asserts eval with completions enabled |
+| 8 | `enableGolangciLint=false` test | ~~done~~ `50fd2c3` | Asserts `apps.lint` disappears |
+| 9 | `enableGofumpt=false` / `enableGoimports=false` test | ~~done~~ `50fd2c3` | Asserts treefmt programs toggle |
+| 10 | `buildFlags` test | ~~done~~ `50fd2c3` | Asserts eval with custom buildFlags |
+| 11 | `version` override test | ~~done~~ `50fd2c3` | Asserts `1.0.0-test` in derivation name |
+| 12 | Real e2e consumer test | Still open — BLOCKED | TODO_LIST "Real e2e consumer test" |
+| 13 | Wire e2e test into CI | Still open — BLOCKED | Depends on #12 |
+| 14 | Test that `apps.fmt` exists | ~~done~~ `50fd2c3` | Covered by module eval test |
+| 15–20 | Design improvements (enableCompletions redesign, apps.fmt conditional, go.mod skeleton, man pages in devShell, extraApps) | #19 done `ef2361f`; rest still open | TODO_LIST + ROADMAP |
+| 21–26 | CI improvements (macOS, Cachix, flake.lock check, generate-flake.sh smoke test) | Still open | TODO_LIST |
+| 27–33 | Documentation polish (enableCompletions docs, extraApps migration, FAQ entries, GOTOOLCHAIN docs) | #33 done (architecture diagram shipped); rest still open | TODO_LIST |
+| 34–42 | Feature additions (enableGoVet, preCommitHooks, nixosModules, darwinModules, docker, cross-compilation) | Still open — long-term | ROADMAP |
+| 43–50 | Ecosystem (register maintainer, audit consumers, examples, benchmarks, publish) | Still open — blocked/long-term | TODO_LIST (blocked) + ROADMAP |
+
+### Questions (G1–G3) — resolution
+
+- **G1** (private-deps CI test repo): Still open. A new feedback file (`docs/feedback/new/2026-08-03_mkpreparedsource-false-positive-on-public-repos.md`) reframes this — the validation itself needs to distinguish public from private repos first.
+- **G2** (remove mkGoFlake.nix?): Kept with deprecation trace warning. Full removal deferred until all consumers migrate (ROADMAP).
+- **G3** (monorepo submodule vs attrsOf): Current `attrsOf (submodule {...})` retained. No downstream consumer has requested per-package build customization.

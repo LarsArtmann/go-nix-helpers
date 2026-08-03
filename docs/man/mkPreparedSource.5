@@ -84,6 +84,11 @@ Fails the build with a clear error if validation fails.
 ERE regex matching private module paths to validate.
 Override for other organizations.
 .TP
+.BR publicDeps " (list str, default: [])"
+Module paths to exclude from private validation.
+Use for repos that match privateDepPattern but are actually public.
+Entries must match the exact module path in go.mod.
+.TP
 .BR postPatchExtra " (str, default: \"\")"
 Additional shell commands appended to postPatch.
 Runs BEFORE replace directives are injected.

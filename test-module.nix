@@ -160,6 +160,8 @@ let
     (assertCheck "packages default is empty" (cfg.packages == { }) "{}")
     (assertCheck "autoGoPrivate default is true" (cfg.autoGoPrivate == true) "true")
     (assertCheck "validatePrivateDeps default is true" (cfg.validatePrivateDeps == true) "true")
+    (assertCheck "privateDepPattern default is LarsArtmann regex" (cfg.privateDepPattern == "github\\.com/[Ll]ars[Aa]rtmann/") "LarsArtmann regex")
+    (assertCheck "publicDeps default is empty" (cfg.publicDeps == [ ]) "[]")
     (assertCheck "proxyVendor default is true" (cfg.proxyVendor == true) "true")
     (assertCheck "systems default is 4-element list" (builtins.length cfg.systems == 4) "4 systems")
     (assertCheck "systems includes x86_64-linux" (builtins.elem "x86_64-linux" cfg.systems)
@@ -274,6 +276,14 @@ let
     ];
   };
 
+  # --- publicDeps test ------------------------------------------------------
+  publicDepsCfg = mkPerSystemConfig {
+    publicDeps = [
+      "github.com/larsartmann/go-atomic-write"
+      "github.com/larsartmann/go-ndjson"
+    ];
+  };
+
   # --- Monorepo overlay test (verifies D1 fix) -----------------------------
   monorepoOverlayCheck =
     let
@@ -339,6 +349,9 @@ let
     (assertCheck "buildFlags accepts custom flags" (
       buildFlagsCfg.packages ? default
     ) "packages.default with custom buildFlags")
+    (assertCheck "publicDeps accepts list of module paths" (
+      publicDepsCfg.packages ? default
+    ) "packages.default with publicDeps")
     monorepoOverlayCheck
   ];
 

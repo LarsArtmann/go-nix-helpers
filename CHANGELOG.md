@@ -37,17 +37,20 @@ This project has not made a tagged release yet; all changes below are in
 - `enableGofumpt` and `enableGoimports` toggles in treefmt programs
   (default: true for both).
 - `enableCompletions` option to install shell completions for the default
-  binary (default: false).
+  binary (default: false). Requires cobra/urfave/cli — silently does nothing
+  if the binary does not support `--completion`.
 - Monorepo support via `packages` option — generates separate `buildGoModule`
   per entry with shared source/vendor hash, separate apps and overlay entries.
 - `fmt` app (`nix run .#fmt`) as a treefmt wrapper convenience.
 - `systems` option to the go-standard module — no longer hardcoded; defaults
   to the standard 4-system list but can be overridden per consumer.
-- `test-module.nix` — module-level test suite with 40+ assertions covering
+- `test-module.nix` — module-level test suite with 54 assertions covering
   option existence, types, defaults, perSystem outputs, overlay conditional
-  generation. Wired as `checks.moduleTest` and `checks.moduleTestNoOverlay`.
+  generation, monorepo packages/apps, toggle defaults, and version override.
+  Wired as `checks.moduleTest` and `checks.moduleTestNoOverlay`.
 - Man pages: `docs/man/go-standard.5` and `docs/man/mkPreparedSource.5`
-  documenting all options and parameters.
+  documenting all options and parameters. Wired into `devShells.default` via
+  a `manPages` derivation that installs `.5` files to `share/man/man5/`.
 - Dynamic CI badge in README (replaces static shields.io badge).
 - MIT license badge in README.
 - `FEATURES.md`, `TODO_LIST.md`, `ROADMAP.md`, and `CHANGELOG.md` to document
@@ -90,6 +93,8 @@ This project has not made a tagged release yet; all changes below are in
   (`dbb76a0`, `d740b3b`).
 - `docs/ci-workflow.yml` drop-in GitHub Actions workflow for consumers
   (`dbb76a0`).
+- `GOTOOLCHAIN = "local"` set by default in all devShells to prevent Go from
+  downloading newer toolchains. Override via `shellExtraEnv.GOTOOLCHAIN`.
 - `AGENTS.md` with enduring project context for AI sessions (`3c22ce4`).
 
 ### Changed
@@ -104,6 +109,8 @@ This project has not made a tagged release yet; all changes below are in
   into `mkGoPackage` using per-package name (was dead code).
 - `modules/go-standard.nix`: Fixed monorepo overlay to map each package to its
   own derivation instead of the default.
+- `modules/go-standard.nix`: `userExtraBuildAttrs` now strips both `preBuild`
+  and `postInstall` to avoid double-application when merging consumer overrides.
 - `flake.nix`: `lib.mkGoFlake` export now wraps with `builtins.trace`
   deprecation warning.
 - `scripts/generate-flake.sh`: Fully rewritten with `--dir`, `--template`,

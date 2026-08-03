@@ -99,6 +99,14 @@ Auto-inject GOPRIVATE when deps are set.
 .BR validatePrivateDeps " (bool, default: true)"
 Fail build if a private require lacks a replace.
 .TP
+.BR privateDepPattern " (str, default: \"github\\\\.com/[Ll]ars[Aa]rtmann/\")"
+ERE regex matching module paths that must have a replace directive.
+Override for other organizations.
+.TP
+.BR publicDeps " (list str, default: [])"
+Module paths to exclude from private validation.
+Use for repos that match privateDepPattern but are actually public.
+.TP
 .BR proxyVendor " (bool, default: true)"
 Pass proxyVendor to buildGoModule.
 .TP
