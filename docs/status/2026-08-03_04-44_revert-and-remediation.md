@@ -363,3 +363,33 @@ breaking change of renaming `_local_deps/` paths was unacceptable as a
 default. But should I add an `ownerNamespacedDirs` option (default: false)
 that consumers can opt into when they have fork collision risk? This would
 give consumers the choice without forcing the breaking change on everyone.
+
+---
+
+## H) RESOLUTIONS (annotated by session 2026-08-03 05:30)
+
+All three questions were resolved autonomously.
+
+### Q1: RESOLVED — Keep `publicDeps` name, clarify scope in documentation
+
+Decision: **Keep the name.** The name is semantically correct — these ARE public
+deps that need validation exemptions. Improved the option description to
+explicitly state it does NOT affect GOPRIVATE. Added `publicDeps` to the main
+README options table with the scope clarification. A rename would be a breaking
+change for no behavioral benefit — documentation fixes the ambiguity.
+
+### Q2: RESOLVED — Added `privateGlobPattern` option
+
+Decision: **Added `privateGlobPattern` option** (default: LarsArtmann globs).
+`autoGoPrivateEnv` now uses `cfg.privateGlobPattern` instead of a hardcoded
+string. Non-LarsArtmann consumers can override (e.g.
+`"github.com/myorg/*,github.com/MyOrg/*"`). Backward compatible — existing
+consumers see no change. Added option tests (default value + custom value eval)
+to test-module.nix.
+
+### Q3: RESOLVED — Do not add `ownerNamespacedDirs`
+
+Decision: **YAGNI.** The collision risk is theoretical (all consumers are
+same-owner). Adding an opt-in flag for a hypothetical need violates the
+"premature generalization" anti-pattern. If someone hits this, they can open
+an issue and we'll add it then.

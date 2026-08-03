@@ -173,13 +173,32 @@ See the full option table below, or copy one of the [templates](#templates).
 | `subModules`            | `{}`                         | Explicit sub-modules (merged with auto-discovered)                   |
 | `postPatchExtra`        | `""`                         | Extra `postPatch` commands for `mkPreparedSource`                    |
 | `autoGoPrivate`         | `true`                       | Auto-inject `GOPRIVATE` when deps are set                            |
+| `privateGlobPattern`    | LarsArtmann globs            | GOPRIVATE glob pattern used by `autoGoPrivate`                       |
 | `validatePrivateDeps`   | `true`                       | Fail build if a private `require` lacks a `replace`                  |
+| `privateDepPattern`     | LarsArtmann regex            | ERE matching module paths that must have a `replace` directive       |
+| `publicDeps`            | `[]`                         | Module paths excluded from validation only (does NOT affect GOPRIVATE) |
 | `proxyVendor`           | `true`                       | Pass `proxyVendor` to `buildGoModule`                                |
 | `ldflags`               | `null` (auto)                | Custom ldflags (`null` = `["-s" "-w" "-X main.version=${version}"]`) |
 | `extraMeta`             | `{}`                         | Extra attributes merged into package meta                            |
-| `extraBuildAttrs`       | `{}`                         | Extra attributes merged into `buildGoModule`                         |
+| `extraBuildAttrs`       | `{}`                         | Extra attributes merged into `buildGoModule` (see merge rules below) |
 | `devShellExtraPackages` | `_: []`                      | Function receiving `pkgs`, returns extra devShell packages           |
 | `shellExtraEnv`         | `{}`                         | Extra env vars for devShells                                         |
+
+#### `extraBuildAttrs` merge rules
+
+Three attributes receive special **concatenation** handling when passed via
+`extraBuildAttrs` — the user's values are appended to the module-generated
+values rather than overriding them:
+
+| Attribute             | Module value                             | User value appended? |
+| --------------------- | ---------------------------------------- | -------------------- |
+| `nativeBuildInputs`   | `templ`, `installShellFiles` (when enabled) | Yes                |
+| `preBuild`            | Auto dep-sync hook                       | Yes                  |
+| `postInstall`         | Completion install hook                  | Yes                  |
+
+All other attributes (e.g. `buildInputs`, `checkInputs`, `configureFlags`)
+**override** the module defaults via the `//` operator. If you need to
+concatenate those, include them explicitly in your value.
 
 ---
 

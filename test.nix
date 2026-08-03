@@ -393,6 +393,39 @@ in
     fi
 
     echo ""
+    echo "=== Test 6: Multiple deps (monorepo simulation) ==="
+    GOMOD5=${multiDepsTest}/go.mod
+    cat "$GOMOD5"
+    echo ""
+    # Both main deps should have replace directives
+    for dep in "mock-dep => " "mock-second => "; do
+      if grep -qF "$dep" "$GOMOD5"; then
+        echo "PASS: $dep has replace"
+      else
+        echo "FAIL: $dep missing replace"
+        exit 1
+      fi
+    done
+    # Sub-modules from BOTH deps should be auto-discovered
+    for sub in "mock-dep/codec/v2 => " "mock-dep/storage/v2 => " "mock-second/logging/v3 => "; do
+      if grep -qF "$sub" "$GOMOD5"; then
+        echo "PASS: $sub auto-discovered"
+      else
+        echo "FAIL: $sub missing replace"
+        exit 1
+      fi
+    done
+    # Both deps should have their own _local_deps directories
+    for dir in "_local_deps/mock-dep" "_local_deps/mock-second"; do
+      if grep -qF "$dir" "$GOMOD5"; then
+        echo "PASS: $dir present"
+      else
+        echo "FAIL: $dir missing"
+        exit 1
+      fi
+    done
+
+    echo ""
     echo "==========================================="
     echo "SUCCESS-PATH TESTS PASSED"
     echo "==========================================="

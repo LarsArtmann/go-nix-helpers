@@ -251,3 +251,30 @@ When `publicDeps` is set, GOPRIVATE switches from the broad glob to specific pat
 ### Q3: Should `mkGoFlake.nix` be deleted now?
 
 It's been deprecated with a `builtins.trace` warning for a while. The migration guide exists. All known consumers have been told to migrate. Should I delete it in this session's commits, or set a hard removal date (e.g. next major version)?
+
+---
+
+## H) RESOLUTIONS (annotated by session 2026-08-03 04:44 + 05:30)
+
+All three questions were resolved autonomously. See
+`docs/status/2026-08-03_04-44_revert-and-remediation.md` for full rationale.
+
+### Q1: REVERTED `repoName` namespacing
+
+Decision: **Reverted to `<repo>` only naming.** Library consumed by 7+ repos.
+Collision risk is theoretical (all same owner). Breaking vendor hashes
+without a major version bump is irresponsible.
+
+### Q2: REVERTED `autoGoPrivateEnv` to broad glob
+
+Decision: **Always uses broad glob** `github.com/larsartmann/*,github.com/LarsArtmann/*`
+regardless of `publicDeps`. Asymmetric risk: marking public repos as private =
+minor perf hit; failing to mark private repos = hard build failure. Broad glob
+is safer. Additionally, a new `privateGlobPattern` option (session 05:30) makes
+the glob configurable for non-LarsArtmann consumers.
+
+### Q3: KEPT `mkGoFlake.nix` with removal target v1.0.0
+
+Decision: **Kept with concrete removal date.** Deprecation warning now states
+"will be removed in the first tagged release (v1.0.0)". Deleting would break
+unmigrated consumers.
