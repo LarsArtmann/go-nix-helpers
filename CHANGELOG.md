@@ -37,7 +37,7 @@ This project has not made a tagged release yet; all changes below are in
 - `enableGofumpt` and `enableGoimports` toggles in treefmt programs
   (default: true for both).
 - `enableCompletions` option to install shell completions for the default
-  binary (default: false). Requires cobra/urfave/cli — silently does nothing
+  binary (default: false). Requires cobra/urfave/cli — emits a clear warning
   if the binary does not support `--completion`.
 - `publicDeps` parameter to `mkPreparedSource` — list of module paths to
   exclude from private validation, solving the false-positive where public
