@@ -88,7 +88,7 @@ nix build .#checks.x86_64-linux.moduleTest  # module-level test (40+ assertions)
 
 - **`maintainers.larsartmann` is NOT registered in nixpkgs** — but works in `meta.maintainers` because Nix evaluation is lazy enough that `nix flake check` and builds pass. The attribute is never deeply evaluated during normal operations. Register in nixpkgs for full correctness (nix-env --maintainer queries).
 - **`goPkg` parameter is dead weight** — the derivation has `dontBuild = true` and never invokes `go`. Kept for API compatibility.
-- **`privateDepPattern` default is LarsArtmann-specific** — `validatePrivateDeps` only validates modules matching `github\.com/[Ll]ars[Aa]rtmann/` by default. Override for other orgs.
+- **`privateDepPattern` default is LarsArtmann-specific** — `validatePrivateDeps` only validates modules matching `github\.com/[Ll]ars[Aa]rtmann/` by default. Override for other orgs. Use `publicDeps` to exclude specific public repos that match the pattern but resolve via proxy.golang.org (e.g. go-atomic-write, go-ndjson, go-sse).
 - **`validationTest` is a deliberately-failing derivation** — it cannot be a Nix dependency of a passing derivation. The `verify` check only tests success paths; `verifyValidation` is a separate shell script run outside the sandbox.
 - **`postPatchExtra` runs BEFORE replace directives are injected** — consumers needing to read the generated replaces must account for this ordering.
 - **Composite module eliminates treefmt-nix + systems inputs** — consumers declaring these inputs won't break (harmless unused inputs), but they're no longer required. The `systems` input can still be used by setting `go-standard.systems = import inputs.systems;`.
