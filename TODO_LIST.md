@@ -7,49 +7,48 @@
 
 | Status           | Meaning                                                     |
 | ---------------- | ----------------------------------------------------------- |
-| 🔴 `TODO`        | Not started. Needs doing.                                   |
-| 🟡 `IN_PROGRESS` | Actively being worked on.                                   |
-| 🔵 `BLOCKED`     | Cannot proceed, external dependency or decision needed.     |
-| 🟢 `DONE`        | Completed. Remove from this list and log in `CHANGELOG.md`. |
+| TODO             | Not started. Needs doing.                                   |
+| IN_PROGRESS      | Actively being worked on.                                   |
+| BLOCKED          | Cannot proceed, external dependency or decision needed.     |
 
 ## High impact
 
-| Task                                                                   | Status       | Impact | Effort | Evidence                                                            |
-| ---------------------------------------------------------------------- | ------------ | ------ | ------ | ------------------------------------------------------------------- |
-| Fix `defaultSystems` hardcoding in `go-standard`                       | 🟢 `DONE`    | High   | 15min  | `go-standard.systems` option added; `cfg.systems` used in config    |
-| Create a real downstream consumer end-to-end test for `go-standard`    | 🔵 `BLOCKED` | High   | 2h     | Requires SSH key secret in CI; private-deps CI job scaffolded       |
-| Delete or formally deprecate `mkGoFlake.nix`                           | 🟢 `DONE`    | High   | 30min  | `builtins.trace` deprecation warning added; migration guide written |
-| Mark `templates/go-flake-parts/` as legacy or delete it                | 🟢 `DONE`    | High   | 30min  | Banner in README, deprecation comment in flake.nix header           |
-| Add `LICENSE` file (MIT) and license badge                             | 🟢 `DONE`    | High   | 5min   | `LICENSE` file + MIT badge in README                                |
-| Set up GitHub Actions CI for `nix flake check` on push/PR              | 🟢 `DONE`    | High   | 30min  | `.github/workflows/ci.yml` with format, tests, module checks        |
-| Replace static "nix flake check" badge in README with dynamic CI badge | 🟢 `DONE`    | High   | 5min   | Dynamic GitHub Actions CI badge in README                           |
-| Add `CONTRIBUTING.md`                                                  | 🟢 `DONE`    | High   | 30min  | `CONTRIBUTING.md` with dev setup, testing, style guide              |
-| Add `.github` issue templates, PR template, and workflows              | 🟢 `DONE`    | High   | 1h     | Bug report, feature request, PR template, CODEOWNERS                |
-| Add unit/integration tests for `go-standard` module outputs            | 🟢 `DONE`    | High   | 2h     | `test-module.nix` with 40+ assertions as flake checks               |
-| Write migration guide from `mkGoFlake.nix` to `go-standard`            | 🟢 `DONE`    | High   | 1h     | `docs/migration-guide.md` with parameter mapping                    |
+| Task                                                                                                            | Status  | Impact | Effort | Evidence                                                                              |
+| --------------------------------------------------------------------------------------------------------------- | ------- | ------ | ------ | ------------------------------------------------------------------------------------- |
+| Fix `mkPreparedSource` false-positive on public LarsArtmann repos — forward `validatePrivateDeps`/`privateDepPattern` through `mkGoFlake.nix` and improve the error message to not assume all matching modules are private | TODO    | High   | 1h     | Feedback `docs/feedback/new/2026-08-03_mkpreparedsource-false-positive-on-public-repos.md`; `mkGoFlake.nix` does not forward these params |
+| Deepen module tests from eval-only to behavioral — verify `buildFlags`, `ldflags`, `nativeBuildInputs` actually reach `buildGoModule` | TODO    | High   | 3h     | `test-module.nix` — current 54 assertions check evaluation succeeds but not attribute values |
+| Improve `enableCompletions` UX — fail loudly or warn when binary doesn't support `--completion` instead of silent no-op | TODO    | High   | 1h     | `modules/go-standard.nix` — `\|\| true` in `installShellCompletion` silently swallows failures |
 
 ## Medium impact
 
-| Task                                                                 | Status       | Impact | Effort | Evidence                                                           |
-| -------------------------------------------------------------------- | ------------ | ------ | ------ | ------------------------------------------------------------------ |
-| Make `scripts/generate-flake.sh` configurable and non-interactive    | 🟢 `DONE`    | Med    | 30min  | `--dir`, `--template`, `--no-push` (default), `--help` flags added |
-| Add `enableCheck` option to `go-standard`                            | 🟢 `DONE`    | Med    | 30min  | Controls `doCheck` in `buildGoModule`; default `true`              |
-| Add `enableOverlay` option to `go-standard`                          | 🟢 `DONE`    | Med    | 30min  | `lib.mkIf` conditional overlay; tested by `moduleTestNoOverlay`    |
-| Add `version` option to override git-derived version                 | 🟢 `DONE`    | Med    | 30min  | `go-standard.version` option; defaults to `self.rev or "dev"`      |
-| Support multiple packages in `go-standard` (monorepo binaries)       | 🟢 `DONE`    | Med    | 4h     | `packages` option generates separate buildGoModule per binary      |
-| Audit all downstream consumers for manual `_local_deps/` workarounds | 🔴 `TODO`    | Med    | 2h     | Requires access to all downstream repos                            |
-| Add architecture diagram to README                                   | 🟢 `DONE`    | Med    | 45min  | `docs/architecture.svg` rendered from D2, inlined in README        |
-| Add troubleshooting/FAQ section to README                            | 🟢 `DONE`    | Med    | 45min  | SSH errors, vendorHash, GOPRIVATE, validation errors documented    |
-| Add real private-repo integration test in CI                         | 🔵 `BLOCKED` | Med    | 2h     | CI job scaffolded (`if: false`); needs SSH key secret              |
-| Add `buildFlags` option to `go-standard` for build tags              | 🟢 `DONE`    | Med    | 30min  | `go-standard.buildFlags` passed to `buildGoModule`                 |
+| Task                                                                                                                                   | Status  | Impact | Effort | Evidence                                                                        |
+| -------------------------------------------------------------------------------------------------------------------------------------- | ------- | ------ | ------ | ------------------------------------------------------------------------------- |
+| Add `generate-flake.sh` smoke test to CI — run script, verify output is valid Nix, `nix flake check` passes                           | TODO    | Med    | 1h     | `.github/workflows/ci.yml` — script has had bugs (D4) CI would catch            |
+| Add `userExtraBuildAttrs` merge protection — extend list attrs (e.g. `nativeBuildInputs`) instead of raw override                     | TODO    | Med    | 30min  | `modules/go-standard.nix` — consumer setting `extraBuildAttrs.nativeBuildInputs` would OVERRIDE module's list |
+| Add FAQ entry for `vendorHash = null` (committed `vendor/`)                                                                            | TODO    | Med    | 15min  | `README.md` FAQ only covers hash mismatch                                       |
+| Add FAQ entry for monorepo `vendorHash` sharing                                                                                        | TODO    | Med    | 15min  | `README.md` — multiple packages share one vendorHash, undocumented              |
+| Document `enableCompletions` cobra/urfave/cli requirement in README options table                                                      | TODO    | Med    | 10min  | `README.md` — options table says "Install shell completions" without caveat     |
+| Document `extraApps`/`extraChecks`/`extraFlake` removal in migration guide                                                              | TODO    | Med    | 20min  | `docs/migration-guide.md` — mkGoFlake had these, go-standard doesn't; no migration path documented |
+| Namespace `repoName` by owner to prevent same-name different-owner collision                                                            | TODO    | Med    | 30min  | `mkPreparedSource.nix:repoName` — two forks with the same repo name would collide |
+| Make `apps.fmt` conditional on at least one treefmt program enabled                                                                    | TODO    | Med    | 15min  | `modules/go-standard.nix` — `apps.fmt` always generated even if all programs disabled |
+| Add macOS CI runner (`runs-on: macos-latest`)                                                                                          | TODO    | Med    | 30min  | `.github/workflows/ci.yml` — only `ubuntu-latest`                               |
+| Add `flake.lock` freshness check to CI                                                                                                | TODO    | Med    | 30min  | `.github/workflows/ci.yml` — no `nix flake update --check` equivalent           |
+| Dedup `requireDeps` against existing `require` lines in `go.mod`                                                                       | TODO    | Med    | 30min  | `mkPreparedSource.nix` — can emit duplicate require lines                       |
 
 ## Low impact
 
-| Task                                                           | Status    | Impact | Effort | Evidence                                                       |
-| -------------------------------------------------------------- | --------- | ------ | ------ | -------------------------------------------------------------- |
-| Add `enableGolangciLint` toggle to `go-standard`               | 🟢 `DONE` | Low    | 30min  | Conditionally includes golangci-lint in devShells and lint app |
-| Add `enableGofumpt` / `enableGoimports` toggles in treefmt     | 🟢 `DONE` | Low    | 30min  | Both conditionally enabled in treefmt programs                 |
-| Add `nix run .#fmt` alias app                                  | 🟢 `DONE` | Low    | 15min  | `apps.fmt` wraps treefmt                                       |
-| Register `maintainers.larsartmann` in nixpkgs                  | 🔴 `TODO` | Low    | 30min  | Requires nixpkgs PR submission; external dependency            |
-| Add shell completions for generated apps                       | 🟢 `DONE` | Low    | 1h     | `enableCompletions` option installs bash/zsh/fish completions  |
-| Add man pages for `mkPreparedSource` and `go-standard` options | 🟢 `DONE` | Low    | 2h     | `docs/man/go-standard.5`, `docs/man/mkPreparedSource.5`        |
+| Task                                                                                                                                 | Status  | Impact | Effort | Evidence                                                            |
+| ------------------------------------------------------------------------------------------------------------------------------------ | ------- | ------ | ------ | ------------------------------------------------------------------- |
+| Add remaining module option tests — `proxyVendor`, `ldflags` custom, `devShellExtraPackages`, `shellExtraEnv`/`autoGoPrivate`, `enableTempl`, `enableGopls`/`enableGovulncheck`, `systems` override | TODO    | Low    | 2h     | `test-module.nix` — 7 options untested                              |
+| Add `generate-flake.sh` option to create `go.mod` skeleton                                                                            | TODO    | Low    | 15min  | `scripts/generate-flake.sh` — generates only `flake.nix`            |
+| Add `generate-flake.sh` `--private-deps` support for go-standard template                                                              | TODO    | Low    | 20min  | `scripts/generate-flake.sh` — only handles `--private-deps` for `go-flake-parts` |
+| Document `GOTOOLCHAIN = "local"` behavior and override in README                                                                      | TODO    | Low    | 10min  | `AGENTS.md` documents it; README does not                            |
+
+## Blocked
+
+| Task                                                                   | Status  | Impact | Effort | Evidence                                                                        |
+| ---------------------------------------------------------------------- | ------- | ------ | ------ | ------------------------------------------------------------------------------- |
+| Register `maintainers.larsartmann` in nixpkgs                          | BLOCKED | Low    | 30min  | Requires external PR to nixpkgs repo                                            |
+| Real private-repo integration test in CI                               | BLOCKED | High   | 2h     | CI job scaffolded (`if: false`); needs SSH key secret (`DEPLOY_SSH_KEY`)       |
+| Audit all downstream consumers for migration status and workarounds    | BLOCKED | Med    | 2h     | Requires access to 7+ downstream repos (BuildFlow, mr-sync, PMA, etc.)         |
+| Real e2e consumer test through full build pipeline                     | BLOCKED | High   | 4h     | Needs mock Go project + flake.nix importing go-standard, built via `nix build` |

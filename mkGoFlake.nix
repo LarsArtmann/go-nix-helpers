@@ -57,6 +57,9 @@
   deps ? { },
   subModules ? { },
   postPatchExtra ? "",
+  validatePrivateDeps ? true,
+  privateDepPattern ? "github\\.com/[Ll]ars[Aa]rtmann/",
+  publicDeps ? [ ],
 
   # Build configuration
   doCheck ? true,
@@ -102,6 +105,9 @@
           deps
           subModules
           postPatchExtra
+          validatePrivateDeps
+          privateDepPattern
+          publicDeps
           ;
       };
 

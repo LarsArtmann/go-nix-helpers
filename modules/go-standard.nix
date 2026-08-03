@@ -258,6 +258,28 @@ in
       '';
     };
 
+    privateDepPattern = lib.mkOption {
+      type = lib.types.str;
+      default = "github\\.com/[Ll]ars[Aa]rtmann/";
+      description = ''
+        ERE regex matching module paths in go.mod that must have a replace
+        directive. Override for other organizations. Default matches all
+        LarsArtmann repos.
+      '';
+    };
+
+    publicDeps = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      default = [ ];
+      description = ''
+        Module paths to exclude from private dependency validation.
+        Use for repos that match privateDepPattern but are actually public
+        (served by proxy.golang.org). Entries must match the exact module
+        path as it appears in go.mod.
+        Example: [ "github.com/larsartmann/go-atomic-write" ]
+      '';
+    };
+
     proxyVendor = lib.mkOption {
       type = lib.types.bool;
       default = true;
@@ -326,6 +348,8 @@ in
                   subModules
                   postPatchExtra
                   validatePrivateDeps
+                  privateDepPattern
+                  publicDeps
                   ;
               }
           else

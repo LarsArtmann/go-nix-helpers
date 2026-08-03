@@ -73,6 +73,11 @@
 #   privateDepPattern    ERE regex matching private module paths in go.mod that must
 #                        have a replace directive (default: "github\\.com/[Ll]ars[Aa]rtmann/").
 #                        Override to support deps outside the LarsArtmann org.
+#   publicDeps           List of module paths to exclude from private validation
+#                        (default: []). Use for repos that match privateDepPattern
+#                        but are actually public and resolve via the Go proxy.
+#                        Entries must match the exact module path as it appears in
+#                        go.mod (including any /vN suffix).
 #   postPatchExtra       Additional shell commands appended to postPatch.
 {
   pkgs,
@@ -99,6 +104,7 @@
   stripLocalReplaces ? true,
   validatePrivateDeps ? true,
   privateDepPattern ? "github\\.com/[Ll]ars[Aa]rtmann/",
+  publicDeps ? [ ],
   postPatchExtra ? "",
 }:
 let
@@ -266,6 +272,16 @@ let
   # Build-time validation: verify every private module require has a replace.
   # Produces a clear error listing missing deps instead of the cryptic
   # "could not read Username for 'https://github.com'" SSH error.
+  #
+  # publicDeps are excluded from validation: repos that match privateDepPattern
+  # but are actually public (served by proxy.golang.org) can be listed here to
+  # avoid false positives while keeping validation active for truly private repos.
+  publicDepsFilter = lib.optionalString (publicDeps != [ ]) ''
+    for pub in ${lib.concatMapStringsSep " " lib.escapeShellArg publicDeps}; do
+      REQUIRED=$(printf '%s\n' "$REQUIRED" | grep -vFx "$pub" || true)
+    done
+  '';
+
   validateScript = ''
     if [ -f go.mod ]; then
       MISSING=""
@@ -279,6 +295,7 @@ let
           inreq{print $1}
         ' go.mod | grep -E '${privateDepPattern}' | sort -u
       )
+      ${publicDepsFilter}
       for mod in $REQUIRED; do
         if ! grep -qF "  $mod => " go.mod; then
           MISSING="''${MISSING}
@@ -288,12 +305,14 @@ let
       if [ -n "''${MISSING# }" ]; then
         echo ""
         echo "=======================================================" >&2
-        echo "mkPreparedSource: private modules without local replace:" >&2
+        echo "mkPreparedSource: modules without local replace:" >&2
         echo "$MISSING" >&2
         echo "" >&2
-        echo "These modules are required in go.mod but have no replace" >&2
-        echo "directive. Add the missing repos to your flake.nix inputs" >&2
-        echo "and deps map." >&2
+        echo "These modules match the private dependency pattern" >&2
+        echo "and have no replace directive. Either:" >&2
+        echo "  1. Add the repos to flake.nix inputs and deps map (if private)" >&2
+        echo "  2. Set validatePrivateDeps = false (if all are public)" >&2
+        echo "  3. Add them to publicDeps (if some are public)" >&2
         echo "=======================================================" >&2
         exit 1
       fi
