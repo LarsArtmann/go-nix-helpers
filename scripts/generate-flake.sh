@@ -3,7 +3,8 @@
 #
 # Usage: generate-flake.sh [options] <project-name>
 #   --templ         Add templ support (treefmt + devShell)
-#   --private-deps  Include go-nix-helpers for private deps
+#   --private-deps  Include private deps section (adds deps attrset)
+#   --go-mod        Also create a go.mod + main.go skeleton
 #   --no-push       Don't push to GitHub (default)
 #   --push          Push to GitHub after generation
 #   --dir <path>    Target directory (default: $PROJECTS_DIR/<project-name>)
@@ -16,7 +17,8 @@ if [ $# -eq 0 ] || [ "${1:-}" = "--help" ] || [ "${1:-}" = "-h" ]; then
   echo ""
   echo "Options:"
   echo "  --templ         Add templ support (treefmt + devShell)"
-  echo "  --private-deps  Include go-nix-helpers for private deps"
+  echo "  --private-deps  Include private deps section (adds deps attrset)"
+  echo "  --go-mod        Also create a go.mod + main.go skeleton"
   echo "  --no-push       Don't push to GitHub (default)"
   echo "  --push          Push to GitHub after generation"
   echo "  --dir <path>    Target directory (default: \$PROJECTS_DIR/<project-name>)"
@@ -33,6 +35,7 @@ fi
 PROJECT=""
 USE_TEMPL=false
 USE_PRIVATE_DEPS=false
+CREATE_GO_MOD=false
 PUSH=false
 TEMPLATE="go-standard"
 CUSTOM_DIR=""
@@ -42,6 +45,7 @@ while [ $# -gt 0 ]; do
   case "$1" in
     --templ)         USE_TEMPL=true; shift ;;
     --private-deps)  USE_PRIVATE_DEPS=true; shift ;;
+    --go-mod)        CREATE_GO_MOD=true; shift ;;
     --no-push)       PUSH=false; shift ;;
     --push)          PUSH=true; shift ;;
     --dir)           CUSTOM_DIR="$2"; shift 2 ;;
