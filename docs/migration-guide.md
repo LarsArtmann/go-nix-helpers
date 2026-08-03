@@ -104,6 +104,7 @@ recommended `flakeModules.go-standard` module.
 | `ldflags`                | `go-standard.ldflags`               | Same                                              |
 | `goPkgAttr`              | `go-standard.goPkgAttr`             | Same                                              |
 | `buildGoModuleOverrides` | `go-standard.extraBuildAttrs`       | Renamed                                           |
+| `enableNixfmt`           | `go-standard.enableNixfmt`           | New — controls nixfmt in treefmt (default: true)  |
 | `devShellExtraPackages`  | `go-standard.devShellExtraPackages` | Same                                              |
 | `shellExtraEnv`          | `go-standard.shellExtraEnv`         | Same                                              |
 | `extraApps`              | (add in consumer flake)             | No equivalent — add apps directly in your flake   |

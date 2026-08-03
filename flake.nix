@@ -38,7 +38,7 @@
         lib.mkPreparedSource = import ./mkPreparedSource.nix;
         lib.mkGoFlake =
           args:
-          builtins.trace "WARNING: mkGoFlake.nix is deprecated. Migrate to flakeModules.go-standard — see docs/migration-guide.md" (
+          builtins.trace "WARNING: mkGoFlake.nix is deprecated and will be removed in the first tagged release (v1.0.0). Migrate to flakeModules.go-standard — see docs/migration-guide.md" (
             import ./mkGoFlake.nix args
           );
 

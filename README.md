@@ -63,6 +63,7 @@ nix flake check # formats, builds, and runs checks
 | ------------------- | -------------------------------------------------------- |
 | `packages.default`  | Compiled binary via `buildGoModule` (Go 1.26)            |
 | `packages.<pname>`  | Same package under its own name                          |
+| `apps.fmt`         | `treefmt` wrapper (only if >=1 formatter enabled)       |
 | `apps.default`      | `nix run .#<pname>`                                      |
 | `apps.test`         | `go test -race -v ./...`                                 |
 | `apps.lint`         | `golangci-lint run ./...`                                |
@@ -357,6 +358,17 @@ go-standard.systems = [ "x86_64-linux" ];  # Linux only
 ```nix
 go-standard.buildFlags = [ "-tags" "production" ];
 ```
+
+### How do I disable Nix formatting (nixfmt)?
+
+```nix
+go-standard.enableNixfmt = false;
+```
+
+This removes nixfmt from treefmt while keeping gofumpt and goimports. To
+disable all formatting, set `enableGofumpt = false; enableGoimports = false;
+enableNixfmt = false;`. When no formatters are enabled, the `apps.fmt`
+output is omitted.
 
 ---
 

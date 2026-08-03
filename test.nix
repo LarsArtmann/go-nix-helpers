@@ -148,6 +148,38 @@ let
     )
   '';
 
+  # ---------------------------------------------------------------------------
+  # Test 5: requireDeps dedup — entries already in go.mod must not be duplicated
+  # ---------------------------------------------------------------------------
+  mockRequireDedupSrc = pkgs.writeTextDir "go.mod" ''
+    module github.com/larsartmann/mock-dedup
+
+    go 1.26
+
+    require (
+      github.com/larsartmann/mock-dep/codec/v2 v0.0.0
+    )
+  '';
+
+  requireDedupTest = mkPreparedSource {
+    name = "test-require-dedup";
+    version = "test";
+    src = mockRequireDedupSrc;
+    deps = {
+      "github.com/larsartmann/mock-dep" = mockDep;
+    };
+    autoSubModules = false;
+    subModules = {
+      "github.com/larsartmann/mock-dep" = [ "codec/v2" "storage/v2" ];
+    };
+    # codec/v2 is already in go.mod (should be deduped).
+    # storage/v2 is NOT in go.mod (should be injected).
+    requireDeps = {
+      "github.com/larsartmann/mock-dep/codec/v2" = "v0.0.0";
+      "github.com/larsartmann/mock-dep/storage/v2" = "v0.0.0";
+    };
+  };
+
   publicDepsTest = mkPreparedSource {
     name = "test-public-deps";
     version = "test";
@@ -169,6 +201,7 @@ in
     explicitOnly
     validationTest
     publicDepsTest
+    requireDedupTest
     ;
 
   # Verification script: checks the success-path test outputs.
@@ -289,6 +322,28 @@ in
       echo "PASS: private dep still has replace"
     else
       echo "FAIL: private dep missing replace"
+      exit 1
+    fi
+
+    echo ""
+    echo "=== Test 5: requireDeps dedup ==="
+    GOMOD4=${requireDedupTest}/go.mod
+    cat "$GOMOD4"
+    echo ""
+    # codec/v2 should appear exactly ONCE (it was in go.mod AND requireDeps)
+    codec_count=$(grep -cF "github.com/larsartmann/mock-dep/codec/v2" "$GOMOD4")
+    if [ "$codec_count" -eq 1 ]; then
+      echo "PASS: codec/v2 appears exactly once (dedup worked)"
+    else
+      echo "FAIL: codec/v2 appears $codec_count times (expected 1)"
+      exit 1
+    fi
+    # storage/v2 should appear exactly ONCE (injected by requireDeps)
+    storage_count=$(grep -cF "github.com/larsartmann/mock-dep/storage/v2" "$GOMOD4")
+    if [ "$storage_count" -eq 1 ]; then
+      echo "PASS: storage/v2 appears exactly once (injected correctly)"
+    else
+      echo "FAIL: storage/v2 appears $storage_count times (expected 1)"
       exit 1
     fi
 
