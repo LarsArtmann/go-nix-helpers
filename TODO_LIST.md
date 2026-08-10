@@ -25,9 +25,9 @@
 
 ## Low impact / Polish
 
-| #   | Task                                                                                  | Status | Effort | Evidence                                                              |
-| ---- | ------------------------------------------------------------------------------------- | ------ | ------ | --------------------------------------------------------------------- |
-| L10 | Extract `postPatch` script from `mkPreparedSource` into separate `.sh` file           | TODO   | 30min  | Deliberately skipped — see `docs/planning/2026-08-10_02-41_pareto-execution-plan.md` for rationale |
+| #  | Task                                                                                  | Status | Effort | Evidence                                                              |
+| -- | ------------------------------------------------------------------------------------- | ------ | ------ | --------------------------------------------------------------------- |
+| -- | _(L1–L9 shipped — see CHANGELOG. L10 evaluated and deliberately skipped: extracting `postPatch` to `.sh` would require passing 8 Nix-generated fragments as env vars or placeholders, increasing complexity for zero gain. This is the idiomatic Nix `mkDerivation` pattern. See `docs/planning/2026-08-10_02-41_pareto-execution-plan.md` P12 for full rationale)_ | — | — | — |
 
 ## Scripts and CI
 
