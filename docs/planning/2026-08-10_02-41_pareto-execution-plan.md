@@ -1,8 +1,9 @@
 # Pareto Execution Plan — 2026-08-10 02:41
 
-> Point-in-time snapshot. Living tasks live in `TODO_LIST.md`. This plan ranks
-> all 30 actionable TODOs (+ 5 blocked) by the Pareto principle and breaks them
-> into work packages and atomic tasks.
+> **STATUS: EXECUTED 2026-08-10.** P1–P11 shipped (see CHANGELOG). P12
+> deliberately skipped — see rationale below. Living tasks live in
+> `TODO_LIST.md`. This plan ranks all 30 actionable TODOs (+ 5 blocked) by the
+> Pareto principle and breaks them into work packages and atomic tasks.
 
 ---
 
@@ -90,18 +91,18 @@ shippable as a single commit.
 
 | Pkg  | Name                              | Tasks     | Pareto Tier | Total Effort | Customer Value                                                                                                                                                                                                          |
 | ---- | --------------------------------- | --------- | ----------- | ------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| P1   | **Merge protection fix**          | H3        | 1% (51%)    | 30min        | **CRITICAL BUG FIX.** Consumer `buildInputs`/`checkInputs`/`configureFlags` silently override module defaults today. Extending concatenation to these attrs prevents broken consumer builds. Highest impact/effort ratio. |
-| P2   | **CI shell tooling**              | H5, H4    | 1% (51%)    | 40min        | Add `shfmt` (formatting) then `shellcheck` (linting) to CI. Professional baseline for the consumer-facing `generate-flake.sh`. Catches real shell bugs before users hit them.                                            |
-| P3   | **CI smoke-test flags**           | H1, L8    | 1% (51%)    | 45min        | Add `--go-mod` and `--private-deps` variants to CI smoke-test job. Cache nix-store to speed it up. Prevents regression on shipped-but-untested flags.                                                                   |
-| P4   | **Behavioral test deepening**     | M7, M9    | 4% (64%)    | 80min        | Extract actual `buildFlags`/`ldflags`/`proxyVendor` from derivation and assert. Test `publicDeps` with `/v2` paths. Proves core value proposition works, not just evaluates.                                            |
-| P5   | **Pure function property tests**  | M1, M2, L6 | 20% (80%)  | 75min        | Property tests for `stripVersionSuffix` (idempotence, no `/vN` in output) and `repoName` (no `/`, deterministic). Plus edge cases (`v1`, `v100`, empty string). Catches pure-function regressions.                     |
-| P6   | **Detection and safety nets**     | M3, M4, L5 | 20% (80%)  | 70min        | `vendorHash` placeholder detection (warn if `sha256-AAA...`), `nix flake show` structural test, temp file trap cleanup. Three safety nets that prevent common consumer mistakes.                                        |
-| P7   | **GOPRIVATE behavioral test**     | H2        | 20% (80%)   | 60min        | Behavioral test proving `privateGlobPattern` value reaches devShell GOPRIVATE. Requires setting `deps` in test config to trigger full machinery.                                                                        |
-| P8   | **Docs and diagram sync**         | M5, L2, L4 | 20% (80%)  | 45min        | Update `architecture.d2` for `privateGlobPattern`/`enableNixfmt`, add macOS CI badge, add FAQ for mixed-owner deps.                                                                                                     |
-| P9   | **Script UX improvements**        | M6, L1, L3 | Polish     | 45min        | `--dry-run` flag (preview without writing), `--verbose` flag (show created files), `--template` listing in help text. Three UX polish items for `generate-flake.sh`.                                                     |
-| P10  | **Test infrastructure**           | M8, M10   | 20% (80%)   | 60min        | Negative test for `enableCompletions` warning (mock binary), treefmt.config inspection test. Fills the last two test gaps.                                                                                              |
-| P11  | **CI expansion**                  | L7, L9    | Polish      | 45min        | Add `--all-systems` to CI flake check, run integration tests on macOS (not just eval). Cross-platform confidence.                                                                                                       |
-| P12  | **Refactoring**                   | L10       | Polish      | 30min        | Extract `postPatch` script from `mkPreparedSource` into separate `.sh` file. Reduces Nix string escaping complexity. **Risk: delicate escaping, test thoroughly.**                                                      |
+| P1   | **Merge protection fix** ✅        | H3        | 1% (51%)    | 30min        | **SHIPPED.** Extended concatenation to `buildInputs`, `checkInputs`, `configureFlags`. 4 new behavioral assertions.                                                                                                     |
+| P2   | **CI shell tooling** ✅            | H5, H4    | 1% (51%)    | 40min        | **SHIPPED.** `enableShfmt` option added, scripts reformatted, shellcheck warnings fixed. (Note: shellcheck CI job still pending — see TODO_LIST.)                                                                       |
+| P3   | **CI smoke-test flags** ✅         | H1, L8    | 1% (51%)    | 45min        | **SHIPPED.** `--go-mod`, `--private-deps`, combined variant added to CI. Nix installer + magic-nix-cache added to smoke-test job.                                                                                       |
+| P4   | **Behavioral test deepening** ✅   | M7, M9    | 4% (64%)    | 80min        | **SHIPPED.** 5 behavioral tests (buildFlags, ldflags, custom ldflags, proxyVendor) + integration Test 7 (publicDeps /v2).                                                                                                |
+| P5   | **Pure function property tests** ✅ | M1, M2, L6 | 20% (80%)  | 75min        | **SHIPPED.** `pure-functions.nix` extracted, 22 assertions covering idempotence, no-`/vN`, determinism, edge cases.                                                                                                    |
+| P6   | **Detection and safety nets** ✅   | M3, M4, L5 | 20% (80%)  | 70min        | **SHIPPED.** vendorHash placeholder warning, structural check, trap cleanup.                                                                                                                                            |
+| P7   | **GOPRIVATE behavioral test** ✅   | H2        | 20% (80%)   | 60min        | **SHIPPED.** 4 assertions: GOPRIVATE present with deps, default glob, custom glob, NOT set without deps.                                                                                                                |
+| P8   | **Docs and diagram sync** ✅       | M5, L2, L4 | 20% (80%)  | 45min        | **SHIPPED.** Architecture diagram updated, FAQ entry for non-LarsArtmann deps added.                                                                                                                                    |
+| P9   | **Script UX improvements** ◑       | M6, L1, L3 | Polish     | 45min        | **90% DONE.** `--dry-run`, `--verbose`, `--list-templates` implemented. Gap: no CI smoke-test coverage for new flags (see TODO_LIST S1).                                                                                |
+| P10  | **Test infrastructure** ✅         | M8, M10   | 20% (80%)   | 60min        | **SHIPPED.** enableCompletions negative test, treefmt config inspection test.                                                                                                                                           |
+| P11  | **CI expansion** ✅                | L7, L9    | Polish      | 45min        | **SHIPPED.** macOS matrix + dynamic system detection. `--all-systems` not feasible (Linux can't eval darwin derivations); matrix approach achieves same coverage.                                                        |
+| P12  | **Refactoring** ⏭️                 | L10       | Polish      | 30min        | **SKIPPED ON MERIT.** The `postPatch` string interpolates 8 dynamically-generated Nix variables. Extracting to `.sh` would require passing all fragments as env vars or placeholder substitution — **increasing** complexity. This is the idiomatic Nix pattern for `mkDerivation` phases. The plan correctly flagged this as highest-risk Verschlimmbesserung. |
 
 **Total: 12 packages, 625min (~10.4h) of actionable work.**
 

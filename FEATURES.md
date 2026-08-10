@@ -50,7 +50,7 @@
 | `enableCompletions` option                                     | 🟡 `PARTIALLY_FUNCTIONAL` | Requires cobra/urfave/cli; emits a build-time warning with remediation options if binary doesn't support `--completion`. Check uses `timeout 10` to prevent hanging |
 | Monorepo support (`packages` option)                           | 🟢 `FULLY_FUNCTIONAL`     | Multiple `buildGoModule` per repo; separate apps/overlays per package                     |
 | `fmt` app (`nix run .#fmt`)                                    | 🟢 `FULLY_FUNCTIONAL`     | Wrapper around treefmt                                                                    |
-| Module-level tests (options, types, outputs)                   | 🟡 `PARTIALLY_FUNCTIONAL` | `test-module.nix` with 74 assertions; includes behavioral tests for nativeBuildInputs concatenation; eval-only for other attrs (see TODO_LIST) |
+| Module-level tests (options, types, outputs)                   | 🟢 `FULLY_FUNCTIONAL`     | `test-module.nix` with 92 assertions; behavioral tests for buildFlags, ldflags, proxyVendor, GOPRIVATE, extraBuildAttrs concatenation (6 attrs), enableCompletions negative path, treefmt config inspection, shfmt toggle |
 | Real downstream consumer end-to-end test                       | ⚪ `PLANNED`              | Requires a real private-repo CI test job with SSH key secret                              |
 
 ## Templates
@@ -72,11 +72,13 @@
 
 | Feature                                              | Status                    | Notes                                                                                                                           |
 | ---------------------------------------------------- | ------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| `flake.nix` with `nix flake check` / `nix fmt`       | 🟢 `FULLY_FUNCTIONAL`     | Checks wired to `test.nix`, `test-module.nix`, formatter uses nixfmt                                                            |
-| Integration test suite (`test.nix`)                  | 🟢 `FULLY_FUNCTIONAL`     | 6 scenarios: auto-discovery, explicit-only, validation, publicDeps exclusion, requireDeps dedup, multi-deps monorepo |
-| Module test suite (`test-module.nix`)                | 🟡 `PARTIALLY_FUNCTIONAL` | 74 assertions; options, types, defaults, perSystem outputs, overlay, behavioral nativeBuildInputs test; remaining attrs eval-only |
+| `flake.nix` with `nix flake check` / `nix fmt`       | 🟢 `FULLY_FUNCTIONAL`     | Checks wired to `test.nix`, `test-module.nix`, `pure-functions.nix`, structural; formatter uses nixfmt + shfmt                  |
+| Integration test suite (`test.nix`)                  | 🟢 `FULLY_FUNCTIONAL`     | 7 scenarios: auto-discovery, explicit-only, validation, publicDeps exclusion, requireDeps dedup, multi-deps monorepo, publicDeps /v2 versioned paths |
+| Module test suite (`test-module.nix`)                | 🟢 `FULLY_FUNCTIONAL`     | 92 assertions; behavioral tests for buildFlags/ldflags/proxyVendor/GOPRIVATE/extraBuildAttrs (6 attrs)/enableCompletions negative/treefmt config/shfmt toggle |
+| Pure function property tests (`test-pure-functions.nix`) | 🟢 `FULLY_FUNCTIONAL`     | 22 assertions: idempotence, no-`/vN`-in-output, determinism, no-slash, edge cases — wired as `checks.pureFunctions`      |
+| Structural output verification (`checks.structural`)       | 🟢 `FULLY_FUNCTIONAL`     | Verifies `flakeModules.go-standard`, `lib.mkPreparedSource`, `lib.mkGoFlake` exist in flake outputs                      |
 | Negative-case validation runner (`verifyValidation`) | 🟢 `FULLY_FUNCTIONAL`     | Run outside sandbox via `nix run .#verifyValidation`                                                                            |
-| GitHub Actions CI workflow for the repo itself       | 🟢 `FULLY_FUNCTIONAL`     | `.github/workflows/ci.yml` with format check, integration + module tests                                                        |
+| GitHub Actions CI workflow for the repo itself       | 🟢 `FULLY_FUNCTIONAL`     | `.github/workflows/ci.yml`: format check, integration + module tests (ubuntu + macOS matrix), smoke tests, flake.lock freshness |
 | Private-repo CI test job                             | 🟡 `PARTIALLY_FUNCTIONAL` | Scaffolded in CI workflow; disabled until SSH key secret is configured                                                          |
 
 ## Documentation & Community

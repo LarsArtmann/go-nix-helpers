@@ -166,6 +166,7 @@ See the full option table below, or copy one of the [templates](#templates).
 | `enableGofumpt`         | `true`                       | Enable `gofumpt` in treefmt programs                                 |
 | `enableGoimports`       | `true`                       | Enable `goimports` in treefmt programs                               |
 | `enableNixfmt`          | `true`                       | Enable `nixfmt` in treefmt programs                                  |
+| `enableShfmt`           | `false`                      | Enable `shfmt` in treefmt programs                                   |
 | `enableCompletions`     | `false`                      | Install shell completions (requires cobra/urfave/cli; warns if unsupported) |
 | `buildFlags`            | `[]`                         | Extra build flags for `go build` (e.g. build tags)                   |
 | `packages`              | `{}`                         | Additional packages for monorepo support                             |
@@ -186,19 +187,20 @@ See the full option table below, or copy one of the [templates](#templates).
 
 #### `extraBuildAttrs` merge rules
 
-Three attributes receive special **concatenation** handling when passed via
+Six attributes receive special **concatenation** handling when passed via
 `extraBuildAttrs` — the user's values are appended to the module-generated
 values rather than overriding them:
 
 | Attribute             | Module value                             | User value appended? |
 | --------------------- | ---------------------------------------- | -------------------- |
 | `nativeBuildInputs`   | `templ`, `installShellFiles` (when enabled) | Yes                |
+| `buildInputs`         | (module-generated)                       | Yes                  |
+| `checkInputs`         | (module-generated)                       | Yes                  |
+| `configureFlags`      | (module-generated)                       | Yes                  |
 | `preBuild`            | Auto dep-sync hook                       | Yes                  |
 | `postInstall`         | Completion install hook                  | Yes                  |
 
-All other attributes (e.g. `buildInputs`, `checkInputs`, `configureFlags`)
-**override** the module defaults via the `//` operator. If you need to
-concatenate those, include them explicitly in your value.
+All other attributes override module defaults via the `//` operator.
 
 ---
 
@@ -388,6 +390,12 @@ This removes nixfmt from treefmt while keeping gofumpt and goimports. To
 disable all formatting, set `enableGofumpt = false; enableGoimports = false;
 enableNixfmt = false;`. When no formatters are enabled, the `apps.fmt`
 output is omitted.
+
+To enable shell script formatting alongside Nix formatting:
+
+```nix
+go-standard.enableShfmt = true;
+```
 
 ### How do I use deps with non-LarsArtmann repos?
 
