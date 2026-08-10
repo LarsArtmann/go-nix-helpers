@@ -15,17 +15,17 @@
 
 | #  | Task                                                                                  | Status | Effort | Evidence                                                              |
 | -- | ------------------------------------------------------------------------------------- | ------ | ------ | --------------------------------------------------------------------- |
-| H1 | Implement G2: per-package `extraBuildAttrs` in monorepo `packages` submodule          | TODO   | 1h     | Unblocks StopTube, browser-history, BuildFlow, go-structure-linter migration. G1+G3 shipped in `26b7620`. |
-| H2 | Migrate Tier A consumer repos to go-standard (10 repos, ~30 min each)                 | TODO   | 5h     | Fleet audit completed (`docs/status/2026-08-10_11-02_consumer-fleet-audit.md`). 0/10 migrated. Start with `go-localsync`. |
-| H3 | Add template-output CI check (eval freshly generated project)                         | TODO   | 30min  | Pre-existing template bug (`9471741`→`26b7620`) went undetected — no CI on template output. |
+| ~~H1~~ | ~~Implement G2: per-package `extraBuildAttrs` in monorepo `packages` submodule~~ | ~~DONE~~ | ~~1h~~ | **Shipped** `2f3b6b2`. 4 test assertions. |
+| ~~H2~~ | ~~Migrate Tier A consumer repos to go-standard~~                                      | ~~DONE~~ | ~~5h~~ | **Shipped**: all 10 Tier A repos migrated (go-localsync, erraudit, project-meta, oxlint-auto-configure, project-dependency-graph, golangci-lint-auto-configure, go-humanize-linter, projects-management-automation, standard-bug-tracking-schema, go-auto-upgrade). All eval-verified. |
+| ~~H3~~ | ~~Add template-output CI check (eval freshly generated project)~~                     | ~~DONE~~ | ~~30min~~ | **Shipped** `2f3b6b2`. 9th flake check. |
 
 ## Medium impact
 
 | #  | Task                                                                                  | Status | Effort | Evidence                                                              |
 | -- | ------------------------------------------------------------------------------------- | ------ | ------ | --------------------------------------------------------------------- |
-| M1 | Add `enableTestCheck` option (auto-generate `checks.test` when enabled)               | TODO   | 30min  | Most consumers hand-write `checks.test = config.packages.default.overrideAttrs { doCheck = true; }`. Module should provide this. |
-| M2 | Migrate Tier B consumer repos (6 repos, modest complexity)                            | TODO   | 3h     | Fleet audit: KeyCountdown, StopTube, branching-flow, bank-sync, overview, BuildFlow. Some need G2 (H1). |
-| M3 | Clean up 5 existing module adopters (remove unused `systems`/`treefmt-nix` inputs)    | TODO   | 1h     | Fleet audit: lean-business-plan, storbi, template-arch-lint, terraform-diagrams-aggregator, index all carry dead inputs. |
+| ~~M1~~ | ~~Add `enableTestCheck` option~~                                                      | ~~DONE~~ | ~~30min~~ | **Shipped** `2f3b6b2`. Module option 38→38 (now 39 with requireDeps). |
+| M2 | Migrate Tier B consumer repos (6 repos, modest complexity)                            | TODO   | 3h     | Fleet audit: KeyCountdown, StopTube, branching-flow, bank-sync, overview, BuildFlow. Some need G2 (H1 — done). |
+| ~~M3~~ | ~~Clean up 5 existing module adopters~~                                               | ~~DONE~~ | ~~1h~~ | **Shipped**: 4/5 cleaned (lean-business-plan, storbi, template-arch-lint, terraform-diagrams-aggregator). index already clean. |
 | M4 | Migrate Tier C consumer repos off deprecated `mkGoFlake` (Standup-Killer, crush-daily) | TODO   | 2h     | Only 2 repos still on deprecated path. Need G2 for subModules support. |
 | -- | _(All medium-impact items from the Pareto plan M1–M10 are shipped — see CHANGELOG)_   | —      | —      | —                                                                     |
 

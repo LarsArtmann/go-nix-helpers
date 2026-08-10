@@ -205,6 +205,120 @@ deps are prepared, which may change the hash.
 
 ---
 
+## Common migration patterns
+
+These patterns were proven across 10+ consumer repo migrations.
+
+### GOEXPERIMENT=jsonv2
+
+Most LarsArtmann Go projects use `encoding/json/v2` behind the `jsonv2`
+experiment flag. Set it in three places:
+
+```nix
+go-standard = {
+  # 1. Build-time: set as a buildGoModule attribute
+  extraBuildAttrs.GOEXPERIMENT = "jsonv2";
+
+  # OR via preBuild (if you need it in the shell environment of the build)
+  extraBuildAttrs.preBuild = "export GOEXPERIMENT=jsonv2";
+
+  # 2. DevShell-time: set as env var in devShells
+  shellExtraEnv.GOEXPERIMENT = "jsonv2";
+
+  # 3. Build tags (if the code uses build constraints)
+  buildFlags = [ "-tags=goexperiment.jsonv2" ];
+};
+```
+
+### proxyVendor behavior change
+
+The module forces `proxyVendor = false` when `deps` are set (private deps
+require vendoring via local copies, not the Go proxy). If your manual setup
+used `proxyVendor = true`, the vendor hash **will change** after migration.
+
+**Fix:** Run `nix build .#default` once after migration. Copy the `got:`
+hash from the mismatch error and update `vendorHash`.
+
+### Cobra completions (not urfave/cli)
+
+The module's `enableCompletions` calls `binary --completion bash` (urfave/cli
+style). Cobra uses `binary completion bash` (subcommand style). If your CLI
+uses Cobra:
+
+```nix
+go-standard = {
+  enableCompletions = false;  # disable module's completion logic
+};
+
+perSystem = { config, pkgs, ... }: {
+  # Custom postInstall for cobra-style completions
+  packages.default = pkgs.lib.mkForce (
+    config.packages.default.overrideAttrs (old: {
+      postInstall = (old.postInstall or "") + ''
+        installShellCompletion --cmd myapp \
+          --bash <($out/bin/myapp completion bash) \
+          --zsh <($out/bin/myapp completion zsh) \
+          --fish <($out/bin/myapp completion fish)
+      '';
+    })
+  );
+};
+```
+
+### requireDeps for sub-module version pins
+
+When a dependency has sub-modules (separate `go.mod` files) that need
+explicit `require` entries in your `go.mod`, use `requireDeps`:
+
+```nix
+go-standard = {
+  deps = {
+    "github.com/LarsArtmann/project-discovery-sdk" = inputs.project-discovery-sdk;
+  };
+  subModules = {
+    "github.com/LarsArtmann/project-discovery-sdk" = [
+      "detection" "discovery" "domain"
+    ];
+  };
+  requireDeps = {
+    "github.com/LarsArtmann/project-discovery-sdk/detection" = "v0.0.0";
+    "github.com/LarsArtmann/project-discovery-sdk/discovery" = "v0.0.0";
+  };
+};
+```
+
+### Custom apps overriding module defaults
+
+The module generates `apps.default`, `apps.test`, `apps.lint`, `apps.fmt`.
+If you need custom versions, use `lib.mkForce`:
+
+```nix
+perSystem = { config, pkgs, lib, ... }: {
+  apps.lint = lib.mkForce {
+    type = "app";
+    program = "${pkgs.writeShellApplication { ... }}/bin/my-lint";
+  };
+};
+```
+
+### Dual treefmt (treefmt-nix + treefmt-flake)
+
+go-standard bundles treefmt-nix for Go formatting. For multi-language
+formatting (web, python, rust, yaml, markdown, json), add treefmt-flake
+as a separate import:
+
+```nix
+imports = [
+  inputs.go-nix-helpers.flakeModules.go-standard
+  inputs.treefmt-flake.flakeModule
+];
+```
+
+Set `enableShfmt = true` if treefmt-flake's `shell.enable` conflicts with
+the module's default `enableShfmt = false`.
+
+---
+
 ## Need help?
 
 Open an [issue](https://github.com/LarsArtmann/go-nix-helpers/issues) if you

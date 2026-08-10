@@ -16,6 +16,16 @@ This project has not made a tagged release yet; all changes below are in
   lines to mkPreparedSource. Needed when sub-modules have explicit version
   requirements not present in go.mod (e.g. PMA's project-discovery-sdk
   sub-modules). Unblocks projects-management-automation migration.
+- Migration guide: common migration patterns section — GOEXPERIMENT recipe,
+  proxyVendor warning, cobra completions workaround, requireDeps for
+  sub-module pins, custom apps with mkForce, dual treefmt setup.
+- All 10 Tier A consumer repos migrated to go-standard: go-localsync,
+  erraudit, project-meta, oxlint-auto-configure, project-dependency-graph,
+  golangci-lint-auto-configure, go-humanize-linter,
+  projects-management-automation, standard-bug-tracking-schema,
+  go-auto-upgrade. Average flake.nix reduction: 45%. All eval-verified.
+- 4 module adopters cleaned (removed dead `systems`/`treefmt-nix` inputs):
+  lean-business-plan, storbi, template-arch-lint, terraform-diagrams-aggregator.
 - `enableTestCheck` option (default: false) — generates `checks.test`, a
   hermetic derivation that forces `go test` regardless of `enableCheck`.
   Use when skipping tests during normal builds but running them in CI.
