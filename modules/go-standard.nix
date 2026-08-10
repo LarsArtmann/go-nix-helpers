@@ -174,6 +174,12 @@ in
       description = "Enable nixfmt in treefmt programs";
     };
 
+    enableShfmt = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = "Enable shfmt (shell script formatter) in treefmt programs";
+    };
+
     enableCompletions = lib.mkOption {
       type = lib.types.bool;
       default = false;
@@ -622,6 +628,7 @@ in
             goimports.enable = cfg.enableGoimports;
             nixfmt.enable = cfg.enableNixfmt;
             templ.enable = cfg.enableTempl;
+            shfmt.enable = cfg.enableShfmt;
           };
         };
       };

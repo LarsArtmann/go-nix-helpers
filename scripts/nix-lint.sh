@@ -19,16 +19,16 @@ TARGETS=()
 
 for arg in "$@"; do
   case "$arg" in
-    --fix)   FIX=true ;;
-    --check) CHECK=true ;;
-    --help|-h)
-      echo "Usage: nix-lint.sh [--fix] [--check] [path...]"
-      echo "  --fix    Auto-fix issues where possible"
-      echo "  --check  Also run nix flake check"
-      echo "  path     Specific project dir(s), or omit for all under ~/projects"
-      exit 0
-      ;;
-    *)       TARGETS+=("$arg") ;;
+  --fix) FIX=true ;;
+  --check) CHECK=true ;;
+  --help | -h)
+    echo "Usage: nix-lint.sh [--fix] [--check] [path...]"
+    echo "  --fix    Auto-fix issues where possible"
+    echo "  --check  Also run nix flake check"
+    echo "  path     Specific project dir(s), or omit for all under ~/projects"
+    exit 0
+    ;;
+  *) TARGETS+=("$arg") ;;
   esac
 done
 

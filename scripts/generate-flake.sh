@@ -21,8 +21,9 @@ if [ $# -eq 0 ] || [ "${1:-}" = "--help" ] || [ "${1:-}" = "-h" ]; then
   echo "  --go-mod        Also create a go.mod + main.go skeleton"
   echo "  --no-push       Don't push to GitHub (default)"
   echo "  --push          Push to GitHub after generation"
-  echo "  --dir <path>    Target directory (default: \$PROJECTS_DIR/<project-name>)"
-  echo "  --template <t>  Template: \"go-standard\" (default) or \"go-flake-parts\""
+  # shellcheck disable=SC2016 # $PROJECTS_DIR is intentionally literal in help text
+  echo '  --dir <path>    Target directory (default: $PROJECTS_DIR/<project-name>)'
+  echo '  --template <t>  Template: "go-standard" (default) or "go-flake-parts"'
   echo ""
   echo "Environment:"
   echo "  PROJECTS_DIR   Base directory for projects (default: $(cd "$(dirname "$0")/.." && pwd)/.."
@@ -43,16 +44,43 @@ CUSTOM_DIR=""
 # Parse arguments: flags can come before or after the project name
 while [ $# -gt 0 ]; do
   case "$1" in
-    --templ)         USE_TEMPL=true; shift ;;
-    --private-deps)  USE_PRIVATE_DEPS=true; shift ;;
-    --go-mod)        CREATE_GO_MOD=true; shift ;;
-    --no-push)       PUSH=false; shift ;;
-    --push)          PUSH=true; shift ;;
-    --dir)           CUSTOM_DIR="$2"; shift 2 ;;
-    --template)      TEMPLATE="$2"; shift 2 ;;
-    --help|-h)       exit 0 ;;
-    -*)              echo "ERROR: Unknown option: $1"; exit 1 ;;
-    *)               PROJECT="$1"; shift ;;
+  --templ)
+    USE_TEMPL=true
+    shift
+    ;;
+  --private-deps)
+    USE_PRIVATE_DEPS=true
+    shift
+    ;;
+  --go-mod)
+    CREATE_GO_MOD=true
+    shift
+    ;;
+  --no-push)
+    PUSH=false
+    shift
+    ;;
+  --push)
+    PUSH=true
+    shift
+    ;;
+  --dir)
+    CUSTOM_DIR="$2"
+    shift 2
+    ;;
+  --template)
+    TEMPLATE="$2"
+    shift 2
+    ;;
+  --help | -h) exit 0 ;;
+  -*)
+    echo "ERROR: Unknown option: $1"
+    exit 1
+    ;;
+  *)
+    PROJECT="$1"
+    shift
+    ;;
   esac
 done
 
@@ -128,7 +156,7 @@ fi
 # Create go.mod + main.go skeleton if requested
 if [ "$CREATE_GO_MOD" = true ]; then
   if [ ! -f "$TARGET_DIR/go.mod" ]; then
-    cat > "$TARGET_DIR/go.mod" <<EOF
+    cat >"$TARGET_DIR/go.mod" <<EOF
 module github.com/larsartmann/$PROJECT
 
 go 1.26
@@ -136,7 +164,7 @@ EOF
     echo "Created $TARGET_DIR/go.mod"
   fi
   if [ ! -f "$TARGET_DIR/main.go" ]; then
-    cat > "$TARGET_DIR/main.go" <<'EOF'
+    cat >"$TARGET_DIR/main.go" <<'EOF'
 package main
 
 func main() {}
@@ -149,7 +177,7 @@ echo "Generated $TARGET"
 echo ""
 echo "Next steps:"
 echo "  1. cd $TARGET_DIR && git init"
-echo "  2. Set vendorHash to \"\" for first build"
+echo '  2. Set vendorHash to "" for first build'
 echo "  3. nix build .#packages.default --no-out-link 2>&1 | grep 'got:'"
 echo "  4. Paste the got: hash as vendorHash"
 echo "  5. nix flake check"

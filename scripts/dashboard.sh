@@ -8,21 +8,20 @@ JSON=false
 
 for arg in "$@"; do
   case "$arg" in
-    --check) CHECK=true ;;
-    --json)  JSON=true ;;
-    --help|-h)
-      echo "Usage: dashboard.sh [--check] [--json]"
-      echo "  --check  Run nix flake check --no-build on each project"
-      echo "  --json   Output JSON format"
-      exit 0
-      ;;
+  --check) CHECK=true ;;
+  --json) JSON=true ;;
+  --help | -h)
+    echo "Usage: dashboard.sh [--check] [--json]"
+    echo "  --check  Run nix flake check --no-build on each project"
+    echo "  --json   Output JSON format"
+    exit 0
+    ;;
   esac
 done
 
 GREEN='\033[0;32m'
 RED='\033[0;31m'
 YELLOW='\033[1;33m'
-CYAN='\033[0;36m'
 NC='\033[0m'
 
 # Projects root is configurable; defaults to ~/projects.
@@ -65,15 +64,18 @@ for f in $(find "$PROJECTS_DIR" -maxdepth 2 -name "flake.nix" -exec dirname {} \
     results+=("{\"project\":\"$project\",\"status\":\"$status\",\"error\":\"$esc_error\"}")
   else
     case "$status" in
-      PASS|OK)  printf "${GREEN}%-40s${NC} %s\n" "$project" "$status" ;;
-      FAIL)     printf "${RED}%-40s${NC} %s %s\n" "$project" "$status" "${error:0:60}" ;;
-      WARN)     printf "${YELLOW}%-40s${NC} %s\n" "$project" "$status" ;;
+    PASS | OK) printf "${GREEN}%-40s${NC} %s\n" "$project" "$status" ;;
+    FAIL) printf "${RED}%-40s${NC} %s %s\n" "$project" "$status" "${error:0:60}" ;;
+    WARN) printf "${YELLOW}%-40s${NC} %s\n" "$project" "$status" ;;
     esac
   fi
 done
 
 if [ "$JSON" = true ]; then
-  printf '[%s]\n' "$(IFS=,; echo "${results[*]}")"
+  printf '[%s]\n' "$(
+    IFS=,
+    echo "${results[*]}"
+  )"
 else
   echo ""
   echo "========================================="
