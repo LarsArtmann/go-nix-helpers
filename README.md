@@ -157,6 +157,8 @@ See the full option table below, or copy one of the [templates](#templates).
 | `systems`               | `[x86_64-linux, ...]`        | Systems to build for (matches `nix-systems/default`)                 |
 | `subPackages`           | `[ "." ]`                    | Subpackages to build                                                 |
 | `goPkgAttr`             | `"go_1_26"`                  | Go package attribute in nixpkgs                                      |
+| `goPkgOverride`         | identity                     | Function applied to the Go package (custom toolchains, e.g. newer patch version) |
+| `lintAsCheck`           | `false`                      | Also expose golangci-lint as a hermetic `checks.lint` derivation (for CI) |
 | `enableCheck`           | `true`                       | Run `go test` during the Nix build (`doCheck`)                       |
 | `enableOverlay`         | `true`                       | Generate `flake.overlays.default`                                    |
 | `enableTempl`           | `false`                      | Include `templ` in devShells and treefmt                             |

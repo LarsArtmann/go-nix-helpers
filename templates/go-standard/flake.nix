@@ -27,7 +27,7 @@
   };
 
   outputs =
-    inputs@{ self, ... }:
+    inputs@{ self, flake-parts, ... }:
     flake-parts.lib.mkFlake { inherit inputs; } {
       imports = [ inputs.go-nix-helpers.flakeModules.go-standard ];
 
@@ -57,11 +57,37 @@
         # Optional: extra build attrs (preBuild, etc.)
         # extraBuildAttrs.preBuild = "templ generate";
 
+        # Optional: custom Go toolchain (e.g. newer patch than nixpkgs ships)
+        # goPkgOverride = pkg: pkg.overrideAttrs (finalAttrs: _prev: {
+        #   version = "1.26.4";
+        #   src = pkgs.fetchurl {
+        #     url = "https://go.dev/dl/go${finalAttrs.version}.src.tar.gz";
+        #     hash = "sha256-...";
+        #   };
+        # });
+
+        # Optional: also expose golangci-lint as checks.lint (for CI that
+        # requires a hermetic lint derivation, not just the apps.lint app)
+        # lintAsCheck = true;
+
         # Optional: extra devShell packages
         # devShellExtraPackages = pkgs: [ pkgs.delve pkgs.gotools ];
 
         # Optional: extra shell env vars (GOPRIVATE is auto-set when deps is set)
         # shellExtraEnv = { GOTOOLCHAIN = "local"; };
+
+        # Optional: monorepo — build extra binaries sharing the same source
+        # and vendorHash (each with its own subPackages and description).
+        # packages = {
+        #   server = {
+        #     subPackages = [ "./cmd/server" ];
+        #     description = "HTTP server";
+        #   };
+        #   worker = {
+        #     subPackages = [ "./cmd/worker" ];
+        #     description = "Background worker";
+        #   };
+        # };
       };
     };
 }

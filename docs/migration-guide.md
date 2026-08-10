@@ -209,3 +209,13 @@ deps are prepared, which may change the hash.
 
 Open an [issue](https://github.com/LarsArtmann/go-nix-helpers/issues) if you
 run into problems during migration.
+
+---
+
+## Post-migration verification
+
+Use the [consumer audit checklist](consumer-audit-checklist.md) to verify a
+migrated repo uses go-standard correctly and idiomatically — 8 sections
+covering module adoption, input minimalism, private deps wiring, redundant
+overrides, verification commands, and flake.lock hygiene. It includes a quick
+triage script for a fast first pass.

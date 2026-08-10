@@ -16,6 +16,15 @@ This project has not made a tagged release yet; all changes below are in
   downstream consumers: module adoption, input minimalism, private deps wiring,
   redundant override detection, verification commands, and a quick triage
   script for fast first-pass assessment.
+- `docs/status/2026-08-10_11-02_consumer-fleet-audit.md` — full audit of all
+  34 consumer repos: migration tiers, systemic findings, module gaps, and
+  per-repo recommendations.
+- `goPkgOverride` option — function applied to the Go package from
+  `goPkgAttr`, enabling custom toolchains (e.g. newer patch version than
+  nixpkgs ships) without changing the attribute name.
+- `lintAsCheck` option (default: false) — also exposes golangci-lint as a
+  `checks.lint` derivation (hermetic, for `nix flake check`-driven CI), in
+  addition to the `apps.lint` app.
 - `LICENSE` file (MIT) with copyright Lars Artmann.
 - GitHub Actions CI workflow (`.github/workflows/ci.yml`) with format check,
   integration tests, and module tests.
@@ -151,28 +160,6 @@ This project has not made a tagged release yet; all changes below are in
   `privateGlobPattern`.
 - `AGENTS.md` with enduring project context for AI sessions (`3c22ce4`).
 
-### Changed
-
-- `templates/go-standard/flake.nix`: Added private deps example (flake input
-  with `flake = false` + `deps` attrset), `publicDeps` example, and fixed
-  misleading `shellExtraEnv.GOPRIVATE` comment (GOPRIVATE is auto-injected
-  when `deps` is set; replaced with a `GOTOOLCHAIN` example instead).
-- `mkPreparedSource.nix`: `publicDeps` now uses versioned-path-aware matching.
-  Listing `github.com/foo/bar` in `publicDeps` also excludes
-  `github.com/foo/bar/v2`, `/v3`, etc. from validation. Previously required
-  exact-match including the `/vN` suffix.
-- `.github/workflows/ci.yml`: Added comments documenting why `--all-systems`
-  is not used (Linux cannot evaluate darwin; matrix approach is the workaround)
-  and what is needed to enable the private-deps test job.
-- `docs/man/mkPreparedSource.5`: Added missing `excludeSubModuleDirs` parameter
-  entry — all mkPreparedSource parameters are now documented.
-- `TODO_LIST.md`: L10 updated from "theoretical skip" to "empirically rejected"
-  after prototyping the extraction (all tests pass, but result adds 11 env vars,
-  8 eval calls, and splits logic across 2 files).
-- README: Updated `publicDeps` description to reflect versioned-path-aware
-  matching (was documented as exact-match only).
-
-### Added
 
 - `modules/go-standard.nix`: New `enableNixfmt` option — controls whether
   nixfmt is included in treefmt programs (default: true). Was previously
@@ -275,6 +262,41 @@ This project has not made a tagged release yet; all changes below are in
   to `mkPreparedSource`.
 - Pareto plan: Updated P9 from ◑ (partially done) to ✅ (shipped) — CI
   smoke-test coverage for `--dry-run` and `--verbose` flags closes the gap.
+
+### Changed
+
+- `templates/go-standard/flake.nix`: Added monorepo, `goPkgOverride`, and
+  `lintAsCheck` examples (in addition to the existing private deps example).
+- `templates/go-standard/flake.nix`: Fixed output-fn destructuring bug —
+  `inputs@{ self, ... }` referenced unbound `flake-parts`; now destructures
+  `flake-parts` explicitly. Generated projects previously failed to evaluate
+  (`undefined variable 'flake-parts'`).
+- `docs/man/go-standard.5`: Documented `goPkgOverride`, `lintAsCheck`, and
+  `checks.lint` output.
+- `docs/consumer-audit-checklist.md`: Fixed triage script POSIX-grep portability
+  bug (`\s` → `[[:space:]]`) and the fragile two-pass awk flake-false detection
+  (now a single awk pass with an explicit WARN marker), tested against
+  go-nix-helpers' own flake.nix.
+- `docs/migration-guide.md`, `AGENTS.md`: Cross-linked the consumer audit
+  checklist for post-migration verification.
+- `templates/go-standard/flake.nix`: Added private deps example (flake input
+  with `flake = false` + `deps` attrset), `publicDeps` example, and fixed
+  misleading `shellExtraEnv.GOPRIVATE` comment (GOPRIVATE is auto-injected
+  when `deps` is set; replaced with a `GOTOOLCHAIN` example instead).
+- `mkPreparedSource.nix`: `publicDeps` now uses versioned-path-aware matching.
+  Listing `github.com/foo/bar` in `publicDeps` also excludes
+  `github.com/foo/bar/v2`, `/v3`, etc. from validation. Previously required
+  exact-match including the `/vN` suffix.
+- `.github/workflows/ci.yml`: Added comments documenting why `--all-systems`
+  is not used (Linux cannot evaluate darwin; matrix approach is the workaround)
+  and what is needed to enable the private-deps test job.
+- `docs/man/mkPreparedSource.5`: Added missing `excludeSubModuleDirs` parameter
+  entry — all mkPreparedSource parameters are now documented.
+- `TODO_LIST.md`: L10 updated from "theoretical skip" to "empirically rejected"
+  after prototyping the extraction (all tests pass, but result adds 11 env vars,
+  8 eval calls, and splits logic across 2 files).
+- README: Updated `publicDeps` description to reflect versioned-path-aware
+  matching (was documented as exact-match only).
 
 ### Deprecated
 

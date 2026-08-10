@@ -57,6 +57,31 @@ buildGoModule with its own subPackages.
 .BR goPkgAttr " (str, default: \"go_1_26\")"
 Go package attribute in nixpkgs.
 .TP
+.BR goPkgOverride " (function, default: identity)"
+Function applied to the Go package selected by
+.BR goPkgAttr .
+Use to build a custom Go toolchain (e.g. a newer patch version than
+nixpkgs ships) without changing the attribute name. Example:
+.nf
+goPkgOverride = pkg: pkg.overrideAttrs (finalAttrs: _prev: {
+  version = "1.26.4";
+  src = fetchurl {
+    url = "https://go.dev/dl/go${finalAttrs.version}.src.tar.gz";
+    hash = "sha256-...";
+  };
+});
+.fi
+.TP
+.BR lintAsCheck " (bool, default: false)"
+Also expose golangci-lint as a
+.BR checks.lint
+derivation, in addition to the
+.BR apps.lint
+app. Useful for CI pipelines that run
+.BR "nix flake check"
+and expect a hermetic lint derivation. The lint check runs golangci-lint
+against the package source (with FOD vendor/ when deps are set).
+.TP
 .BR enableCheck " (bool, default: true)"
 Run go test during the Nix build (doCheck).
 .TP
@@ -173,6 +198,13 @@ Treefmt formatting check.
 .TP
 .BR checks.build
 Package build verification.
+.TP
+.BR checks.lint
+golangci-lint derivation (only when
+.BR lintAsCheck
+= true). Mirrors
+.BR apps.lint
+but as a hermetic check derivation for CI.
 .TP
 .BR overlays.default
 Exposes pkgs.\\fIpname\\fR to other flakes.

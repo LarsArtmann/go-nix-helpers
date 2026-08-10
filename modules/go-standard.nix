@@ -85,6 +85,39 @@ in
       description = "Go package attribute in nixpkgs";
     };
 
+    goPkgOverride = lib.mkOption {
+      type = lib.types.functionTo lib.types.package;
+      default = pkg: pkg;
+      example = lib.literalExpression ''
+        pkg: pkg.overrideAttrs (finalAttrs: _prev: {
+          version = "1.26.4";
+          src = pkgs.fetchurl {
+            url = "https://go.dev/dl/go''${finalAttrs.version}.src.tar.gz";
+            hash = "sha256-...";
+          };
+        });
+      '';
+      description = ''
+        Function applied to the Go package selected by `goPkgAttr`.
+        Use to build a custom Go toolchain (e.g. a newer patch version
+        than nixpkgs ships) without changing the attribute name.
+        Example: `goPkgOverride = pkg: pkg.overrideAttrs ...`.
+      '';
+    };
+
+    lintAsCheck = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = ''
+        Also expose golangci-lint as a `checks.lint` derivation, in addition
+        to the `apps.lint` app. Useful for CI pipelines that run
+        `nix flake check` and expect a hermetic lint derivation. The lint
+        check runs golangci-lint against the package source (with FOD
+        vendor/ when deps are set), inheriting the module's source tree.
+        Only takes effect when `enableGolangciLint` is true.
+      '';
+    };
+
     enableTempl = lib.mkOption {
       type = lib.types.bool;
       default = false;
@@ -370,7 +403,7 @@ in
       let
         inherit (cfg) version;
 
-        goPkg = pkgs.${cfg.goPkgAttr};
+        goPkg = cfg.goPkgOverride pkgs.${cfg.goPkgAttr};
 
         usePreparedSource = cfg.deps != { };
 
@@ -629,6 +662,27 @@ in
         checks = {
           format = config.treefmt.build.check self;
           build = config.packages.default;
+        }
+        // lib.optionalAttrs (cfg.lintAsCheck && cfg.enableGolangciLint) {
+          lint =
+            let
+              pkg = config.packages.default.overrideAttrs (_old: {
+                pname = "${cfg.pname}-lint";
+                nativeBuildInputs = [
+                  goPkg
+                  pkgs.golangci-lint
+                ];
+                buildPhase = ''
+                  runHook preBuild
+                  export HOME=$TMPDIR
+                  golangci-lint run ./...
+                  runHook postBuild
+                '';
+                doCheck = false;
+                installPhase = "touch $out";
+              });
+            in
+            pkg;
         };
 
         treefmt = {

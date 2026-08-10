@@ -145,6 +145,10 @@ let
     (assertCheck "description option exists" (cfg ? description) "description attr")
     (assertCheck "subPackages default is [\".\"]" (cfg.subPackages == [ "." ]) "[\".\"]")
     (assertCheck "goPkgAttr default is go_1_26" (cfg.goPkgAttr == "go_1_26") "go_1_26")
+    (assertCheck "goPkgOverride default is identity" (
+      (cfg.goPkgOverride pkgs.go_1_26) == pkgs.go_1_26
+    ) "identity function")
+    (assertCheck "lintAsCheck default is false" (cfg.lintAsCheck == false) "false")
     (assertCheck "enableTempl default is false" (cfg.enableTempl == false) "false")
     (assertCheck "enableGovulncheck default is true" (cfg.enableGovulncheck == true) "true")
     (assertCheck "enableGopls default is true" (cfg.enableGopls == true) "true")
@@ -349,6 +353,18 @@ let
 
   # --- enableTempl test -----------------------------------------------------
   templCfg = mkPerSystemConfig { enableTempl = true; };
+
+  # --- goPkgOverride test ---------------------------------------------------
+  goPkgOverrideCfg = mkPerSystemConfig {
+    goPkgOverride =
+      pkg:
+      pkg.overrideAttrs (_: {
+        version = "1.26.4-custom";
+      });
+  };
+
+  # --- lintAsCheck test ------------------------------------------------------
+  lintAsCheckCfg = mkPerSystemConfig { lintAsCheck = true; };
 
   # --- nativeBuildInputs merge test (user inputs appended, not overridden) ---
   nativeBuildInputsMergeCfg = mkPerSystemConfig {
@@ -712,6 +728,36 @@ let
     (assertCheck "GOPRIVATE not set when deps empty" (
       !(psCfg.devShells.default ? GOPRIVATE)
     ) "no GOPRIVATE without deps")
+    # --- Behavioral: goPkgOverride applies to the package Go version ---
+    (assertCheck "goPkgOverride applies to packages.default" (
+      let
+        go = goPkgOverrideCfg.packages.default.go or null;
+        # goDrv is the actual derivation; compare version attr if available
+        goDrv = goPkgOverrideCfg.packages.default.go or null;
+        hasCustomVersion =
+          goDrv != null
+          && ((goDrv.version or "") == "1.26.4-custom" || lib.hasInfix "1.26.4-custom" (goDrv.name or ""));
+      in
+      hasCustomVersion
+    ) "go version 1.26.4-custom in derivation")
+    (assertCheck "goPkgOverride applies to devShell" (
+      let
+        shell = goPkgOverrideCfg.devShells.default;
+        inputs = shell.nativeBuildInputs or shell.buildInputs or [ ];
+        hasCustomGo = builtins.any (x: lib.hasInfix "1.26.4-custom" (x.name or "")) inputs;
+      in
+      hasCustomGo
+    ) "custom go in devShell nativeBuildInputs")
+    # --- Behavioral: lintAsCheck exposes checks.lint ---------------------
+    (assertCheck "lintAsCheck=false has no checks.lint" (
+      !(psCfg.checks ? lint)
+    ) "no checks.lint by default")
+    (assertCheck "lintAsCheck=true exposes checks.lint" (
+      lintAsCheckCfg.checks ? lint
+    ) "checks.lint exists")
+    (assertCheck "lintAsCheck=true keeps apps.lint" (
+      lintAsCheckCfg.apps ? lint
+    ) "apps.lint still exists")
     systemsOverrideCheck
     monorepoOverlayCheck
   ];

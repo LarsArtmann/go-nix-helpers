@@ -96,16 +96,18 @@ grep -q 'go-flake-parts' flake.nix && echo "WARN: old template referenced" || ec
 grep -q 'treefmt-nix' flake.nix && echo "WARN: unnecessary treefmt-nix input" || echo "OK: no treefmt-nix input"
 
 echo "=== go-nix-helpers as real flake (not flake=false) ==="
-# Check if go-nix-helpers block contains flake = false
-awk '/go-nix-helpers = \{/{found=1} found && /flake = false/{print "WARN: go-nix-helpers has flake=false"; found=0} found && /\}/{found=0}' flake.nix
-awk '/go-nix-helpers = \{/{found=1} found && /flake = false/{f=1} found && /\}/{if(!f) print "OK: go-nix-helpers is real flake"; found=0; f=0}' flake.nix
+if awk '/go-nix-helpers = \{/{found=1} found && /flake = false/{print "WARN"; found=0} found && /^[[:space:]]*\};/{found=0}' flake.nix | grep -q WARN; then
+  echo "WARN: go-nix-helpers declared with flake=false (module requires a real flake)"
+else
+  echo "OK: go-nix-helpers is a real flake"
+fi
 
 echo "=== Placeholder vendorHash ==="
 grep -q 'sha256-AAA' flake.nix && echo "WARN: placeholder vendorHash" || echo "OK: no placeholder"
 
 echo "=== Redundant default overrides ==="
 for opt in enableCheck enableOverlay enableGolangciLint enableGofumpt enableGoimports enableNixfmt enableGopls enableGovulncheck proxyVendor; do
-  grep -q "^\s*${opt} = true" flake.nix && echo "NOTE: ${opt} = true is the default (can remove)"
+  grep -qE "^[[:space:]]*${opt} = true" flake.nix && echo "NOTE: ${opt} = true is the default (can remove)"
 done
 
 echo "=== Follows chains ==="
