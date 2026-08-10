@@ -40,86 +40,97 @@ let
 
   # --- stripVersionSuffix idempotence ---
   stripIdempotence = [
-    (assertEq "idempotence: strip twice = strip once"
-      (stripVersionSuffix (stripVersionSuffix "event/v3/eventtest"))
-      (stripVersionSuffix "event/v3/eventtest"))
-    (assertEq "idempotence: already stripped"
-      (stripVersionSuffix (stripVersionSuffix "codec"))
-      "codec")
+    (assertEq "idempotence: strip twice = strip once" (stripVersionSuffix (
+      stripVersionSuffix "event/v3/eventtest"
+    )) (stripVersionSuffix "event/v3/eventtest"))
+    (assertEq "idempotence: already stripped" (stripVersionSuffix (stripVersionSuffix "codec")) "codec")
   ];
 
   # --- stripVersionSuffix invariant: no /vN in output ---
-  stripNoVersionInOutput = lib.map (
-    input:
-    let
-      output = stripVersionSuffix input;
-      parts = lib.splitString "/" output;
-      hasVersion = lib.any (p: builtins.match "v[0-9]+" p != null) parts;
-    in
-    if !hasVersion then
-      "echo 'PASS: no /vN in output for input: ${input}'"
-    else
-      ''
-        echo 'FAIL: /vN found in output for input: ${input}'
-        echo "  output: ${output}"
-        exit 1
-      ''
-  ) [
-    "codec/v2"
-    "event/v3/eventtest"
-    "a/v2/b/v3/c"
-    "v2"
-    ""
-    "pkg"
-    "v100/v200"
-  ];
+  stripNoVersionInOutput =
+    lib.map
+      (
+        input:
+        let
+          output = stripVersionSuffix input;
+          parts = lib.splitString "/" output;
+          hasVersion = lib.any (p: builtins.match "v[0-9]+" p != null) parts;
+        in
+        if !hasVersion then
+          "echo 'PASS: no /vN in output for input: ${input}'"
+        else
+          ''
+            echo 'FAIL: /vN found in output for input: ${input}'
+            echo "  output: ${output}"
+            exit 1
+          ''
+      )
+      [
+        "codec/v2"
+        "event/v3/eventtest"
+        "a/v2/b/v3/c"
+        "v2"
+        ""
+        "pkg"
+        "v100/v200"
+      ];
 
   # --- repoName tests ---
   repoBasic = [
-    (assertEq "repoName: standard 3-segment"
-      (repoName "github.com/larsartmann/go-cqrs-lite") "go-cqrs-lite")
-    (assertEq "repoName: with v2 suffix"
-      (repoName "github.com/larsartmann/go-filewatcher/v2") "go-filewatcher")
+    (assertEq "repoName: standard 3-segment" (repoName "github.com/larsartmann/go-cqrs-lite")
+      "go-cqrs-lite"
+    )
+    (assertEq "repoName: with v2 suffix" (repoName "github.com/larsartmann/go-filewatcher/v2")
+      "go-filewatcher"
+    )
     (assertEq "repoName: deep path with version"
-      (repoName "github.com/larsartmann/go-cqrs-lite/codec/v2") "go-cqrs-lite")
-    (assertEq "repoName: short path"
-      (repoName "foo/bar") "bar")
-    (assertEq "repoName: single segment"
-      (repoName "mypkg") "mypkg")
+      (repoName "github.com/larsartmann/go-cqrs-lite/codec/v2")
+      "go-cqrs-lite"
+    )
+    (assertEq "repoName: short path" (repoName "foo/bar") "bar")
+    (assertEq "repoName: single segment" (repoName "mypkg") "mypkg")
   ];
 
   # --- repoName determinism ---
   repoDeterminism = [
-    (assertEq "determinism: same input same output"
-      (repoName "github.com/larsartmann/go-cqrs-lite")
-      (repoName "github.com/larsartmann/go-cqrs-lite"))
-    (assertEq "determinism: different calls match"
-      (repoName "a/b/c") (repoName "a/b/c"))
+    (assertEq "determinism: same input same output" (repoName "github.com/larsartmann/go-cqrs-lite") (
+      repoName "github.com/larsartmann/go-cqrs-lite"
+    ))
+    (assertEq "determinism: different calls match" (repoName "a/b/c") (repoName "a/b/c"))
   ];
 
   # --- repoName no-slash invariant ---
-  repoNoSlash = lib.map (
-    input:
-    let
-      output = repoName input;
-      hasSlash = lib.hasInfix "/" output;
-    in
-    if !hasSlash then
-      "echo 'PASS: no slash in repoName output for: ${input}'"
-    else
-      ''
-        echo 'FAIL: slash found in repoName output for: ${input}'
-        echo "  output: ${output}"
-        exit 1
-      ''
-  ) [
-    "github.com/larsartmann/go-cqrs-lite"
-    "github.com/larsartmann/go-filewatcher/v2"
-    "foo/bar"
-    "mypkg"
-  ];
+  repoNoSlash =
+    lib.map
+      (
+        input:
+        let
+          output = repoName input;
+          hasSlash = lib.hasInfix "/" output;
+        in
+        if !hasSlash then
+          "echo 'PASS: no slash in repoName output for: ${input}'"
+        else
+          ''
+            echo 'FAIL: slash found in repoName output for: ${input}'
+            echo "  output: ${output}"
+            exit 1
+          ''
+      )
+      [
+        "github.com/larsartmann/go-cqrs-lite"
+        "github.com/larsartmann/go-filewatcher/v2"
+        "foo/bar"
+        "mypkg"
+      ];
 
-  allChecks = stripBasic ++ stripIdempotence ++ stripNoVersionInOutput ++ repoBasic ++ repoDeterminism ++ repoNoSlash;
+  allChecks =
+    stripBasic
+    ++ stripIdempotence
+    ++ stripNoVersionInOutput
+    ++ repoBasic
+    ++ repoDeterminism
+    ++ repoNoSlash;
 in
 pkgs.runCommand "test-pure-functions" { } ''
   ${builtins.concatStringsSep "\n" allChecks}
