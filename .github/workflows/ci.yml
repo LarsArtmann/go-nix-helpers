@@ -46,6 +46,8 @@ jobs:
           SYSTEM=$(nix eval --raw --impure --expr 'builtins.currentSystem')
           nix build .#checks.$SYSTEM.verify
           nix build .#checks.$SYSTEM.moduleTest
+          nix build .#checks.$SYSTEM.pureFunctions
+          nix build .#checks.$SYSTEM.structural
 
   smoke-test:
     runs-on: ubuntu-latest
@@ -98,11 +100,39 @@ jobs:
           nix-instantiate --parse /tmp/smoke-combined/flake.nix > /dev/null
           echo "PASS: --go-mod --private-deps --templ combined flags work"
 
+      - name: Generate flake with --dry-run
+        run: |
+          ./scripts/generate-flake.sh --dir /tmp/smoke-dryrun --dry-run smoke-dryrun 2>&1 | tee /tmp/dryrun-output
+          test ! -d /tmp/smoke-dryrun
+          grep -q "flake.nix" /tmp/dryrun-output
+          echo "PASS: --dry-run previews without writing"
+
+      - name: Generate flake with --verbose
+        run: |
+          ./scripts/generate-flake.sh --dir /tmp/smoke-verbose --verbose smoke-verbose 2>&1 | tee /tmp/verbose-output
+          test -f /tmp/smoke-verbose/flake.nix
+          grep -q "Created" /tmp/verbose-output
+          echo "PASS: --verbose lists created files"
+
       - name: Generate flake from go-flake-parts template
         run: |
           ./scripts/generate-flake.sh --dir /tmp/smoke-parts --template go-flake-parts smoke-parts
           nix-instantiate --parse /tmp/smoke-parts/flake.nix > /dev/null
           echo "PASS: go-flake-parts template generates valid Nix"
+
+  shellcheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@v16
+
+      - name: Cache Nix Store
+        uses: DeterminateSystems/magic-nix-cache-action@v9
+
+      - name: Run shellcheck on all scripts
+        run: nix run nixpkgs#shellcheck -- scripts/*.sh
 
   flake-lock-freshness:
     runs-on: ubuntu-latest

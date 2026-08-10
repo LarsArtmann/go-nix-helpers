@@ -333,6 +333,14 @@ graph TD
 | 20% tier (80% value)      | 470min (16 tasks) |
 | 100% coverage             | 625min (30 tasks) |
 
+### Execution result (2026-08-10)
+
+| Status        | Packages | Notes                                           |
+| ------------- | -------- | ----------------------------------------------- |
+| Shipped ✅     | P1–P8, P10, P11 | 10 packages fully completed               |
+| Partially ◑   | P9       | Flags implemented, CI smoke-test gap remains    |
+| Skipped ⏭️    | P12      | Skipped on merit — see table above for rationale |
+
 ---
 
 _Arte in Aeternum_

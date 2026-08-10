@@ -33,7 +33,7 @@
 
 | #  | Task                                                                                  | Status | Effort | Evidence                                                              |
 | -- | ------------------------------------------------------------------------------------- | ------ | ------ | --------------------------------------------------------------------- |
-| S1 | Add `--dry-run` and `--verbose` flag coverage to CI smoke-test job                    | TODO   | 20min  | `.github/workflows/ci.yml`; flags implemented but only tested locally |
+| -- | _(Shell scripts are linted via `nix run nixpkgs#shellcheck` in CI; `--dry-run` and `--verbose` have smoke-test coverage)_ | — | — | —                                                                     |
 
 ## Documentation
 
