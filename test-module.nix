@@ -533,6 +533,9 @@ let
     (assertCheck "enableNixfmt=false disables nixfmt" (
       noNixfmtCfg.treefmt.programs.nixfmt.enable or true == false
     ) "nixfmt.enable = false")
+    (assertCheck "enableShfmt=true enables shfmt in treefmt" (
+      shfmtCfg.treefmt.programs.shfmt.enable or false == true
+    ) "shfmt.enable = true")
     (assertCheck "apps.fmt removed when all formatters disabled" (
       !(noAllFmtCfg.apps ? fmt)
     ) "no apps.fmt when no formatters")
