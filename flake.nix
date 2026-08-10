@@ -96,6 +96,23 @@
             inherit (tests) verify;
             inherit (moduleTests) moduleTest moduleTestNoOverlay;
             pureFunctions = pureFunctionTests;
+            # Structural test: verify all expected flake outputs exist
+            structural = pkgs.runCommand "structural-test" { } ''
+              ${lib.concatStringsSep "\n" (
+                lib.map (check: ''
+                  if [ -z "${check.value}" ]; then
+                    echo "FAIL: ${check.name} is empty"
+                    exit 1
+                  fi
+                '') [
+                  { name = "flakeModules.go-standard"; value = toString (self.flakeModules.go-standard or { } != { }); }
+                  { name = "lib.mkPreparedSource"; value = toString (self.lib ? mkPreparedSource); }
+                  { name = "lib.mkGoFlake"; value = toString (self.lib ? mkGoFlake); }
+                ]
+              )}
+              echo "PASS: all expected flake outputs exist"
+              mkdir $out
+            '';
           };
 
           # -- Apps (nix run .#<name>) --------------------------------------------

@@ -546,6 +546,10 @@ let
       in
       builtins.elem "--with-feature" flags
     ) "--with-feature in configureFlags")
+    # --- vendorHash placeholder evaluates with warning (M3) ----------------
+    (assertCheck "vendorHash placeholder evaluates successfully" (
+      vendorHashPlaceholderCfg.packages ? default
+    ) "packages.default with placeholder vendorHash")
     # --- Behavioral: meta propagation (H2) ---------------------------------
     (assertCheck "meta.description matches config" (
       psCfg.packages.default ? meta && psCfg.packages.default.meta.description == "Test project"
