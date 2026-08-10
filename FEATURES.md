@@ -44,6 +44,9 @@
 | `version` option (override git-derived version)                | 🟢 `FULLY_FUNCTIONAL`     | Defaults to `self.rev or self.dirtyRev or "dev"`                                          |
 | `enableGolangciLint` toggle                                    | 🟢 `FULLY_FUNCTIONAL`     | Conditionally includes golangci-lint in devShells and lint app                            |
 | `enableGofumpt` / `enableGoimports` toggles                    | 🟢 `FULLY_FUNCTIONAL`     | Conditionally enabled in treefmt programs                                                 |
+| `enableNixfmt` / `enableShfmt` toggles                         | 🟢 `FULLY_FUNCTIONAL`     | nixfmt default: true; shfmt default: false — both wired to treefmt programs                |
+| `enableTempl` toggle                                          | 🟢 `FULLY_FUNCTIONAL`     | Includes templ in devShells and treefmt (default: false)                                  |
+| `enableGopls` / `enableGovulncheck` toggles                   | 🟢 `FULLY_FUNCTIONAL`     | Include gopls and govulncheck in devShells (default: true for both)                       |
 | `enableCompletions` option                                     | 🟡 `PARTIALLY_FUNCTIONAL` | Requires cobra/urfave/cli; emits a build-time warning with remediation options if binary doesn't support `--completion`. Check uses `timeout 10` to prevent hanging |
 | Monorepo support (`packages` option)                           | 🟢 `FULLY_FUNCTIONAL`     | Multiple `buildGoModule` per repo; separate apps/overlays per package                     |
 | `fmt` app (`nix run .#fmt`)                                    | 🟢 `FULLY_FUNCTIONAL`     | Wrapper around treefmt                                                                    |

@@ -110,6 +110,41 @@ This project has not made a tagged release yet; all changes below are in
   (`dbb76a0`).
 - `GOTOOLCHAIN = "local"` set by default in all devShells to prevent Go from
   downloading newer toolchains. Override via `shellExtraEnv.GOTOOLCHAIN`.
+- `enableShfmt` option to `go-standard` — enables shell script formatting via
+  shfmt in treefmt programs (default: false). Enabled by default in this
+  repo's own treefmt config.
+- `vendorHash` placeholder detection in `go-standard` — emits a
+  `builtins.trace` warning at evaluation time when `vendorHash` matches the
+  `sha256-AAA...` placeholder pattern, prompting the consumer to set the
+  real hash after the first build.
+- `pure-functions.nix` — extracted `stripVersionSuffix` and `repoName` from
+  `mkPreparedSource.nix` into a standalone, testable module. Wired as
+  `checks.pureFunctions` with 22 assertions covering idempotence,
+  no-`/vN`-in-output, determinism, no-slash, and edge cases (`v1`, `v100`,
+  empty string, single segment, non-version `v`-prefixes).
+- `checks.structural` — derivation verifying that `flakeModules.go-standard`,
+  `lib.mkPreparedSource`, and `lib.mkGoFlake` all exist in flake outputs.
+- `--dry-run` flag to `generate-flake.sh` — previews file creation without
+  writing to disk.
+- `--verbose` flag to `generate-flake.sh` — lists all created files after
+  generation.
+- `--list-templates` flag to `generate-flake.sh` — prints available
+  templates and exits.
+- Behavioral tests for `buildFlags`, `ldflags` (with version injection),
+  custom `ldflags`, and `proxyVendor` propagation in `test-module.nix` —
+  proves consumer config reaches the derivation, not just eval.
+- Behavioral test for GOPRIVATE injection into devShell — 4 assertions:
+  GOPRIVATE present when `deps` set, uses default `privateGlobPattern`,
+  uses custom pattern, NOT set when `deps` empty.
+- Negative test for `enableCompletions` warning — verifies the "does not
+  support the --completion subcommand" message is present in `postInstall`.
+- treefmt config inspection test — verifies enabled programs produce
+  correct treefmt configuration (3 programs with defaults, 0 when disabled).
+- Integration Test 7: `publicDeps` with `/v2` versioned module path in
+  `test.nix`.
+- FAQ entry in README: "How do I use deps with non-LarsArtmann repos?"
+  with code example for overriding `privateDepPattern` and
+  `privateGlobPattern`.
 - `AGENTS.md` with enduring project context for AI sessions (`3c22ce4`).
 
 ### Changed
@@ -180,6 +215,28 @@ This project has not made a tagged release yet; all changes below are in
 - `go-standard` forwarding into `mkPreparedSource` changed from
   `src = cfg.src;` to `inherit (cfg) src;` for internal consistency
   (`00ea4e9`).
+- `modules/go-standard.nix`: `extraBuildAttrs` concatenation extended to
+  `buildInputs`, `checkInputs`, and `configureFlags` (in addition to the
+  existing `nativeBuildInputs`, `preBuild`, `postInstall`). Consumer values
+  are now appended rather than overriding.
+- `modules/go-standard.nix`: Module test suite deepened from 74 to 92
+  assertions — added behavioral tests for build option propagation,
+  GOPRIVATE injection, enableCompletions negative path, treefmt config
+  inspection, and shfmt option toggle.
+- `mkPreparedSource.nix`: Added `trap 'rm -f go.mod.requires.tmp' EXIT`
+  around the temp file lifecycle in `postPatch` for cleanup safety.
+- `mkPreparedSource.nix`: `stripVersionSuffix` and `repoName` extracted to
+  `pure-functions.nix` and imported, making them independently testable.
+- `.github/workflows/ci.yml`: Extended integration-tests job to a matrix
+  of `[ubuntu-latest, macos-latest]` with dynamic system detection via
+  `nix eval --raw --impure --expr 'builtins.currentSystem'`.
+- `.github/workflows/ci.yml`: Added smoke-test steps for `--go-mod`,
+  `--private-deps`, and combined `--go-mod --private-deps --templ` variants.
+- `docs/architecture.d2` / `.svg`: Updated to show `privateGlobPattern`,
+  `enableNixfmt`, `enableShfmt` options (was showing "+20 more").
+- `scripts/dashboard.sh`, `scripts/generate-flake.sh`, `scripts/nix-lint.sh`:
+  Reformatted with shfmt for consistent style. Fixed unused `CYAN` variable
+  in `dashboard.sh`.
 - `go-standard` hardcodes the default systems list so consumers do not need a
   `systems` input (`9471741`).
 
