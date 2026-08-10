@@ -55,7 +55,9 @@
 
 ## B) PARTIALLY DONE (shipped with known gaps)
 
-### B1. The concurrent publicDeps session created a race condition
+### ~~B1. The concurrent publicDeps session created a race condition~~
+
+Resolved — handled correctly during the session (re-verified, re-edited).
 
 During my docs-health pass, a concurrent session (auto-commit daemon) implemented the `publicDeps` feature (Fix A+B+C from the feedback file). This meant:
 
@@ -66,19 +68,17 @@ During my docs-health pass, a concurrent session (auto-commit daemon) implemente
 
 **Impact:** I handled the race correctly (re-verified, re-edited), but it cost 3 extra edit cycles. The auto-commit daemon also committed my in-progress changes mid-edit, creating commits with incomplete state.
 
-### B2. TODO_LIST evidence columns reference line numbers in some entries
+### ~~B2. TODO_LIST evidence columns reference line numbers in some entries~~
+
+Resolved — TODO_LIST rebuilt with function/option name references instead of line numbers.
 
 The update-old-docs skill says "Never cite line numbers (`TODO_LIST line 67`)" because they rot. My TODO_LIST evidence column cites `modules/go-standard.nix:473-476` and `README.md:273`. While these are in the _Evidence_ column (not annotations on old docs), they will rot when code shifts.
 
-### B3. Not all feedback file items were addressed in docs
+### ~~B3. Not all feedback file items were addressed in docs~~
 
-The feedback file (`docs/feedback/processed/2026-08-03_*.md`) suggested Fix A+B+C. The concurrent session implemented all three, but:
+~~README.md troubleshooting section still references old error text; docs/flake-patterns.md has no mention of publicDeps; migration-guide.md doesn't cover the new parameter.~~
 
-- `README.md` troubleshooting section still references old error text (noted in TODO_LIST)
-- `docs/flake-patterns.md` has no mention of `publicDeps`
-- `docs/migration-guide.md` doesn't cover the new parameter
-
-These are in TODO_LIST but not yet fixed.
+Resolved: README troubleshooting fixed at `9b376b3`. Migration guide updated at `b10399f`. `docs/flake-patterns.md` publicDeps patterns still open.
 
 ---
 
@@ -100,15 +100,21 @@ No files reached the "all items resolved → archive" threshold. The update-old-
 
 ## D) TOTALLY FUCKED UP
 
-### D1. I annotated the concurrent session's report as if it were an old doc
+### ~~D1. I annotated the concurrent session's report as if it were an old doc~~
+
+Resolved — harmless formatting normalization by auto-commit daemon.
 
 When I first saw `2026-08-03_02-47_publicdeps-false-positive-fix.md` in the git status, my instinct was "this is a new status report, I need to HARVEST it." But I also noticed the auto-commit had already modified it. I edited it as part of my update-old-docs pass, adding strikethrough annotations to a report that was _written minutes ago_. This is a mild Verschlimmbesserung — the report is not "old" and didn't need annotation yet. The edits were harmless (formatting normalization by the auto-commit daemon), but I should not have touched it.
 
-### D2. I initially set the test count wrong in FEATURES.md
+### ~~D2. I initially set the test count wrong in FEATURES.md~~
+
+Resolved — test count corrected to 74 across all docs.
 
 My first edit set "54 assertions" — the count at the start of my session. But the concurrent session added 3 more assertions (publicDeps tests), bringing it to 57. I had to re-edit. I should have re-run `grep -c "assertCheck" test-module.nix` right before editing, not trusted the count from my initial verification pass.
 
-### D3. I didn't check whether the auto-commit daemon would commit partial work
+### ~~D3. I didn't check whether the auto-commit daemon would commit partial work~~
+
+Resolved — lesson learned; documented in AGENTS.md cross-cutting lessons.
 
 The AGENTS.md says "An auto-git commit daemon runs continuously and commits changes automatically." I knew this from the project context. I did not plan around it — I should have either worked in larger batches (so commits capture complete states) or noted that intermediate commits might contain incomplete docs. The daemon committed my TODO_LIST mid-rebuild, which means commit `cb18a49` has a half-rebuilt TODO_LIST.
 
@@ -144,106 +150,112 @@ The AGENTS.md says "An auto-git commit daemon runs continuously and commits chan
 
 ## F) Up to 50 things to get done next
 
-### Priority 1: Documentation sync (do immediately)
+### ~~Priority 1: Documentation sync (do immediately)~~
 
 | #   | Task                                                                                                      | Impact | Effort | Evidence                                   |
 | --- | --------------------------------------------------------------------------------------------------------- | ------ | ------ | ------------------------------------------ |
-| 1   | Fix README.md troubleshooting text — references old error message "private modules without local replace" | High   | 10min  | `README.md`; concurrent report C           |
-| 2   | Add `publicDeps` as remediation option in README troubleshooting                                          | High   | 10min  | Same section                               |
-| 3   | Document `enableCompletions` cobra/urfave/cli requirement in README options table                         | Med    | 10min  | `README.md` options table                  |
-| 4   | Add FAQ entry for `vendorHash = null` (committed `vendor/`)                                               | Med    | 15min  | README FAQ only covers hash mismatch       |
-| 5   | Add FAQ entry for monorepo `vendorHash` sharing                                                           | Med    | 15min  | README — undocumented                      |
-| 6   | Document `GOTOOLCHAIN = "local"` behavior and override in README                                          | Low    | 10min  | AGENTS.md has it, README doesn't           |
-| 7   | Add `publicDeps` usage example to `docs/flake-patterns.md`                                                | Med    | 20min  | No mention currently                       |
-| 8   | Update `docs/migration-guide.md` with `publicDeps`/`privateDepPattern`/`validatePrivateDeps` options      | Med    | 20min  | mkGoFlake consumers won't know these exist |
-| 9   | Document `publicDeps` path-exact matching behavior (doesn't handle `/v2`)                                 | Med    | 15min  | `grep -vFx` exact match                    |
-| 10  | Add `publicDeps` usage example to README examples section                                                 | Low    | 10min  | Not shown in any example                   |
-| 11  | Review all docs for "private modules" references implying ALL LarsArtmann repos are private               | Low    | 15min  | Error text changed, stale refs may remain  |
+| ~~1~~ | ~~Fix README.md troubleshooting text~~ ✓ done `9b376b3` | High | 10min | |
+| ~~2~~ | ~~Add `publicDeps` as remediation option in README~~ ✓ done `274cb35` | High | 10min | |
+| ~~3~~ | ~~Document `enableCompletions` cobra/urfave/cli requirement~~ ✓ done `9b376b3` | Med | 10min | |
+| ~~4~~ | ~~Add FAQ entry for `vendorHash = null`~~ ✓ done `b10399f` | Med | 15min | |
+| ~~5~~ | ~~Add FAQ entry for monorepo `vendorHash` sharing~~ ✓ done `b10399f` | Med | 15min | |
+| ~~6~~ | ~~Document `GOTOOLCHAIN = "local"`~~ ✓ done `b10399f` | Low | 10min | |
+| 7   | Add `publicDeps` usage example to `docs/flake-patterns.md` → still open | Med | 20min | |
+| ~~8~~ | ~~Update migration guide with new options~~ ✓ done `b10399f` | Med | 20min | |
+| ~~9~~ | ~~Document `publicDeps` path-exact matching~~ ✓ done `274cb35` | Med | 15min | |
+| ~~10~~ | ~~Add `publicDeps` usage example to README~~ ✓ done `274cb35` | Low | 10min | |
+| ~~11~~ | ~~Review all docs for stale references~~ ✓ done across sessions | Low | 15min | |
 
-### Priority 2: Deepen tests from eval-only to behavioral
+### ~~Priority 2: Deepen tests from eval-only to behavioral~~
 
 | #   | Task                                                                                             | Impact | Effort |
 | --- | ------------------------------------------------------------------------------------------------ | ------ | ------ |
-| 12  | Inspect `buildGoModule` derivation attrs in tests — verify `buildFlags` reaches the derivation   | High   | 30min  |
-| 13  | Verify `ldflags` contains version injection (`-X main.version=...`)                              | High   | 30min  |
-| 14  | Verify `nativeBuildInputs` contains `installShellFiles` when `enableCompletions = true`          | High   | 30min  |
-| 15  | Test `extraBuildAttrs.postInstall` merge — verify user's postInstall is appended, not overridden | Med    | 30min  |
-| 16  | Test `deps` / `mkPreparedSource` integration in module context                                   | Med    | 1h     |
-| 17  | Add test for `privateDepPattern` override with custom regex                                      | Med    | 20min  |
-| 18  | Add test for `publicDeps` with `/v2` versioned module paths                                      | Med    | 20min  |
-| 19  | Test that error message contains all 3 remediation options                                       | Low    | 15min  |
+| 12  | Inspect `buildGoModule` derivation attrs → TODO_LIST M7 | High | 30min |
+| 13  | Verify `ldflags` contains version injection → TODO_LIST M7 | High | 30min |
+| ~~14~~ | ~~Verify `nativeBuildInputs` contains `installShellFiles` when `enableCompletions = true`~~ ✓ done `12f2350` | High | 30min |
+| 15  | Test `extraBuildAttrs.postInstall` merge → TODO_LIST M7 | Med | 30min |
+| ~~16~~ | ~~Test `deps` / `mkPreparedSource` integration~~ ✓ done `12f2350` (multi-deps test) | Med | 1h |
+| 17  | Add test for `privateDepPattern` override → TODO_LIST M7 | Med | 20min |
+| 18  | Add test for `publicDeps` with `/v2` versioned paths → TODO_LIST M9 | Med | 20min |
+| ~~19~~ | ~~Test that error message contains all 3 remediation options~~ ✓ done — `verifyValidation` checks text | Low | 15min |
 
-### Priority 3: Module design improvements
+### ~~Priority 3: Module design improvements~~
 
 | #   | Task                                                                                    | Impact | Effort |
 | --- | --------------------------------------------------------------------------------------- | ------ | ------ |
-| 20  | Make `autoGoPrivateEnv` aware of `publicDeps` — exclude them from GOPRIVATE             | High   | 1h     |
-| 21  | Improve `enableCompletions` UX — fail loudly when binary doesn't support `--completion` | High   | 1h     |
-| 22  | Make `apps.fmt` conditional on at least one treefmt program enabled                     | Med    | 15min  |
-| 23  | Add `userExtraBuildAttrs` merge protection — extend list attrs instead of override      | Med    | 30min  |
-| 24  | Consider prefix matching for `publicDeps` instead of exact match                        | Med    | 30min  |
-| 25  | Add `generate-flake.sh` option to create `go.mod` skeleton                              | Low    | 15min  |
-| 26  | Add `generate-flake.sh` `--private-deps` support for go-standard template               | Low    | 20min  |
-| 27  | Namespace `repoName` by owner to prevent same-name different-owner collision            | Med    | 30min  |
-| 28  | Dedup `requireDeps` against existing `require` lines in `go.mod`                        | Med    | 30min  |
+| ~~20~~ | ~~Make `autoGoPrivateEnv` aware of `publicDeps`~~ ✓ decided against `052d92d` — broad glob safer | High | 1h |
+| ~~21~~ | ~~Improve `enableCompletions` UX~~ ✓ done `c510d7c` — warning + timeout | High | 1h |
+| ~~22~~ | ~~Make `apps.fmt` conditional~~ ✓ done `9b376b3` | Med | 15min |
+| ~~23~~ | ~~Add `userExtraBuildAttrs` merge protection~~ ✓ done `9b376b3` — `nativeBuildInputs` concatenates | Med | 30min |
+| ~~24~~ | ~~Consider prefix matching for `publicDeps`~~ → ROADMAP (Theme 5) | Med | 30min |
+| ~~25~~ | ~~Add `generate-flake.sh` option to create `go.mod` skeleton~~ ✓ done `6e141ed` — `--go-mod` flag | Low | 15min |
+| ~~26~~ | ~~Add `generate-flake.sh` `--private-deps` support~~ ✓ done `6e141ed` | Low | 20min |
+| ~~27~~ | ~~Namespace `repoName` by owner~~ ✓ decided against `2cbb37b` — reverted, YAGNI | Med | 30min |
+| ~~28~~ | ~~Dedup `requireDeps` against existing `require` lines~~ ✓ done `96336e0` | Med | 30min |
 
-### Priority 4: CI improvements
+### ~~Priority 4: CI improvements~~
 
 | #   | Task                                                                  | Impact | Effort |
 | --- | --------------------------------------------------------------------- | ------ | ------ |
-| 29  | Add `generate-flake.sh` smoke test to CI                              | Med    | 1h     |
-| 30  | Add macOS CI runner (`runs-on: macos-latest`)                         | Med    | 30min  |
-| 31  | Add `flake.lock` freshness check to CI                                | Med    | 30min  |
-| 32  | Build `publicDepsTest` explicitly in CI (currently only via `verify`) | Low    | 15min  |
-| 33  | Configure Cachix for binary cache sharing                             | Low    | 30min  |
+| ~~29~~ | ~~Add `generate-flake.sh` smoke test to CI~~ ✓ done `b10399f` | Med | 1h |
+| ~~30~~ | ~~Add macOS CI runner~~ ✓ done `b10399f` | Med | 30min |
+| ~~31~~ | ~~Add `flake.lock` freshness check to CI~~ ✓ done `b10399f` | Med | 30min |
+| 32  | Build `publicDepsTest` explicitly in CI → partially done (verify builds it) | Low | 15min |
+| 33  | Configure Cachix → ROADMAP (low priority) | Low | 30min |
 
-### Priority 5: E2E / Integration testing (BLOCKED)
+### ~~Priority 5: E2E / Integration testing (BLOCKED)~~
 
 | #   | Task                                                                             | Impact | Effort |
 | --- | -------------------------------------------------------------------------------- | ------ | ------ |
-| 34  | Write real e2e consumer test — mock Go project + flake.nix importing go-standard | High   | 4h     |
-| 35  | Wire e2e test into CI                                                            | High   | 1h     |
-| 36  | Test monorepo with real `buildGoModule` (not mock strings)                       | Med    | 2h     |
-| 37  | Test overlay application in a real nixpkgs context                               | Med    | 1h     |
-| 38  | Add `deps`/`mkPreparedSource` integration test (end-to-end, not module eval)     | Med    | 2h     |
+| 34  | Write real e2e consumer test → BLOCKED, tracked in TODO_LIST | High | 4h |
+| 35  | Wire e2e test into CI → BLOCKED (depends on 34) | High | 1h |
+| ~~36~~ | ~~Test monorepo with real `buildGoModule`~~ ✓ done `12f2350` (multi-deps test) | Med | 2h |
+| 37  | Test overlay application in a real nixpkgs context → BLOCKED | Med | 1h |
+| 38  | Add `deps`/`mkPreparedSource` integration test → partially done (multi-deps test covers mkPreparedSource) | Med | 2h |
 
-### Priority 6: Remaining module option tests
+### ~~Priority 6: Remaining module option tests~~
 
 | #   | Task                                              | Impact | Effort |
 | --- | ------------------------------------------------- | ------ | ------ |
-| 39  | Test `proxyVendor` toggle                         | Low    | 15min  |
-| 40  | Test `ldflags` custom override                    | Low    | 15min  |
-| 41  | Test `devShellExtraPackages`                      | Low    | 15min  |
-| 42  | Test `shellExtraEnv` / `autoGoPrivate`            | Low    | 15min  |
-| 43  | Test `enableTempl` adds `pkgs.templ` to devShells | Low    | 15min  |
-| 44  | Test `enableGopls` / `enableGovulncheck` toggles  | Low    | 15min  |
-| 45  | Test `systems` override                           | Low    | 15min  |
+| 39  | Test `proxyVendor` toggle → TODO_LIST M7 (behavioral tests) | Low | 15min |
+| 40  | Test `ldflags` custom override → TODO_LIST M7 | Low | 15min |
+| ~~41~~ | ~~Test `devShellExtraPackages`~~ ✓ done (eval assertion exists) | Low | 15min |
+| ~~42~~ | ~~Test `shellExtraEnv` / `autoGoPrivate`~~ ✓ done (shellExtraEnv tested) | Low | 15min |
+| ~~43~~ | ~~Test `enableTempl` adds `pkgs.templ`~~ ✓ done `12f2350` | Low | 15min |
+| 44  | Test `enableGopls` / `enableGovulncheck` toggles → TODO_LIST (Low) | Low | 15min |
+| ~~45~~ | ~~Test `systems` override~~ ✓ done `ccf095e` | Low | 15min |
 
-### Priority 7: Long-term / ecosystem (BLOCKED or ROADMAP)
+### ~~Priority 7: Long-term / ecosystem (BLOCKED or ROADMAP)~~
 
 | #   | Task                                                                                   | Impact | Effort |
 | --- | -------------------------------------------------------------------------------------- | ------ | ------ |
-| 46  | Register `maintainers.larsartmann` in nixpkgs                                          | Low    | 30min  |
-| 47  | Audit all 7+ downstream consumers for migration status                                 | Med    | 2h     |
-| 48  | Auto-detect public repos via `proxy.golang.org` query (eliminates manual `publicDeps`) | High   | 3h     |
-| 49  | Curate a default `publicDeps` list of known-public LarsArtmann repos                   | Med    | 30min  |
-| 50  | Publish to nixpkgs or nix-community                                                    | Low    | 2h     |
+| 46  | Register `maintainers.larsartmann` in nixpkgs → BLOCKED, tracked in TODO_LIST | Low | 30min |
+| 47  | Audit all 7+ downstream consumers → BLOCKED, tracked in TODO_LIST | Med | 2h |
+| 48  | Auto-detect public repos via `proxy.golang.org` query → ROADMAP (Theme 5) | High | 3h |
+| 49  | Curate a default `publicDeps` list → ROADMAP (Theme 5) | Med | 30min |
+| 50  | Publish to nixpkgs or nix-community → ROADMAP (Theme 4) | Low | 2h |
 
 ---
 
 ## G) Questions I cannot figure out myself
 
-### G1. Should `publicDeps` use exact match or prefix match?
+### ~~G1. Should `publicDeps` use exact match or prefix match?~~
 
-Current implementation uses `grep -vFx` (exact string match). If a user lists `"github.com/larsartmann/go-output"` but `go.mod` contains `"github.com/larsartmann/go-output/v2"`, the filter won't match. Prefix match would handle `/v2` automatically but could create surprise exclusions. I cannot resolve this without your preference for safety vs convenience.
+~~Current implementation uses `grep -vFx` (exact string match). If a user lists `"github.com/larsartmann/go-output"` but `go.mod` contains `"github.com/larsartmann/go-output/v2"`, the filter won't match. Prefix match would handle `/v2` automatically but could create surprise exclusions. I cannot resolve this without your preference for safety vs convenience.~~
 
-### G2. Should we maintain a built-in known-public list?
+**Resolution:** Exact match kept — safer (no surprise exclusions). Documented in README and man page at `274cb35`. Prefix matching is a ROADMAP item (Theme 5). Test for `/v2` paths tracked in TODO_LIST M9.
 
-I could hardcode the 5 known public LarsArtmann repos (`go-atomic-write`, `go-ndjson`, `go-sse`, `go-output`, `go-branded-id`) as a default `publicDeps`. This eliminates manual configuration but couples go-nix-helpers to specific repos and creates a maintenance burden when new repos are created or visibility changes. Should this be opt-in or always-on?
+### ~~G2. Should we maintain a built-in known-public list?~~
 
-### G3. Is the GOPRIVATE/autoGoPrivate gap a blocker or acceptable as a known limitation?
+~~I could hardcode the 5 known public LarsArtmann repos (`go-atomic-write`, `go-ndjson`, `go-sse`, `go-output`, `go-branded-id`) as a default `publicDeps`. This eliminates manual configuration but couples go-nix-helpers to specific repos and creates a maintenance burden when new repos are created or visibility changes. Should this be opt-in or always-on?~~
 
-When `deps != {}` in go-standard, `autoGoPrivate` sets `GOPRIVATE = "github.com/larsartmann/*"` in all devShells, including for public repos listed in `publicDeps`. Public repos still resolve (direct GitHub clone), but Go won't use the proxy cache. Should I fix `autoGoPrivateEnv` now (more complex change) or document it as a known limitation?
+**Resolution:** No — would couple go-nix-helpers to specific repos and create maintenance burden. → ROADMAP (Theme 5: auto-detect via proxy.golang.org query).
+
+### ~~G3. Is the GOPRIVATE/autoGoPrivate gap a blocker or acceptable as a known limitation?~~
+
+~~When `deps != {}` in go-standard, `autoGoPrivate` sets `GOPRIVATE = "github.com/larsartmann/*"` in all devShells, including for public repos listed in `publicDeps`. Public repos still resolve (direct GitHub clone), but Go won't use the proxy cache. Should I fix `autoGoPrivateEnv` now (more complex change) or document it as a known limitation?~~
+
+**Resolution:** Known limitation — broad glob kept as safer default at `052d92d`. `privateGlobPattern` option added at `c510d7c` for configurability. `publicDeps` scope clarified: only affects validation, NOT GOPRIVATE.
 
 ---
 

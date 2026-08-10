@@ -67,7 +67,7 @@ nix flake check                    # runs all checks (autoDiscovery, explicitOnl
 nix fmt                            # format all .nix files with nixfmt
 nix-build test.nix -A verify       # success-path integration test
 nix run .#verifyValidation         # negative-case validation test (run outside sandbox)
-nix build .#checks.x86_64-linux.moduleTest  # module-level test (40+ assertions)
+nix build .#checks.x86_64-linux.moduleTest  # module-level test (74 assertions)
 ```
 
 ## Architecture

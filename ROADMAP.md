@@ -17,6 +17,8 @@ Raw ideas:
 - Auto-detect `subPackages` from `cmd/` or `main` package layout
 - Provide a `nix flake init -t go-nix-helpers#go-standard` template via `flake.templates`
 - Generate a complete consumer `flake.nix` from a project name and a few flags
+- `goPkg` as `lib.types.package` instead of `goPkgAttr` string (breaking, target v2)
+- `lib.mkForce` support for consumers who need to override list attrs (`nativeBuildInputs`, etc.)
 
 ### 2. Ecosystem consolidation
 

@@ -112,65 +112,31 @@ action might provide a different treefmt.
 
 ## D) TOTALLY FUCKED UP / PROBLEMS INTRODUCED OR FOUND
 
-### D1. STALE OPTION DOCUMENTATION — I reverted code but left the old docs lying
+### ~~D1. STALE OPTION DOCUMENTATION — I reverted code but left the old docs lying~~
 
-**Severity: HIGH.** When I reverted `autoGoPrivateEnv` to always use the broad
-glob, the `autoGoPrivate` option description in `modules/go-standard.nix` still
-said "When publicDeps is set, uses specific dep paths instead so public repos
-aren't marked as private." This was a **lie in the code** — the code no longer
-did what the documentation said. A consumer reading the option docs would
-believe publicDeps affects GOPRIVATE behavior, which it no longer does.
+**Resolved:** Caught and fixed during this session. Option description updated to match code.
 
-**Caught during this self-review** and fixed. But I should have caught it when
-making the revert. The revert touched the code body but not the option
-description 250 lines above. This is the exact "fix at root cause" failure
-mode — I treated the symptom (code behavior) but not the documentation that
-describes it.
+**Lesson applies:** When reverting a behavior change, grep for ALL references to the old behavior.
 
-**Lesson:** When reverting a behavior change, grep for ALL references to the
-old behavior, including comments, option descriptions, and documentation.
+### ~~D2. THE PREVIOUS SESSION MISCOUNTED ASSERTIONS~~
 
-### D2. THE PREVIOUS SESSION MISCOUNTED ASSERTIONS
+**Resolved:** Count corrected to 74 across all docs through successive sessions.
 
-**Severity: LOW.** The previous report claimed "70 assertions (up from 57)"
-with "+13 net". The actual count before this session was 69 (this session's
-addition brings it to 70). The previous session added 12 assertions, not 13.
-This is minor but shows imprecise self-reporting. The CHANGELOG also
-referenced "57 assertions" — fixed this session to "70".
+### ~~D3. `publicDeps` option in go-standard now has UNCLEAR scope~~
 
-### D3. `publicDeps` option in go-standard now has UNCLEAR scope
+**Resolved:** Option description now explicitly states "This does NOT affect GOPRIVATE" at `c510d7c`. Added to README options table with scope clarification at `274cb35`.
 
-**Severity: MEDIUM.** After reverting `autoGoPrivateEnv`, the `publicDeps`
-option in `go-standard.nix` only affects **validation** in `mkPreparedSource`
-(suppressing false-positive "missing dep" errors for public repos that match
-the private pattern). It no longer affects GOPRIVATE. But nothing in the
-option description makes this clear. Users setting `publicDeps` might expect
-it to also exclude those repos from GOPRIVATE (the previous behavior).
+### ~~D4. DIDN'T ANNOTATE THE PREVIOUS STATUS REPORT~~
 
-The option description says: "List of module paths to exclude from private
-validation" — which is technically correct, but doesn't clarify that GOPRIVATE
-is unaffected.
+**Resolved:** Previous report annotated with H section (Q resolutions) at `5f441d7`. This report also annotated in that session.
 
-### D4. DIDN'T ANNOTATE THE PREVIOUS STATUS REPORT
+### ~~D5. NO PROOF THAT nativeBuildInputs IS ACTUALLY CONCATENATED~~
 
-**Severity: LOW.** The file `docs/status/2026-08-03_03-28_session-todo-blitz.md`
-still shows Q1–Q3 as unanswered questions. Future readers will think these
-are unresolved. Should have added an appendix noting the resolutions.
+**Resolved:** Behavioral test added at `12f2350` — extracts actual `nativeBuildInputs` list from derivation and verifies BOTH `templ` AND `git` are present.
 
-### D5. NO PROOF THAT nativeBuildInputs IS ACTUALLY CONCATENATED
+### ~~D6. DIDN'T RUN generate-flake.sh TO VERIFY NEW FLAGS~~
 
-**Severity: MEDIUM.** My test (`nativeBuildInputsMergeCfg`) only proves the
-package *evaluates*. It doesn't prove the user's `nativeBuildInputs` are
-actually in the final derivation. If the merge logic silently dropped them,
-the test would still pass. The test is a smoke test, not a behavioral test.
-
-### D6. DIDN'T RUN generate-flake.sh TO VERIFY NEW FLAGS
-
-**Severity: MEDIUM.** The CHANGELOG claims `--go-mod` and `--private-deps`
-flags work, but I never ran the script in this session. The CI smoke test
-(`smoke-test` job) doesn't test these flags either — it only tests basic
-generation and `--templ`. If the flags produce broken output, nobody would
-know until a user tries them.
+**Resolved:** Manually verified all flags (`--go-mod`, `--private-deps`, `--templ`) in session `5f441d7`. All produce valid output. CI smoke test still doesn't cover these flags → TODO_LIST H1.
 
 ---
 
@@ -248,93 +214,67 @@ know until a user tries them.
 
 ## F) NEXT 50 THINGS TO GET DONE
 
-### Critical (correctness + coverage gaps)
+### ~~Critical (correctness + coverage gaps)~~
 
-1. **Deepen nativeBuildInputs merge test** — extract actual list from
-   derivation, verify both templ AND user inputs present
-2. **Add negative requireDeps test** — remove dedup logic, verify duplication
-   occurs, then restore
-3. **Clarify `publicDeps` scope in option description** — note it only
-   affects validation, not GOPRIVATE
-4. **Add `autoGoPrivate` to README options table**
-5. **Add timeout to enableCompletions check** — `timeout 5 $out/bin/...`
-6. **Run generate-flake.sh with --go-mod and --private-deps** — verify
-   output manually
-7. **Add generate-flake.sh --go-mod and --private-deps to CI smoke test**
-8. **Annotate previous status report** (`2026-08-03_03-28_*`) with Q1–Q3
-   resolutions
-9. **Add monorepo integration test** to test.nix — two packages sharing vendor
-10. **Document the nativeBuildInputs merge limitation** — which attrs
-    concatenate vs override
+1. ~~**Deepen nativeBuildInputs merge test**~~ done at `12f2350` — behavioral test extracts actual list.
+2. **Add negative requireDeps test** ← still open (hard to test without modifying source)
+3. ~~**Clarify `publicDeps` scope in option description**~~ done at `c510d7c`
+4. ~~**Add `autoGoPrivate` to README options table**~~ done at `274cb35`
+5. ~~**Add timeout to enableCompletions check**~~ done at `c510d7c` — `timeout 10`
+6. ~~**Run generate-flake.sh with --go-mod and --private-deps**~~ done at `5f441d7` — manually verified
+7. **Add generate-flake.sh --go-mod and --private-deps to CI smoke test** ← still open → TODO_LIST H1
+8. ~~**Annotate previous status report**~~ done at `5f441d7`
+9. ~~**Add monorepo integration test** to test.nix~~ done at `12f2350` — Test 6
+10. ~~**Document the nativeBuildInputs merge limitation**~~ done at `c510d7c` — option description updated
 
 ### High impact
 
-11. **Add real e2e consumer test** — mock Go project + flake.nix (blocked but
-    could mock)
-12. **Deepen behavioral tests** — extract actual `buildGoModule` attribute
-    values (buildFlags, ldflags, proxyVendor) and assert on them
-13. **Add negative test for enableCompletions warning** — mock binary without
-    `--completion`, verify warning emitted
-14. **Extend merge protection** to `buildInputs`, `checkInputs`,
-    `configureFlags`
-15. **Add property test for stripVersionSuffix** — idempotence, no `/vN` in
-    output
-16. **Add property test for repoName** — no `/` in output, deterministic
-17. **Register `maintainers.larsartmann` in nixpkgs** (blocked on external PR)
-18. **Audit downstream consumers** for migration status (blocked on access)
-19. **Add `shellcheck` to CI** for scripts/generate-flake.sh
-20. **Add `shfmt` to treefmt** for shell formatting
+11. **Add real e2e consumer test** ← BLOCKED → tracked in TODO_LIST
+12. **Deepen behavioral tests** ← still open → TODO_LIST M7
+13. **Add negative test for enableCompletions warning** ← still open → TODO_LIST M8
+14. **Extend merge protection** to `buildInputs`, `checkInputs`, `configureFlags` ← still open → TODO_LIST H3
+15. **Add property test for stripVersionSuffix** ← still open → TODO_LIST M1
+16. **Add property test for repoName** ← still open → TODO_LIST M2
+17. **Register `maintainers.larsartmann` in nixpkgs** ← BLOCKED → tracked in TODO_LIST
+18. **Audit downstream consumers** ← BLOCKED → tracked in TODO_LIST
+19. **Add `shellcheck` to CI** ← still open → TODO_LIST H4
+20. **Add `shfmt` to treefmt** ← still open → TODO_LIST H5
 
 ### Medium impact
 
-21. **Document `userExtraBuildAttrs` merge strategy** — which attrs
-    concatenate, which override, in README or migration guide
-22. **Add `GONOSUMDB` docs** as alternative to GOPRIVATE for publicDeps edge
-    case
-23. **Add `privateDepPattern` override docs** — how to use for non-LarsArtmann
-    orgs
-24. **Add `--dry-run` flag to generate-flake.sh** — preview without writing
-25. **Add `--verbose` flag to generate-flake.sh** — show created files
-26. **Cache nix-store in smoke-test CI job** — speed up
-27. **Run integration tests on macOS** — not just module eval
-28. **Add treefmt.config inspection test** — verify all enabled programs
-    produce correct treefmt config
-29. **Consider GOPRIVATE wildcard + GONOPROXY** for publicDeps instead of
-    broad glob (finer control)
-30. **Add `vendorHash` placeholder detection** — warn if still `sha256-AAA...`
-31. **Add `nix flake show` test** — verify all expected outputs exist
-32. **Update `docs/architecture.d2`** to reflect enableNixfmt option
-33. **Add `docs/flake-patterns.md` entry** for enableNixfmt toggle
-34. **Document completion warning behavior** in README enableCompletions
-    option description
-35. **Test CI freshness check** — verify it catches a stale lock file
+21. ~~**Document `userExtraBuildAttrs` merge strategy**~~ done at `c510d7c` — option description lists concatenation vs override
+22. ~~**Add `GONOSUMDB` docs**~~ → ROADMAP (Theme 5)
+23. ~~**Add `privateDepPattern` override docs**~~ done at `274cb35`
+24. **Add `--dry-run` flag to generate-flake.sh** ← still open → TODO_LIST M6
+25. **Add `--verbose` flag to generate-flake.sh** ← still open → TODO_LIST L1
+26. **Cache nix-store in smoke-test CI job** ← still open → TODO_LIST L8
+27. **Run integration tests on macOS** ← still open → TODO_LIST L9
+28. **Add treefmt.config inspection test** ← still open → TODO_LIST M10
+29. ~~**Consider GOPRIVATE wildcard + GONOPROXY**~~ → ROADMAP (Theme 5)
+30. **Add `vendorHash` placeholder detection** ← still open → TODO_LIST M3
+31. **Add `nix flake show` test** ← still open → TODO_LIST M4
+32. **Update `docs/architecture.d2`** ← still open → TODO_LIST M5
+33. **Add `docs/flake-patterns.md` entry** for enableNixfmt toggle ← still open
+34. ~~**Document completion warning behavior** in README~~ done — option description updated
+35. **Test CI freshness check** ← still open → TODO_LIST (Low)
 
 ### Low impact / Polish
 
-36. **Fix commit df9a5ff empty message** — `git rebase -i` (needs force push)
-37. **Add `--template` listing** to generate-flake.sh help text
-38. **Add macOS CI badge** to README
-39. **Add `CONTRIBUTING.md` link verification** — README references it, verify
-    it exists
-40. **Consider `lib.mkForce` support** for consumers overriding list attrs
-41. **Consider `lib.types.package` for goPkg** instead of `goPkgAttr` string
-    (breaking, plan for v2)
-42. **Add test for `goPkgAttr = "go_1_24"`** — verify non-default Go version
-43. **Clean up `collectMissingRequires` temp file in trap** — `trap "rm -f
-    go.mod.requires.tmp" EXIT`
-44. **Add `stripVersionSuffix` edge case tests** — `v1`, `v100`, empty string,
-    single segment
-45. **Document `_local_deps` naming convention** in mkPreparedSource header
-46. **Add FAQ entry for `deps` with mixed owners** — non-LarsArtmann private
-    repos
-47. **Review all `_local_deps` references** in downstream repos (after any
-    future repoName change)
-48. **Add `nix flake check --all-systems` to CI** — currently only checks
-    x86_64-linux
-49. **Consider `--impure` flag warning** in generate-flake.sh if deps require
-    SSH
-50. **Add session-end checklist** to AGENTS.md — "grep for stale comments
-    after reverts"
+36. **Fix commit df9a5ff empty message** ← BLOCKED → tracked in TODO_LIST (needs user approval)
+37. **Add `--template` listing** to generate-flake.sh help text ← still open → TODO_LIST L3
+38. **Add macOS CI badge** to README ← still open → TODO_LIST L2
+39. ~~**Add `CONTRIBUTING.md` link verification**~~ already exists
+40. ~~**Consider `lib.mkForce` support**~~ → ROADMAP (Theme 1)
+41. ~~**Consider `lib.types.package` for goPkg`**~~ → ROADMAP (Theme 1)
+42. ~~**Add test for `goPkgAttr = "go_1_24"`**~~ → covered by eval tests (non-default attr evaluates)
+43. **Clean up `collectMissingRequires` temp file in trap** ← still open → TODO_LIST L5
+44. **Add `stripVersionSuffix` edge case tests** ← still open → TODO_LIST L6
+45. ~~**Document `_local_deps` naming convention**~~ NOT-NEEDED — simple `<repo>` naming
+46. **Add FAQ entry for `deps` with mixed owners** ← still open → TODO_LIST L4
+47. ~~**Review all `_local_deps` references**~~ NOT-NEEDED — repoName change reverted
+48. **Add `nix flake check --all-systems` to CI** ← still open → TODO_LIST L7
+49. ~~**Consider `--impure` flag warning**~~ → ROADMAP (low priority)
+50. ~~**Add session-end checklist** to AGENTS.md~~ → tracked in TODO_LIST L-series
 
 ---
 

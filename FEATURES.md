@@ -44,7 +44,7 @@
 | `version` option (override git-derived version)                | 🟢 `FULLY_FUNCTIONAL`     | Defaults to `self.rev or self.dirtyRev or "dev"`                                          |
 | `enableGolangciLint` toggle                                    | 🟢 `FULLY_FUNCTIONAL`     | Conditionally includes golangci-lint in devShells and lint app                            |
 | `enableGofumpt` / `enableGoimports` toggles                    | 🟢 `FULLY_FUNCTIONAL`     | Conditionally enabled in treefmt programs                                                 |
-| `enableCompletions` option                                     | 🟡 `PARTIALLY_FUNCTIONAL` | Requires cobra/urfave/cli; silently does nothing if binary doesn't support `--completion` |
+| `enableCompletions` option                                     | 🟡 `PARTIALLY_FUNCTIONAL` | Requires cobra/urfave/cli; emits a build-time warning with remediation options if binary doesn't support `--completion`. Check uses `timeout 10` to prevent hanging |
 | Monorepo support (`packages` option)                           | 🟢 `FULLY_FUNCTIONAL`     | Multiple `buildGoModule` per repo; separate apps/overlays per package                     |
 | `fmt` app (`nix run .#fmt`)                                    | 🟢 `FULLY_FUNCTIONAL`     | Wrapper around treefmt                                                                    |
 | Module-level tests (options, types, outputs)                   | 🟡 `PARTIALLY_FUNCTIONAL` | `test-module.nix` with 74 assertions; includes behavioral tests for nativeBuildInputs concatenation; eval-only for other attrs (see TODO_LIST) |
@@ -70,7 +70,7 @@
 | Feature                                              | Status                    | Notes                                                                                                                           |
 | ---------------------------------------------------- | ------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
 | `flake.nix` with `nix flake check` / `nix fmt`       | 🟢 `FULLY_FUNCTIONAL`     | Checks wired to `test.nix`, `test-module.nix`, formatter uses nixfmt                                                            |
-| Integration test suite (`test.nix`)                  | 🟢 `FULLY_FUNCTIONAL`     | `autoDiscovery`, `explicitOnly`, `verify`, `validationTest`                                                                     |
+| Integration test suite (`test.nix`)                  | 🟢 `FULLY_FUNCTIONAL`     | 6 scenarios: auto-discovery, explicit-only, validation, publicDeps exclusion, requireDeps dedup, multi-deps monorepo |
 | Module test suite (`test-module.nix`)                | 🟡 `PARTIALLY_FUNCTIONAL` | 74 assertions; options, types, defaults, perSystem outputs, overlay, behavioral nativeBuildInputs test; remaining attrs eval-only |
 | Negative-case validation runner (`verifyValidation`) | 🟢 `FULLY_FUNCTIONAL`     | Run outside sandbox via `nix run .#verifyValidation`                                                                            |
 | GitHub Actions CI workflow for the repo itself       | 🟢 `FULLY_FUNCTIONAL`     | `.github/workflows/ci.yml` with format check, integration + module tests                                                        |

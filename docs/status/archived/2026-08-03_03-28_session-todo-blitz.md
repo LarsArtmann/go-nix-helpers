@@ -90,7 +90,9 @@ All non-blocked TODO items were addressed. The 4 blocked items remain:
 
 ## D) TOTALLY FUCKED UP / PROBLEMS INTRODUCED
 
-### D1. BREAKING CHANGE: `repoName` namespacing changes `_local_deps/` paths — NO MIGRATION GUIDE
+### ~~D1. BREAKING CHANGE: `repoName` namespacing changes `_local_deps/` paths — NO MIGRATION GUIDE~~
+
+**Resolved:** Reverted at `2cbb37b` — `<repo>` only naming restored. Broad glob kept. No migration needed since the breaking change was reverted before any consumer upgraded.
 
 **Severity: HIGH.** The `repoName` change (M9) renames all `_local_deps/` directories from `<repo>` to `<owner>-<repo>`. Every downstream consumer that uses `mkPreparedSource` will get a **different vendor hash** when upgrading. This is a breaking change that was NOT documented in the migration guide. Consumers upgrading go-nix-helpers will see:
 - Build fails with vendorHash mismatch
@@ -98,11 +100,15 @@ All non-blocked TODO items were addressed. The 4 blocked items remain:
 
 **What I should have done:** Added a "Breaking Changes" section to the migration guide documenting the `_local_deps/` path change and the need to recompute vendor hashes.
 
-### D2. requireDeps dedup logic is UNTESTED
+### ~~D2. requireDeps dedup logic is UNTESTED~~
+
+**Resolved:** Test added at `687b62f` — Test 5 in `test.nix` verifies dedup with entries already present in go.mod.
 
 The dedup logic (M12) was implemented but **no test case was added** to `test.nix` that passes `requireDeps` with entries already present in `go.mod` and verifies they are not duplicated. The dedup could be broken and we wouldn't know.
 
-### D3. `autoGoPrivateEnv` change may be INCORRECT for edge cases
+### ~~D3. `autoGoPrivateEnv` change may be INCORRECT for edge cases~~
+
+**Resolved:** Reverted to broad glob at `052d92d`. `privateGlobPattern` option added at `c510d7c` for configurability.
 
 When `publicDeps` is non-empty, I switched GOPRIVATE from the broad glob to specific dep paths. But consider: what if the user has private deps in `deps` AND **other** private LarsArtmann repos that are NOT in deps but ARE required in go.mod (resolvable via SSH in devShell)? Those would no longer be covered by GOPRIVATE and Go would try to fetch them from the proxy, failing. The previous broad glob covered ALL LarsArtmann repos. The new specific-path approach only covers repos explicitly in `deps`.
 
@@ -110,23 +116,23 @@ When `publicDeps` is non-empty, I switched GOPRIVATE from the broad glob to spec
 
 ### D4. Commit `df9a5ff` has an EMPTY commit message
 
-The auto-git daemon committed the `generate-flake.sh` placeholder fix with a blank message. This is ugly in git history. Not directly my fault, but I should have squashed or amended.
+Still open → tracked in TODO_LIST (Blocked — needs interactive rebase + force push, user approval).
 
-### D5. `checkRequireLines` naming is misleading
+### ~~D5. `checkRequireLines` naming is misleading~~
 
-The variable name suggests it only checks, but it also builds the `NEW_REQUIRES` string. Should be named `buildDedupedRequires` or `collectMissingRequires`.
+**Resolved:** Renamed to `collectMissingRequires` at `96336e0`.
 
-### D6. The requireDeps dedup heredoc has fragile escaping
+### ~~D6. The requireDeps dedup heredoc has fragile escaping~~
 
-The expression `''${NEW_REQUIRES%"$'''\n'''"}` uses triple-escaping (Nix `''` escaping + shell `$` escaping + literal `\n`). This is correct but extremely hard to read or maintain. A simpler approach would use `printf` or `awk` to check/write.
+**Resolved:** Replaced with temp file approach at `96336e0`.
 
-### D7. README "What you get" table doesn't mention conditional `apps.fmt`
+### ~~D7. README "What you get" table doesn't mention conditional `apps.fmt`~~
 
-The table at README line 68 lists `apps.fmt` as always present. After M10, `apps.fmt` is conditional. The table should note this.
+**Resolved:** Fixed at `9b376b3` — `apps.fmt` added to table with conditional note.
 
-### D8. `enableNixfmt` not in migration guide parameter mapping
+### ~~D8. `enableNixfmt` not in migration guide parameter mapping~~
 
-The migration guide's parameter mapping table (mkGoFlake -> go-standard) doesn't mention `enableNixfmt`. Not strictly wrong (it's a new option, not a migration), but inconsistent.
+**Resolved:** Added to migration guide parameter mapping at `b10399f`.
 
 ---
 
@@ -174,67 +180,67 @@ The migration guide's parameter mapping table (mkGoFlake -> go-standard) doesn't
 
 ## F) NEXT 50 THINGS TO GET DONE
 
-### Critical (breaking change remediation)
+### ~~Critical (breaking change remediation)~~
 
-1. **Add "Breaking Changes" section to migration guide** documenting `repoName` path change and required vendorHash recompute
-2. **Add CHANGELOG.md** with this session's breaking change entry
-3. **Fix D3: rethink `autoGoPrivateEnv` with publicDeps** — test with real mixed private/public repos or keep glob + document tradeoff
-4. **Add test for requireDeps dedup** in test.nix (pass requireDeps that duplicate existing go.mod entries)
-5. **Add test for nativeBuildInputs merge** proving user inputs are appended not overridden
+1. ~~**Add "Breaking Changes" section to migration guide** documenting `repoName` path change~~ NOT-NEEDED — `repoName` change was reverted at `2cbb37b`; no breaking change shipped.
+2. ~~**Add CHANGELOG.md** with this session's breaking change entry~~ done — CHANGELOG.md exists and is comprehensive.
+3. ~~**Fix D3: rethink `autoGoPrivateEnv` with publicDeps**~~ done at `052d92d` — reverted to broad glob.
+4. ~~**Add test for requireDeps dedup** in test.nix~~ done at `687b62f`.
+5. ~~**Add test for nativeBuildInputs merge** proving user inputs are appended not overridden~~ done at `12f2350` — behavioral test extracts actual list.
 
 ### High impact
 
-6. **Add real e2e consumer test** — mock Go project + flake.nix importing go-standard, built via `nix build` (currently blocked but could be unblocked with a mock)
-7. **Deepen behavioral tests** — extract actual `buildGoModule` attribute values (buildFlags, ldflags, proxyVendor) and assert on them
-8. **Add negative test for enableCompletions warning** — mock binary without `--completion` support, verify warning is emitted
-9. **Audit all downstream consumers** for the `repoName` breaking change impact (blocked on access)
-10. **Register `maintainers.larsartmann` in nixpkgs** (blocked on external PR)
+6. **Add real e2e consumer test** ← BLOCKED → tracked in TODO_LIST
+7. **Deepen behavioral tests** ← still open → TODO_LIST M7
+8. **Add negative test for enableCompletions warning** ← still open → TODO_LIST M8
+9. **Audit all downstream consumers** ← BLOCKED → tracked in TODO_LIST
+10. **Register `maintainers.larsartmann` in nixpkgs** ← BLOCKED → tracked in TODO_LIST
 
 ### Medium impact
 
-11. **Fix "What you get" table** — note `apps.fmt` is conditional
-12. **Add `enableNixfmt` to README FAQ** — "How do I disable nixfmt?"
-13. **Rename `checkRequireLines`** to `collectMissingRequires`
-14. **Simplify requireDeps dedup escaping** — use `grep -q` + conditional append instead of string accumulation
-15. **Extend merge protection** to `buildInputs`, `checkInputs`, `configureFlags`
-16. **Add timeout to completion check** — `timeout 5 $out/bin/${pkgName} --completion bash`
-17. **Remove `mkGoFlake.nix`** — set a removal date and delete it, update migration guide
-18. **Extract postPatch script** from mkPreparedSource into a separate `.sh` file
-19. **Add monorepo integration test** to test.nix — two packages sharing vendor hash
-20. **Document `GONOSUMCHECK`/`GONOSUMDB`** as alternatives to GOPRIVATE for the publicDeps edge case
-21. **Add `nix flake check` to generate-flake.sh smoke test** — use `--override-input` to avoid network
-22. **Run integration tests on macOS too** — not just eval
-23. **Add property tests** for stripVersionSuffix and repoName edge cases
-24. **Add FAQ entry for `deps` with mixed owners** — non-LarsArtmann private repos
-25. **Document the `owner-repo` naming convention** in mkPreparedSource header comment
-26. **Consider `goPkg` as `lib.types.package`** instead of `goPkgAttr` string (breaking, plan for v2)
-27. **Add `enableNixfmt` to migration guide** parameter mapping table
-28. **Test the CI freshness check** — verify it catches a stale lock file
-29. **Test the macOS CI job** — verify it actually passes on macOS (can't verify locally)
-30. **Add `privateDepPattern` override documentation** — how to use for non-LarsArtmann orgs
-31. **Consider GOPRIVATE wildcard with GONOPROXY exclusions** — instead of specific paths
-32. **Add `--dry-run` flag to generate-flake.sh** — preview without writing
-33. **Add `generate-flake.sh` integration test** — generate + `nix flake check` with `--override-input`
-34. **Document the completion warning behavior** in README enableCompletions option
-35. **Add `treefmt.config` inspection test** — verify all enabled programs produce correct treefmt config
+11. ~~**Fix "What you get" table** — note `apps.fmt` is conditional~~ done at `9b376b3`
+12. ~~**Add `enableNixfmt` to README FAQ** — "How do I disable nixfmt?"~~ done at `9b376b3`
+13. ~~**Rename `checkRequireLines`** to `collectMissingRequires`~~ done at `96336e0`
+14. ~~**Simplify requireDeps dedup escaping**~~ done at `96336e0` — temp file approach
+15. **Extend merge protection** to `buildInputs`, `checkInputs`, `configureFlags` ← still open → TODO_LIST H3
+16. ~~**Add timeout to completion check**~~ done at `c510d7c` — `timeout 10`
+17. ~~**Remove `mkGoFlake.nix`** — set a removal date~~ done — removal target set to v1.0.0 at `9b376b3`
+18. **Extract postPatch script** ← still open → TODO_LIST L10
+19. ~~**Add monorepo integration test** to test.nix~~ done at `12f2350` — Test 6 (multi-deps)
+20. ~~**Document `GONOSUMCHECK`/`GONOSUMDB`**~~ → ROADMAP (Theme 5)
+21. ~~**Add `nix flake check` to generate-flake.sh smoke test**~~ partially — CI smoke-test job validates parse only
+22. **Run integration tests on macOS too** ← still open → TODO_LIST L9
+23. **Add property tests** for stripVersionSuffix and repoName ← still open → TODO_LIST M1-M2
+24. **Add FAQ entry for `deps` with mixed owners** ← still open → TODO_LIST L4
+25. ~~**Document the `owner-repo` naming convention`**~~ NOT-NEEDED — owner prefix reverted at `2cbb37b`
+26. ~~**Consider `goPkg` as `lib.types.package`**~~ → ROADMAP (Theme 1)
+27. ~~**Add `enableNixfmt` to migration guide** parameter mapping table~~ done at `b10399f`
+28. **Test the CI freshness check** ← still open → TODO_LIST (Low)
+29. ~~**Test the macOS CI job**~~ partially — CI runs `--no-build` on macOS
+30. ~~**Add `privateDepPattern` override documentation**~~ done at `274cb35`
+31. ~~**Consider GOPRIVATE wildcard with GONOPROXY exclusions**~~ → ROADMAP (Theme 5)
+32. **Add `--dry-run` flag to generate-flake.sh** ← still open → TODO_LIST M6
+33. **Add `generate-flake.sh` integration test** ← partially — CI smoke-test validates parse
+34. ~~**Document the completion warning behavior** in README~~ done — option description updated
+35. **Add `treefmt.config` inspection test** ← still open → TODO_LIST M10
 
 ### Low impact / Polish
 
-36. **Fix commit df9a5ff empty message** — `git rebase -i` to squash or amend (requires force push, ask user)
-37. **Add `shellcheck` to CI** for scripts/generate-flake.sh
-38. **Add `shfmt` to treefmt** for shell script formatting
-39. **Consider `lib.types.package` for goPkg** in a future v2 API
-40. **Add `vendorHash` placeholder detection** — warn if still `sha256-AAA...` in consumer flakes
-41. **Add `nix flake show` test** — verify all expected outputs exist
-42. **Add `--template` listing** to generate-flake.sh help text
-43. **Cache nix-store in smoke-test job** — speed up CI
-44. **Add badges for macOS CI** to README
-45. **Add `CONTRIBUTING.md`** referenced by README but may not exist
-46. **Update `docs/architecture.d2`** to reflect new enableNixfmt option
-47. **Add `docs/flake-patterns.md`** entry for enableNixfmt toggle
-48. **Consider `lib.mkForce` support** for consumers who need to override list attrs
-49. **Add `--verbose` flag to generate-flake.sh** — show what files were created
-50. **Review all `_local_deps` references in downstream repos** after the breaking repoName change
+36. **Fix commit df9a5ff empty message** ← BLOCKED → tracked in TODO_LIST (needs user approval for force push)
+37. **Add `shellcheck` to CI** ← still open → TODO_LIST H4
+38. **Add `shfmt` to treefmt** ← still open → TODO_LIST H5
+39. ~~**Consider `lib.types.package` for goPkg`**~~ → ROADMAP (Theme 1)
+40. **Add `vendorHash` placeholder detection** ← still open → TODO_LIST M3
+41. **Add `nix flake show` test** ← still open → TODO_LIST M4
+42. **Add `--template` listing** to generate-flake.sh help text ← still open → TODO_LIST L3
+43. **Cache nix-store in smoke-test job** ← still open → TODO_LIST L8
+44. **Add badges for macOS CI** to README ← still open → TODO_LIST L2
+45. ~~**Add `CONTRIBUTING.md`** referenced by README~~ already exists
+46. **Update `docs/architecture.d2`** ← still open → TODO_LIST M5
+47. **Add `docs/flake-patterns.md`** entry for enableNixfmt toggle ← still open
+48. ~~**Consider `lib.mkForce` support**~~ → ROADMAP (Theme 1)
+49. **Add `--verbose` flag to generate-flake.sh** ← still open → TODO_LIST L1
+50. ~~**Review all `_local_deps` references in downstream repos**~~ NOT-NEEDED — repoName change reverted at `2cbb37b`
 
 ---
 

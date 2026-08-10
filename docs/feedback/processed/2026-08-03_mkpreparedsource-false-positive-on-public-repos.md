@@ -99,9 +99,11 @@ But this workaround is only available when calling `mkPreparedSource` directly. 
 
 ---
 
-## Suggested Fixes
+## ~~Suggested Fixes~~ — ALL THREE SHIPPED (A + B + C)
 
-### Fix A: Forward `validatePrivateDeps` and `privateDepPattern` through `mkGoFlake.nix` (minimal, backward-compatible)
+### ~~Fix A: Forward `validatePrivateDeps` and `privateDepPattern` through `mkGoFlake.nix` (minimal, backward-compatible)~~
+
+**DONE.** All three parameters forwarded through both `mkGoFlake.nix` and the go-standard module.
 
 ```nix
 # mkGoFlake.nix — add to parameter list:
@@ -127,7 +129,9 @@ Projects with public LarsArtmann deps can then set `validatePrivateDeps = false;
 
 **Drawback:** Disabling validation entirely loses the safety net for genuinely private repos.
 
-### Fix B: Add a `publicDeps` exclusion list (more precise)
+### ~~Fix B: Add a `publicDeps` exclusion list (more precise)~~
+
+**DONE.** `publicDeps` parameter added to `mkPreparedSource` with `grep -vFx` exact match filtering. Forwarded through go-standard and mkGoFlake. Integration test (Test 4) verifies public dep has no replace while private dep still has replace.
 
 ```nix
 # mkPreparedSource.nix — new parameter:
@@ -155,7 +159,9 @@ Projects can list known-public repos:
 
 **Advantage:** Keeps validation active for genuinely private repos while allowing specific exclusions.
 
-### Fix C: Improve the error message (quick win, independent of A/B)
+### ~~Fix C: Improve the error message (quick win, independent of A/B)~~
+
+**DONE.** Error message now says "modules without local replace" (not "private modules") and offers three resolution paths: add as dep, set `validatePrivateDeps = false`, or add to `publicDeps`.
 
 Change the wording to not assume the modules are private:
 
@@ -178,9 +184,11 @@ This prevents users from blindly following guidance that only applies to private
 
 ---
 
-## Recommendation
+## ~~Recommendation~~
 
-Implement **Fix A + Fix C** as the immediate improvement (minimal change, backward-compatible, better error message). Consider **Fix B** as a follow-up for projects with a mix of public and private LarsArtmann deps.
+~~Implement **Fix A + Fix C** as the immediate improvement (minimal change, backward-compatible, better error message). Consider **Fix B** as a follow-up for projects with a mix of public and private LarsArtmann deps.~~
+
+**ALL THREE FIXES IMPLEMENTED.** This feedback is fully resolved.
 
 ---
 

@@ -125,27 +125,27 @@ New integration scenario:
 
 ### High impact (should do next)
 
-1. Add `--go-mod` and `--private-deps` variants to CI smoke-test job
-2. Add behavioral test for GOPRIVATE with custom `privateGlobPattern` (requires deps in test)
-3. Extend merge protection to `buildInputs`, `checkInputs` (or document the limitation more prominently)
-4. Add `shellcheck` to CI for `scripts/generate-flake.sh`
-5. Add `shfmt` to treefmt for shell formatting
+1. Add `--go-mod` and `--private-deps` variants to CI smoke-test job → TODO_LIST H1
+2. Add behavioral test for GOPRIVATE with custom `privateGlobPattern` (requires deps in test) → TODO_LIST H2
+3. Extend merge protection to `buildInputs`, `checkInputs` (or document the limitation more prominently) → TODO_LIST H3
+4. Add `shellcheck` to CI for `scripts/generate-flake.sh` → TODO_LIST H4
+5. Add `shfmt` to treefmt for shell formatting → TODO_LIST H5
 
 ### Medium impact
 
-6. Add property test for `stripVersionSuffix` (idempotence, no `/vN` in output)
-7. Add `vendorHash` placeholder detection (warn if `sha256-AAA...`)
-8. Add `nix flake show` test (verify all expected outputs exist)
-9. Update `docs/architecture.d2` to reflect `privateGlobPattern`
-10. Add `--dry-run` flag to generate-flake.sh
+6. Add property test for `stripVersionSuffix` (idempotence, no `/vN` in output) → TODO_LIST M1
+7. Add `vendorHash` placeholder detection (warn if `sha256-AAA...`) → TODO_LIST M3
+8. Add `nix flake show` test (verify all expected outputs exist) → TODO_LIST M4
+9. Update `docs/architecture.d2` to reflect `privateGlobPattern` → TODO_LIST M5
+10. Add `--dry-run` flag to generate-flake.sh → TODO_LIST M6
 
 ### Low impact / Polish
 
-11. Fix commit `df9a5ff` empty message (needs rebase)
-12. Add macOS CI badge to README
-13. Add `--verbose` flag to generate-flake.sh
-14. Add session-end checklist to AGENTS.md
-15. Consider `lib.types.package` for `goPkg` (breaking, plan for v2)
+11. Fix commit `df9a5ff` empty message (needs rebase) → TODO_LIST Blocked
+12. Add macOS CI badge to README → TODO_LIST L2
+13. Add `--verbose` flag to generate-flake.sh → TODO_LIST L1
+14. Add session-end checklist to AGENTS.md → TODO_LIST (Low)
+15. Consider `lib.types.package` for `goPkg` (breaking, plan for v2) → ROADMAP (Theme 1)
 
 ---
 
