@@ -109,29 +109,10 @@
 }:
 let
   # ---------------------------------------------------------------------------
-  # Path helpers
+  # Path helpers (imported from pure-functions.nix for testability)
   # ---------------------------------------------------------------------------
-
-  # Strip ALL /vN major version suffixes from a path — not just trailing.
-  # "codec/v2" → "codec", "event/v3/eventtest" → "event/eventtest", "core" → "core"
-  stripVersionSuffix =
-    path:
-    let
-      parts = lib.splitString "/" path;
-    in
-    lib.concatStringsSep "/" (lib.filter (p: builtins.match "v[0-9]+" p == null) parts);
-
-  # Extract a unique directory name from a Go import path, stripping any
-  # /vN major version suffix.
-  # "github.com/larsartmann/go-cqrs-lite" → "go-cqrs-lite"
-  # "github.com/larsartmann/go-filewatcher/v2" → "go-filewatcher"
-  repoName =
-    path:
-    let
-      stripped = stripVersionSuffix path;
-      parts = lib.splitString "/" stripped;
-    in
-    if lib.length parts >= 3 then lib.elemAt parts 2 else lib.last parts;
+  pureFuncs = import ./pure-functions.nix { inherit lib; };
+  inherit (pureFuncs) stripVersionSuffix repoName;
 
   # Read the module path from the first non-empty line of a go.mod file.
   # go.mod line 1 is always: "module <import-path>"
@@ -348,6 +329,7 @@ pkgs.stdenv.mkDerivation {
 
     ${lib.optionalString hasRequires ''
       touch go.mod.requires.tmp
+      trap 'rm -f go.mod.requires.tmp' EXIT
       ${collectMissingRequires}
       if [ -s go.mod.requires.tmp ]; then
         echo "" >> go.mod
@@ -356,6 +338,7 @@ pkgs.stdenv.mkDerivation {
         echo ')' >> go.mod
       fi
       rm -f go.mod.requires.tmp
+      trap - EXIT
     ''}
 
     if [ -n "$(cat go.mod | tr -d '\n')" ]; then
