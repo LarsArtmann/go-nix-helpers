@@ -76,8 +76,8 @@
 #   publicDeps           List of module paths to exclude from private validation
 #                        (default: []). Use for repos that match privateDepPattern
 #                        but are actually public and resolve via the Go proxy.
-#                        Entries must match the exact module path as it appears in
-#                        go.mod (including any /vN suffix).
+#                        Versioned-path aware: listing "github.com/foo/bar" also
+#                        excludes "github.com/foo/bar/v2", "/v3", etc.
 #   postPatchExtra       Additional shell commands appended to postPatch.
 {
   pkgs,
@@ -266,9 +266,12 @@ let
   # publicDeps are excluded from validation: repos that match privateDepPattern
   # but are actually public (served by proxy.golang.org) can be listed here to
   # avoid false positives while keeping validation active for truly private repos.
+  # Versioned-path aware: listing "github.com/foo/bar" also matches
+  # "github.com/foo/bar/v2", "github.com/foo/bar/v3", etc. Consumers no longer
+  # need to enumerate every /vN variant separately.
   publicDepsFilter = lib.optionalString (publicDeps != [ ]) ''
     for pub in ${lib.concatMapStringsSep " " lib.escapeShellArg publicDeps}; do
-      REQUIRED=$(printf '%s\n' "$REQUIRED" | grep -vFx "$pub" || true)
+      REQUIRED=$(printf '%s\n' "$REQUIRED" | grep -vE "^''${pub}(/v[0-9]+)?\$" || true)
     done
   '';
 

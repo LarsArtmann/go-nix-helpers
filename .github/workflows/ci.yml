@@ -22,6 +22,10 @@ jobs:
         uses: DeterminateSystems/magic-nix-cache-action@v9
 
       - name: Check Flake
+        # --no-build: evaluate all outputs without building (faster CI).
+        # --all-systems is NOT used because Linux cannot evaluate darwin
+        # derivations. Cross-platform coverage is achieved via the
+        # ubuntu-latest + macos-latest matrix below.
         run: nix flake check --no-build
 
       - name: Format Check
@@ -158,6 +162,9 @@ jobs:
 
   private-deps-test:
     runs-on: ubuntu-latest
+    # Disabled until DEPLOY_SSH_KEY secret is added to GitHub repo settings.
+    # This would test a real consumer flake with private LarsArtmann deps,
+    # catching breakages that mock tests cannot detect.
     if: false # Enable when SSH key secret is configured
     steps:
       - uses: actions/checkout@v4

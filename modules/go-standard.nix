@@ -299,8 +299,8 @@ in
       description = ''
         Module paths to exclude from private dependency validation only.
         Use for repos that match privateDepPattern but are actually public
-        (served by proxy.golang.org). Entries must match the exact module
-        path as it appears in go.mod.
+        (served by proxy.golang.org). Versioned-path aware: listing
+        "github.com/foo/bar" also excludes "github.com/foo/bar/v2", "/v3", etc.
         Example: [ "github.com/larsartmann/go-atomic-write" ]
 
         NOTE: This does NOT affect GOPRIVATE. All modules matching

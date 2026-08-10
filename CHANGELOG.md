@@ -149,6 +149,23 @@ This project has not made a tagged release yet; all changes below are in
 
 ### Changed
 
+- `mkPreparedSource.nix`: `publicDeps` now uses versioned-path-aware matching.
+  Listing `github.com/foo/bar` in `publicDeps` also excludes
+  `github.com/foo/bar/v2`, `/v3`, etc. from validation. Previously required
+  exact-match including the `/vN` suffix.
+- `.github/workflows/ci.yml`: Added comments documenting why `--all-systems`
+  is not used (Linux cannot evaluate darwin; matrix approach is the workaround)
+  and what is needed to enable the private-deps test job.
+- `docs/man/mkPreparedSource.5`: Added missing `excludeSubModuleDirs` parameter
+  entry — all mkPreparedSource parameters are now documented.
+- `TODO_LIST.md`: L10 updated from "theoretical skip" to "empirically rejected"
+  after prototyping the extraction (all tests pass, but result adds 11 env vars,
+  8 eval calls, and splits logic across 2 files).
+- README: Updated `publicDeps` description to reflect versioned-path-aware
+  matching (was documented as exact-match only).
+
+### Added
+
 - `modules/go-standard.nix`: New `enableNixfmt` option — controls whether
   nixfmt is included in treefmt programs (default: true). Was previously
   hardcoded.
@@ -219,10 +236,10 @@ This project has not made a tagged release yet; all changes below are in
   `buildInputs`, `checkInputs`, and `configureFlags` (in addition to the
   existing `nativeBuildInputs`, `preBuild`, `postInstall`). Consumer values
   are now appended rather than overriding.
-- `modules/go-standard.nix`: Module test suite deepened from 74 to 92
-  assertions — added behavioral tests for build option propagation,
-  GOPRIVATE injection, enableCompletions negative path, treefmt config
-  inspection, and shfmt option toggle.
+- `modules/go-standard.nix`: Module test suite deepened from 92 to 99
+  assertions — added disabled-state tests for enableTempl=false (alone),
+  enableGopls=false, enableGovulncheck=false, and monorepo version
+  propagation.
 - `mkPreparedSource.nix`: Added `trap 'rm -f go.mod.requires.tmp' EXIT`
   around the temp file lifecycle in `postPatch` for cleanup safety.
 - `mkPreparedSource.nix`: `stripVersionSuffix` and `repoName` extracted to

@@ -50,7 +50,7 @@
 | `enableCompletions` option                                     | 🟡 `PARTIALLY_FUNCTIONAL` | Requires cobra/urfave/cli; emits a build-time warning with remediation options if binary doesn't support `--completion`. Check uses `timeout 10` to prevent hanging |
 | Monorepo support (`packages` option)                           | 🟢 `FULLY_FUNCTIONAL`     | Multiple `buildGoModule` per repo; separate apps/overlays per package                     |
 | `fmt` app (`nix run .#fmt`)                                    | 🟢 `FULLY_FUNCTIONAL`     | Wrapper around treefmt                                                                    |
-| Module-level tests (options, types, outputs)                   | 🟢 `FULLY_FUNCTIONAL`     | `test-module.nix` with 92 assertions; behavioral tests for buildFlags, ldflags, proxyVendor, GOPRIVATE, extraBuildAttrs concatenation (6 attrs), enableCompletions negative path, treefmt config inspection, shfmt toggle |
+| Module-level tests (options, types, outputs)                   | 🟢 `FULLY_FUNCTIONAL`     | `test-module.nix` with 99 assertions; behavioral tests for buildFlags, ldflags, proxyVendor, GOPRIVATE, extraBuildAttrs concatenation (6 attrs), enableCompletions negative path, treefmt config inspection, shfmt toggle, enableTempl=false alone, monorepo version propagation |
 | Real downstream consumer end-to-end test                       | ⚪ `PLANNED`              | Requires a real private-repo CI test job with SSH key secret                              |
 
 ## Templates
@@ -74,7 +74,7 @@
 | ---------------------------------------------------- | ------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
 | `flake.nix` with `nix flake check` / `nix fmt`       | 🟢 `FULLY_FUNCTIONAL`     | Checks wired to `test.nix`, `test-module.nix`, `pure-functions.nix`, structural; formatter uses nixfmt + shfmt                  |
 | Integration test suite (`test.nix`)                  | 🟢 `FULLY_FUNCTIONAL`     | 7 scenarios: auto-discovery, explicit-only, validation, publicDeps exclusion, requireDeps dedup, multi-deps monorepo, publicDeps /v2 versioned paths |
-| Module test suite (`test-module.nix`)                | 🟢 `FULLY_FUNCTIONAL`     | 92 assertions; behavioral tests for buildFlags/ldflags/proxyVendor/GOPRIVATE/extraBuildAttrs (6 attrs)/enableCompletions negative/treefmt config/shfmt toggle |
+| Module test suite (`test-module.nix`)                | 🟢 `FULLY_FUNCTIONAL`     | 99 assertions; behavioral tests for buildFlags/ldflags/proxyVendor/GOPRIVATE/extraBuildAttrs (6 attrs)/enableCompletions negative/treefmt config/shfmt toggle/enableTempl=false/monorepo version |
 | Pure function property tests (`test-pure-functions.nix`) | 🟢 `FULLY_FUNCTIONAL`     | 22 assertions: idempotence, no-`/vN`-in-output, determinism, no-slash, edge cases — wired as `checks.pureFunctions`      |
 | Structural output verification (`checks.structural`)       | 🟢 `FULLY_FUNCTIONAL`     | Verifies `flakeModules.go-standard`, `lib.mkPreparedSource`, `lib.mkGoFlake` exist in flake outputs                      |
 | Negative-case validation runner (`verifyValidation`) | 🟢 `FULLY_FUNCTIONAL`     | Run outside sandbox via `nix run .#verifyValidation`                                                                            |

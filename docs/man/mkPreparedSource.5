@@ -61,6 +61,9 @@ Version string.
 Auto-discover sub-modules from dep source trees.
 When true, recursively walks each dep to find all go.mod files.
 .TP
+.BR excludeSubModuleDirs " (list str, default: [example examples testdata .git vendor node_modules])"
+Directory names to skip during recursive auto-discovery.
+.TP
 .BR subModules " (attrs, default: {})"
 Explicit sub-modules (merged with auto-discovered).
 Keys are module paths, values are lists of relative paths.
@@ -87,7 +90,7 @@ Override for other organizations.
 .BR publicDeps " (list str, default: [])"
 Module paths to exclude from private validation.
 Use for repos that match privateDepPattern but are actually public.
-Entries must match the exact module path in go.mod.
+Versioned-path aware: base path also matches /v2, /v3, etc.
 .TP
 .BR postPatchExtra " (str, default: \"\")"
 Additional shell commands appended to postPatch.

@@ -67,7 +67,7 @@ nix flake check                    # runs all checks (autoDiscovery, explicitOnl
 nix fmt                            # format all .nix files with nixfmt
 nix-build test.nix -A verify       # success-path integration test
 nix run .#verifyValidation         # negative-case validation test (run outside sandbox)
-nix build .#checks.x86_64-linux.moduleTest  # module-level test (92 assertions)
+nix build .#checks.x86_64-linux.moduleTest  # module-level test (99 assertions)
 nix build .#checks.x86_64-linux.pureFunctions  # pure function property tests (22 assertions)
 nix build .#checks.x86_64-linux.structural     # structural output verification
 ```
@@ -78,7 +78,7 @@ nix build .#checks.x86_64-linux.structural     # structural output verification
 - **`mkGoFlake.nix`** (DEPRECATED) — shared flake-parts module. Superseded by go-standard module. Takes a config attrset with `{inputs, self, pname, version, vendorHash, description, src, deps, ...}`. Returns a flake-parts module attrset with packages, apps, devShells, checks, treefmt, and overlay.
 - **Composite module** — `flake.flakeModules.go-standard` in `flake.nix` is a composite module `{ imports = [ treefmt-nix.flakeModule ./modules/go-standard.nix ]; }`. This bundles treefmt-nix so consumers don't need it as a separate input. treefmt-nix's flakeModule only uses `pkgs` from the consuming context, so re-exporting via a composite is seamless.
 - **`systems` is now configurable** — go-standard exposes a `systems` option (default = `[ "x86_64-linux" "aarch64-linux" "x86_64-darwin" "aarch64-darwin" ]` matching `nix-systems/default`). Consumers can override via `go-standard.systems = [...]` or `go-standard.systems = import inputs.systems;`.
-- **Module options (35 total)** — go-standard supports: `enableCheck`, `enableOverlay`, `buildFlags`, `version`, `enableGolangciLint`, `enableGofumpt`, `enableGoimports`, `enableNixfmt`, `enableShfmt`, `enableTempl`, `enableGopls`, `enableGovulncheck`, `enableCompletions`, `packages` (monorepo), `validatePrivateDeps`, `privateDepPattern`, `publicDeps`, `privateGlobPattern`. All with sensible defaults, tested by `test-module.nix` (92 assertions).
+- **Module options (35 total)** — go-standard supports: `enableCheck`, `enableOverlay`, `buildFlags`, `version`, `enableGolangciLint`, `enableGofumpt`, `enableGoimports`, `enableNixfmt`, `enableShfmt`, `enableTempl`, `enableGopls`, `enableGovulncheck`, `enableCompletions`, `packages` (monorepo), `validatePrivateDeps`, `privateDepPattern`, `publicDeps`, `privateGlobPattern`. All with sensible defaults, tested by `test-module.nix` (99 assertions).
 - **Monorepo support** — the `packages` option generates separate `buildGoModule` per entry, each with its own `subPackages` and `description`. Shared config (vendorHash, deps, goPkg) comes from the top-level go-standard config. Backward compatible — when `packages` is empty (default), single-package behavior is unchanged.
 - **Recursive auto-discovery** — walks each dep source recursively to find ALL `go.mod` files at any depth (not just top-level), reads the module path, and generates replace directives automatically. Excludes example/testdata/vendor directories.
 - **Unified sub-module pipeline** — explicit `subModules` entries are mapped into the same `{modulePath, localDir}` shape as auto-discovered ones, then a single replace generator and single version normalizer process both. (Unified 2026-06-19; previously was a split brain with 4 duplicate code paths.)
@@ -115,7 +115,7 @@ nix build .#checks.x86_64-linux.structural     # structural output verification
 | `modules/go-standard.nix`            | Proper flake-parts module (exposed as `flakeModules.go-standard`) — 35 options, monorepo support, bundles treefmt-nix |
 | `flake.nix`                          | Self-hosting: checks, formatter, devShell, lib export, flakeModules export                                            |
 | `test.nix`                           | Integration tests (auto-discovery, explicit, validation, publicDeps, requireDeps dedup, multi-deps monorepo, publicDeps /v2 — 7 scenarios) |
-| `test-module.nix`                    | Module-level tests for go-standard options and outputs (92 assertions)                                                |
+| `test-module.nix`                    | Module-level tests for go-standard options and outputs (99 assertions)                                                |
 | `templates/go-flake-parts/flake.nix` | DEPRECATED — old manual template; marked with deprecation banner                                                      |
 | `templates/go-standard/flake.nix`    | Minimal template using go-standard module (recommended for new projects)                                              |
 | `scripts/nix-lint.sh`                | Lints flake.nix files across all projects for common errors                                                           |

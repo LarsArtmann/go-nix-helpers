@@ -323,6 +323,22 @@ let
   # --- enableShfmt toggle test ----------------------------------------------
   shfmtCfg = mkPerSystemConfig { enableShfmt = true; };
 
+  # --- enableTempl=false alone (other formatters still on) -------------------
+  noTemplCfg = mkPerSystemConfig { enableTempl = false; };
+
+  # --- enableGopls=false -----------------------------------------------------
+  noGoplsCfg = mkPerSystemConfig { enableGopls = false; };
+
+  # --- enableGovulncheck=false -----------------------------------------------
+  noVulncheckCfg = mkPerSystemConfig { enableGovulncheck = false; };
+
+  # --- Monorepo + version propagation ----------------------------------------
+  monorepoVersionCfg = mkPerSystemConfig {
+    version = "2.0.0-mono";
+    packages.worker.subPackages = [ "cmd/worker" ];
+    packages.worker.description = "Worker";
+  };
+
   # --- All formatters disabled (apps.fmt should disappear) ------------------
   noAllFmtCfg = mkPerSystemConfig {
     enableGofumpt = false;
@@ -644,6 +660,33 @@ let
     (assertCheck "enableTempl=true enables templ in treefmt" (
       templCfg.treefmt.programs.templ.enable or false == true
     ) "templ.enable = true")
+    # --- enableTempl=false alone (other formatters still on) -----------------
+    (assertCheck "enableTempl=false disables templ in treefmt" (
+      noTemplCfg.treefmt.programs.templ.enable or true == false
+    ) "templ.enable = false")
+    (assertCheck "enableTempl=false keeps gofumpt enabled" (
+      noTemplCfg.treefmt.programs.gofumpt.enable or false == true
+    ) "gofumpt.enable = true")
+    (assertCheck "enableTempl=false keeps apps.fmt (other formatters on)" (
+      noTemplCfg.apps ? fmt
+    ) "apps.fmt exists")
+    # --- enableGopls=false evaluates successfully ---------------------------
+    (assertCheck "enableGopls=false evaluates without error" (
+      noGoplsCfg.devShells ? default
+    ) "devShell evaluates")
+    # --- enableGovulncheck=false evaluates successfully ----------------------
+    (assertCheck "enableGovulncheck=false evaluates without error" (
+      noVulncheckCfg.devShells ? default
+    ) "devShell evaluates")
+    # --- Monorepo + version propagation --------------------------------------
+    (assertCheck "monorepo: version propagates to default package" (
+      monorepoVersionCfg.packages.default ? name
+      && lib.hasInfix "2.0.0-mono" monorepoVersionCfg.packages.default.name
+    ) "version 2.0.0-mono in default package name")
+    (assertCheck "monorepo: version propagates to worker package" (
+      monorepoVersionCfg.packages.worker ? name
+      && lib.hasInfix "2.0.0-mono" monorepoVersionCfg.packages.worker.name
+    ) "version 2.0.0-mono in worker package name")
     (assertCheck "nativeBuildInputs merge: package evaluates with user inputs" (
       nativeBuildInputsMergeCfg.packages ? default
     ) "packages.default with merged nativeBuildInputs")

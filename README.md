@@ -239,7 +239,7 @@ preparedSrc = mkPreparedSource {
 | `stripLocalReplaces`  | `true`                              | Strip stale `replace X => /home/...` directives     |
 | `validatePrivateDeps` | `true`                              | Verify every private `require` has a `replace`      |
 | `privateDepPattern`   | `"github\\.com/[Ll]ars[Aa]rtmann/"` | ERE regex matching private module paths to validate |
-| `publicDeps`          | `[]`                                | Module paths excluded from private validation (exact match, incl. `/vN`) |
+| `publicDeps`          | `[]`                                | Module paths excluded from private validation (versioned-path aware: base path matches `/v2`, `/v3`, etc.) |
 | `postPatchExtra`      | `""`                                | Additional shell commands appended to `postPatch`   |
 
 ### `mkGoFlake.nix` (deprecated)
@@ -310,8 +310,8 @@ go-standard = {
 };
 ```
 
-Note: `publicDeps` uses exact path matching (including any `/vN` suffix).
-`github.com/larsartmann/go-atomic-write` will NOT match `github.com/larsartmann/go-atomic-write/v2`.
+Note: `publicDeps` is versioned-path aware. Listing `github.com/larsartmann/go-atomic-write`
+also excludes `github.com/larsartmann/go-atomic-write/v2`, `/v3`, etc.
 
 ### vendorHash mismatch after adding deps
 

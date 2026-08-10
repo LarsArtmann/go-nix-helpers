@@ -239,14 +239,9 @@ let
   };
 
   # ---------------------------------------------------------------------------
-  # Test 7: publicDeps with /v2 versioned path — verifies that publicDeps
-  # entries matching the FULL versioned module path (e.g. "foo/bar/v2")
-  # are correctly excluded from validation.
-  #
-  # KNOWN LIMITATION: publicDeps uses `grep -vFx` (exact line match).
-  # An entry "github.com/larsartmann/mock-public-lib" will NOT match
-  # "github.com/larsartmann/mock-public-lib/v2" in go.mod. Consumers must
-  # include the full versioned path in publicDeps.
+  # Test 7: publicDeps versioned-path-aware matching — verifies that a
+  # publicDeps entry with the BASE path (no /vN suffix) correctly excludes
+  # versioned module paths (e.g. "foo/bar" matches "foo/bar/v2" in go.mod).
   # ---------------------------------------------------------------------------
   mockVersionedPublicSrc = pkgs.writeTextDir "go.mod" ''
     module github.com/larsartmann/mock-versioned-public
@@ -270,8 +265,9 @@ let
     subModules = {
       "github.com/larsartmann/mock-dep" = [ "codec/v2" ];
     };
-    # Must include the FULL versioned path for grep -vFx to match.
-    publicDeps = [ "github.com/larsartmann/mock-versioned-pub/v2" ];
+    # Only the BASE path is listed — the versioned-path-aware filter
+    # matches "github.com/larsartmann/mock-versioned-pub/v2" in go.mod.
+    publicDeps = [ "github.com/larsartmann/mock-versioned-pub" ];
   };
 in
 {
@@ -463,11 +459,11 @@ in
     done
 
     echo ""
-    echo "=== Test 7: publicDeps with /v2 versioned path ==="
+    echo "=== Test 7: publicDeps versioned-path-aware matching ==="
     GOMOD6=${versionedPublicDepsTest}/go.mod
     cat "$GOMOD6"
     echo ""
-    # Build succeeded — validation passed with the versioned publicDeps entry.
+    # Build succeeded — validation passed with only the BASE path in publicDeps.
     # Verify the versioned public dep has NO replace (it's not in deps).
     if grep -qF "mock-versioned-pub/v2 => " "$GOMOD6"; then
       echo "FAIL: versioned public dep should not have a replace directive"

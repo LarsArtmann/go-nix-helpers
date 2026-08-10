@@ -27,7 +27,7 @@
 
 | #  | Task                                                                                  | Status | Effort | Evidence                                                              |
 | -- | ------------------------------------------------------------------------------------- | ------ | ------ | --------------------------------------------------------------------- |
-| -- | _(L1–L9 shipped — see CHANGELOG. L10 evaluated and deliberately skipped: extracting `postPatch` to `.sh` would require passing 8 Nix-generated fragments as env vars or placeholders, increasing complexity for zero gain. This is the idiomatic Nix `mkDerivation` pattern. See `docs/planning/2026-08-10_02-41_pareto-execution-plan.md` P12 for full rationale)_ | — | — | — |
+| -- | _(L1–L9 shipped — see CHANGELOG. L10 **empirically rejected**: prototyped extraction to `scripts/post-patch.sh`, all 8 tests passed, but the result requires 11 env var declarations, 8 `eval` calls, and splits logic across 2 files — a Verschlimmbesserung. The inline `postPatch` is the idiomatic Nix `mkDerivation` pattern. See `docs/planning/2026-08-10_02-41_pareto-execution-plan.md` P12 for theoretical rationale)_ | — | — | — |
 
 ## Scripts and CI
 
