@@ -299,6 +299,24 @@ let
     privateGlobPattern = "github.com/myorg/*,github.com/MyOrg/*";
   };
 
+  # --- GOPRIVATE behavioral test: deps triggers GOPRIVATE injection --------
+  # When deps is non-empty, GOPRIVATE should be injected into the devShell.
+  # We use a mock dep path — the devShell doesn't trigger mkPreparedSource
+  # (lazy evaluation), so no real dep source is needed.
+  goprivateCfg = mkPerSystemConfig {
+    deps = {
+      "github.com/larsartmann/mock-dep" = mockSrc;
+    };
+  };
+
+  # --- GOPRIVATE with custom privateGlobPattern + deps --------------------
+  goprivateCustomGlobCfg = mkPerSystemConfig {
+    deps = {
+      "github.com/larsartmann/mock-dep" = mockSrc;
+    };
+    privateGlobPattern = "github.com/myorg/*,github.com/MyOrg/*";
+  };
+
   # --- enableNixfmt toggle test ---------------------------------------------
   noNixfmtCfg = mkPerSystemConfig { enableNixfmt = false; };
 
@@ -596,6 +614,23 @@ let
     (assertCheck "shellExtraEnv evaluates with custom vars" (
       customEnvCfg.devShells ? default
     ) "devShell with custom env")
+    # --- Behavioral: GOPRIVATE injection into devShell (H2) ----------------
+    # With deps set, GOPRIVATE should be injected with the default glob.
+    (assertCheck "GOPRIVATE injected into devShell when deps set" (
+      goprivateCfg.devShells.default ? GOPRIVATE
+    ) "GOPRIVATE in devShell")
+    (assertCheck "GOPRIVATE uses default privateGlobPattern" (
+      goprivateCfg.devShells.default.GOPRIVATE or ""
+      == "github.com/larsartmann/*,github.com/LarsArtmann/*"
+    ) "default glob in GOPRIVATE")
+    (assertCheck "GOPRIVATE uses custom privateGlobPattern" (
+      goprivateCustomGlobCfg.devShells.default.GOPRIVATE or ""
+      == "github.com/myorg/*,github.com/MyOrg/*"
+    ) "custom glob in GOPRIVATE")
+    # Without deps, GOPRIVATE should NOT be set
+    (assertCheck "GOPRIVATE not set when deps empty" (
+      !(psCfg.devShells.default ? GOPRIVATE)
+    ) "no GOPRIVATE without deps")
     systemsOverrideCheck
     monorepoOverlayCheck
   ];
