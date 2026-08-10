@@ -12,6 +12,10 @@ This project has not made a tagged release yet; all changes below are in
 
 ### Added
 
+- `docs/consumer-audit-checklist.md` — systematic criteria for auditing
+  downstream consumers: module adoption, input minimalism, private deps wiring,
+  redundant override detection, verification commands, and a quick triage
+  script for fast first-pass assessment.
 - `LICENSE` file (MIT) with copyright Lars Artmann.
 - GitHub Actions CI workflow (`.github/workflows/ci.yml`) with format check,
   integration tests, and module tests.
@@ -149,6 +153,10 @@ This project has not made a tagged release yet; all changes below are in
 
 ### Changed
 
+- `templates/go-standard/flake.nix`: Added private deps example (flake input
+  with `flake = false` + `deps` attrset), `publicDeps` example, and fixed
+  misleading `shellExtraEnv.GOPRIVATE` comment (GOPRIVATE is auto-injected
+  when `deps` is set; replaced with a `GOTOOLCHAIN` example instead).
 - `mkPreparedSource.nix`: `publicDeps` now uses versioned-path-aware matching.
   Listing `github.com/foo/bar` in `publicDeps` also excludes
   `github.com/foo/bar/v2`, `/v3`, etc. from validation. Previously required
