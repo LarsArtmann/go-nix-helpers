@@ -318,6 +318,21 @@ let
     extraBuildAttrs.nativeBuildInputs = [ pkgs.git ];
   };
 
+  # --- buildInputs merge test (concatenation, not override) ---
+  buildInputsMergeCfg = mkPerSystemConfig {
+    extraBuildAttrs.buildInputs = [ pkgs.sqlite ];
+  };
+
+  # --- checkInputs merge test (concatenation, not override) ---
+  checkInputsMergeCfg = mkPerSystemConfig {
+    extraBuildAttrs.checkInputs = [ pkgs.sqlite ];
+  };
+
+  # --- configureFlags merge test (concatenation, not override) ---
+  configureFlagsMergeCfg = mkPerSystemConfig {
+    extraBuildAttrs.configureFlags = [ "--with-feature" ];
+  };
+
   # --- Custom ldflags test --------------------------------------------------
   customLdflagsCfg = mkPerSystemConfig {
     ldflags = [ "-X main.version=custom" ];
@@ -457,6 +472,38 @@ let
       in
       hasGit
     ) "git in nativeBuildInputs")
+    # --- Behavioral: buildInputs concatenation (H3) -----------------------
+    # Verify user buildInputs appear in the final derivation, proving
+    # concatenation works (not silent override via //).
+    (assertCheck "buildInputs merge: sqlite present in derivation" (
+      let
+        pkg = buildInputsMergeCfg.packages.default;
+        inputs = pkg.buildInputs or pkg.drvAttrs.buildInputs or [ ];
+        hasSqlite = builtins.any (
+          x: x.pname or x.name or "" == "sqlite" || lib.hasInfix "sqlite" (x.name or "")
+        ) inputs;
+      in
+      hasSqlite
+    ) "sqlite in buildInputs")
+    # --- Behavioral: checkInputs concatenation (H3) -----------------------
+    (assertCheck "checkInputs merge: sqlite present in derivation" (
+      let
+        pkg = checkInputsMergeCfg.packages.default;
+        inputs = pkg.checkInputs or pkg.drvAttrs.checkInputs or [ ];
+        hasSqlite = builtins.any (
+          x: x.pname or x.name or "" == "sqlite" || lib.hasInfix "sqlite" (x.name or "")
+        ) inputs;
+      in
+      hasSqlite
+    ) "sqlite in checkInputs")
+    # --- Behavioral: configureFlags concatenation (H3) --------------------
+    (assertCheck "configureFlags merge: flag present in derivation" (
+      let
+        pkg = configureFlagsMergeCfg.packages.default;
+        flags = pkg.configureFlags or pkg.drvAttrs.configureFlags or [ ];
+      in
+      builtins.elem "--with-feature" flags
+    ) "--with-feature in configureFlags")
     # --- Behavioral: meta propagation (H2) ---------------------------------
     (assertCheck "meta.description matches config" (
       psCfg.packages.default ? meta && psCfg.packages.default.meta.description == "Test project"

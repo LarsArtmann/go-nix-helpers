@@ -327,8 +327,11 @@ in
       default = { };
       description = ''
         Extra attributes merged into buildGoModule.
-        Three attributes receive special concatenation handling:
+        Six attributes receive special concatenation handling:
         - `nativeBuildInputs` — appended to module's list (templ, installShellFiles)
+        - `buildInputs` — appended to module's list
+        - `checkInputs` — appended to module's list
+        - `configureFlags` — appended to module's list
         - `preBuild` — prepended to module-generated preBuild
         - `postInstall` — prepended to module-generated postInstall
         All other attributes override module defaults via the `//` operator.
@@ -434,13 +437,20 @@ in
         # that should be concatenated rather than overridden:
         # - preBuild/postInstall: concatenated with module-generated values
         # - nativeBuildInputs: concatenated (module adds templ, installShellFiles)
+        # - buildInputs/checkInputs/configureFlags: concatenated for future-proofing
         # All other attrs override the module defaults via the // operator.
         userExtraBuildAttrs = builtins.removeAttrs cfg.extraBuildAttrs [
           "preBuild"
           "postInstall"
           "nativeBuildInputs"
+          "buildInputs"
+          "checkInputs"
+          "configureFlags"
         ];
         userNativeBuildInputs = cfg.extraBuildAttrs.nativeBuildInputs or [ ];
+        userBuildInputs = cfg.extraBuildAttrs.buildInputs or [ ];
+        userCheckInputs = cfg.extraBuildAttrs.checkInputs or [ ];
+        userConfigureFlags = cfg.extraBuildAttrs.configureFlags or [ ];
         mergedPreBuild = autoDepSyncPreBuild + (cfg.extraBuildAttrs.preBuild or "");
 
         # Reusable package builder for monorepo support.
@@ -488,6 +498,9 @@ in
                 lib.optionals cfg.enableTempl [ pkgs.templ ]
                 ++ lib.optionals cfg.enableCompletions [ pkgs.installShellFiles ]
                 ++ userNativeBuildInputs;
+              buildInputs = userBuildInputs;
+              checkInputs = userCheckInputs;
+              configureFlags = userConfigureFlags;
               meta = {
                 description = pkgDesc;
                 license = lib.licenses.mit;
