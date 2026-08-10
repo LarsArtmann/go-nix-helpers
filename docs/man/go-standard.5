@@ -131,6 +131,11 @@ Private Go deps for mkPreparedSource.
 .BR subModules " (attrs, default: {})"
 Explicit sub-modules (merged with auto-discovered).
 .TP
+.BR requireDeps " (attrs, default: {})"
+Manually injected require lines for mkPreparedSource. Keys are module
+paths, values are version strings. Used when sub-modules need explicit
+require entries not in go.mod.
+.TP
 .BR postPatchExtra " (str, default: \"\")"
 Extra postPatch commands for mkPreparedSource (rarely needed). Runs before
 replace directives are injected.

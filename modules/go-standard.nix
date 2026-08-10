@@ -301,6 +301,16 @@ in
       '';
     };
 
+    requireDeps = lib.mkOption {
+      type = lib.types.attrsOf lib.types.str;
+      default = { };
+      description = ''
+        Manually injected require lines for mkPreparedSource.
+        Keys are module paths, values are version strings.
+        Used when sub-modules need explicit require entries not in go.mod.
+      '';
+    };
+
     postPatchExtra = lib.mkOption {
       type = lib.types.str;
       default = "";
@@ -445,6 +455,7 @@ in
                   deps
                   subModules
                   postPatchExtra
+                  requireDeps
                   validatePrivateDeps
                   privateDepPattern
                   publicDeps

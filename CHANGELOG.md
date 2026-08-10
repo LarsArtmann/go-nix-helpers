@@ -12,6 +12,10 @@ This project has not made a tagged release yet; all changes below are in
 
 ### Added
 
+- `requireDeps` option (default: `{}`) — passes manually injected require
+  lines to mkPreparedSource. Needed when sub-modules have explicit version
+  requirements not present in go.mod (e.g. PMA's project-discovery-sdk
+  sub-modules). Unblocks projects-management-automation migration.
 - `enableTestCheck` option (default: false) — generates `checks.test`, a
   hermetic derivation that forces `go test` regardless of `enableCheck`.
   Use when skipping tests during normal builds but running them in CI.
