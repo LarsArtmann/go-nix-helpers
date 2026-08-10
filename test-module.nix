@@ -446,6 +446,39 @@ let
     (assertCheck "buildFlags accepts custom flags" (
       buildFlagsCfg.packages ? default
     ) "packages.default with custom buildFlags")
+    # --- Behavioral: buildFlags reaches derivation (M7) -------------------
+    (assertCheck "buildFlags reaches derivation" (
+      let
+        pkg = buildFlagsCfg.packages.default;
+        flags = pkg.buildFlags or pkg.drvAttrs.buildFlags or [ ];
+      in
+      flags == [ "-tags" "integration" ]
+    ) "[-tags integration] in .buildFlags")
+    # --- Behavioral: ldflags reaches derivation with version (M7) ---------
+    (assertCheck "ldflags reaches derivation with version injection" (
+      let
+        pkg = versionCfg.packages.default;
+        flags = pkg.ldflags or pkg.drvAttrs.ldflags or [ ];
+        hasVersionFlag = builtins.any (f: lib.hasInfix "-X main.version=" f) flags;
+      in
+      hasVersionFlag
+    ) "-X main.version= in .ldflags")
+    # --- Behavioral: custom ldflags reach derivation (M7) -----------------
+    (assertCheck "custom ldflags reach derivation" (
+      let
+        pkg = customLdflagsCfg.packages.default;
+        flags = pkg.ldflags or pkg.drvAttrs.ldflags or [ ];
+      in
+      builtins.elem "-X main.version=custom" flags
+    ) "-X main.version=custom in .ldflags")
+    # --- Behavioral: proxyVendor reaches derivation (M7) ------------------
+    (assertCheck "proxyVendor=true reaches derivation" (
+      let
+        pkg = psCfg.packages.default;
+        pv = pkg.proxyVendor or pkg.drvAttrs.proxyVendor or null;
+      in
+      pv == true
+    ) "proxyVendor = true in derivation")
     (assertCheck "publicDeps accepts list of module paths" (
       publicDepsCfg.packages ? default
     ) "packages.default with publicDeps")

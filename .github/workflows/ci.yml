@@ -52,6 +52,9 @@ jobs:
       - name: Install Nix
         uses: DeterminateSystems/nix-installer-action@v16
 
+      - name: Cache Nix Store
+        uses: DeterminateSystems/magic-nix-cache-action@v9
+
       - name: Generate flake from go-standard template
         run: |
           ./scripts/generate-flake.sh --dir /tmp/smoke-test smoke-test
@@ -64,6 +67,33 @@ jobs:
           ./scripts/generate-flake.sh --dir /tmp/smoke-templ --templ smoke-templ
           nix-instantiate --parse /tmp/smoke-templ/flake.nix > /dev/null
           echo "PASS: --templ flag produces valid Nix"
+
+      - name: Generate flake with --go-mod
+        run: |
+          ./scripts/generate-flake.sh --dir /tmp/smoke-gomod --go-mod smoke-gomod
+          test -f /tmp/smoke-gomod/flake.nix
+          test -f /tmp/smoke-gomod/go.mod
+          test -f /tmp/smoke-gomod/main.go
+          nix-instantiate --parse /tmp/smoke-gomod/flake.nix > /dev/null
+          echo "PASS: --go-mod flag creates flake.nix + go.mod + main.go"
+
+      - name: Generate flake with --private-deps
+        run: |
+          ./scripts/generate-flake.sh --dir /tmp/smoke-deps --private-deps smoke-deps
+          test -f /tmp/smoke-deps/flake.nix
+          grep -q "deps = {" /tmp/smoke-deps/flake.nix
+          nix-instantiate --parse /tmp/smoke-deps/flake.nix > /dev/null
+          echo "PASS: --private-deps flag creates deps section"
+
+      - name: Generate flake with combined flags
+        run: |
+          ./scripts/generate-flake.sh --dir /tmp/smoke-combined --go-mod --private-deps --templ smoke-combined
+          test -f /tmp/smoke-combined/go.mod
+          test -f /tmp/smoke-combined/main.go
+          grep -q "deps = {" /tmp/smoke-combined/flake.nix
+          grep -q "enableTempl = true" /tmp/smoke-combined/flake.nix
+          nix-instantiate --parse /tmp/smoke-combined/flake.nix > /dev/null
+          echo "PASS: --go-mod --private-deps --templ combined flags work"
 
       - name: Generate flake from go-flake-parts template
         run: |
