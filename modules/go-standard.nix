@@ -535,7 +535,9 @@ in
           );
 
         # Build the default package (always present)
-        package = mkGoPackage cfg.pname cfg.subPackages cfg.description;
+        # vendorHashWarning is referenced here to force evaluation of the
+        # placeholder-detection trace at build time.
+        package = builtins.seq vendorHashWarning (mkGoPackage cfg.pname cfg.subPackages cfg.description);
 
         # Build extra packages when monorepo config is set
         extraPackages = lib.mapAttrs (

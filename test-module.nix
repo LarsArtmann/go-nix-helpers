@@ -337,6 +337,11 @@ let
     extraBuildAttrs.configureFlags = [ "--with-feature" ];
   };
 
+  # --- vendorHash placeholder test (M3) — evaluates with placeholder hash ---
+  vendorHashPlaceholderCfg = mkPerSystemConfig {
+    vendorHash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+  };
+
   # --- Custom ldflags test --------------------------------------------------
   customLdflagsCfg = mkPerSystemConfig {
     ldflags = [ "-X main.version=custom" ];
