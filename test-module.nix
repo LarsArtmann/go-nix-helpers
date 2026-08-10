@@ -466,6 +466,28 @@ let
     (assertCheck "enableCompletions=true evaluates successfully" (
       completionsCfg.packages ? default
     ) "packages.default with completions")
+    # --- M8: enableCompletions warning text in postInstall ----------------
+    # The warning message must be present in the derivation's postInstall
+    # script so it fires at build time when the binary lacks --completion.
+    (assertCheck "enableCompletions: warning text present in postInstall" (
+      let
+        pkg = completionsCfg.packages.default;
+        postInstall = pkg.postInstall or pkg.drvAttrs.postInstall or "";
+      in
+      lib.hasInfix "does not support the --completion subcommand" postInstall
+    ) "warning text in postInstall")
+    (assertCheck "enableCompletions: installShellFiles in nativeBuildInputs" (
+      let
+        pkg = completionsCfg.packages.default;
+        inputs = pkg.nativeBuildInputs or pkg.drvAttrs.nativeBuildInputs or [ ];
+        hasInstallShellFiles = builtins.any (
+          x: x.pname or x.name or "" == "install-shell-files"
+          || lib.hasInfix "install-shell-files" (x.name or "")
+          || lib.hasInfix "installShellFiles" (x.name or "")
+        ) inputs;
+      in
+      hasInstallShellFiles
+    ) "installShellFiles in nativeBuildInputs")
     (assertCheck "buildFlags accepts custom flags" (
       buildFlagsCfg.packages ? default
     ) "packages.default with custom buildFlags")
@@ -599,6 +621,22 @@ let
     (assertCheck "enableShfmt=true enables shfmt in treefmt" (
       shfmtCfg.treefmt.programs.shfmt.enable or false == true
     ) "shfmt.enable = true")
+    # --- M10: Treefmt config inspection (all defaults) --------------------
+    (assertCheck "treefmt.programs has 3 default programs" (
+      let
+        allPrograms = builtins.attrValues psCfg.treefmt.programs;
+        enabledPrograms = lib.filter (cfg: cfg.enable or false == true) allPrograms;
+      in
+      builtins.length enabledPrograms == 3
+    ) "3 enabled programs (gofumpt, goimports, nixfmt)")
+    # --- M10: Treefmt config inspection (all disabled) --------------------
+    (assertCheck "treefmt: no programs when all disabled" (
+      let
+        allPrograms = builtins.attrValues noAllFmtCfg.treefmt.programs;
+        enabledPrograms = lib.filter (cfg: cfg.enable or false == true) allPrograms;
+      in
+      builtins.length enabledPrograms == 0
+    ) "0 enabled programs")
     (assertCheck "apps.fmt removed when all formatters disabled" (
       !(noAllFmtCfg.apps ? fmt)
     ) "no apps.fmt when no formatters")

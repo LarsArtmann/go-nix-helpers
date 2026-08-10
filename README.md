@@ -389,6 +389,25 @@ disable all formatting, set `enableGofumpt = false; enableGoimports = false;
 enableNixfmt = false;`. When no formatters are enabled, the `apps.fmt`
 output is omitted.
 
+### How do I use deps with non-LarsArtmann repos?
+
+The defaults (`privateDepPattern`, `privateGlobPattern`) are LarsArtmann-specific.
+For other organizations, override both:
+
+```nix
+go-standard = {
+  privateDepPattern = "github\\.com/myorg/";
+  privateGlobPattern = "github.com/myorg/*,github.com/MyOrg/*";
+  deps = {
+    "github.com/myorg/my-private-lib" = inputs.my-private-lib;
+  };
+};
+```
+
+For mixed-owner deps (some LarsArtmann, some external), add the external
+private repos to `deps` and override `privateDepPattern` to match both
+organizations (e.g. `"github\\.com/(myorg|otherorg)/"`).
+
 ---
 
 ## Development
