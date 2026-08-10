@@ -452,7 +452,10 @@ let
         pkg = buildFlagsCfg.packages.default;
         flags = pkg.buildFlags or pkg.drvAttrs.buildFlags or [ ];
       in
-      flags == [ "-tags" "integration" ]
+      flags == [
+        "-tags"
+        "integration"
+      ]
     ) "[-tags integration] in .buildFlags")
     # --- Behavioral: ldflags reaches derivation with version (M7) ---------
     (assertCheck "ldflags reaches derivation with version injection" (
