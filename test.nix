@@ -237,6 +237,42 @@ let
     };
     # subModules omitted — auto-discovery should find sub-modules in both deps
   };
+
+  # ---------------------------------------------------------------------------
+  # Test 7: publicDeps with /v2 versioned path — verifies that publicDeps
+  # entries matching the FULL versioned module path (e.g. "foo/bar/v2")
+  # are correctly excluded from validation.
+  #
+  # KNOWN LIMITATION: publicDeps uses `grep -vFx` (exact line match).
+  # An entry "github.com/larsartmann/mock-public-lib" will NOT match
+  # "github.com/larsartmann/mock-public-lib/v2" in go.mod. Consumers must
+  # include the full versioned path in publicDeps.
+  # ---------------------------------------------------------------------------
+  mockVersionedPublicSrc = pkgs.writeTextDir "go.mod" ''
+    module github.com/larsartmann/mock-versioned-public
+
+    go 1.26
+
+    require (
+      github.com/larsartmann/mock-dep/codec/v2 v0.0.0
+      github.com/larsartmann/mock-versioned-pub/v2 v1.0.0
+    )
+  '';
+
+  versionedPublicDepsTest = mkPreparedSource {
+    name = "test-versioned-public-deps";
+    version = "test";
+    src = mockVersionedPublicSrc;
+    deps = {
+      "github.com/larsartmann/mock-dep" = mockDep;
+    };
+    autoSubModules = false;
+    subModules = {
+      "github.com/larsartmann/mock-dep" = [ "codec/v2" ];
+    };
+    # Must include the FULL versioned path for grep -vFx to match.
+    publicDeps = [ "github.com/larsartmann/mock-versioned-pub/v2" ];
+  };
 in
 {
   # nix-build test.nix -A autoDiscovery -o result-auto
@@ -247,6 +283,7 @@ in
     publicDepsTest
     requireDedupTest
     multiDepsTest
+    versionedPublicDepsTest
     ;
 
   # Verification script: checks the success-path test outputs.
@@ -424,6 +461,27 @@ in
         exit 1
       fi
     done
+
+    echo ""
+    echo "=== Test 7: publicDeps with /v2 versioned path ==="
+    GOMOD6=${versionedPublicDepsTest}/go.mod
+    cat "$GOMOD6"
+    echo ""
+    # Build succeeded — validation passed with the versioned publicDeps entry.
+    # Verify the versioned public dep has NO replace (it's not in deps).
+    if grep -qF "mock-versioned-pub/v2 => " "$GOMOD6"; then
+      echo "FAIL: versioned public dep should not have a replace directive"
+      exit 1
+    else
+      echo "PASS: versioned public dep correctly has no replace"
+    fi
+    # Verify the private dep still has its replace.
+    if grep -qF "codec/v2 => " "$GOMOD6"; then
+      echo "PASS: private dep still has replace"
+    else
+      echo "FAIL: private dep missing replace"
+      exit 1
+    fi
 
     echo ""
     echo "==========================================="
