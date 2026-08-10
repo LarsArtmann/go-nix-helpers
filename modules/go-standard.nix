@@ -399,6 +399,16 @@ in
 
         buildGoModule = pkgs.buildGoModule.override { go = goPkg; };
 
+        # Warn if vendorHash looks like a placeholder that the consumer
+        # forgot to replace with a real hash after initial setup.
+        vendorHashWarning =
+          if cfg.vendorHash != null && builtins.match "sha256-(AAA[A+/]*=*)" cfg.vendorHash != null then
+            builtins.trace
+              "warning: go-standard.vendorHash appears to be a placeholder (${cfg.vendorHash}). Set the real hash after the first build."
+              null
+          else
+            null;
+
         finalLdflags =
           if cfg.ldflags != null then
             cfg.ldflags
