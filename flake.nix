@@ -73,6 +73,8 @@
               inputs
               ;
           };
+          # Pure function property tests for stripVersionSuffix/repoName.
+          pureFunctionTests = import ./test-pure-functions.nix { inherit pkgs lib; };
           # Man pages for go-standard and mkPreparedSource
           manPages = pkgs.stdenv.mkDerivation {
             name = "go-nix-helpers-manpages";
@@ -93,6 +95,7 @@
             inherit (tests) autoDiscovery explicitOnly;
             inherit (tests) verify;
             inherit (moduleTests) moduleTest moduleTestNoOverlay;
+            pureFunctions = pureFunctionTests;
           };
 
           # -- Apps (nix run .#<name>) --------------------------------------------
