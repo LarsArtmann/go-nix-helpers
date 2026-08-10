@@ -239,6 +239,17 @@ This project has not made a tagged release yet; all changes below are in
   in `dashboard.sh`.
 - `go-standard` hardcodes the default systems list so consumers do not need a
   `systems` input (`9471741`).
+- `docs/migration-guide.md`: Added `enableShfmt`, `enableTempl`, `enableGopls`,
+  `enableGovulncheck` to the parameter mapping table. Updated `extraBuildAttrs`
+  note to document the 6-attr concatenation semantics.
+- `docs/flake-patterns.md`: Added `extraBuildAttrs Merge Rules` section
+  documenting all 6 concatenated attributes (nativeBuildInputs, buildInputs,
+  checkInputs, configureFlags, preBuild, postInstall) with correct/wrong examples.
+- `docs/architecture.d2` / `.svg`: Added `pure-functions.nix` node showing
+  `stripVersionSuffix` and `repoName` functions and their import relationship
+  to `mkPreparedSource`.
+- Pareto plan: Updated P9 from ◑ (partially done) to ✅ (shipped) — CI
+  smoke-test coverage for `--dry-run` and `--verbose` flags closes the gap.
 
 ### Deprecated
 
@@ -267,6 +278,13 @@ This project has not made a tagged release yet; all changes below are in
   `PROJECTS_DIR` (`a31fec9`).
 - `GOPRIVATE` auto-injection, `validatePrivateDeps`, and `proxyVendor` wiring
   in `go-standard` (`4c9b53c`).
+- `docs/man/go-standard.5`: Added missing `postPatchExtra` option entry —
+  all 35 module options now documented (was absent since the unified
+  pipeline work).
+- `docs/man/go-standard.5`: Fixed `extraBuildAttrs` description — stated only
+  3 attrs concatenate (`nativeBuildInputs`, `preBuild`, `postInstall`) when all
+  6 do since P1 shipped (`buildInputs`, `checkInputs`, `configureFlags` also
+  concatenate).
 
 ### Removed
 

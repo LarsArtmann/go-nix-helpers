@@ -338,8 +338,8 @@ in
         - `buildInputs` — appended to module's list
         - `checkInputs` — appended to module's list
         - `configureFlags` — appended to module's list
-        - `preBuild` — prepended to module-generated preBuild
-        - `postInstall` — prepended to module-generated postInstall
+        - `preBuild` — appended after module-generated preBuild (dep-sync runs first)
+        - `postInstall` — appended after module-generated postInstall (completion install runs first)
         All other attributes override module defaults via the `//` operator.
       '';
     };

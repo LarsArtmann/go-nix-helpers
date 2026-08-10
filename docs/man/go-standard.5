@@ -99,6 +99,10 @@ Private Go deps for mkPreparedSource.
 .BR subModules " (attrs, default: {})"
 Explicit sub-modules (merged with auto-discovered).
 .TP
+.BR postPatchExtra " (str, default: \"\")"
+Extra postPatch commands for mkPreparedSource (rarely needed). Runs before
+replace directives are injected.
+.TP
 .BR autoGoPrivate " (bool, default: true)"
 Auto-inject GOPRIVATE when deps are set.
 .TP
@@ -128,7 +132,10 @@ Extra attributes merged into package meta.
 .TP
 .BR extraBuildAttrs " (attrs, default: {})"
 Extra attributes merged into buildGoModule.
-nativeBuildInputs, preBuild, postInstall are concatenated; all others override.
+Six attributes concatenate with module values: nativeBuildInputs, buildInputs,
+checkInputs, configureFlags, preBuild, postInstall (all appended — user values
+come after module-generated values). All other attributes override module
+defaults via the // operator.
 .TP
 .BR devShellExtraPackages " (function, default: _: [])"
 Function receiving pkgs, returns extra devShell packages.

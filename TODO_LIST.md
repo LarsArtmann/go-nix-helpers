@@ -39,8 +39,7 @@
 
 | #  | Task                                                                                  | Status | Effort | Evidence                                                              |
 | -- | ------------------------------------------------------------------------------------- | ------ | ------ | --------------------------------------------------------------------- |
-| D1 | Update `docs/migration-guide.md` to mention `enableShfmt`                             | TODO   | 10min  | `docs/migration-guide.md`                                             |
-| D2 | Update `docs/flake-patterns.md` with the new `extraBuildAttrs` merge pattern (6 attrs) | TODO   | 15min  | `docs/flake-patterns.md`; currently documents only 3 concatenated attrs |
+| -- | _(D1 enableShfmt in migration-guide, D2 extraBuildAttrs in flake-patterns — both shipped — see CHANGELOG)_ | — | — | — |
 
 ## Blocked
 

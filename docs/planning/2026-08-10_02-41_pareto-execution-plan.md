@@ -99,7 +99,7 @@ shippable as a single commit.
 | P6   | **Detection and safety nets** ✅   | M3, M4, L5 | 20% (80%)  | 70min        | **SHIPPED.** vendorHash placeholder warning, structural check, trap cleanup.                                                                                                                                            |
 | P7   | **GOPRIVATE behavioral test** ✅   | H2        | 20% (80%)   | 60min        | **SHIPPED.** 4 assertions: GOPRIVATE present with deps, default glob, custom glob, NOT set without deps.                                                                                                                |
 | P8   | **Docs and diagram sync** ✅       | M5, L2, L4 | 20% (80%)  | 45min        | **SHIPPED.** Architecture diagram updated, FAQ entry for non-LarsArtmann deps added.                                                                                                                                    |
-| P9   | **Script UX improvements** ◑       | M6, L1, L3 | Polish     | 45min        | **90% DONE.** `--dry-run`, `--verbose`, `--list-templates` implemented. Gap: no CI smoke-test coverage for new flags (see TODO_LIST S1).                                                                                |
+| P9   | **Script UX improvements** ✅       | M6, L1, L3 | Polish     | 45min        | **SHIPPED.** `--dry-run`, `--verbose`, `--list-templates` implemented. CI smoke-test coverage for `--dry-run` and `--verbose` flags added.               |
 | P10  | **Test infrastructure** ✅         | M8, M10   | 20% (80%)   | 60min        | **SHIPPED.** enableCompletions negative test, treefmt config inspection test.                                                                                                                                           |
 | P11  | **CI expansion** ✅                | L7, L9    | Polish      | 45min        | **SHIPPED.** macOS matrix + dynamic system detection. `--all-systems` not feasible (Linux can't eval darwin derivations); matrix approach achieves same coverage.                                                        |
 | P12  | **Refactoring** ⏭️                 | L10       | Polish      | 30min        | **SKIPPED ON MERIT.** The `postPatch` string interpolates 8 dynamically-generated Nix variables. Extracting to `.sh` would require passing all fragments as env vars or placeholder substitution — **increasing** complexity. This is the idiomatic Nix pattern for `mkDerivation` phases. The plan correctly flagged this as highest-risk Verschlimmbesserung. |
@@ -109,6 +109,10 @@ shippable as a single commit.
 ---
 
 ## Detailed Breakdown — Fine Granularity (max 12min per task)
+
+> **All tasks in sections P1–P11 below are shipped.** P12 was skipped on merit.
+> See the summary table above for execution details. The sub-task tables below
+> are the original plan, preserved for historical reference.
 
 Each task below is atomic: one verifiable action, one test, or one edit. Tasks
 within a package are ordered by dependency.
@@ -337,8 +341,7 @@ graph TD
 
 | Status        | Packages | Notes                                           |
 | ------------- | -------- | ----------------------------------------------- |
-| Shipped ✅     | P1–P8, P10, P11 | 10 packages fully completed               |
-| Partially ◑   | P9       | Flags implemented, CI smoke-test gap remains    |
+| Shipped ✅     | P1–P11   | 11 packages fully completed                     |
 | Skipped ⏭️    | P12      | Skipped on merit — see table above for rationale |
 
 ---

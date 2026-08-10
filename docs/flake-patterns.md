@@ -10,6 +10,7 @@ All LarsArtmann Go projects use the **flake-parts** + **go-nix-helpers** (which 
 4. [Private Go Dependencies](#private-go-dependencies)
 5. [Checks Placement Rules](#checks-placement-rules)
 6. [treefmt Configuration Rules](#treefmt-configuration-rules)
+7. [extraBuildAttrs Merge Rules](#extrabuildattrs-merge-rules)
 
 ---
 
@@ -211,3 +212,42 @@ Reference implementations: `go-structure-linter`, `mr-sync`.
 2. **Standard formatters for Go projects:** gofumpt, goimports, nixfmt
 3. **For templ projects, add:** `programs.templ.enable = true`
 4. **Never use bare names:** `treefmt.nixfmt.enable` is WRONG
+
+---
+
+## extraBuildAttrs Merge Rules
+
+Six attributes in `extraBuildAttrs` are **concatenated** with the module's
+values (not overridden). All other attributes override via `//`.
+
+| Attribute             | Direction  | Module provides                                     |
+| --------------------- | ---------- | --------------------------------------------------- |
+| `nativeBuildInputs`   | Appended   | `templ`, `installShellFiles` (when enabled)         |
+| `buildInputs`         | Appended   | (none by default)                                   |
+| `checkInputs`         | Appended   | (none by default)                                   |
+| `configureFlags`      | Appended   | (none by default)                                   |
+| `preBuild`            | Appended   | Auto dep-sync logic when `deps` are set (runs first) |
+| `postInstall`         | Appended   | Shell completion installation when `enableCompletions` (runs first) |
+
+**Correct — your values are added to the module's:**
+
+```nix
+go-standard = {
+  extraBuildAttrs = {
+    nativeBuildInputs = [ pkgs.pkg-config ];
+    buildInputs = [ pkgs.sqlite ];
+    # These APPEND to the module's lists, not replace them.
+  };
+};
+```
+
+**All other attrs override (standard `//` merge):**
+
+```nix
+go-standard = {
+  extraBuildAttrs = {
+    doCheck = false;       # Overrides module default (true)
+    installPhase = "...";   # Overrides buildGoModule default
+  };
+};
+```

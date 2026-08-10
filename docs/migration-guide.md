@@ -103,8 +103,12 @@ recommended `flakeModules.go-standard` module.
 | `doCheck`                | `go-standard.enableCheck`           | Renamed, default `true`                           |
 | `ldflags`                | `go-standard.ldflags`               | Same                                              |
 | `goPkgAttr`              | `go-standard.goPkgAttr`             | Same                                              |
-| `buildGoModuleOverrides` | `go-standard.extraBuildAttrs`       | Renamed                                           |
+| `buildGoModuleOverrides` | `go-standard.extraBuildAttrs`       | Renamed — 6 attrs now concatenate (nativeBuildInputs, buildInputs, checkInputs, configureFlags, preBuild, postInstall) |
 | `enableNixfmt`           | `go-standard.enableNixfmt`           | New — controls nixfmt in treefmt (default: true)  |
+| (new)                    | `go-standard.enableShfmt`            | New — controls shfmt in treefmt (default: false) |
+| (new)                    | `go-standard.enableTempl`            | New — includes templ in devShells and treefmt (default: false) |
+| (new)                    | `go-standard.enableGopls`            | New — includes gopls in devShell (default: true) |
+| (new)                    | `go-standard.enableGovulncheck`      | New — includes govulncheck in devShell (default: true) |
 | `devShellExtraPackages`  | `go-standard.devShellExtraPackages` | Same                                              |
 | `shellExtraEnv`          | `go-standard.shellExtraEnv`         | Same                                              |
 | `extraApps`              | (add in consumer flake)             | No equivalent — add apps directly in your flake   |

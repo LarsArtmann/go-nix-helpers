@@ -53,6 +53,13 @@ prepared_source: mkPreparedSource {
   validates: "Validates private requires"
 }
 
+pure_functions: pure-functions.nix {
+  shape: package
+  style.fill: "#e3e9fd"
+  stripVersionSuffix: "Strips /vN from module paths"
+  repoName: "Extracts repo name from module path"
+}
+
 outputs: Flake Outputs {
   shape: package
   style.fill: "#edf0fd"
@@ -67,5 +74,6 @@ outputs: Flake Outputs {
 consumer_flake -> module: "imports"
 module.options -> module.config
 module.config -> prepared_source: "when deps set"
+pure_functions -> prepared_source: "imported by"
 prepared_source -> outputs: "prepared src"
 module.config -> outputs: "packages, apps, ..."
