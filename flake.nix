@@ -124,6 +124,50 @@
               echo "PASS: all expected flake outputs exist"
               mkdir $out
             '';
+
+            # Template evaluation test: verifies the go-standard template's
+            # outputs function accepts mock inputs and produces a valid module.
+            # Catches the class of bug where an identifier (e.g. flake-parts)
+            # is used in the body but not destructured from inputs@{ ... }.
+            # The original template bug (9471741→26b7620) went undetected
+            # because nix-instantiate --parse only checks syntax, not semantics.
+            templateEval =
+              let
+                evalResult = builtins.tryEval (
+                  let
+                    templateContent = import ./templates/go-standard/flake.nix;
+                    outputsFn = templateContent.outputs;
+                    mockInputs = {
+                      self = self;
+                      flake-parts = {
+                        lib.mkFlake = _: attrs: attrs;
+                      };
+                      nixpkgs = pkgs;
+                      go-nix-helpers = self;
+                    };
+                    result = outputsFn mockInputs;
+                  in
+                  result ? go-standard && result ? imports
+                );
+              in
+              pkgs.runCommand "template-eval-check" { } ''
+                ${
+                  if evalResult.success && evalResult.value then
+                    ""
+                  else
+                    ''
+                      echo "FAIL: go-standard template does not evaluate to a valid module"
+                      echo "The outputs function must:"
+                      echo "  1. Accept inputs@{ self, flake-parts, ... }"
+                      echo "  2. Return an attrset with 'imports' and 'go-standard' keys"
+                      echo "Common cause: an identifier used in the body is not"
+                      echo "destructured from the inputs attribute set."
+                      exit 1
+                    ''
+                }
+                echo "PASS: go-standard template evaluates correctly"
+                mkdir $out
+              '';
           };
 
           # -- Apps (nix run .#<name>) --------------------------------------------

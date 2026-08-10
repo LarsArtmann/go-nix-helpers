@@ -11,6 +11,7 @@ All LarsArtmann Go projects use the **flake-parts** + **go-nix-helpers** (which 
 5. [Checks Placement Rules](#checks-placement-rules)
 6. [treefmt Configuration Rules](#treefmt-configuration-rules)
 7. [extraBuildAttrs Merge Rules](#extrabuildattrs-merge-rules)
+8. [CI-friendly options](#ci-friendly-options)
 
 ---
 
@@ -249,5 +250,47 @@ go-standard = {
     doCheck = false;       # Overrides module default (true)
     installPhase = "...";   # Overrides buildGoModule default
   };
+};
+```
+
+### Per-package extraBuildAttrs (G2)
+
+Each entry in the `packages` submodule can carry its own `extraBuildAttrs`.
+Per-package values are **appended** to top-level values for the six concat
+keys, and **override** for all others.
+
+```nix
+go-standard = {
+  extraBuildAttrs.nativeBuildInputs = [ pkgs.git ];  # applies to ALL packages
+
+  packages = {
+    worker = {
+      subPackages = [ "cmd/worker" ];
+      # nativeBuildInputs = [ pkgs.git, pkgs.makeWrapper ]  (top-level + per-package)
+      # ldflags overrides top-level entirely (non-concat key)
+      extraBuildAttrs.ldflags = [ "-X main.mode=worker" ];
+    };
+  };
+};
+```
+
+---
+
+## CI-friendly options
+
+### `lintAsCheck` — hermetic lint check
+
+```nix
+go-standard.lintAsCheck = true;
+# Produces checks.lint (gated on enableGolangciLint = true)
+# Use when CI requires a derivation, not just an app
+```
+
+### `enableTestCheck` — hermetic test check
+
+```nix
+go-standard = {
+  enableCheck = false;    # skip tests during normal builds (faster)
+  enableTestCheck = true; # but still run tests in CI via nix flake check
 };
 ```

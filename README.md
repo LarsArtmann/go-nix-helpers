@@ -121,12 +121,14 @@ go-standard = {
   packages = {
     server.subPackages = [ "cmd/server" ];
     worker.subPackages = [ "cmd/worker" ];
+    worker.extraBuildAttrs.ldflags = [ "-X main.mode=worker" ];
   };
 };
 ```
 
 This generates `packages.server`, `packages.worker` (plus `packages.default`),
-separate `apps` for each, and all entries in the overlay.
+separate `apps` for each, and all entries in the overlay. Each entry can
+carry its own `extraBuildAttrs` for per-binary customization (G2).
 
 ---
 
@@ -160,6 +162,7 @@ See the full option table below, or copy one of the [templates](#templates).
 | `goPkgOverride`         | identity                     | Function applied to the Go package (custom toolchains, e.g. newer patch version) |
 | `lintAsCheck`           | `false`                      | Also expose golangci-lint as a hermetic `checks.lint` derivation (for CI) |
 | `enableCheck`           | `true`                       | Run `go test` during the Nix build (`doCheck`)                       |
+| `enableTestCheck`       | `false`                      | Generate `checks.test` — force `go test` in CI even when `enableCheck = false` |
 | `enableOverlay`         | `true`                       | Generate `flake.overlays.default`                                    |
 | `enableTempl`           | `false`                      | Include `templ` in devShells and treefmt                             |
 | `enableGovulncheck`     | `true`                       | Include `govulncheck` in the default devShell                        |

@@ -161,6 +161,17 @@ in
       description = "Whether to run `go test` during the Nix build (doCheck)";
     };
 
+    enableTestCheck = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = ''
+        Generate `checks.test` — a hermetic derivation that forces `go test`
+        regardless of `enableCheck`. Use when you want to skip tests during
+        normal builds (`enableCheck = false`) but still run them via
+        `nix flake check` in CI.
+      '';
+    };
+
     enableOverlay = lib.mkOption {
       type = lib.types.bool;
       default = true;
@@ -238,6 +249,17 @@ in
               default = "A LarsArtmann Go project";
               description = "Short description for this package's meta";
             };
+            extraBuildAttrs = lib.mkOption {
+              type = lib.types.attrs;
+              default = { };
+              description = ''
+                Per-package extra attributes merged into this entry's buildGoModule.
+                Same concatenation semantics as the top-level `extraBuildAttrs`:
+                `nativeBuildInputs`, `buildInputs`, `checkInputs`,
+                `configureFlags`, `preBuild`, `postInstall` are appended to
+                top-level values; all other attrs override.
+              '';
+            };
           };
         }
       );
@@ -246,12 +268,15 @@ in
         Additional packages for monorepo support.
         When set, generates a separate buildGoModule for each entry,
         all sharing the same source and vendor hash.
+        Each entry can carry its own `extraBuildAttrs` for per-binary
+        customization (build flags, inputs, phases).
 
         Example:
         ```
         go-standard.packages = {
           server.subPackages = [ "cmd/server" ];
           worker.subPackages = [ "cmd/worker" ];
+          worker.extraBuildAttrs.ldflags = [ "-X main.workerMode=true" ];
         };
         ```
       '';
@@ -485,8 +510,8 @@ in
         # - preBuild/postInstall: concatenated with module-generated values
         # - nativeBuildInputs: concatenated (module adds templ, installShellFiles)
         # - buildInputs/checkInputs/configureFlags: concatenated for future-proofing
-        # All other attrs override the module defaults via the // operator.
-        userExtraBuildAttrs = builtins.removeAttrs cfg.extraBuildAttrs [
+        # Keys that receive concatenation (not override) in extraBuildAttrs.
+        concatKeys = [
           "preBuild"
           "postInstall"
           "nativeBuildInputs"
@@ -494,17 +519,28 @@ in
           "checkInputs"
           "configureFlags"
         ];
-        userNativeBuildInputs = cfg.extraBuildAttrs.nativeBuildInputs or [ ];
-        userBuildInputs = cfg.extraBuildAttrs.buildInputs or [ ];
-        userCheckInputs = cfg.extraBuildAttrs.checkInputs or [ ];
-        userConfigureFlags = cfg.extraBuildAttrs.configureFlags or [ ];
-        mergedPreBuild = autoDepSyncPreBuild + (cfg.extraBuildAttrs.preBuild or "");
 
         # Reusable package builder for monorepo support.
-        # Builds one Go binary with the given name and subPackages.
+        # Builds one Go binary with the given name, subPackages, description,
+        # and optional per-package extraBuildAttrs (G2).
+        # Per-package attrs merge with top-level cfg.extraBuildAttrs:
+        # the six concatKeys append per-package values after top-level values;
+        # all other keys use per-package override of top-level.
         mkGoPackage =
-          pkgName: subPkgs: pkgDesc:
+          pkgName: subPkgs: pkgDesc: pkgExtraBuildAttrs:
           let
+            topLevel = cfg.extraBuildAttrs;
+            perPkg = pkgExtraBuildAttrs;
+            combinedConcat = {
+              nativeBuildInputs = (topLevel.nativeBuildInputs or [ ]) ++ (perPkg.nativeBuildInputs or [ ]);
+              buildInputs = (topLevel.buildInputs or [ ]) ++ (perPkg.buildInputs or [ ]);
+              checkInputs = (topLevel.checkInputs or [ ]) ++ (perPkg.checkInputs or [ ]);
+              configureFlags = (topLevel.configureFlags or [ ]) ++ (perPkg.configureFlags or [ ]);
+              preBuild = (topLevel.preBuild or "") + (perPkg.preBuild or "");
+              postInstall = (topLevel.postInstall or "") + (perPkg.postInstall or "");
+            };
+            combinedOther =
+              (builtins.removeAttrs topLevel concatKeys) // (builtins.removeAttrs perPkg concatKeys);
             completionPostInstall = lib.optionalString cfg.enableCompletions ''
               # Check if the binary supports --completion before installing.
               # Falls back to a clear warning instead of silently installing
@@ -526,7 +562,7 @@ in
                   --fish <(timeout 10 $out/bin/${pkgName} --completion fish 2>/dev/null || true)
               fi
             '';
-            mergedPostInstall = completionPostInstall + (cfg.extraBuildAttrs.postInstall or "");
+            mergedPostInstall = completionPostInstall + combinedConcat.postInstall;
           in
           buildGoModule (
             {
@@ -539,15 +575,15 @@ in
               doCheck = cfg.enableCheck;
               inherit (cfg) buildFlags;
               ldflags = finalLdflags;
-              preBuild = mergedPreBuild;
+              preBuild = autoDepSyncPreBuild + combinedConcat.preBuild;
               postInstall = mergedPostInstall;
               nativeBuildInputs =
                 lib.optionals cfg.enableTempl [ pkgs.templ ]
                 ++ lib.optionals cfg.enableCompletions [ pkgs.installShellFiles ]
-                ++ userNativeBuildInputs;
-              buildInputs = userBuildInputs;
-              checkInputs = userCheckInputs;
-              configureFlags = userConfigureFlags;
+                ++ combinedConcat.nativeBuildInputs;
+              buildInputs = combinedConcat.buildInputs;
+              checkInputs = combinedConcat.checkInputs;
+              configureFlags = combinedConcat.configureFlags;
               meta = {
                 description = pkgDesc;
                 license = lib.licenses.mit;
@@ -562,17 +598,19 @@ in
               // cfg.extraMeta;
             }
             // autoDepFodAttrs
-            // userExtraBuildAttrs
+            // combinedOther
           );
 
         # Build the default package (always present)
         # vendorHashWarning is referenced here to force evaluation of the
         # placeholder-detection trace at build time.
-        package = builtins.seq vendorHashWarning (mkGoPackage cfg.pname cfg.subPackages cfg.description);
+        package = builtins.seq vendorHashWarning (
+          mkGoPackage cfg.pname cfg.subPackages cfg.description { }
+        );
 
         # Build extra packages when monorepo config is set
         extraPackages = lib.mapAttrs (
-          name: pcfg: mkGoPackage name pcfg.subPackages pcfg.description
+          name: pcfg: mkGoPackage name pcfg.subPackages pcfg.description (pcfg.extraBuildAttrs or { })
         ) cfg.packages;
 
         templPkg = lib.optionals cfg.enableTempl [ pkgs.templ ];
@@ -683,6 +721,11 @@ in
               });
             in
             pkg;
+        }
+        // lib.optionalAttrs cfg.enableTestCheck {
+          test = config.packages.default.overrideAttrs (_old: {
+            doCheck = true;
+          });
         };
 
         treefmt = {

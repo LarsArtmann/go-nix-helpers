@@ -12,6 +12,17 @@ This project has not made a tagged release yet; all changes below are in
 
 ### Added
 
+- `enableTestCheck` option (default: false) — generates `checks.test`, a
+  hermetic derivation that forces `go test` regardless of `enableCheck`.
+  Use when skipping tests during normal builds but running them in CI.
+- **G2: per-package `extraBuildAttrs`** in the monorepo `packages` submodule.
+  Each entry can now carry its own `extraBuildAttrs` for per-binary
+  customization (ldflags, build inputs, phases). Same concatenation semantics
+  as the top-level `extraBuildAttrs`. Unblocks StopTube, browser-history,
+  BuildFlow, go-structure-linter migration.
+- `templateEval` check — evaluates the go-standard template's `outputs`
+  function with mock inputs to catch unbound-variable bugs (the class of bug
+  fixed in `26b7620` that went undetected since `9471741`).
 - `docs/consumer-audit-checklist.md` — systematic criteria for auditing
   downstream consumers: module adoption, input minimalism, private deps wiring,
   redundant override detection, verification commands, and a quick triage

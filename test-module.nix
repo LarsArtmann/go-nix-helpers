@@ -149,6 +149,7 @@ let
       (cfg.goPkgOverride pkgs.go_1_26) == pkgs.go_1_26
     ) "identity function")
     (assertCheck "lintAsCheck default is false" (cfg.lintAsCheck == false) "false")
+    (assertCheck "enableTestCheck default is false" (cfg.enableTestCheck == false) "false")
     (assertCheck "enableTempl default is false" (cfg.enableTempl == false) "false")
     (assertCheck "enableGovulncheck default is true" (cfg.enableGovulncheck == true) "true")
     (assertCheck "enableGopls default is true" (cfg.enableGopls == true) "true")
@@ -267,6 +268,19 @@ let
     packages.worker.description = "Worker binary";
   };
 
+  # --- Per-package extraBuildAttrs (G2) test --------------------------------
+  perPackageExtraCfg = mkPerSystemConfig {
+    packages.worker.subPackages = [ "cmd/worker" ];
+    packages.worker.extraBuildAttrs.passthru.g2test = "per-pkg-override-works";
+  };
+
+  # --- Per-package + top-level extraBuildAttrs merge (G2 concat test) -------
+  perPackageMergeCfg = mkPerSystemConfig {
+    extraBuildAttrs.nativeBuildInputs = [ pkgs.git ];
+    packages.worker.subPackages = [ "cmd/worker" ];
+    packages.worker.extraBuildAttrs.nativeBuildInputs = [ pkgs.makeWrapper ];
+  };
+
   # --- No-lint tests -------------------------------------------------------
   noLintCfg = mkPerSystemConfig { enableGolangciLint = false; };
 
@@ -365,6 +379,9 @@ let
 
   # --- lintAsCheck test ------------------------------------------------------
   lintAsCheckCfg = mkPerSystemConfig { lintAsCheck = true; };
+
+  # --- enableTestCheck test --------------------------------------------------
+  enableTestCheckCfg = mkPerSystemConfig { enableTestCheck = true; };
 
   # --- nativeBuildInputs merge test (user inputs appended, not overridden) ---
   nativeBuildInputsMergeCfg = mkPerSystemConfig {
@@ -758,6 +775,53 @@ let
     (assertCheck "lintAsCheck=true keeps apps.lint" (
       lintAsCheckCfg.apps ? lint
     ) "apps.lint still exists")
+    (assertCheck "lintAsCheck gated on enableGolangciLint" (
+      !(
+        (mkPerSystemConfig {
+          lintAsCheck = true;
+          enableGolangciLint = false;
+        }).checks ? lint
+      )
+    ) "no checks.lint when enableGolangciLint=false")
+    # --- G2: per-package extraBuildAttrs ----------------------------------
+    (assertCheck "packages.<name>.extraBuildAttrs option default is {}" (
+      let
+        testEval = lib.evalModules {
+          modules = [
+            flakePartsStub
+            ./modules/go-standard.nix
+            {
+              go-standard = {
+                pname = "test";
+                vendorHash = null;
+                packages.foo.subPackages = [ "." ];
+              };
+            }
+          ];
+          specialArgs = {
+            inherit inputs;
+            self = mockSelf;
+          };
+        };
+      in
+      testEval.config.go-standard.packages.foo.extraBuildAttrs or "MISSING" == { }
+    ) "empty default")
+    (assertCheck "G2: per-package extraBuildAttrs evaluates without error" (
+      perPackageExtraCfg.packages ? worker
+    ) "worker package exists")
+    (assertCheck "G2: per-package override key flows through" (
+      perPackageExtraCfg.packages.worker.passthru.g2test or "MISSING" == "per-pkg-override-works"
+    ) "passthru value visible in worker package")
+    (assertCheck "G2: per-package + top-level concat evaluates" (
+      perPackageMergeCfg.packages ? worker
+    ) "worker package with merged attrs exists")
+    # --- Behavioral: enableTestCheck exposes checks.test ----------------------
+    (assertCheck "enableTestCheck=false has no checks.test" (
+      !(psCfg.checks ? test)
+    ) "no checks.test by default")
+    (assertCheck "enableTestCheck=true exposes checks.test" (
+      enableTestCheckCfg.checks ? test
+    ) "checks.test exists")
     systemsOverrideCheck
     monorepoOverlayCheck
   ];

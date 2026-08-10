@@ -52,7 +52,9 @@ Go subPackages to build.
 .TP
 .BR packages " (attrs, default: {})"
 Additional packages for monorepo support. Each entry generates a separate
-buildGoModule with its own subPackages.
+buildGoModule with its own subPackages, description, and extraBuildAttrs
+(per-binary customization with the same merge semantics as top-level
+extraBuildAttrs).
 .TP
 .BR goPkgAttr " (str, default: \"go_1_26\")"
 Go package attribute in nixpkgs.
@@ -84,6 +86,11 @@ against the package source (with FOD vendor/ when deps are set).
 .TP
 .BR enableCheck " (bool, default: true)"
 Run go test during the Nix build (doCheck).
+.TP
+.BR enableTestCheck " (bool, default: false)"
+Generate checks.test — a hermetic derivation that forces go test regardless
+of enableCheck. Use when skipping tests during normal builds but running
+them in CI via nix flake check.
 .TP
 .BR enableOverlay " (bool, default: true)"
 Generate flake.overlays.default.
@@ -202,9 +209,18 @@ Package build verification.
 .BR checks.lint
 golangci-lint derivation (only when
 .BR lintAsCheck
+= true and
+.BR enableGolangciLint
 = true). Mirrors
 .BR apps.lint
 but as a hermetic check derivation for CI.
+.TP
+.BR checks.test
+go test derivation (only when
+.BR enableTestCheck
+= true). Forces doCheck=true regardless of
+.BR enableCheck .
+Useful for CI when normal builds skip tests.
 .TP
 .BR overlays.default
 Exposes pkgs.\\fIpname\\fR to other flakes.
