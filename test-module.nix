@@ -481,7 +481,8 @@ let
         pkg = completionsCfg.packages.default;
         inputs = pkg.nativeBuildInputs or pkg.drvAttrs.nativeBuildInputs or [ ];
         hasInstallShellFiles = builtins.any (
-          x: x.pname or x.name or "" == "install-shell-files"
+          x:
+          x.pname or x.name or "" == "install-shell-files"
           || lib.hasInfix "install-shell-files" (x.name or "")
           || lib.hasInfix "installShellFiles" (x.name or "")
         ) inputs;
@@ -662,8 +663,7 @@ let
       == "github.com/larsartmann/*,github.com/LarsArtmann/*"
     ) "default glob in GOPRIVATE")
     (assertCheck "GOPRIVATE uses custom privateGlobPattern" (
-      goprivateCustomGlobCfg.devShells.default.GOPRIVATE or ""
-      == "github.com/myorg/*,github.com/MyOrg/*"
+      goprivateCustomGlobCfg.devShells.default.GOPRIVATE or "" == "github.com/myorg/*,github.com/MyOrg/*"
     ) "custom glob in GOPRIVATE")
     # Without deps, GOPRIVATE should NOT be set
     (assertCheck "GOPRIVATE not set when deps empty" (

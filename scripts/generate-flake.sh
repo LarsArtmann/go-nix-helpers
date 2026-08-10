@@ -9,8 +9,20 @@
 #   --push          Push to GitHub after generation
 #   --dir <path>    Target directory (default: $PROJECTS_DIR/<project-name>)
 #   --template <t>  Template to use: "go-standard" (default) or "go-flake-parts"
+#   --dry-run       Print what would be created without writing any files
+#   --verbose       List created files after generation
+#   --list-templates  Print available templates and exit
 #   --help          Show this help message
 set -euo pipefail
+
+AVAILABLE_TEMPLATES=("go-standard" "go-flake-parts")
+
+print_templates() {
+  echo "Available templates:"
+  for t in "${AVAILABLE_TEMPLATES[@]}"; do
+    echo "  $t"
+  done
+}
 
 if [ $# -eq 0 ] || [ "${1:-}" = "--help" ] || [ "${1:-}" = "-h" ]; then
   echo "Usage: generate-flake.sh [options] <project-name>"
@@ -24,12 +36,24 @@ if [ $# -eq 0 ] || [ "${1:-}" = "--help" ] || [ "${1:-}" = "-h" ]; then
   # shellcheck disable=SC2016 # $PROJECTS_DIR is intentionally literal in help text
   echo '  --dir <path>    Target directory (default: $PROJECTS_DIR/<project-name>)'
   echo '  --template <t>  Template: "go-standard" (default) or "go-flake-parts"'
+  echo "  --dry-run       Print what would be created without writing any files"
+  echo "  --verbose       List created files after generation"
+  echo "  --list-templates  Print available templates and exit"
   echo ""
   echo "Environment:"
   echo "  PROJECTS_DIR   Base directory for projects (default: $(cd "$(dirname "$0")/.." && pwd)/.."
   echo ""
+  echo "Templates:"
+  print_templates
+  echo ""
   echo "Example:"
   echo "  generate-flake.sh my-project --templ --private-deps"
+  exit 0
+fi
+
+# Handle --list-templates early (no project name needed)
+if [ "${1:-}" = "--list-templates" ]; then
+  print_templates
   exit 0
 fi
 
@@ -40,6 +64,8 @@ CREATE_GO_MOD=false
 PUSH=false
 TEMPLATE="go-standard"
 CUSTOM_DIR=""
+DRY_RUN=false
+VERBOSE=false
 
 # Parse arguments: flags can come before or after the project name
 while [ $# -gt 0 ]; do
@@ -72,6 +98,18 @@ while [ $# -gt 0 ]; do
     TEMPLATE="$2"
     shift 2
     ;;
+  --dry-run)
+    DRY_RUN=true
+    shift
+    ;;
+  --verbose)
+    VERBOSE=true
+    shift
+    ;;
+  --list-templates)
+    print_templates
+    exit 0
+    ;;
   --help | -h) exit 0 ;;
   -*)
     echo "ERROR: Unknown option: $1"
@@ -98,7 +136,7 @@ TEMPLATE_FILE="$REPO_ROOT/templates/$TEMPLATE/flake.nix"
 
 if [ ! -f "$TEMPLATE_FILE" ]; then
   echo "ERROR: Template not found at $TEMPLATE_FILE"
-  echo "Available templates: go-standard, go-flake-parts"
+  print_templates
   exit 1
 fi
 
@@ -112,6 +150,20 @@ fi
 
 TARGET="$TARGET_DIR/flake.nix"
 
+# Track created files for --verbose
+CREATED_FILES=()
+
+if [ "$DRY_RUN" = true ]; then
+  echo "[dry-run] Would create: $TARGET"
+  if [ "$CREATE_GO_MOD" = true ]; then
+    [ -f "$TARGET_DIR/go.mod" ] || echo "[dry-run] Would create: $TARGET_DIR/go.mod"
+    [ -f "$TARGET_DIR/main.go" ] || echo "[dry-run] Would create: $TARGET_DIR/main.go"
+  fi
+  echo "[dry-run] Template: $TEMPLATE"
+  echo "[dry-run] Flags: templ=$USE_TEMPL private-deps=$USE_PRIVATE_DEPS go-mod=$CREATE_GO_MOD"
+  exit 0
+fi
+
 if [ -f "$TARGET" ]; then
   echo "ERROR: $TARGET already exists"
   exit 1
@@ -121,6 +173,7 @@ mkdir -p "$TARGET_DIR"
 
 # Copy template
 cp "$TEMPLATE_FILE" "$TARGET"
+CREATED_FILES+=("$TARGET")
 
 # Replace placeholders (works with both templates)
 sed -i "s/REPLACE_ME/$PROJECT/g" "$TARGET"
@@ -146,7 +199,7 @@ fi
 # For go-standard template, add deps section when --private-deps is requested
 if [ "$USE_PRIVATE_DEPS" = true ] && [ "$TEMPLATE" = "go-standard" ]; then
   sed -i '/description = "One-line description of the project";/a\
-\
+
         # Private dependencies (add each as a flake = false input)\
         deps = {\
           # "github.com/larsartmann/go-cqrs-lite" = inputs.go-cqrs-lite;\
@@ -161,7 +214,7 @@ module github.com/larsartmann/$PROJECT
 
 go 1.26
 EOF
-    echo "Created $TARGET_DIR/go.mod"
+    CREATED_FILES+=("$TARGET_DIR/go.mod")
   fi
   if [ ! -f "$TARGET_DIR/main.go" ]; then
     cat >"$TARGET_DIR/main.go" <<'EOF'
@@ -169,7 +222,7 @@ package main
 
 func main() {}
 EOF
-    echo "Created $TARGET_DIR/main.go"
+    CREATED_FILES+=("$TARGET_DIR/main.go")
   fi
 fi
 
@@ -181,6 +234,14 @@ echo '  2. Set vendorHash to "" for first build'
 echo "  3. nix build .#packages.default --no-out-link 2>&1 | grep 'got:'"
 echo "  4. Paste the got: hash as vendorHash"
 echo "  5. nix flake check"
+
+if [ "$VERBOSE" = true ]; then
+  echo ""
+  echo "Created files:"
+  for f in "${CREATED_FILES[@]}"; do
+    echo "  $f"
+  done
+fi
 
 if [ "$PUSH" = true ]; then
   read -rp "Push to GitHub? [y/N] " -n 1 -r
