@@ -8,10 +8,12 @@
 # go.mod so the Go toolchain resolves them locally.
 #
 # Key features:
-#   - Recursive auto-discovery: walks each dep source recursively to find
-#     ALL go.mod files at any depth (not just top-level) and generates replace
-#     directives automatically. Excludes example/testdata/vendor directories.
-#     No manual `subModules` list needed (though explicit entries are merged).
+#   - Recursive auto-discovery (build-time): scans _local_deps/ at build time
+#     to find ALL go.mod files at any depth (not just top-level) and generates
+#     replace directives automatically. Excludes example/testdata/vendor
+#     directories. No manual `subModules` list needed (though explicit entries
+#     are merged). Build-time discovery avoids builtins.readDir on derivation
+#     outputs during evaluation, keeping `nix flake check --no-build` working.
 #   - Build-time validation: verifies every private module require in go.mod
 #     has a corresponding replace directive, failing with a clear message
 #     instead of a cryptic "could not read Username" SSH error.
@@ -114,66 +116,6 @@ let
   pureFuncs = import ./pure-functions.nix { inherit lib; };
   inherit (pureFuncs) stripVersionSuffix repoName;
 
-  # Read the module path from the first non-empty line of a go.mod file.
-  # go.mod line 1 is always: "module <import-path>"
-  # Returns "" for empty/malformed files.
-  readModulePath =
-    goModFile:
-    let
-      content = builtins.readFile goModFile;
-      lines = lib.splitString "\n" content;
-      nonEmpty = lib.filter (l: l != "") lines;
-      firstLine = if lib.length nonEmpty > 0 then lib.head nonEmpty else "";
-      parts = lib.splitString " " firstLine;
-    in
-    if lib.length parts >= 2 then lib.elemAt parts 1 else "";
-
-  # ---------------------------------------------------------------------------
-  # Auto-discovery: scan dep source for sub-modules
-  # ---------------------------------------------------------------------------
-
-  # Discover sub-modules by recursively scanning a dep source for go.mod files
-  # at ANY depth (not just top-level). Returns: [ { modulePath, localDir; } ]
-  # Example for go-cqrs-lite:
-  #   [ { modulePath = ".../catalog/v2";           localDir = "./_local_deps/go-cqrs-lite/catalog"; }
-  #     { modulePath = ".../event/v3/eventtest";   localDir = "./_local_deps/go-cqrs-lite/event/eventtest"; }
-  #     { modulePath = ".../storage/memory/v3";    localDir = "./_local_deps/go-cqrs-lite/storage/memory"; }
-  #     ... ]
-  discoverSubModules =
-    depPath: depSrc:
-    if !autoSubModules then
-      [ ]
-    else
-      let
-        # Recursively walk the dep tree, collecting relative paths to every
-        # directory that contains a go.mod (excluding the dep root itself
-        # and excluded directories like example/testdata/vendor).
-        walk =
-          dir:
-          let
-            entries = builtins.readDir dir;
-            allDirs = lib.attrNames (lib.filterAttrs (_: type: type == "directory") entries);
-            dirs = lib.filter (d: !(lib.elem d excludeSubModuleDirs)) allDirs;
-            subs = lib.flatten (map (d: walk "${dir}/${d}") dirs);
-          in
-          if builtins.pathExists "${dir}/go.mod" && dir != rootDir then
-            [ (lib.removePrefix (rootDir + "/") dir) ] ++ subs
-          else
-            subs;
-        rootDir = toString depSrc;
-        found = walk rootDir;
-        basename = repoName depPath;
-      in
-      map (rel: {
-        modulePath = readModulePath "${depSrc}/${rel}/go.mod";
-        localDir = "./_local_deps/${basename}/${rel}";
-      }) found;
-
-  # Collect all auto-discovered sub-modules across all deps.
-  allDiscovered = lib.flatten (
-    lib.mapAttrsToList (depPath: depSrc: discoverSubModules depPath depSrc) deps
-  );
-
   # ---------------------------------------------------------------------------
   # Shell script generation
   # ---------------------------------------------------------------------------
@@ -215,13 +157,10 @@ let
     ) subModules
   );
 
-  # Merged + deduplicated sub-module list (explicit entries first).
-  allSubModules = lib.unique (explicitSubModules ++ allDiscovered);
-
-  # Single replace-directive generator for ALL sub-modules (explicit + auto).
-  # "github.com/.../codec/v2" => ./_local_deps/go-cqrs-lite/codec
-  allSubModuleReplace = lib.concatStringsSep "\n" (
-    map (sm: ''echo "  ${sm.modulePath} => ${sm.localDir}" >> go.mod'') allSubModules
+  # Replace directives for EXPLICIT sub-modules only.
+  # Auto-discovered sub-modules are generated at build time (see autoDiscoverScript).
+  explicitSubModuleReplace = lib.concatStringsSep "\n" (
+    map (sm: ''echo "  ${sm.modulePath} => ${sm.localDir}" >> go.mod'') explicitSubModules
   );
 
   # Require lines for manually injected deps (rarely needed).
@@ -238,13 +177,35 @@ let
 
   hasRequires = requireDeps != { };
 
-  # Normalize pseudo-versions for ALL sub-modules so replace directives match.
-  # Replaces "v0.0.0-20260101000000-abc123" with "v0.0.0".
-  subModuleVersionNormalize = lib.concatStringsSep "\n" (
+  # Normalize pseudo-versions for EXPLICIT sub-modules so replace directives match.
+  # Auto-discovered modules are normalized at build time (see autoDiscoverScript).
+  explicitVersionNormalize = lib.concatStringsSep "\n" (
     map (sm: ''
       sed -i 's|${sm.modulePath} v0\.0\.0-[^ ]*|${sm.modulePath} ${subModuleVersion}|g' go.mod
-    '') allSubModules
+    '') explicitSubModules
   );
+
+  # Build-time auto-discovery script.
+  # Runs AFTER deps are copied to _local_deps/ but BEFORE replace directives
+  # are appended. Moving discovery from eval-time to build-time avoids
+  # builtins.readDir/readFile on derivation outputs, which would force those
+  # derivations to be built during evaluation (breaking `nix flake check --no-build`).
+  autoDiscoverScript = lib.optionalString autoSubModules ''
+    rm -f go.mod.discovered
+    find _local_deps/ -mindepth 3 -name go.mod | sort | while IFS= read -r gomod; do
+      case "$gomod" in
+        ${lib.concatStringsSep "|" (map (d: "*/${d}/*") excludeSubModuleDirs)}) continue ;;
+      esac
+      dir=$(dirname "$gomod")
+      rel=''${dir#_local_deps/}
+      basename=$(printf '%s' "$rel" | cut -d/ -f1)
+      subdir=$(printf '%s' "$rel" | cut -d/ -f2-)
+      modulePath=$(awk '/^module /{print $2; exit}' "$gomod")
+      [ -z "$modulePath" ] && continue
+      sed -i "s|$modulePath v0\.0\.0-[^ ]*|$modulePath ${subModuleVersion}|g" go.mod
+      printf '  %s => ./_local_deps/%s/%s\n' "$modulePath" "$basename" "$subdir" >> go.mod.discovered
+    done
+  '';
 
   # Strip replace directives that point OUTSIDE the prepared source tree,
   # where the path cannot exist inside the Nix sandbox:
@@ -328,7 +289,9 @@ pkgs.stdenv.mkDerivation {
 
     ${postPatchExtra}
 
-    ${subModuleVersionNormalize}
+    ${explicitVersionNormalize}
+
+    ${autoDiscoverScript}
 
     ${lib.optionalString hasRequires ''
       touch go.mod.requires.tmp
@@ -349,7 +312,16 @@ pkgs.stdenv.mkDerivation {
     fi
     echo 'replace (' >> go.mod
     ${replaceLines}
-    ${allSubModuleReplace}
+    ${explicitSubModuleReplace}
+    if [ -f go.mod.discovered ]; then
+      while IFS= read -r line; do
+        modPath=$(printf '%s' "$line" | awk '{print $1}')
+        if ! grep -qF "  $modPath => " go.mod; then
+          printf '%s\n' "$line" >> go.mod
+        fi
+      done < go.mod.discovered
+      rm -f go.mod.discovered
+    fi
     echo ')' >> go.mod
 
     ${lib.optionalString validatePrivateDeps validateScript}

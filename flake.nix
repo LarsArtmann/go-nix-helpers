@@ -66,7 +66,6 @@
             inherit
               pkgs
               lib
-              self
               inputs
               ;
           };
