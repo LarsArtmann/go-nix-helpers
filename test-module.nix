@@ -10,7 +10,6 @@
 {
   pkgs,
   lib,
-  self,
   inputs,
 }:
 let
@@ -118,7 +117,7 @@ let
   perSystemEval = lib.evalModules {
     modules = [
       perSystemStubOptions
-      (if builtins.isFunction perSystemFn then perSystemFn else { config, ... }: perSystemFn)
+      (if builtins.isFunction perSystemFn then perSystemFn else _: perSystemFn)
     ];
     specialArgs = {
       inherit pkgs lib;
@@ -251,7 +250,7 @@ let
             let
               fn = modEval.config.perSystem;
             in
-            if builtins.isFunction fn then fn else { config, ... }: fn
+            if builtins.isFunction fn then fn else _: fn
           )
         ];
         specialArgs = {
@@ -748,7 +747,6 @@ let
     # --- Behavioral: goPkgOverride applies to the package Go version ---
     (assertCheck "goPkgOverride applies to packages.default" (
       let
-        go = goPkgOverrideCfg.packages.default.go or null;
         # goDrv is the actual derivation; compare version attr if available
         goDrv = goPkgOverrideCfg.packages.default.go or null;
         hasCustomVersion =

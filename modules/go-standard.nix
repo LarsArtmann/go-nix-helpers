@@ -592,9 +592,9 @@ in
                 lib.optionals cfg.enableTempl [ pkgs.templ ]
                 ++ lib.optionals cfg.enableCompletions [ pkgs.installShellFiles ]
                 ++ combinedConcat.nativeBuildInputs;
-              buildInputs = combinedConcat.buildInputs;
-              checkInputs = combinedConcat.checkInputs;
-              configureFlags = combinedConcat.configureFlags;
+              inherit (combinedConcat) buildInputs;
+              inherit (combinedConcat) checkInputs;
+              inherit (combinedConcat) configureFlags;
               meta = {
                 description = pkgDesc;
                 license = lib.licenses.mit;

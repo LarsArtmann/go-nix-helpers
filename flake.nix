@@ -21,7 +21,6 @@
     inputs@{
       self,
       flake-parts,
-      systems,
       ...
     }:
     flake-parts.lib.mkFlake { inherit inputs; } {
@@ -55,10 +54,8 @@
 
       perSystem =
         {
-          config,
           pkgs,
           lib,
-          system,
           ...
         }:
         let
@@ -138,7 +135,7 @@
                     templateContent = import ./templates/go-standard/flake.nix;
                     outputsFn = templateContent.outputs;
                     mockInputs = {
-                      self = self;
+                      inherit self;
                       flake-parts = {
                         lib.mkFlake = _: attrs: attrs;
                       };
