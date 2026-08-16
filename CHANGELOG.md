@@ -12,6 +12,12 @@ This project has not made a tagged release yet; all changes below are in
 
 ### Added
 
+- `checks.templ-committed` (eval-time) — throws at `nix flake check` when any
+  `.templ` file in the flake source lacks its `*_templ.go` sibling. Nix builds
+  vendor the source without running `templ generate`, so an untracked
+  generated file breaks the build with `undefined: someFragment`. The flake
+  source contains only tracked files, so the walk sees exactly the committed
+  set. Zero cost for repos without `.templ` files. Covered by 3 module tests.
 - `requireDeps` option (default: `{}`) — passes manually injected require
   lines to mkPreparedSource. Needed when sub-modules have explicit version
   requirements not present in go.mod (e.g. PMA's project-discovery-sdk

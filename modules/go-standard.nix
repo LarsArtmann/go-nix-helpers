@@ -3,7 +3,9 @@
 # Bundles: treefmt-nix (via composite module in flake.nix)
 #
 # Provides: packages.default, apps.default/test/lint, devShells.default/ci,
-#           checks.format/build, treefmt, flake.overlays.default
+#           checks.format/build, checks.templ-committed (eval-time throw when
+#           any .templ lacks its committed *_templ.go sibling), treefmt,
+#           flake.overlays.default
 #
 # Usage (consumer's flake.nix — only 3 inputs needed!):
 #
@@ -737,7 +739,48 @@ in
           test = config.packages.default.overrideAttrs (_old: {
             doCheck = true;
           });
-        };
+        }
+        // (
+          let
+            # Every .templ file in the flake source must ship its generated
+            # *_templ.go sibling. Nix builds vendor the source WITHOUT running
+            # `templ generate`, so an untracked generated file breaks the build
+            # with `undefined: someFragment`. The flake source contains only
+            # TRACKED files, so a missing sibling here means it is not
+            # committed to git.
+            walkTempl =
+              dir:
+              lib.concatLists (
+                lib.mapAttrsToList (
+                  name: type:
+                  let
+                    path = dir + "/${name}";
+                  in
+                  if type == "directory" then
+                    (if name == ".git" then [ ] else walkTempl path)
+                  else if lib.hasSuffix ".templ" name then
+                    [ path ]
+                  else
+                    [ ]
+                ) (builtins.readDir dir)
+              );
+            templFiles = walkTempl self.outPath;
+            missing = builtins.filter (
+              f: !builtins.pathExists (lib.removeSuffix ".templ" f + "_templ.go")
+            ) templFiles;
+          in
+          lib.optionalAttrs (missing != [ ]) {
+            templ-committed = builtins.throw ''
+              go-standard: ${toString (builtins.length missing)} .templ file(s) without a committed *_templ.go sibling:
+              ${lib.concatStringsSep "\n" (map (f: "  ${f}") missing)}
+
+              Nix builds vendor the source without running `templ generate` —
+              the build fails with `undefined: someFragment`. Run `templ generate`
+              and commit the generated *_templ.go files:
+                git add -- '*_templ.go'
+            '';
+          }
+        );
 
         treefmt = {
           projectRootFile = "go.mod";
