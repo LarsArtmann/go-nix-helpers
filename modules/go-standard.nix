@@ -107,6 +107,30 @@ in
       '';
     };
 
+    # Build Go from the go.dev SOURCE tarball instead of nixpkgs — set when
+    # the repo's go.mod floor is newer than nixpkgs' toolchain. Unlike
+    # goPkgOverride this needs no `pkgs` in scope, so consumers can set it at
+    # flake level. Takes precedence over goPkgOverride. Drop the setting once
+    # nixpkgs' go_1_26 satisfies the go.mod floor again.
+    goTarballVersion = lib.mkOption {
+      type = lib.types.nullOr lib.types.str;
+      default = null;
+      example = "1.26.6";
+      description = ''
+        Exact Go version to build from https://go.dev/dl/go<version>.src.tar.gz
+        (e.g. "1.26.6"). Use when the go.mod floor is newer than nixpkgs'
+        go_1_26 and buildGoModule's GOTOOLCHAIN=local forbids toolchain
+        auto-downloads. Requires goTarballHash.
+      '';
+    };
+
+    goTarballHash = lib.mkOption {
+      type = lib.types.nullOr lib.types.str;
+      default = null;
+      example = "sha256-oHIcVMaIkBRI13rZs+x+p8R0cwdV/4kTgukuy5P/LLE=";
+      description = "SRI hash of the go.dev source tarball pinned by goTarballVersion.";
+    };
+
     lintAsCheck = lib.mkOption {
       type = lib.types.bool;
       default = false;
@@ -440,7 +464,24 @@ in
       let
         inherit (cfg) version;
 
-        goPkg = cfg.goPkgOverride pkgs.${cfg.goPkgAttr};
+        # go.dev source tarball wins over goPkgOverride when set: it is the
+        # declarative, pkgs-scope-free way to outrun a lagging nixpkgs go.
+        goPkg =
+          if cfg.goTarballVersion != null then
+            if cfg.goTarballHash == null then
+              throw "go-standard.goTarballHash is required when goTarballVersion is set"
+            else
+              pkgs.${cfg.goPkgAttr}.overrideAttrs (
+                finalAttrs: _prev: {
+                  version = cfg.goTarballVersion;
+                  src = pkgs.fetchurl {
+                    url = "https://go.dev/dl/go${finalAttrs.version}.src.tar.gz";
+                    hash = cfg.goTarballHash;
+                  };
+                }
+              )
+          else
+            cfg.goPkgOverride pkgs.${cfg.goPkgAttr};
 
         usePreparedSource = cfg.deps != { };
 

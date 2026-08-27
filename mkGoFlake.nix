@@ -65,6 +65,11 @@
   doCheck ? true,
   ldflags ? null,
   goPkgAttr ? "go_1_26",
+  # Go from the go.dev SOURCE tarball — set when the go.mod floor is newer
+  # than nixpkgs' go (buildGoModule pins GOTOOLCHAIN=local, so the sandbox
+  # cannot auto-download a toolchain). Drop once nixpkgs catches up.
+  goTarballVersion ? null,
+  goTarballHash ? null,
   buildGoModuleOverrides ? { },
 
   # Dev shell configuration
@@ -89,7 +94,22 @@
       ...
     }:
     let
-      goPkg = pkgs.${goPkgAttr};
+      goPkg =
+        if goTarballVersion != null then
+          if goTarballHash == null then
+            throw "mkGoFlake: goTarballHash is required when goTarballVersion is set"
+          else
+            pkgs.${goPkgAttr}.overrideAttrs (
+              finalAttrs: _prev: {
+                version = goTarballVersion;
+                src = pkgs.fetchurl {
+                  url = "https://go.dev/dl/go${finalAttrs.version}.src.tar.gz";
+                  hash = goTarballHash;
+                };
+              }
+            )
+        else
+          pkgs.${goPkgAttr};
 
       mkPreparedSource = import (inputs.go-nix-helpers + "/mkPreparedSource.nix") {
         inherit pkgs lib goPkg;
