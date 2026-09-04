@@ -63,7 +63,7 @@ nix flake check # formats, builds, and runs checks
 | ------------------- | -------------------------------------------------------- |
 | `packages.default`  | Compiled binary via `buildGoModule` (Go 1.26)            |
 | `packages.<pname>`  | Same package under its own name                          |
-| `apps.fmt`         | `treefmt` wrapper (only if >=1 formatter enabled)       |
+| `apps.fmt`          | `treefmt` wrapper (only if >=1 formatter enabled)        |
 | `apps.default`      | `nix run .#<pname>`                                      |
 | `apps.test`         | `go test -race -v ./...`                                 |
 | `apps.lint`         | `golangci-lint run ./...`                                |
@@ -149,46 +149,46 @@ carry its own `extraBuildAttrs` for per-binary customization (G2).
 
 See the full option table below, or copy one of the [templates](#templates).
 
-| Option                  | Default                      | Description                                                          |
-| ----------------------- | ---------------------------- | -------------------------------------------------------------------- |
-| `pname`                 | (required)                   | Package name, overlay attr, and `mainProgram`                        |
-| `vendorHash`            | `null`                       | Vendor hash for `buildGoModule` (`null` = committed `vendor/`)       |
-| `src`                   | `self.outPath`               | Source path (use `lib.fileset` to filter)                            |
-| `description`           | `"A LarsArtmann Go project"` | Short description for package meta                                   |
-| `version`               | `self.rev or "dev"`          | Version string (defaults to git revision)                            |
-| `systems`               | `[x86_64-linux, ...]`        | Systems to build for (matches `nix-systems/default`)                 |
-| `subPackages`           | `[ "." ]`                    | Subpackages to build                                                 |
-| `goPkgAttr`             | `"go_1_26"`                  | Go package attribute in nixpkgs                                      |
+| Option                  | Default                      | Description                                                                      |
+| ----------------------- | ---------------------------- | -------------------------------------------------------------------------------- |
+| `pname`                 | (required)                   | Package name, overlay attr, and `mainProgram`                                    |
+| `vendorHash`            | `null`                       | Vendor hash for `buildGoModule` (`null` = committed `vendor/`)                   |
+| `src`                   | `self.outPath`               | Source path (use `lib.fileset` to filter)                                        |
+| `description`           | `"A LarsArtmann Go project"` | Short description for package meta                                               |
+| `version`               | `self.rev or "dev"`          | Version string (defaults to git revision)                                        |
+| `systems`               | `[x86_64-linux, ...]`        | Systems to build for (matches `nix-systems/default`)                             |
+| `subPackages`           | `[ "." ]`                    | Subpackages to build                                                             |
+| `goPkgAttr`             | `"go_1_26"`                  | Go package attribute in nixpkgs                                                  |
 | `goPkgOverride`         | identity                     | Function applied to the Go package (custom toolchains, e.g. newer patch version) |
-| `lintAsCheck`           | `false`                      | Also expose golangci-lint as a hermetic `checks.lint` derivation (for CI) |
-| `enableCheck`           | `true`                       | Run `go test` during the Nix build (`doCheck`)                       |
-| `enableTestCheck`       | `false`                      | Generate `checks.test` — force `go test` in CI even when `enableCheck = false` |
-| `enableOverlay`         | `true`                       | Generate `flake.overlays.default`                                    |
-| `enableTempl`           | `false`                      | Include `templ` in devShells and treefmt                             |
-| `enableGovulncheck`     | `true`                       | Include `govulncheck` in the default devShell                        |
-| `enableGopls`           | `true`                       | Include `gopls` in the default devShell                              |
-| `enableGolangciLint`    | `true`                       | Include `golangci-lint` in devShells and the lint app                |
-| `enableGofumpt`         | `true`                       | Enable `gofumpt` in treefmt programs                                 |
-| `enableGoimports`       | `true`                       | Enable `goimports` in treefmt programs                               |
-| `enableNixfmt`          | `true`                       | Enable `nixfmt` in treefmt programs                                  |
-| `enableShfmt`           | `false`                      | Enable `shfmt` in treefmt programs                                   |
-| `enableCompletions`     | `false`                      | Install shell completions (requires cobra/urfave/cli; warns if unsupported) |
-| `buildFlags`            | `[]`                         | Extra build flags for `go build` (e.g. build tags)                   |
-| `packages`              | `{}`                         | Additional packages for monorepo support                             |
-| `deps`                  | `{}`                         | Private Go deps for `mkPreparedSource`                               |
-| `subModules`            | `{}`                         | Explicit sub-modules (merged with auto-discovered)                   |
-| `postPatchExtra`        | `""`                         | Extra `postPatch` commands for `mkPreparedSource`                    |
-| `autoGoPrivate`         | `true`                       | Auto-inject `GOPRIVATE` when deps are set                            |
-| `privateGlobPattern`    | LarsArtmann globs            | GOPRIVATE glob pattern used by `autoGoPrivate`                       |
-| `validatePrivateDeps`   | `true`                       | Fail build if a private `require` lacks a `replace`                  |
-| `privateDepPattern`     | LarsArtmann regex            | ERE matching module paths that must have a `replace` directive       |
-| `publicDeps`            | `[]`                         | Module paths excluded from validation only (does NOT affect GOPRIVATE) |
-| `proxyVendor`           | `true`                       | Pass `proxyVendor` to `buildGoModule`                                |
-| `ldflags`               | `null` (auto)                | Custom ldflags (`null` = `["-s" "-w" "-X main.version=${version}"]`) |
-| `extraMeta`             | `{}`                         | Extra attributes merged into package meta                            |
-| `extraBuildAttrs`       | `{}`                         | Extra attributes merged into `buildGoModule` (see merge rules below) |
-| `devShellExtraPackages` | `_: []`                      | Function receiving `pkgs`, returns extra devShell packages           |
-| `shellExtraEnv`         | `{}`                         | Extra env vars for devShells                                         |
+| `lintAsCheck`           | `false`                      | Also expose golangci-lint as a hermetic `checks.lint` derivation (for CI)        |
+| `enableCheck`           | `true`                       | Run `go test` during the Nix build (`doCheck`)                                   |
+| `enableTestCheck`       | `false`                      | Generate `checks.test` — force `go test` in CI even when `enableCheck = false`   |
+| `enableOverlay`         | `true`                       | Generate `flake.overlays.default`                                                |
+| `enableTempl`           | `false`                      | Include `templ` in devShells and treefmt                                         |
+| `enableGovulncheck`     | `true`                       | Include `govulncheck` in the default devShell                                    |
+| `enableGopls`           | `true`                       | Include `gopls` in the default devShell                                          |
+| `enableGolangciLint`    | `true`                       | Include `golangci-lint` in devShells and the lint app                            |
+| `enableGofumpt`         | `true`                       | Enable `gofumpt` in treefmt programs                                             |
+| `enableGoimports`       | `true`                       | Enable `goimports` in treefmt programs                                           |
+| `enableNixfmt`          | `true`                       | Enable `nixfmt` in treefmt programs                                              |
+| `enableShfmt`           | `false`                      | Enable `shfmt` in treefmt programs                                               |
+| `enableCompletions`     | `false`                      | Install shell completions (requires cobra/urfave/cli; warns if unsupported)      |
+| `buildFlags`            | `[]`                         | Extra build flags for `go build` (e.g. build tags)                               |
+| `packages`              | `{}`                         | Additional packages for monorepo support                                         |
+| `deps`                  | `{}`                         | Private Go deps for `mkPreparedSource`                                           |
+| `subModules`            | `{}`                         | Explicit sub-modules (merged with auto-discovered)                               |
+| `postPatchExtra`        | `""`                         | Extra `postPatch` commands for `mkPreparedSource`                                |
+| `autoGoPrivate`         | `true`                       | Auto-inject `GOPRIVATE` when deps are set                                        |
+| `privateGlobPattern`    | LarsArtmann globs            | GOPRIVATE glob pattern used by `autoGoPrivate`                                   |
+| `validatePrivateDeps`   | `true`                       | Fail build if a private `require` lacks a `replace`                              |
+| `privateDepPattern`     | LarsArtmann regex            | ERE matching module paths that must have a `replace` directive                   |
+| `publicDeps`            | `[]`                         | Module paths excluded from validation only (does NOT affect GOPRIVATE)           |
+| `proxyVendor`           | `true`                       | Pass `proxyVendor` to `buildGoModule`                                            |
+| `ldflags`               | `null` (auto)                | Custom ldflags (`null` = `["-s" "-w" "-X main.version=${version}"]`)             |
+| `extraMeta`             | `{}`                         | Extra attributes merged into package meta                                        |
+| `extraBuildAttrs`       | `{}`                         | Extra attributes merged into `buildGoModule` (see merge rules below)             |
+| `devShellExtraPackages` | `_: []`                      | Function receiving `pkgs`, returns extra devShell packages                       |
+| `shellExtraEnv`         | `{}`                         | Extra env vars for devShells                                                     |
 
 #### `extraBuildAttrs` merge rules
 
@@ -196,14 +196,14 @@ Six attributes receive special **concatenation** handling when passed via
 `extraBuildAttrs` — the user's values are appended to the module-generated
 values rather than overriding them:
 
-| Attribute             | Module value                             | User value appended? |
-| --------------------- | ---------------------------------------- | -------------------- |
-| `nativeBuildInputs`   | `templ`, `installShellFiles` (when enabled) | Yes                |
-| `buildInputs`         | (module-generated)                       | Yes                  |
-| `checkInputs`         | (module-generated)                       | Yes                  |
-| `configureFlags`      | (module-generated)                       | Yes                  |
-| `preBuild`            | Auto dep-sync hook                       | Yes                  |
-| `postInstall`         | Completion install hook                  | Yes                  |
+| Attribute           | Module value                                | User value appended? |
+| ------------------- | ------------------------------------------- | -------------------- |
+| `nativeBuildInputs` | `templ`, `installShellFiles` (when enabled) | Yes                  |
+| `buildInputs`       | (module-generated)                          | Yes                  |
+| `checkInputs`       | (module-generated)                          | Yes                  |
+| `configureFlags`    | (module-generated)                          | Yes                  |
+| `preBuild`          | Auto dep-sync hook                          | Yes                  |
+| `postInstall`       | Completion install hook                     | Yes                  |
 
 All other attributes override module defaults via the `//` operator.
 
@@ -231,21 +231,21 @@ preparedSrc = mkPreparedSource {
 };
 ```
 
-| Parameter             | Default                             | Description                                         |
-| --------------------- | ----------------------------------- | --------------------------------------------------- |
-| `name`                | (required)                          | Derivation name prefix                              |
-| `src`                 | (required)                          | Source derivation or path                           |
-| `deps`                | (required)                          | Attrset of `{ "import/path" = flake-input; }`       |
-| `version`             | `"dev"`                             | Version string                                      |
-| `autoSubModules`      | `true`                              | Auto-discover sub-modules from dep source trees     |
-| `subModules`          | `{}`                                | Explicit sub-modules (merged with auto-discovered)  |
-| `requireDeps`         | `{}`                                | Manually inject `require` lines                     |
-| `subModuleVersion`    | `"v0.0.0"`                          | Version for pseudo-version normalization            |
-| `stripLocalReplaces`  | `true`                              | Strip stale `replace X => /home/...` directives     |
-| `validatePrivateDeps` | `true`                              | Verify every private `require` has a `replace`      |
-| `privateDepPattern`   | `"github\\.com/[Ll]ars[Aa]rtmann/"` | ERE regex matching private module paths to validate |
+| Parameter             | Default                             | Description                                                                                                |
+| --------------------- | ----------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| `name`                | (required)                          | Derivation name prefix                                                                                     |
+| `src`                 | (required)                          | Source derivation or path                                                                                  |
+| `deps`                | (required)                          | Attrset of `{ "import/path" = flake-input; }`                                                              |
+| `version`             | `"dev"`                             | Version string                                                                                             |
+| `autoSubModules`      | `true`                              | Auto-discover sub-modules from dep source trees                                                            |
+| `subModules`          | `{}`                                | Explicit sub-modules (merged with auto-discovered)                                                         |
+| `requireDeps`         | `{}`                                | Manually inject `require` lines                                                                            |
+| `subModuleVersion`    | `"v0.0.0"`                          | Version for pseudo-version normalization                                                                   |
+| `stripLocalReplaces`  | `true`                              | Strip stale `replace X => /home/...` directives                                                            |
+| `validatePrivateDeps` | `true`                              | Verify every private `require` has a `replace`                                                             |
+| `privateDepPattern`   | `"github\\.com/[Ll]ars[Aa]rtmann/"` | ERE regex matching private module paths to validate                                                        |
 | `publicDeps`          | `[]`                                | Module paths excluded from private validation (versioned-path aware: base path matches `/v2`, `/v3`, etc.) |
-| `postPatchExtra`      | `""`                                | Additional shell commands appended to `postPatch`   |
+| `postPatchExtra`      | `""`                                | Additional shell commands appended to `postPatch`                                                          |
 
 ### `mkGoFlake.nix` (deprecated)
 
@@ -258,9 +258,9 @@ The function-based predecessor to `flakeModules.go-standard`. Kept for backwards
 
 ## Templates
 
-| Template                                                                   | Use when...                                                              |
-| -------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
-| [`templates/go-standard/flake.nix`](templates/go-standard/flake.nix)       | Starting a new project — recommended, minimal setup                      |
+| Template                                                                   | Use when...                                                             |
+| -------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| [`templates/go-standard/flake.nix`](templates/go-standard/flake.nix)       | Starting a new project — recommended, minimal setup                     |
 | [`templates/go-flake-parts/flake.nix`](templates/go-flake-parts/flake.nix) | ⚠️ **Deprecated.** Old 5-input manual pattern. Migrate to `go-standard`. |
 
 ---

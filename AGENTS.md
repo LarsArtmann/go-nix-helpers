@@ -107,25 +107,25 @@ nix build .#checks.x86_64-linux.structural     # structural output verification
 
 ## Key files
 
-| File                                 | Purpose                                                                                                               |
-| ------------------------------------ | --------------------------------------------------------------------------------------------------------------------- |
-| `mkPreparedSource.nix`               | Core helper — solves private Go dep injection for Nix sandbox builds                                                  |
-| `pure-functions.nix`                 | Extracted `stripVersionSuffix` and `repoName` — standalone, testable pure functions used by mkPreparedSource          |
-| `test-pure-functions.nix`            | 22 assertions: idempotence, no-`/vN`-in-output, determinism, edge cases — wired as `checks.pureFunctions`              |
-| `mkGoFlake.nix`                      | DEPRECATED — function-based predecessor to go-standard module; emits trace warning                                    |
-| `modules/go-standard.nix`            | Proper flake-parts module (exposed as `flakeModules.go-standard`) — 39 options, monorepo support, bundles treefmt-nix |
-| `flake.nix`                          | Self-hosting: checks, formatter, devShell, lib export, flakeModules export                                            |
+| File                                 | Purpose                                                                                                                                    |
+| ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| `mkPreparedSource.nix`               | Core helper — solves private Go dep injection for Nix sandbox builds                                                                       |
+| `pure-functions.nix`                 | Extracted `stripVersionSuffix` and `repoName` — standalone, testable pure functions used by mkPreparedSource                               |
+| `test-pure-functions.nix`            | 22 assertions: idempotence, no-`/vN`-in-output, determinism, edge cases — wired as `checks.pureFunctions`                                  |
+| `mkGoFlake.nix`                      | DEPRECATED — function-based predecessor to go-standard module; emits trace warning                                                         |
+| `modules/go-standard.nix`            | Proper flake-parts module (exposed as `flakeModules.go-standard`) — 39 options, monorepo support, bundles treefmt-nix                      |
+| `flake.nix`                          | Self-hosting: checks, formatter, devShell, lib export, flakeModules export                                                                 |
 | `test.nix`                           | Integration tests (auto-discovery, explicit, validation, publicDeps, requireDeps dedup, multi-deps monorepo, publicDeps /v2 — 7 scenarios) |
-| `test-module.nix`                    | Module-level tests for go-standard options and outputs (114 assertions)                                                |
-| `templates/go-flake-parts/flake.nix` | DEPRECATED — old manual template; marked with deprecation banner                                                      |
-| `templates/go-standard/flake.nix`    | Minimal template using go-standard module (recommended for new projects)                                              |
-| `scripts/nix-lint.sh`                | Lints flake.nix files across all projects for common errors                                                           |
-| `scripts/dashboard.sh`               | Overview of flake check status across all projects                                                                    |
-| `scripts/generate-flake.sh`          | Bootstrap new projects; configurable with `--dir`, `--template`, `--no-push`, `--dry-run`, `--verbose`, `--list-templates` |
-| `docs/migration-guide.md`            | Migration guide: mkGoFlake/go-flake-parts/manual → go-standard                                                        |
-| `docs/architecture.d2` / `.svg`      | Architecture diagram: consumer inputs → module → outputs                                                              |
-| `docs/man/go-standard.5`             | Man page documenting all go-standard module options                                                                   |
-| `docs/man/mkPreparedSource.5`        | Man page documenting all mkPreparedSource parameters                                                                  |
-| `docs/flake-patterns.md`             | Reference: correct patterns and anti-patterns                                                                         |
-| `docs/consumer-audit-checklist.md`  | 8-section audit criteria + triage script for verifying consumer repos use go-standard superbly                          |
-| `.github/workflows/ci.yml`           | GitHub Actions CI: format check, integration tests, module tests, smoke tests, flake.lock freshness — ubuntu + macOS matrix |
+| `test-module.nix`                    | Module-level tests for go-standard options and outputs (114 assertions)                                                                    |
+| `templates/go-flake-parts/flake.nix` | DEPRECATED — old manual template; marked with deprecation banner                                                                           |
+| `templates/go-standard/flake.nix`    | Minimal template using go-standard module (recommended for new projects)                                                                   |
+| `scripts/nix-lint.sh`                | Lints flake.nix files across all projects for common errors                                                                                |
+| `scripts/dashboard.sh`               | Overview of flake check status across all projects                                                                                         |
+| `scripts/generate-flake.sh`          | Bootstrap new projects; configurable with `--dir`, `--template`, `--no-push`, `--dry-run`, `--verbose`, `--list-templates`                 |
+| `docs/migration-guide.md`            | Migration guide: mkGoFlake/go-flake-parts/manual → go-standard                                                                             |
+| `docs/architecture.d2` / `.svg`      | Architecture diagram: consumer inputs → module → outputs                                                                                   |
+| `docs/man/go-standard.5`             | Man page documenting all go-standard module options                                                                                        |
+| `docs/man/mkPreparedSource.5`        | Man page documenting all mkPreparedSource parameters                                                                                       |
+| `docs/flake-patterns.md`             | Reference: correct patterns and anti-patterns                                                                                              |
+| `docs/consumer-audit-checklist.md`   | 8-section audit criteria + triage script for verifying consumer repos use go-standard superbly                                             |
+| `.github/workflows/ci.yml`           | GitHub Actions CI: format check, integration tests, module tests, smoke tests, flake.lock freshness — ubuntu + macOS matrix                |
