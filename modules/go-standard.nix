@@ -809,7 +809,11 @@ in
                     path = dir + "/${name}";
                   in
                   if type == "directory" then
-                    (if name == ".git" then [ ] else walkTempl path)
+                    # `test-assets` hosts this library's OWN templ-check fixtures
+                    # (modules/../test-module.nix walks them via a mock self);
+                    # the missing-generated fixture deliberately lacks a
+                    # sibling, which must not fail the host repo's own check.
+                    (if name == ".git" || name == "test-assets" then [ ] else walkTempl path)
                   else if lib.hasSuffix ".templ" name then
                     [ path ]
                   else
