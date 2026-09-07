@@ -204,11 +204,11 @@
 
           # -- Dev Shell ----------------------------------------------------------
           devShells.default = pkgs.mkShellNoCC {
-            packages = with pkgs; [
-              nixfmt
-              nix
-              git
-              man
+            packages = [
+              pkgs.nixfmt
+              pkgs.nix
+              pkgs.git
+              pkgs.man
               manPages
             ];
             shellHook = ''

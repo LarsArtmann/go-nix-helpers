@@ -26,8 +26,14 @@ let
     EOF
   '';
 
+  # `self.outPath` must be a REAL path (not a derivation): go-standard's
+  # templ-committed check does `builtins.readDir self.outPath` at eval time,
+  # and readDir on a derivation realises its context — which fails under
+  # `nix flake check --no-build` (and on newer nixpkgs/flake-parts even in
+  # plain eval). mockSrc stays a derivation for deps-shaped option tests;
+  # the outPath slot gets this committed static directory instead.
   mockSelf = {
-    outPath = mockSrc;
+    outPath = ./test-assets/mock-project;
   };
 
   # Minimal flake-parts infrastructure stubs for module evaluation.
@@ -508,7 +514,7 @@ let
   monorepoOverlayCheck =
     let
       mockSelfMono = {
-        outPath = mockSrc;
+        outPath = ./test-assets/mock-project;
         packages.x86_64-linux = {
           default = "mock-default-derivation";
           test-project = "mock-default-derivation";
