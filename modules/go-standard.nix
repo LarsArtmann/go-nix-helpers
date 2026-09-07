@@ -824,7 +824,7 @@ in
                         # context-carrying STRING, and `builtins.pathExists` on
                         # that realises the context — fatal under
                         # `nix flake check --no-build` on current Nix.
-                        generated = dir + ("/${lib.removeSuffix ".templ" name}_templ.go");
+                        generated = dir + "/${lib.removeSuffix ".templ" name}_templ.go";
                       }
                     ]
                   else
