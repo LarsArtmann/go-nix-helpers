@@ -580,6 +580,17 @@ in
         # Per-package attrs merge with top-level cfg.extraBuildAttrs:
         # the six concatKeys append per-package values after top-level values;
         # all other keys use per-package override of top-level.
+        # joinSnippet merges two shell snippets with a newline separator so a
+        # top-level snippet not ending in \n cannot merge with the first line
+        # of the per-package snippet into one broken command.
+        joinSnippet =
+          a: b:
+          if a == "" then
+            b
+          else if b == "" then
+            a
+          else
+            a + "\n" + b;
         mkGoPackage =
           pkgName: subPkgs: pkgDesc: pkgExtraBuildAttrs:
           let
@@ -590,8 +601,8 @@ in
               buildInputs = (topLevel.buildInputs or [ ]) ++ (perPkg.buildInputs or [ ]);
               checkInputs = (topLevel.checkInputs or [ ]) ++ (perPkg.checkInputs or [ ]);
               configureFlags = (topLevel.configureFlags or [ ]) ++ (perPkg.configureFlags or [ ]);
-              preBuild = (topLevel.preBuild or "") + (perPkg.preBuild or "");
-              postInstall = (topLevel.postInstall or "") + (perPkg.postInstall or "");
+              preBuild = joinSnippet (topLevel.preBuild or "") (perPkg.preBuild or "");
+              postInstall = joinSnippet (topLevel.postInstall or "") (perPkg.postInstall or "");
             };
             combinedOther =
               (builtins.removeAttrs topLevel concatKeys) // (builtins.removeAttrs perPkg concatKeys);

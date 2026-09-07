@@ -179,9 +179,13 @@ let
 
   # Normalize pseudo-versions for EXPLICIT sub-modules so replace directives match.
   # Auto-discovered modules are normalized at build time (see autoDiscoverScript).
+  # NOTE: `[.]` not `\\.` — in a Nix double-quoted string an unknown escape like
+  # `\\.` is DROPPED ("v0\\.0" becomes the wildcard-dot regex), while indented
+  # strings keep it. `[.]` is regex-equivalent and spelling-safe in BOTH string
+  # styles, so this line and autoDiscoverScript's sed stay provably identical.
   explicitVersionNormalize = lib.concatStringsSep "\n" (
     map (sm: ''
-      sed -i 's|${sm.modulePath} v0\.0\.0-[^ ]*|${sm.modulePath} ${subModuleVersion}|g' go.mod
+      sed -i 's|${sm.modulePath} v0[.]0[.]0-[^ ]*|${sm.modulePath} ${subModuleVersion}|g' go.mod
     '') explicitSubModules
   );
 
@@ -202,7 +206,10 @@ let
       subdir=$(printf '%s' "$rel" | cut -d/ -f2-)
       modulePath=$(awk '/^module /{print $2; exit}' "$gomod")
       [ -z "$modulePath" ] && continue
-      sed -i "s|$modulePath v0\.0\.0-[^ ]*|$modulePath ${subModuleVersion}|g" go.mod
+      # `[.]` not `\\.`: this is a Nix DOUBLE-quoted string where `\\.` is an
+      # unknown escape and the backslash is DROPPED — the pattern must stay a
+      # literal-dot regex either way (see explicitVersionNormalize note).
+      sed -i "s|$modulePath v0[.]0[.]0-[^ ]*|$modulePath ${subModuleVersion}|g" go.mod
       printf '  %s => ./_local_deps/%s/%s\n' "$modulePath" "$basename" "$subdir" >> go.mod.discovered
     done
   '';
