@@ -400,9 +400,12 @@ let
       # go-standard walkTempl excludes so the host repo check stays green.
       templSelf = {
         outPath =
-          if !withTempl then ./test-assets/mock-project
-          else if withGenerated then ./test-assets/mock-templ-committed
-          else ./test-assets/mock-templ-missing-generated;
+          if !withTempl then
+            ./test-assets/mock-project
+          else if withGenerated then
+            ./test-assets/mock-templ-committed
+          else
+            ./test-assets/mock-templ-missing-generated;
       };
       modEval = lib.evalModules {
         modules = [

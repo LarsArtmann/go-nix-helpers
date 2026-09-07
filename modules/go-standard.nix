@@ -815,20 +815,29 @@ in
                     # sibling, which must not fail the host repo's own check.
                     (if name == ".git" || name == "test-assets" then [ ] else walkTempl path)
                   else if lib.hasSuffix ".templ" name then
-                    [ path ]
+                    [
+                      {
+                        templ = path;
+                        # Path arithmetic ONLY: `dir + "/${...}"` keeps the value
+                        # a Nix PATH. Coercing the path to a string first
+                        # (`removeSuffix path + "_templ.go"`) builds a
+                        # context-carrying STRING, and `builtins.pathExists` on
+                        # that realises the context — fatal under
+                        # `nix flake check --no-build` on current Nix.
+                        generated = dir + ("/${lib.removeSuffix ".templ" name}_templ.go");
+                      }
+                    ]
                   else
                     [ ]
                 ) (builtins.readDir dir)
               );
             templFiles = walkTempl self.outPath;
-            missing = builtins.filter (
-              f: !builtins.pathExists (lib.removeSuffix ".templ" f + "_templ.go")
-            ) templFiles;
+            missing = builtins.filter (f: !builtins.pathExists f.generated) templFiles;
           in
           lib.optionalAttrs (missing != [ ]) {
             templ-committed = builtins.throw ''
               go-standard: ${toString (builtins.length missing)} .templ file(s) without a committed *_templ.go sibling:
-              ${lib.concatStringsSep "\n" (map (f: "  ${f}") missing)}
+              ${lib.concatStringsSep "\n" (map (f: "  ${toString f.templ}") missing)}
 
               Nix builds vendor the source without running `templ generate` —
               the build fails with `undefined: someFragment`. Run `templ generate`
