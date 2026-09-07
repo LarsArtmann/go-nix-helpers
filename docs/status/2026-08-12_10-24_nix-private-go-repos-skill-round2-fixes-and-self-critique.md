@@ -18,12 +18,12 @@
 
 ### 2. Verified the fix against 4 test scenarios
 
-| Scenario | Input | Result |
-|----------|-------|--------|
-| Standard deps | 3 private requires (mixed case) | 3 correct flake inputs + 3 correct deps map entries |
-| Versioned paths + indirect | `/v3`, `// indirect`, replace directive | `/vN` stripped, indirects captured, replace excluded |
-| Empty deps | Only public deps (cobra, testify) | "No private LarsArtmann dependencies found" |
-| Module declaration collision | `module github.com/LarsArtmann/test-project` | `module` entry no longer appears |
+| Scenario                     | Input                                        | Result                                               |
+| ---------------------------- | -------------------------------------------- | ---------------------------------------------------- |
+| Standard deps                | 3 private requires (mixed case)              | 3 correct flake inputs + 3 correct deps map entries  |
+| Versioned paths + indirect   | `/v3`, `// indirect`, replace directive      | `/vN` stripped, indirects captured, replace excluded |
+| Empty deps                   | Only public deps (cobra, testify)            | "No private LarsArtmann dependencies found"          |
+| Module declaration collision | `module github.com/LarsArtmann/test-project` | `module` entry no longer appears                     |
 
 ### 3. Updated SKILL.md with auto-behaviors table
 

@@ -20,11 +20,11 @@ Verified every API claim, option name, default value, and code example against t
 
 ### 2. Fixed 3 issues across 3 files
 
-| # | File | Issue | Fix |
-|---|------|-------|-----|
+| # | File                                                              | Issue                                                                                                                                                                                                                               | Fix                                                                                              |
+| - | ----------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
 | 1 | `SKILL.md` + `implementation-guide.md` + `migration-checklist.md` | `publicDeps` option completely missing from the skill — only suggested `validatePrivateDeps = false` (blunt instrument) for public LarsArtmann repos, ignoring the targeted `publicDeps` exclusion list that has existed for months | Added `publicDeps` as the **preferred** approach in gotcha tables, code examples, and checklists |
-| 2 | `SKILL.md` verification block | Said claims "could not be independently verified" because go-nix-helpers is private — but we HAVE local access and the APIs were verified | Rewrote to reflect verified status with date stamp (2026-08-12) |
-| 3 | `implementation-guide.md` gotcha #7 | Referenced `GONOSUMCHECK` — a deprecated pre-Go-1.13 env var name that does not exist in modern Go | Corrected to `GONOSUMDB` / `GONOPROXY` |
+| 2 | `SKILL.md` verification block                                     | Said claims "could not be independently verified" because go-nix-helpers is private — but we HAVE local access and the APIs were verified                                                                                           | Rewrote to reflect verified status with date stamp (2026-08-12)                                  |
+| 3 | `implementation-guide.md` gotcha #7                               | Referenced `GONOSUMCHECK` — a deprecated pre-Go-1.13 env var name that does not exist in modern Go                                                                                                                                  | Corrected to `GONOSUMDB` / `GONOPROXY`                                                           |
 
 ### 3. Synced both copies
 
@@ -44,6 +44,7 @@ Source (`/home/lars/projects/SKILLS/`) and installed (`~/.config/crush/skills/`)
 ### 1. Gotcha table GOWORK row is still misleading
 
 The SKILL.md gotcha table row says:
+
 > `go.work` — Workspace resolution interferes with module builds — Set `GOWORK = "off";` in devShells
 
 For go-standard users, `GOWORK = "off"` is already automatic. The row should note this is only for manual/Option B setups. I improved the comment block but left the table row as-is.
@@ -81,11 +82,13 @@ echo "  \"${dep}\" = inputs.${dep#github.com/[Ll]ars[Aa]rtmann/};"
 Bash `#` parameter expansion (shortest prefix removal) does **NOT** support regex character classes. It treats `github.com/[Ll]ars[Aa]rtmann/` as a **literal string**. Since the actual dep path is `github.com/LarsArtmann/go-cqrs-lite` (with literal uppercase), the literal prefix `github.com/[Ll]ars[Aa]rtmann/` doesn't match, so **nothing is stripped**.
 
 **Expected output:**
+
 ```
 "github.com/LarsArtmann/go-cqrs-lite" = inputs.go-cqrs-lite;
 ```
 
 **Actual output:**
+
 ```
 "github.com/LarsArtmann/go-cqrs-lite" = inputs.github.com/LarsArtmann/go-cqrs-lite;
 ```
@@ -103,6 +106,7 @@ The `inputs.github.com/LarsArtmann/go-cqrs-lite` is invalid Nix — dots create 
 ### 2. Didn't run ANY verification on what I shipped
 
 I made documentation edits to 3 files across 2 directories and synced them, but:
+
 - Never ran `bash -n` on the shell script
 - Never ran `nix-instantiate --parse` on any Nix snippet
 - Never executed the skill workflow on a test project

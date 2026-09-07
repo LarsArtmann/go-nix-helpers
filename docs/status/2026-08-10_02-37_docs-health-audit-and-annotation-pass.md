@@ -19,17 +19,18 @@ consistent (32 options, 74 assertions, 6 scenarios).
 
 ### VERIFY — counts verified against code
 
-| Claim          | Verified value | Source                    |
-| -------------- | -------------- | ------------------------- |
-| Module assertions | 74          | `grep -cE 'assertCheck "' test-module.nix` |
-| Module options | 32             | `grep mkOption modules/go-standard.nix` (34 total, 2 duplicated: `subPackages`, `description`) |
-| Integration scenarios | 6      | Test 1–6 in `test.nix`    |
-| `nix flake check --no-build` | passes | Verified at session end |
-| `nix fmt -- --ci` | 0 changed  | Verified at session end   |
+| Claim                        | Verified value | Source                                                                                         |
+| ---------------------------- | -------------- | ---------------------------------------------------------------------------------------------- |
+| Module assertions            | 74             | `grep -cE 'assertCheck "' test-module.nix`                                                     |
+| Module options               | 32             | `grep mkOption modules/go-standard.nix` (34 total, 2 duplicated: `subPackages`, `description`) |
+| Integration scenarios        | 6              | Test 1–6 in `test.nix`                                                                         |
+| `nix flake check --no-build` | passes         | Verified at session end                                                                        |
+| `nix fmt -- --ci`            | 0 changed      | Verified at session end                                                                        |
 
 ### HARVEST — TODO_LIST rebuilt
 
 Previous TODO_LIST had **4 items** (all BLOCKED). Rebuilt to **30 items**:
+
 - 5 High impact (CI smoke-test flags, behavioral tests, merge protection, shellcheck, shfmt)
 - 10 Medium impact (property tests, vendorHash detection, architecture diagram, dry-run flag, behavioral deepening, negative tests)
 - 10 Low impact / Polish (verbose flag, badges, help text, FAQ entries, cleanup)
@@ -40,12 +41,12 @@ retained (structural decay eliminated).
 
 ### BUILD/VERIFY — Living docs fixed
 
-| Doc          | Fix                                                                              |
-| ------------ | -------------------------------------------------------------------------------- |
-| FEATURES.md  | `enableCompletions`: "silently does nothing" → "emits build-time warning with `timeout 10`" (stale description; code changed at `c510d7c`) |
-| FEATURES.md  | Integration test description: named 4 old scenarios → "6 scenarios: auto-discovery, explicit-only, validation, publicDeps exclusion, requireDeps dedup, multi-deps monorepo" |
-| ROADMAP.md   | Added `goPkg` as `lib.types.package` and `lib.mkForce` support to Theme 1 (v2 API ideas harvested from reports) |
-| AGENTS.md    | "40+ assertions" → "74 assertions" in build commands section (was stale since session 02:51) |
+| Doc         | Fix                                                                                                                                                                          |
+| ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| FEATURES.md | `enableCompletions`: "silently does nothing" → "emits build-time warning with `timeout 10`" (stale description; code changed at `c510d7c`)                                   |
+| FEATURES.md | Integration test description: named 4 old scenarios → "6 scenarios: auto-discovery, explicit-only, validation, publicDeps exclusion, requireDeps dedup, multi-deps monorepo" |
+| ROADMAP.md  | Added `goPkg` as `lib.types.package` and `lib.mkForce` support to Theme 1 (v2 API ideas harvested from reports)                                                              |
+| AGENTS.md   | "40+ assertions" → "74 assertions" in build commands section (was stale since session 02:51)                                                                                 |
 
 ### ANNOTATE — 5 status reports + 1 feedback file
 
@@ -57,6 +58,7 @@ with `~~strikethrough~~` + commit hash or routing marker (`→ TODO_LIST`,
 ### ARCHIVE — 5 reports moved
 
 All 5 `2026-08-03_*` reports moved to `docs/status/archived/` via `git mv`:
+
 - `2026-08-03_02-47_publicdeps-false-positive-fix.md`
 - `2026-08-03_02-51_docs-health-and-update-old-docs-comprehensive-pass.md`
 - `2026-08-03_03-28_session-todo-blitz.md`
@@ -214,88 +216,88 @@ name). This will rot less than line numbers but still couples to file structure.
 
 ### Critical (fix this session's gaps)
 
-| #  | Task                                                                  | Impact | Effort |
-| -- | --------------------------------------------------------------------- | ------ | ------ |
-| 1  | Annotate report 02-51 section C (C1–C3) inline                        | Med    | 10min  |
-| 2  | Annotate report 07-38 section C table inline                          | Med    | 10min  |
-| 3  | Annotate report 02-51 section E items inline (or explicitly SKIP)     | Low    | 15min  |
-| 4  | Annotate feedback file problem sections §1–§4 inline                  | Low    | 10min  |
-| 5  | Trash `verify-result` symlink                                         | Low    | 1min   |
+| # | Task                                                              | Impact | Effort |
+| - | ----------------------------------------------------------------- | ------ | ------ |
+| 1 | Annotate report 02-51 section C (C1–C3) inline                    | Med    | 10min  |
+| 2 | Annotate report 07-38 section C table inline                      | Med    | 10min  |
+| 3 | Annotate report 02-51 section E items inline (or explicitly SKIP) | Low    | 15min  |
+| 4 | Annotate feedback file problem sections §1–§4 inline              | Low    | 10min  |
+| 5 | Trash `verify-result` symlink                                     | Low    | 1min   |
 
 ### High impact (from TODO_LIST, carried forward)
 
-| #  | Task                                                                  | Impact | Effort |
-| -- | --------------------------------------------------------------------- | ------ | ------ |
-| 6  | Add `--go-mod` and `--private-deps` variants to CI smoke-test job     | High   | 30min  |
-| 7  | Add behavioral test for GOPRIVATE with custom `privateGlobPattern`    | High   | 1h     |
-| 8  | Extend `extraBuildAttrs` merge protection to `buildInputs`, etc.      | High   | 30min  |
-| 9  | Add `shellcheck` to CI                                                | High   | 20min  |
-| 10 | Add `shfmt` to treefmt                                                | High   | 20min  |
+| #  | Task                                                               | Impact | Effort |
+| -- | ------------------------------------------------------------------ | ------ | ------ |
+| 6  | Add `--go-mod` and `--private-deps` variants to CI smoke-test job  | High   | 30min  |
+| 7  | Add behavioral test for GOPRIVATE with custom `privateGlobPattern` | High   | 1h     |
+| 8  | Extend `extraBuildAttrs` merge protection to `buildInputs`, etc.   | High   | 30min  |
+| 9  | Add `shellcheck` to CI                                             | High   | 20min  |
+| 10 | Add `shfmt` to treefmt                                             | High   | 20min  |
 
 ### Medium impact (from TODO_LIST)
 
-| #  | Task                                                                  | Impact | Effort |
-| -- | --------------------------------------------------------------------- | ------ | ------ |
-| 11 | Property test for `stripVersionSuffix`                                | Med    | 30min  |
-| 12 | Property test for `repoName`                                          | Med    | 30min  |
-| 13 | `vendorHash` placeholder detection                                    | Med    | 30min  |
-| 14 | `nix flake show` test                                                 | Med    | 30min  |
-| 15 | Update `docs/architecture.d2` for `privateGlobPattern` + `enableNixfmt` | Med  | 20min  |
-| 16 | `--dry-run` flag for `generate-flake.sh`                              | Med    | 20min  |
-| 17 | Deepen behavioral tests (`buildFlags`, `ldflags`, `proxyVendor`)      | Med    | 1h     |
-| 18 | Negative test for `enableCompletions` warning                         | Med    | 30min  |
-| 19 | Test for `publicDeps` with `/v2` versioned paths                      | Med    | 20min  |
-| 20 | `treefmt.config` inspection test                                      | Med    | 30min  |
+| #  | Task                                                                    | Impact | Effort |
+| -- | ----------------------------------------------------------------------- | ------ | ------ |
+| 11 | Property test for `stripVersionSuffix`                                  | Med    | 30min  |
+| 12 | Property test for `repoName`                                            | Med    | 30min  |
+| 13 | `vendorHash` placeholder detection                                      | Med    | 30min  |
+| 14 | `nix flake show` test                                                   | Med    | 30min  |
+| 15 | Update `docs/architecture.d2` for `privateGlobPattern` + `enableNixfmt` | Med    | 20min  |
+| 16 | `--dry-run` flag for `generate-flake.sh`                                | Med    | 20min  |
+| 17 | Deepen behavioral tests (`buildFlags`, `ldflags`, `proxyVendor`)        | Med    | 1h     |
+| 18 | Negative test for `enableCompletions` warning                           | Med    | 30min  |
+| 19 | Test for `publicDeps` with `/v2` versioned paths                        | Med    | 20min  |
+| 20 | `treefmt.config` inspection test                                        | Med    | 30min  |
 
 ### Low impact / Polish
 
-| #  | Task                                                                  | Impact | Effort |
-| -- | --------------------------------------------------------------------- | ------ | ------ |
-| 21 | `--verbose` flag for `generate-flake.sh`                              | Low    | 15min  |
-| 22 | macOS CI badge in README                                              | Low    | 10min  |
-| 23 | `--template` listing in help text                                     | Low    | 10min  |
-| 24 | FAQ entry for mixed-owner deps                                       | Low    | 15min  |
-| 25 | Clean up `collectMissingRequires` temp file in trap                   | Low    | 10min  |
-| 26 | `stripVersionSuffix` edge case tests                                  | Low    | 15min  |
-| 27 | `nix flake check --all-systems` in CI                                 | Low    | 15min  |
-| 28 | Cache nix-store in CI smoke-test job                                  | Low    | 15min  |
-| 29 | Run integration tests on macOS                                        | Low    | 30min  |
-| 30 | Extract `postPatch` script to separate `.sh` file                     | Low    | 30min  |
+| #  | Task                                                | Impact | Effort |
+| -- | --------------------------------------------------- | ------ | ------ |
+| 21 | `--verbose` flag for `generate-flake.sh`            | Low    | 15min  |
+| 22 | macOS CI badge in README                            | Low    | 10min  |
+| 23 | `--template` listing in help text                   | Low    | 10min  |
+| 24 | FAQ entry for mixed-owner deps                      | Low    | 15min  |
+| 25 | Clean up `collectMissingRequires` temp file in trap | Low    | 10min  |
+| 26 | `stripVersionSuffix` edge case tests                | Low    | 15min  |
+| 27 | `nix flake check --all-systems` in CI               | Low    | 15min  |
+| 28 | Cache nix-store in CI smoke-test job                | Low    | 15min  |
+| 29 | Run integration tests on macOS                      | Low    | 30min  |
+| 30 | Extract `postPatch` script to separate `.sh` file   | Low    | 30min  |
 
 ### Blocked
 
-| #  | Task                                                                  | Impact | Effort |
-| -- | --------------------------------------------------------------------- | ------ | ------ |
-| 31 | Register `maintainers.larsartmann` in nixpkgs                         | Low    | 30min  |
-| 32 | Real private-repo integration test in CI                              | High   | 2h     |
-| 33 | Audit all downstream consumers                                        | Med    | 2h     |
-| 34 | Real e2e consumer test                                                | High   | 4h     |
-| 35 | Fix empty commit message in `df9a5ff`                                 | Low    | 15min  |
+| #  | Task                                          | Impact | Effort |
+| -- | --------------------------------------------- | ------ | ------ |
+| 31 | Register `maintainers.larsartmann` in nixpkgs | Low    | 30min  |
+| 32 | Real private-repo integration test in CI      | High   | 2h     |
+| 33 | Audit all downstream consumers                | Med    | 2h     |
+| 34 | Real e2e consumer test                        | High   | 4h     |
+| 35 | Fix empty commit message in `df9a5ff`         | Low    | 15min  |
 
 ### Long-term / ROADMAP
 
-| #  | Task                                                                  | Impact | Effort |
-| -- | --------------------------------------------------------------------- | ------ | ------ |
-| 36 | Auto-detect public repos via `proxy.golang.org` query                 | High   | 3h     |
-| 37 | Curate default `publicDeps` list                                      | Med    | 30min  |
-| 38 | Auto-detect `enableTempl` by scanning for `.templ` files             | Med    | 1h     |
-| 39 | Auto-calculate `vendorHash` on first build                            | Med    | 2h     |
-| 40 | Publish to nixpkgs or nix-community                                   | Low    | 2h     |
-| 41 | `goPkg` as `lib.types.package` (breaking v2)                          | Med    | 1h     |
-| 42 | `lib.mkForce` support for list attr overrides                         | Med    | 30min  |
-| 43 | Migration script: 5-input flake → 3-input module                      | Low    | 2h     |
-| 44 | Public documentation site (Astro/Starlight)                           | Low    | 4h     |
-| 45 | Semver-tagged releases with release notes                             | Med    | 1h     |
+| #  | Task                                                     | Impact | Effort |
+| -- | -------------------------------------------------------- | ------ | ------ |
+| 36 | Auto-detect public repos via `proxy.golang.org` query    | High   | 3h     |
+| 37 | Curate default `publicDeps` list                         | Med    | 30min  |
+| 38 | Auto-detect `enableTempl` by scanning for `.templ` files | Med    | 1h     |
+| 39 | Auto-calculate `vendorHash` on first build               | Med    | 2h     |
+| 40 | Publish to nixpkgs or nix-community                      | Low    | 2h     |
+| 41 | `goPkg` as `lib.types.package` (breaking v2)             | Med    | 1h     |
+| 42 | `lib.mkForce` support for list attr overrides            | Med    | 30min  |
+| 43 | Migration script: 5-input flake → 3-input module         | Low    | 2h     |
+| 44 | Public documentation site (Astro/Starlight)              | Low    | 4h     |
+| 45 | Semver-tagged releases with release notes                | Med    | 1h     |
 
 ### Fill remaining slots (deduped ideas from all sessions)
 
-| #  | Task                                                                  | Impact | Effort |
-| -- | --------------------------------------------------------------------- | ------ | ------ |
-| 46 | Add `--impure` flag warning in `generate-flake.sh` for SSH deps       | Low    | 15min  |
-| 47 | Consider `publicDepPattern` (regex exclusion) vs `publicDeps` (list)  | Med    | 30min  |
-| 48 | Consider GONOPROXY/GONOSUMDB as alternative to GOPRIVATE               | Low    | 30min  |
-| 49 | Add `--list-public` script to check GitHub API for public repos       | Low    | 1h     |
-| 50 | Add session-end checklist to AGENTS.md ("grep for stale comments after reverts") | Low | 15min |
+| #  | Task                                                                             | Impact | Effort |
+| -- | -------------------------------------------------------------------------------- | ------ | ------ |
+| 46 | Add `--impure` flag warning in `generate-flake.sh` for SSH deps                  | Low    | 15min  |
+| 47 | Consider `publicDepPattern` (regex exclusion) vs `publicDeps` (list)             | Med    | 30min  |
+| 48 | Consider GONOPROXY/GONOSUMDB as alternative to GOPRIVATE                         | Low    | 30min  |
+| 49 | Add `--list-public` script to check GitHub API for public repos                  | Low    | 1h     |
+| 50 | Add session-end checklist to AGENTS.md ("grep for stale comments after reverts") | Low    | 15min  |
 
 ---
 
@@ -318,7 +320,7 @@ permanent fix, or just trash it and remember to use `--no-out-link` next time?
 
 ### G3. Should I run the full docs-health AUDIT on the older reports too (June/July)?
 
-There are 11 older status reports (2026-06-*, 2026-07-*) that were annotated in
+There are 11 older status reports (2026-06-_, 2026-07-_) that were annotated in
 a previous session (2026-08-03 02:51) but NOT archived. Some may now be fully
 resolvable. Should I do a full annotation + archival pass on ALL 16 reports, or
 just keep the 5 most recent ones archived and leave the older ones as-is?

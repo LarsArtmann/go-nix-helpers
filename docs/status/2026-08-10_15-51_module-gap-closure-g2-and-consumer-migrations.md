@@ -10,14 +10,17 @@
 ## A) FULLY DONE ✅
 
 ### 1. lintAsCheck gating test added
+
 The previous session left a coverage gap: `lintAsCheck` was gated on `enableGolangciLint` in the module code (line 666), but no test verified the gating behavior. Added assertion: `lintAsCheck=true + enableGolangciLint=false → no checks.lint`. The daemon had committed `26b7620` mid-edit before the test was saved — this closes that gap.
 
 **File:** `test-module.nix` — 1 new assertion (107 total at that point).
 
 ### 2. G2: per-package extraBuildAttrs implemented + tested
+
 The fleet audit identified G2 as the blocker for 4+ monorepo repos (StopTube, browser-history, BuildFlow, go-structure-linter). The `packages` submodule couldn't carry per-binary customization.
 
 **Implementation:**
+
 - Added `extraBuildAttrs` option to the `packages` submodule (attrs, default `{}`)
 - Refactored `mkGoPackage` from 3-arg to 4-arg: `(pkgName, subPkgs, pkgDesc, pkgExtraBuildAttrs)`
 - Introduced `concatKeys` list and `combinedConcat`/`combinedOther` let-bindings that merge top-level `cfg.extraBuildAttrs` with per-package values
@@ -25,6 +28,7 @@ The fleet audit identified G2 as the blocker for 4+ monorepo repos (StopTube, br
 - Updated both call sites: `package` (passes `{}`) and `extraPackages` (passes `pcfg.extraBuildAttrs`)
 
 **Tests (4 new assertions):**
+
 1. `packages.<name>.extraBuildAttrs` option default is `{}`
 2. Per-package extraBuildAttrs evaluates without error
 3. Per-package override key flows through (verified via `passthru`)
@@ -35,14 +39,17 @@ The fleet audit identified G2 as the blocker for 4+ monorepo repos (StopTube, br
 **File:** `modules/go-standard.nix` — +79/-15 lines in the perSystem implementation.
 
 ### 3. enableTestCheck option implemented + tested
+
 Most consumers hand-write `checks.test = config.packages.default.overrideAttrs { doCheck = true; }`. The module now provides this as a first-class option.
 
 **Implementation:**
+
 - New option `enableTestCheck` (bool, default: false) — generates `checks.test` derivation that forces `doCheck = true` regardless of `enableCheck`
 - Use case: skip tests during normal builds (`enableCheck = false`) for faster iteration, but still run them in CI via `nix flake check`
 - Added to checks output via `lib.optionalAttrs cfg.enableTestCheck { test = ...; }`
 
 **Tests (3 new assertions):**
+
 1. `enableTestCheck` default is false
 2. `enableTestCheck=false` has no `checks.test`
 3. `enableTestCheck=true` exposes `checks.test`
@@ -50,12 +57,15 @@ Most consumers hand-write `checks.test = config.packages.default.overrideAttrs {
 **File:** `modules/go-standard.nix` — new option at ~line 164, checks output at ~line 725.
 
 ### 4. templateEval CI check added
+
 The pre-existing template bug (`inputs@{ self, ... }` calling unbound `flake-parts`, fixed in `26b7620`) went undetected since `9471741` because:
+
 - `nix-instantiate --parse` only checks syntax, not semantics
 - The CI smoke-test jobs used `--parse`, not evaluation
 - The 5 repos that adopted the module were hand-written, not generated from the template
 
 **Implementation:**
+
 - New `templateEval` check in `flake.nix`
 - Imports the template file, calls its `outputs` function with mock inputs (`{ self, flake-parts, nixpkgs, go-nix-helpers }`)
 - Verifies the result has `imports` and `go-standard` keys
@@ -65,6 +75,7 @@ The pre-existing template bug (`inputs@{ self, ... }` calling unbound `flake-par
 **File:** `flake.nix` — +44 lines. Now 9 checks total (was 8).
 
 ### 5. Documentation updated comprehensively
+
 - **AGENTS.md:** Option count 37→38, assertion count 106→114, added `enableTestCheck` to the options list, noted per-package `extraBuildAttrs` in monorepo description
 - **README.md:** Added `enableTestCheck` row to options table, updated monorepo example with `worker.extraBuildAttrs.ldflags`, noted per-binary customization
 - **CHANGELOG.md:** Added entries for `enableTestCheck`, G2 per-package extraBuildAttrs, `templateEval` check
@@ -72,6 +83,7 @@ The pre-existing template bug (`inputs@{ self, ... }` calling unbound `flake-par
 - **docs/flake-patterns.md:** Added "Per-package extraBuildAttrs (G2)" section with before/after example, added "CI-friendly options" section documenting `lintAsCheck` and `enableTestCheck`
 
 ### 6. TODO_LIST.md updated
+
 - Marked fleet audit item as **DONE** (was BLOCKED — "Requires access to 7+ downstream repos")
 - Added **H1**: G2 per-package extraBuildAttrs → **DONE** (this session)
 - Added **H2**: Migrate Tier A consumer repos (10 repos)
@@ -82,25 +94,28 @@ The pre-existing template bug (`inputs@{ self, ... }` calling unbound `flake-par
 - Added **M4**: Migrate Tier C repos off deprecated mkGoFlake
 
 ### 7. Three consumer repos migrated to go-standard
+
 All verified with `nix flake check --no-build`:
 
-| Repo | Before | After | Reduction | Key Features Migrated |
-|------|--------|-------|-----------|----------------------|
-| go-localsync | 237 lines | 86 lines | **64%** | deps (3 private), monorepo packages (cqrs-lint), GOEXPERIMENT, custom checks (cqrs-lint architectural gate), GOFLAGS |
-| erraudit | 258 lines | 119 lines | **54%** | deps (10 private), custom ldflags (version/commit injection), GOEXPERIMENT, `enableCheck=false`, CGO_ENABLED=0, extra devShell packages |
-| project-meta | 268 lines | 158 lines | **41%** | deps (7 private) + subModules (13 sub-modules for project-discovery-sdk), git-hooks.nix integration, cobra completions (custom postInstall), GOEXPERIMENT, enableCompletions |
+| Repo         | Before    | After     | Reduction | Key Features Migrated                                                                                                                                                        |
+| ------------ | --------- | --------- | --------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| go-localsync | 237 lines | 86 lines  | **64%**   | deps (3 private), monorepo packages (cqrs-lint), GOEXPERIMENT, custom checks (cqrs-lint architectural gate), GOFLAGS                                                         |
+| erraudit     | 258 lines | 119 lines | **54%**   | deps (10 private), custom ldflags (version/commit injection), GOEXPERIMENT, `enableCheck=false`, CGO_ENABLED=0, extra devShell packages                                      |
+| project-meta | 268 lines | 158 lines | **41%**   | deps (7 private) + subModules (13 sub-modules for project-discovery-sdk), git-hooks.nix integration, cobra completions (custom postInstall), GOEXPERIMENT, enableCompletions |
 
 ### 8. Four module adopters cleaned up
+
 Removed dead `systems` and `treefmt-nix` inputs from 4 repos that had already adopted go-standard (which bundles both internally):
 
-| Repo | Inputs Removed | Status |
-|------|---------------|--------|
-| lean-business-plan | `systems` + `treefmt-nix` | ✅ `--no-build` passes |
-| storbi | `systems` + `treefmt-nix` | ✅ `--no-build` passes |
-| template-arch-lint | `systems` + `treefmt-nix` | ✅ `--no-build` passes |
+| Repo                          | Inputs Removed            | Status                 |
+| ----------------------------- | ------------------------- | ---------------------- |
+| lean-business-plan            | `systems` + `treefmt-nix` | ✅ `--no-build` passes |
+| storbi                        | `systems` + `treefmt-nix` | ✅ `--no-build` passes |
+| template-arch-lint            | `systems` + `treefmt-nix` | ✅ `--no-build` passes |
 | terraform-diagrams-aggregator | `systems` + `treefmt-nix` | ✅ `--no-build` passes |
 
 ### 9. Full verification
+
 - `nix fmt` — 0 files changed (clean)
 - `nix flake check` — all 9 checks pass (autoDiscovery, explicitOnly, verify, moduleTest, moduleTestNoOverlay, pureFunctions, structural, **templateEval** (new), treefmt)
 - Module tests: **114 assertions** (was 106 at session start, was 99 before prior session)
@@ -112,6 +127,7 @@ Removed dead `systems` and `treefmt-nix` inputs from 4 repos that had already ad
 ## B) PARTIALLY DONE ◑
 
 ### 1. Consumer migrations: 3 of 12 Tier A repos done
+
 The session migrated 3 of the 10 straightforward Tier A repos. The remaining 7 (go-humanize-linter, golangci-lint-auto-configure, oxlint-auto-configure, go-auto-upgrade, project-dependency-graph, projects-management-automation, standard-bug-tracking-schema) were surveyed but not migrated. All have `GOEXPERIMENT=jsonv2` and fileset source filtering that adds complexity.
 
 **What's proven:** The migration pattern works. go-localsync, erraudit, and project-meta all evaluate correctly after migration. The key insight: `extraBuildAttrs.env` handles `GOEXPERIMENT` cleanly, and `shellExtraEnv` handles it for devShells.
@@ -119,12 +135,15 @@ The session migrated 3 of the 10 straightforward Tier A repos. The remaining 7 (
 **What's blocking:** Nothing technical — just time. Each migration is ~15-20 min of work.
 
 ### 2. Module adopter cleanups: 4 of 5 done
+
 The 5th adopter (`index`) was not cleaned up. The audit noted it needs `enableCheck=true` removal and deps/publicDeps expansion, but I didn't get to it.
 
 ### 3. G2 is implemented but untested in a real consumer
+
 G2 (per-package extraBuildAttrs) has 4 test assertions but zero real-world usage. No consumer has been migrated TO a monorepo using per-package attrs yet. The implementation is correct by construction (same merge logic as top-level, just applied per-entry), but there's no proof it works for the actual use case (StopTube's per-binary ldflags, BuildFlow's per-binary build tags).
 
 ### 4. Migrated repos are eval-verified but not build-verified
+
 All 3 migrated repos pass `nix flake check --no-build` but none have been actually built with `nix build`. The migration changes `proxyVendor` behavior (module forces `false` when deps are set, manual repos often had `true`), which may require a vendorHash update. SSH access to GitHub is blocked in this environment.
 
 ---
@@ -148,6 +167,7 @@ All 3 migrated repos pass `nix flake check --no-build` but none have been actual
 ## D) TOTALLY FUCKED UP 💥
 
 ### 1. I forgot to commit ANYTHING
+
 **Nine files in go-nix-helpers are uncommitted (+256/-26 lines).** Seven consumer repos have uncommitted `flake.nix` changes. The auto-commit daemon committed `26b7620` mid-prior-session, but nothing I did this session has been committed. If the daemon doesn't fire, this is all lost.
 
 **Impact:** HIGH. All work is in working tree only. A `git checkout` or crash loses everything.
@@ -155,13 +175,16 @@ All 3 migrated repos pass `nix flake check --no-build` but none have been actual
 **Root cause:** I focused on execution and verification, never circled back to commit. The prior session's handoff said "commit the status report + test fix" as a next step and I didn't do it.
 
 ### 2. The G2 refactor changed the merge semantics subtly
+
 The old code had:
+
 ```
 userExtraBuildAttrs = builtins.removeAttrs cfg.extraBuildAttrs [concatKeys]
 mergedPreBuild = autoDepSyncPreBuild + (cfg.extraBuildAttrs.preBuild or "")
 ```
 
 The new code has:
+
 ```
 combinedConcat.preBuild = (topLevel.preBuild or "") + (perPkg.preBuild or "")
 ```
@@ -171,16 +194,19 @@ But `combinedConcat.preBuild` does NOT include `autoDepSyncPreBuild` — that's 
 **Impact:** MEDIUM (maintainability risk, not a bug).
 
 ### 3. The templateEval check has a false-positive risk
+
 The mock inputs include `flake-parts.lib.mkFlake = _: attrs: attrs` — this returns the attrs as-is. But the real `flake-parts.lib.mkFlake` wraps them in a module. If a template does something that only works through mkFlake's module wrapping (e.g., references `config` in an option), the mock would incorrectly pass. The check verifies that the outputs function ACCEPTS the inputs and produces SOMETHING with `imports` and `go-standard` keys — but it doesn't verify the module is semantically valid.
 
 **Impact:** LOW. The check catches the important class of bugs (unbound variables). Full module evaluation would require importing the real flake-parts, which is expensive.
 
 ### 4. The erraudit migration lost `proxyVendor = true`
+
 The original erraudit had `proxyVendor = true`. The module forces `proxyVendor = false` when `deps` is non-empty. This is intentional (mkPreparedSource handles vendoring differently), but it means the first `nix build` will likely fail with a vendorHash mismatch and require updating the hash.
 
 **Impact:** MEDIUM. The migration is functionally correct but will need a vendorHash update on first build. I should have documented this in the migration itself or added a comment.
 
 ### 5. I didn't update the `systems` option in migrated repos
+
 The module defaults to `systems = [ "x86_64-linux" "aarch64-linux" "x86_64-darwin" "aarch64-darwin" ]`. The original repos used `import inputs.systems` (same default list). But if any repo had a CUSTOM systems list, the migration would silently change the build matrix.
 
 **Impact:** LOW (all 3 repos used the default). But I should have verified this per-repo instead of assuming.
@@ -302,10 +328,13 @@ The module defaults to `systems = [ "x86_64-linux" "aarch64-linux" "x86_64-darwi
 ## G) Questions I cannot answer myself
 
 ### 1. Should I commit the consumer repo changes?
+
 Seven consumer repos have uncommitted `flake.nix` changes. Three are migrations (go-localsync, erraudit, project-meta) and four are input cleanups (lean-business-plan, storbi, template-arch-lint, terraform-diagrams-aggregator). I don't know if you want me to commit these directly, or if you want to review them first, or if the auto-daemon should handle them. The global AGENTS.md says "An auto-git commit daemon runs continuously" but I'm not sure if that applies to repos other than the one I'm working in.
 
 ### 2. Is the `proxyVendor = false` behavior when deps are set correct?
+
 The module forces `proxyVendor = false` when `usePreparedSource = true` (deps non-empty). erraudit had `proxyVendor = true` WITH deps. I preserved the module's behavior (false) rather than erraudit's original (true). This may require a vendorHash update on first build. Is the module's behavior correct here, or should `proxyVendor` be respected even when deps are set?
 
 ### 3. Should `enableCompletions` support cobra-style (`completion <shell>`) or only urfave/cli (`--completion <shell>`)?
+
 project-meta uses cobra, which uses `meta completion bash` (subcommand), not `meta --completion bash` (flag). The module's `enableCompletions` calls `--completion`, which would fail for cobra projects. I worked around this in project-meta by setting `enableCompletions = false` and using a custom `postInstall`. Should I add a `completionStyle` option to handle this properly, or is the workaround acceptable?

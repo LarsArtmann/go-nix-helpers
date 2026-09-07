@@ -20,52 +20,53 @@ scenarios), module tests pass (70 assertions), format check clean.
 
 ### Autonomous Decisions (resolved Q1–Q3 without user input)
 
-| Question | Decision | Rationale |
-| --- | --- | --- |
-| **Q1: Keep or revert `repoName` breaking change?** | **REVERTED** | Library consumed by 7+ repos. Collision risk is theoretical (all same owner). Breaking all consumers' vendor hashes without a major version bump is irresponsible. Reverted to `<repo>` only naming. |
-| **Q2: Is `autoGoPrivateEnv` publicDeps tradeoff acceptable?** | **REVERTED to broad glob** | Asymmetric risk: marking public repos as private = minor perf hit (Go tries SSH first, falls back to proxy). Failing to mark private repos = hard build failure. Broad glob is the safer default. |
-| **Q3: Delete `mkGoFlake.nix` now or later?** | **KEPT with removal date** | Deleting would break unmigrated consumers. Deprecation warning now states concrete removal target: v1.0.0. |
+| Question                                                      | Decision                   | Rationale                                                                                                                                                                                            |
+| ------------------------------------------------------------- | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Q1: Keep or revert `repoName` breaking change?**            | **REVERTED**               | Library consumed by 7+ repos. Collision risk is theoretical (all same owner). Breaking all consumers' vendor hashes without a major version bump is irresponsible. Reverted to `<repo>` only naming. |
+| **Q2: Is `autoGoPrivateEnv` publicDeps tradeoff acceptable?** | **REVERTED to broad glob** | Asymmetric risk: marking public repos as private = minor perf hit (Go tries SSH first, falls back to proxy). Failing to mark private repos = hard build failure. Broad glob is the safer default.    |
+| **Q3: Delete `mkGoFlake.nix` now or later?**                  | **KEPT with removal date** | Deleting would break unmigrated consumers. Deprecation warning now states concrete removal target: v1.0.0.                                                                                           |
 
 ### Code Changes
 
-| Task | What was done | File:Line |
-| --- | --- | --- |
-| **Revert repoName** | Removed owner prefix from `_local_deps/` dir names. Back to `<repo>` only. | `mkPreparedSource.nix:124-136` |
-| **Revert autoGoPrivateEnv** | Always uses broad glob `github.com/larsartmann/*,github.com/LarsArtmann/*` regardless of publicDeps. Eliminates the risk of non-deps private repos losing GOPRIVATE coverage. | `modules/go-standard.nix:503-507` |
-| **Fix stale autoGoPrivate doc** | Option description now matches code (removed publicDeps-specific language that described reverted behavior). | `modules/go-standard.nix:249-257` |
-| **Rename checkRequireLines** | Renamed to `collectMissingRequires` — the old name suggested it only checked, but it also collects. | `mkPreparedSource.nix:249` |
-| **Simplify requireDeps dedup** | Replaced fragile triple-escaped shell variable accumulation (`''${NEW_REQUIRES%"$'''\n'''"}`) with a temp file approach (`go.mod.requires.tmp`). Readable, maintainable, no escaping gymnastics. | `mkPreparedSource.nix:249-256, 349-360` |
-| **Fix mkGoFlake deprecation** | Warning now states removal target: "will be removed in the first tagged release (v1.0.0)". | `flake.nix:41` |
+| Task                            | What was done                                                                                                                                                                                    | File:Line                               |
+| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------- |
+| **Revert repoName**             | Removed owner prefix from `_local_deps/` dir names. Back to `<repo>` only.                                                                                                                       | `mkPreparedSource.nix:124-136`          |
+| **Revert autoGoPrivateEnv**     | Always uses broad glob `github.com/larsartmann/*,github.com/LarsArtmann/*` regardless of publicDeps. Eliminates the risk of non-deps private repos losing GOPRIVATE coverage.                    | `modules/go-standard.nix:503-507`       |
+| **Fix stale autoGoPrivate doc** | Option description now matches code (removed publicDeps-specific language that described reverted behavior).                                                                                     | `modules/go-standard.nix:249-257`       |
+| **Rename checkRequireLines**    | Renamed to `collectMissingRequires` — the old name suggested it only checked, but it also collects.                                                                                              | `mkPreparedSource.nix:249`              |
+| **Simplify requireDeps dedup**  | Replaced fragile triple-escaped shell variable accumulation (`''${NEW_REQUIRES%"$'''\n'''"}`) with a temp file approach (`go.mod.requires.tmp`). Readable, maintainable, no escaping gymnastics. | `mkPreparedSource.nix:249-256, 349-360` |
+| **Fix mkGoFlake deprecation**   | Warning now states removal target: "will be removed in the first tagged release (v1.0.0)".                                                                                                       | `flake.nix:41`                          |
 
 ### Test Changes
 
-| Task | What was done | File |
-| --- | --- | --- |
-| **requireDeps dedup integration test** | New Test 5 in verify script: passes `requireDeps` with entries already in go.mod + entries not in go.mod. Verifies dedup (existing entry appears once) AND injection (new entry appears once). Excludes replace directive lines from count. | `test.nix:136-163, 295-318` |
-| **nativeBuildInputs merge eval test** | New assertion: `extraBuildAttrs.nativeBuildInputs = [ pkgs.git ]` evaluates without error alongside `enableTempl = true`. | `test-module.nix:307-311, 459-461` |
-| **Revert test assertion** | Updated `event/v3/eventtest` path assertion back to `_local_deps/mock-dep/` (was `larsartmann-mock-dep/`). | `test.nix:217` |
+| Task                                   | What was done                                                                                                                                                                                                                               | File                               |
+| -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------- |
+| **requireDeps dedup integration test** | New Test 5 in verify script: passes `requireDeps` with entries already in go.mod + entries not in go.mod. Verifies dedup (existing entry appears once) AND injection (new entry appears once). Excludes replace directive lines from count. | `test.nix:136-163, 295-318`        |
+| **nativeBuildInputs merge eval test**  | New assertion: `extraBuildAttrs.nativeBuildInputs = [ pkgs.git ]` evaluates without error alongside `enableTempl = true`.                                                                                                                   | `test-module.nix:307-311, 459-461` |
+| **Revert test assertion**              | Updated `event/v3/eventtest` path assertion back to `_local_deps/mock-dep/` (was `larsartmann-mock-dep/`).                                                                                                                                  | `test.nix:217`                     |
 
 ### CI Fix
 
-| Task | What was done | File |
-| --- | --- | --- |
+| Task                         | What was done                                                                                                                                        | File                          |
+| ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------- |
 | **Fix treefmt format check** | Changed `nix fmt -- --check` to `nix fmt -- --ci`. Treefmt 2.x has no `--check` flag; uses `--ci` (which implies `--fail-on-change` + `--no-cache`). | `.github/workflows/ci.yml:28` |
 
 ### Documentation Changes
 
-| Task | What was done | File |
-| --- | --- | --- |
-| **README apps.fmt row** | Added `apps.fmt` to "What you get" table with conditional note. | `README.md:66` |
-| **README enableNixfmt FAQ** | New FAQ entry: "How do I disable Nix formatting (nixfmt)?" with instructions for partial and full formatter disable. | `README.md:362-371` |
-| **Migration guide enableNixfmt** | Added `enableNixfmt` to parameter mapping table. | `docs/migration-guide.md:107` |
-| **CHANGELOG updated** | Added entries for: enableNixfmt, apps.fmt conditional, enableCompletions warning, nativeBuildInputs merge, requireDeps dedup, CI fixes, generate-flake.sh flags. Fixed stale "57 assertions" → "70 assertions". Updated enableCompletions description from "silently does nothing" to "emits a clear warning". | `CHANGELOG.md` |
-| **AGENTS.md cleaned** | Removed stale gotchas: `autoGoPrivate uses specific paths when publicDeps is set` and `repoName includes owner`. Fixed option count 30→31. | `AGENTS.md` |
+| Task                             | What was done                                                                                                                                                                                                                                                                                                  | File                          |
+| -------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------- |
+| **README apps.fmt row**          | Added `apps.fmt` to "What you get" table with conditional note.                                                                                                                                                                                                                                                | `README.md:66`                |
+| **README enableNixfmt FAQ**      | New FAQ entry: "How do I disable Nix formatting (nixfmt)?" with instructions for partial and full formatter disable.                                                                                                                                                                                           | `README.md:362-371`           |
+| **Migration guide enableNixfmt** | Added `enableNixfmt` to parameter mapping table.                                                                                                                                                                                                                                                               | `docs/migration-guide.md:107` |
+| **CHANGELOG updated**            | Added entries for: enableNixfmt, apps.fmt conditional, enableCompletions warning, nativeBuildInputs merge, requireDeps dedup, CI fixes, generate-flake.sh flags. Fixed stale "57 assertions" → "70 assertions". Updated enableCompletions description from "silently does nothing" to "emits a clear warning". | `CHANGELOG.md`                |
+| **AGENTS.md cleaned**            | Removed stale gotchas: `autoGoPrivate uses specific paths when publicDeps is set` and `repoName includes owner`. Fixed option count 30→31.                                                                                                                                                                     | `AGENTS.md`                   |
 
 ---
 
 ## B) PARTIALLY DONE (implemented but incomplete coverage)
 
 ### nativeBuildInputs merge test: eval-only, not behavioral
+
 **What works:** The test proves the package evaluates successfully when
 `extraBuildAttrs.nativeBuildInputs` and `enableTempl = true` are both set.
 **What's missing:** The test does NOT verify that both `pkgs.templ` AND
@@ -76,6 +77,7 @@ inspecting `.nativeBuildInputs` or `drvAttrs`, which is non-trivial in
 eval-only tests but possible.
 
 ### requireDeps dedup test: proves the outcome, not the mechanism
+
 **What works:** The test proves that with dedup logic active, a require entry
 already present in go.mod appears exactly once in the output.
 **What's missing:** The test does NOT prove that WITHOUT the dedup logic, the
@@ -85,6 +87,7 @@ already in go.mod from the source. A true negative test would remove the
 dedup logic and verify duplication occurs.
 
 ### CI format check fix: verified locally, not in CI
+
 **What works:** `nix fmt -- --ci` runs locally without error (0 changed files).
 **What's missing:** The GitHub Actions workflow hasn't actually run with the
 `--ci` flag. The runner's treefmt version might differ, or the Nix installer
@@ -94,19 +97,19 @@ action might provide a different treefmt.
 
 ## C) NOT STARTED (from broader backlog)
 
-| Task | Status | Blocker |
-| --- | --- | --- |
-| Register `maintainers.larsartmann` in nixpkgs | BLOCKED | External PR to nixpkgs |
-| Real private-repo integration test in CI | BLOCKED | Needs SSH key secret |
-| Audit all downstream consumers | BLOCKED | Needs access to 7+ repos |
-| Real e2e consumer test | BLOCKED | Needs mock Go project + full build |
-| Update previous status report with Q1–Q3 resolutions | NOT DONE | No blocker — just didn't do it |
-| D4: Fix empty commit message (df9a5ff) | NOT DONE | Needs interactive rebase + force push |
-| Negative test for enableCompletions warning | NOT DONE | No blocker — need mock binary |
-| Monorepo integration test in test.nix | NOT DONE | No blocker — not attempted |
-| Property tests for stripVersionSuffix/repoName | NOT DONE | No blocker — not attempted |
-| Extract postPatch script to separate file | NOT DONE | No blocker — refactoring |
-| Extend merge protection to buildInputs/checkInputs | NOT DONE | No blocker — API change |
+| Task                                                 | Status   | Blocker                               |
+| ---------------------------------------------------- | -------- | ------------------------------------- |
+| Register `maintainers.larsartmann` in nixpkgs        | BLOCKED  | External PR to nixpkgs                |
+| Real private-repo integration test in CI             | BLOCKED  | Needs SSH key secret                  |
+| Audit all downstream consumers                       | BLOCKED  | Needs access to 7+ repos              |
+| Real e2e consumer test                               | BLOCKED  | Needs mock Go project + full build    |
+| Update previous status report with Q1–Q3 resolutions | NOT DONE | No blocker — just didn't do it        |
+| D4: Fix empty commit message (df9a5ff)               | NOT DONE | Needs interactive rebase + force push |
+| Negative test for enableCompletions warning          | NOT DONE | No blocker — need mock binary         |
+| Monorepo integration test in test.nix                | NOT DONE | No blocker — not attempted            |
+| Property tests for stripVersionSuffix/repoName       | NOT DONE | No blocker — not attempted            |
+| Extract postPatch script to separate file            | NOT DONE | No blocker — refactoring              |
+| Extend merge protection to buildInputs/checkInputs   | NOT DONE | No blocker — API change               |
 
 ---
 

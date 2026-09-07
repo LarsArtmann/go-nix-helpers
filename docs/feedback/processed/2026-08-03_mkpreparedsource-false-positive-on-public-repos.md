@@ -1,7 +1,7 @@
 # Feedback: mkPreparedSource false-positive on public LarsArtmann repos
 
-**From:** Standup-Killer project session (2026-08-03)  
-**Severity:** Medium — causes incorrect workarounds, misleading error messages, unnecessary SSH inputs  
+**From:** Standup-Killer project session (2026-08-03)\
+**Severity:** Medium — causes incorrect workarounds, misleading error messages, unnecessary SSH inputs\
 **Files:** `mkPreparedSource.nix`, `mkGoFlake.nix`
 
 ---

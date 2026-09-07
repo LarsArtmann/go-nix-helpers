@@ -11,67 +11,70 @@ All `nix flake check`, integration tests, and module tests (70 assertions) pass.
 
 ### Code Changes
 
-| Task | What was done | Files |
-| --- | --- | --- |
-| **H1** — `autoGoPrivateEnv` aware of `publicDeps` | When `publicDeps` is non-empty, GOPRIVATE switches from broad glob `github.com/larsartmann/*` to specific dep paths so public repos fetch via proxy | `modules/go-standard.nix:503-519` |
-| **H3** — `enableCompletions` UX | Checks `--completion bash` support before installing; emits clear stderr warning with remediation options instead of silent no-op | `modules/go-standard.nix:429-447` |
-| **M5** — `nativeBuildInputs` merge protection | Consumer's `extraBuildAttrs.nativeBuildInputs` is now concatenated to module's list instead of overriding | `modules/go-standard.nix:411-421, 464-467` |
-| **M9** — `repoName` namespaced by owner | `_local_deps/` uses `<owner>-<repo>` format (e.g. `larsartmann-go-cqrs-lite`) to prevent fork collisions | `mkPreparedSource.nix:124-138` |
-| **M10** — `apps.fmt` conditional + `enableNixfmt` | New `enableNixfmt` option (was hardcoded true); `apps.fmt` only generated when >=1 formatter enabled | `modules/go-standard.nix:171-176, 543-545, 602` |
-| **M12** — `requireDeps` dedup | Manually injected require lines are checked against existing go.mod entries before insertion | `mkPreparedSource.nix:248-258, 351-360` |
+| Task                                              | What was done                                                                                                                                       | Files                                           |
+| ------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
+| **H1** — `autoGoPrivateEnv` aware of `publicDeps` | When `publicDeps` is non-empty, GOPRIVATE switches from broad glob `github.com/larsartmann/*` to specific dep paths so public repos fetch via proxy | `modules/go-standard.nix:503-519`               |
+| **H3** — `enableCompletions` UX                   | Checks `--completion bash` support before installing; emits clear stderr warning with remediation options instead of silent no-op                   | `modules/go-standard.nix:429-447`               |
+| **M5** — `nativeBuildInputs` merge protection     | Consumer's `extraBuildAttrs.nativeBuildInputs` is now concatenated to module's list instead of overriding                                           | `modules/go-standard.nix:411-421, 464-467`      |
+| **M9** — `repoName` namespaced by owner           | `_local_deps/` uses `<owner>-<repo>` format (e.g. `larsartmann-go-cqrs-lite`) to prevent fork collisions                                            | `mkPreparedSource.nix:124-138`                  |
+| **M10** — `apps.fmt` conditional + `enableNixfmt` | New `enableNixfmt` option (was hardcoded true); `apps.fmt` only generated when >=1 formatter enabled                                                | `modules/go-standard.nix:171-176, 543-545, 602` |
+| **M12** — `requireDeps` dedup                     | Manually injected require lines are checked against existing go.mod entries before insertion                                                        | `mkPreparedSource.nix:248-258, 351-360`         |
 
 ### CI Changes
 
-| Task | What was done |
-| --- | --- |
+| Task                                    | What was done                                                                         |
+| --------------------------------------- | ------------------------------------------------------------------------------------- |
 | **M1** — `generate-flake.sh` smoke test | New CI job tests 3 template variants, validates output with `nix-instantiate --parse` |
-| **M11** — macOS CI runner | Matrix strategy adds `macos-latest` to the check job |
-| **M13** — `flake.lock` freshness | New CI job runs `nix flake update`, diffs against committed lock file |
+| **M11** — macOS CI runner               | Matrix strategy adds `macos-latest` to the check job                                  |
+| **M13** — `flake.lock` freshness        | New CI job runs `nix flake update`, diffs against committed lock file                 |
 
 ### Script Changes
 
-| Task | What was done |
-| --- | --- |
-| **L2** — `--go-mod` flag | Creates `go.mod` + `main.go` skeleton during generation |
-| **L3** — `--private-deps` for go-standard | Adds `deps = { ... }` section to go-standard template output |
-| **Bonus fix** — Placeholder mismatch | Fixed pre-existing bug: `YOUR-PROJECT-NAME` in go-standard template was never replaced |
+| Task                                      | What was done                                                                          |
+| ----------------------------------------- | -------------------------------------------------------------------------------------- |
+| **L2** — `--go-mod` flag                  | Creates `go.mod` + `main.go` skeleton during generation                                |
+| **L3** — `--private-deps` for go-standard | Adds `deps = { ... }` section to go-standard template output                           |
+| **Bonus fix** — Placeholder mismatch      | Fixed pre-existing bug: `YOUR-PROJECT-NAME` in go-standard template was never replaced |
 
 ### Documentation Changes
 
-| Task | What was done |
-| --- | --- |
-| **M3/M4** — FAQ entries | Added `vendorHash = null` (committed vendor) and monorepo vendorHash sharing entries |
-| **M6** — enableCompletions caveat | Options table now notes cobra/urfave/cli requirement |
-| **M7** — Troubleshooting fix | Updated error text from old wording to current `"modules without local replace"`, added `publicDeps` as remediation option 3 |
-| **M8** — publicDeps matching docs | Documented exact-match behavior and `/vN` caveat |
-| **M9-doc** — Migration guide | Added detailed code example for migrating `extraApps`/`extraChecks`/`extraFlake` to direct flake-parts declarations |
-| **L4** — GOTOOLCHAIN docs | Added FAQ entry for `GOTOOLCHAIN = "local"` and override instructions |
-| **Man page** | Added `enableNixfmt` entry to `go-standard.5` |
-| **AGENTS.md** | Updated option count (30->31), added gotchas for autoGoPrivate, nativeBuildInputs merge, repoName namespacing, apps.fmt conditional, enableCompletions warning, requireDeps dedup |
+| Task                              | What was done                                                                                                                                                                     |
+| --------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **M3/M4** — FAQ entries           | Added `vendorHash = null` (committed vendor) and monorepo vendorHash sharing entries                                                                                              |
+| **M6** — enableCompletions caveat | Options table now notes cobra/urfave/cli requirement                                                                                                                              |
+| **M7** — Troubleshooting fix      | Updated error text from old wording to current `"modules without local replace"`, added `publicDeps` as remediation option 3                                                      |
+| **M8** — publicDeps matching docs | Documented exact-match behavior and `/vN` caveat                                                                                                                                  |
+| **M9-doc** — Migration guide      | Added detailed code example for migrating `extraApps`/`extraChecks`/`extraFlake` to direct flake-parts declarations                                                               |
+| **L4** — GOTOOLCHAIN docs         | Added FAQ entry for `GOTOOLCHAIN = "local"` and override instructions                                                                                                             |
+| **Man page**                      | Added `enableNixfmt` entry to `go-standard.5`                                                                                                                                     |
+| **AGENTS.md**                     | Updated option count (30->31), added gotchas for autoGoPrivate, nativeBuildInputs merge, repoName namespacing, apps.fmt conditional, enableCompletions warning, requireDeps dedup |
 
 ### Test Changes
 
-| Task | What was done | Assertion count |
-| --- | --- | --- |
-| **L1** — Remaining option tests | Added `enableNixfmt` default, `devShellExtraPackages` callable, systems override propagation | +3 |
-| **H2** — Behavioral tests | Added meta propagation (description, mainProgram, license, maintainers, extraMeta), monorepo meta, formatter toggles (nixfmt, all-off), enableTempl, custom ldflags, shellExtraEnv, apps.fmt conditional | +12 |
-| Total | 70 assertions (up from 57) | +13 net |
+| Task                            | What was done                                                                                                                                                                                            | Assertion count |
+| ------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------- |
+| **L1** — Remaining option tests | Added `enableNixfmt` default, `devShellExtraPackages` callable, systems override propagation                                                                                                             | +3              |
+| **H2** — Behavioral tests       | Added meta propagation (description, mainProgram, license, maintainers, extraMeta), monorepo meta, formatter toggles (nixfmt, all-off), enableTempl, custom ldflags, shellExtraEnv, apps.fmt conditional | +12             |
+| Total                           | 70 assertions (up from 57)                                                                                                                                                                               | +13 net         |
 
 ---
 
 ## B) PARTIALLY DONE (implemented but incomplete coverage)
 
 ### H2 — Behavioral tests: partially deepened
+
 **What works:** Meta attribute propagation (description, license, mainProgram, maintainers) is now verified.
-**What's missing:** The behavioral tests verify *evaluation produces the right attribute values* for meta, but they do NOT verify that `buildFlags`, `ldflags`, and `nativeBuildInputs` actually reach the `buildGoModule` call as correct argument values. The TODO said "verify buildFlags, ldflags, nativeBuildInputs actually reach buildGoModule" — I added tests that confirm packages *exist* with custom flags, but did not extract and inspect the actual attribute values passed to `buildGoModule`. This would require inspecting the derivation's attributes (`.builder`, `.args`, or using `drvAttrs`) which is non-trivial in Nix eval-only tests.
+**What's missing:** The behavioral tests verify _evaluation produces the right attribute values_ for meta, but they do NOT verify that `buildFlags`, `ldflags`, and `nativeBuildInputs` actually reach the `buildGoModule` call as correct argument values. The TODO said "verify buildFlags, ldflags, nativeBuildInputs actually reach buildGoModule" — I added tests that confirm packages _exist_ with custom flags, but did not extract and inspect the actual attribute values passed to `buildGoModule`. This would require inspecting the derivation's attributes (`.builder`, `.args`, or using `drvAttrs`) which is non-trivial in Nix eval-only tests.
 
 ### M1 — generate-flake.sh smoke test: parse-only, not build
+
 **What works:** CI generates 3 template variants and validates they parse as valid Nix.
 **What's missing:** Does not run `nix flake check` on the generated output because that would require fetching all flake inputs (network-intensive in CI). The test catches syntax errors but not semantic ones (e.g. invalid option values).
 
 ### M11 — macOS CI: eval-only
+
 **What works:** `nix flake check --no-build` runs on macOS.
-**What's missing:** No derivations are actually *built* on macOS. The `--no-build` flag means we only verify evaluation, not compilation. Integration and module tests still run on `ubuntu-latest` only.
+**What's missing:** No derivations are actually _built_ on macOS. The `--no-build` flag means we only verify evaluation, not compilation. Integration and module tests still run on `ubuntu-latest` only.
 
 ---
 
@@ -79,12 +82,12 @@ All `nix flake check`, integration tests, and module tests (70 assertions) pass.
 
 All non-blocked TODO items were addressed. The 4 blocked items remain:
 
-| Task | Status | Blocker |
-| --- | --- | --- |
-| Register `maintainers.larsartmann` in nixpkgs | BLOCKED | External PR to nixpkgs |
-| Real private-repo integration test in CI | BLOCKED | Needs SSH key secret |
-| Audit all downstream consumers | BLOCKED | Needs access to 7+ repos |
-| Real e2e consumer test | BLOCKED | Needs mock Go project + full build |
+| Task                                          | Status  | Blocker                            |
+| --------------------------------------------- | ------- | ---------------------------------- |
+| Register `maintainers.larsartmann` in nixpkgs | BLOCKED | External PR to nixpkgs             |
+| Real private-repo integration test in CI      | BLOCKED | Needs SSH key secret               |
+| Audit all downstream consumers                | BLOCKED | Needs access to 7+ repos           |
+| Real e2e consumer test                        | BLOCKED | Needs mock Go project + full build |
 
 ---
 
@@ -95,6 +98,7 @@ All non-blocked TODO items were addressed. The 4 blocked items remain:
 **Resolved:** Reverted at `2cbb37b` — `<repo>` only naming restored. Broad glob kept. No migration needed since the breaking change was reverted before any consumer upgraded.
 
 **Severity: HIGH.** The `repoName` change (M9) renames all `_local_deps/` directories from `<repo>` to `<owner>-<repo>`. Every downstream consumer that uses `mkPreparedSource` will get a **different vendor hash** when upgrading. This is a breaking change that was NOT documented in the migration guide. Consumers upgrading go-nix-helpers will see:
+
 - Build fails with vendorHash mismatch
 - Must recompute hash via `nix build`
 
@@ -164,7 +168,7 @@ Still open → tracked in TODO_LIST (Blocked — needs interactive rebase + forc
 
 ### Testing
 
-11. **No negative tests for new features** — The enableCompletions warning, the requireDeps dedup, the nativeBuildInputs merge — none have tests proving the *absence* of the old behavior.
+11. **No negative tests for new features** — The enableCompletions warning, the requireDeps dedup, the nativeBuildInputs merge — none have tests proving the _absence_ of the old behavior.
 
 12. **No property-based testing** — All tests are example-based. Property tests for `stripVersionSuffix`, `repoName`, etc. would catch edge cases.
 
@@ -212,7 +216,7 @@ Still open → tracked in TODO_LIST (Blocked — needs interactive rebase + forc
 22. **Run integration tests on macOS too** ← still open → TODO_LIST L9
 23. **Add property tests** for stripVersionSuffix and repoName ← still open → TODO_LIST M1-M2
 24. **Add FAQ entry for `deps` with mixed owners** ← still open → TODO_LIST L4
-25. ~~**Document the `owner-repo` naming convention`**~~ NOT-NEEDED — owner prefix reverted at `2cbb37b`
+25. ~~**Document the `owner-repo` naming convention`**~~ NOT-NEEDED — owner prefix reverted at`2cbb37b`
 26. ~~**Consider `goPkg` as `lib.types.package`**~~ → ROADMAP (Theme 1)
 27. ~~**Add `enableNixfmt` to migration guide** parameter mapping table~~ done at `b10399f`
 28. **Test the CI freshness check** ← still open → TODO_LIST (Low)

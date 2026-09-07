@@ -91,29 +91,29 @@ recommended `flakeModules.go-standard` module.
 
 ### Parameter mapping
 
-| mkGoFlake parameter      | go-standard option                  | Notes                                             |
-| ------------------------ | ----------------------------------- | ------------------------------------------------- |
-| `pname`                  | `go-standard.pname`                 | Same                                              |
-| `version`                | `go-standard.version`               | Defaults to `self.rev or "dev"` — usually omit    |
-| `vendorHash`             | `go-standard.vendorHash`            | Same                                              |
-| `description`            | `go-standard.description`           | Same                                              |
-| `src`                    | `go-standard.src`                   | Defaults to `self.outPath` — usually omit         |
-| `deps`                   | `go-standard.deps`                  | Same                                              |
-| `subModules`             | `go-standard.subModules`            | Rarely needed — auto-discovery handles it         |
-| `doCheck`                | `go-standard.enableCheck`           | Renamed, default `true`                           |
-| `ldflags`                | `go-standard.ldflags`               | Same                                              |
-| `goPkgAttr`              | `go-standard.goPkgAttr`             | Same                                              |
+| mkGoFlake parameter      | go-standard option                  | Notes                                                                                                                  |
+| ------------------------ | ----------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| `pname`                  | `go-standard.pname`                 | Same                                                                                                                   |
+| `version`                | `go-standard.version`               | Defaults to `self.rev or "dev"` — usually omit                                                                         |
+| `vendorHash`             | `go-standard.vendorHash`            | Same                                                                                                                   |
+| `description`            | `go-standard.description`           | Same                                                                                                                   |
+| `src`                    | `go-standard.src`                   | Defaults to `self.outPath` — usually omit                                                                              |
+| `deps`                   | `go-standard.deps`                  | Same                                                                                                                   |
+| `subModules`             | `go-standard.subModules`            | Rarely needed — auto-discovery handles it                                                                              |
+| `doCheck`                | `go-standard.enableCheck`           | Renamed, default `true`                                                                                                |
+| `ldflags`                | `go-standard.ldflags`               | Same                                                                                                                   |
+| `goPkgAttr`              | `go-standard.goPkgAttr`             | Same                                                                                                                   |
 | `buildGoModuleOverrides` | `go-standard.extraBuildAttrs`       | Renamed — 6 attrs now concatenate (nativeBuildInputs, buildInputs, checkInputs, configureFlags, preBuild, postInstall) |
-| `enableNixfmt`           | `go-standard.enableNixfmt`           | New — controls nixfmt in treefmt (default: true)  |
-| (new)                    | `go-standard.enableShfmt`            | New — controls shfmt in treefmt (default: false) |
-| (new)                    | `go-standard.enableTempl`            | New — includes templ in devShells and treefmt (default: false) |
-| (new)                    | `go-standard.enableGopls`            | New — includes gopls in devShell (default: true) |
-| (new)                    | `go-standard.enableGovulncheck`      | New — includes govulncheck in devShell (default: true) |
-| `devShellExtraPackages`  | `go-standard.devShellExtraPackages` | Same                                              |
-| `shellExtraEnv`          | `go-standard.shellExtraEnv`         | Same                                              |
-| `extraApps`              | (add in consumer flake)             | No equivalent — add apps directly in your flake   |
-| `extraChecks`            | (add in consumer flake)             | No equivalent — add checks directly in your flake |
-| `extraFlake`             | (add in consumer flake)             | No equivalent — add flake attrs directly          |
+| `enableNixfmt`           | `go-standard.enableNixfmt`          | New — controls nixfmt in treefmt (default: true)                                                                       |
+| (new)                    | `go-standard.enableShfmt`           | New — controls shfmt in treefmt (default: false)                                                                       |
+| (new)                    | `go-standard.enableTempl`           | New — includes templ in devShells and treefmt (default: false)                                                         |
+| (new)                    | `go-standard.enableGopls`           | New — includes gopls in devShell (default: true)                                                                       |
+| (new)                    | `go-standard.enableGovulncheck`     | New — includes govulncheck in devShell (default: true)                                                                 |
+| `devShellExtraPackages`  | `go-standard.devShellExtraPackages` | Same                                                                                                                   |
+| `shellExtraEnv`          | `go-standard.shellExtraEnv`         | Same                                                                                                                   |
+| `extraApps`              | (add in consumer flake)             | No equivalent — add apps directly in your flake                                                                        |
+| `extraChecks`            | (add in consumer flake)             | No equivalent — add checks directly in your flake                                                                      |
+| `extraFlake`             | (add in consumer flake)             | No equivalent — add flake attrs directly                                                                               |
 
 ### Migrating `extraApps`, `extraChecks`, `extraFlake`
 

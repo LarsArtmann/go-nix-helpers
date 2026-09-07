@@ -11,37 +11,37 @@
 
 These items are implemented, pass `nix flake check`, and have no known issues:
 
-| #   | Task                                        | Evidence                                                                      |
-| --- | ------------------------------------------- | ----------------------------------------------------------------------------- |
-| 1   | `LICENSE` file (MIT)                        | `LICENSE` in repo root, MIT badge in README                                   |
-| 2   | Fix `defaultSystems` hardcoding             | `go-standard.systems` option added; `config.systems = cfg.systems`            |
-| 3   | `enableCheck` option                        | Controls `doCheck` in buildGoModule; default true; tested                     |
-| 4   | `enableOverlay` option                      | `lib.mkIf` conditional overlay; default true; tested by `moduleTestNoOverlay` |
-| 5   | `buildFlags` option                         | Passed to buildGoModule; default `[]`                                         |
-| 6   | `version` option                            | Defaults to `self.rev or "dev"`; replaces hardcoded derivation                |
-| 7   | `enableGolangciLint` toggle                 | Conditional in devShells and lint app; default true                           |
-| 8   | `enableGofumpt` / `enableGoimports` toggles | Conditional in treefmt programs; default true                                 |
-| 9   | `apps.fmt` (nix run .#fmt)                  | Treefmt wrapper app                                                           |
-| 10  | Deprecate `mkGoFlake.nix`                   | `builtins.trace` warning in flake.nix export                                  |
-| 11  | Mark `go-flake-parts` template legacy       | Banner in README, deprecation comment in flake.nix header                     |
-| 12  | GitHub Actions CI                           | `.github/workflows/ci.yml` with format check + integration + module tests     |
-| 13  | Dynamic CI badge in README                  | GitHub Actions badge replaces static shields.io                               |
-| 14  | `CONTRIBUTING.md`                           | Full dev setup, testing, code style, PR guide                                 |
-| 15  | `.github/ISSUE_TEMPLATE/`                   | Bug report + feature request templates                                        |
-| 16  | `.github/PULL_REQUEST_TEMPLATE.md`          | PR checklist with testing/docs sections                                       |
-| 17  | `.github/CODEOWNERS`                        | Auto-assign @LarsArtmann                                                      |
-| 18  | Migration guide                             | `docs/migration-guide.md` with mkGoFlake + go-flake-parts + manual migration  |
-| 19  | Architecture diagram                        | `docs/architecture.d2` + `docs/architecture.svg`, inlined in README           |
-| 20  | README FAQ/Troubleshooting                  | SSH errors, vendorHash, GOPRIVATE, validation errors                          |
-| 21  | Module test suite                           | `test-module.nix` with **43 assertions** on options, types, defaults, outputs |
-| 22  | `generate-flake.sh` rewrite                 | `--dir`, `--template`, `--no-push` (default), `--help`, `PROJECTS_DIR`        |
-| 23  | Man pages                                   | `docs/man/go-standard.5` and `docs/man/mkPreparedSource.5`                    |
-| 24  | `enableCompletions` option                  | Option exists with correct type/default (but see bugs below)                  |
-| 25  | Monorepo `packages` option                  | Option exists, generates extra buildGoModule + apps (but see bugs below)      |
-| 26  | FEATURES.md updated                         | All statuses current                                                          |
-| 27  | CHANGELOG.md updated                        | All changes documented under [Unreleased]                                     |
-| 28  | TODO_LIST.md updated                        | 24 DONE, 2 BLOCKED, 1 TODO                                                    |
-| 29  | AGENTS.md updated                           | New options, gotchas, key files table                                         |
+| #  | Task                                        | Evidence                                                                      |
+| -- | ------------------------------------------- | ----------------------------------------------------------------------------- |
+| 1  | `LICENSE` file (MIT)                        | `LICENSE` in repo root, MIT badge in README                                   |
+| 2  | Fix `defaultSystems` hardcoding             | `go-standard.systems` option added; `config.systems = cfg.systems`            |
+| 3  | `enableCheck` option                        | Controls `doCheck` in buildGoModule; default true; tested                     |
+| 4  | `enableOverlay` option                      | `lib.mkIf` conditional overlay; default true; tested by `moduleTestNoOverlay` |
+| 5  | `buildFlags` option                         | Passed to buildGoModule; default `[]`                                         |
+| 6  | `version` option                            | Defaults to `self.rev or "dev"`; replaces hardcoded derivation                |
+| 7  | `enableGolangciLint` toggle                 | Conditional in devShells and lint app; default true                           |
+| 8  | `enableGofumpt` / `enableGoimports` toggles | Conditional in treefmt programs; default true                                 |
+| 9  | `apps.fmt` (nix run .#fmt)                  | Treefmt wrapper app                                                           |
+| 10 | Deprecate `mkGoFlake.nix`                   | `builtins.trace` warning in flake.nix export                                  |
+| 11 | Mark `go-flake-parts` template legacy       | Banner in README, deprecation comment in flake.nix header                     |
+| 12 | GitHub Actions CI                           | `.github/workflows/ci.yml` with format check + integration + module tests     |
+| 13 | Dynamic CI badge in README                  | GitHub Actions badge replaces static shields.io                               |
+| 14 | `CONTRIBUTING.md`                           | Full dev setup, testing, code style, PR guide                                 |
+| 15 | `.github/ISSUE_TEMPLATE/`                   | Bug report + feature request templates                                        |
+| 16 | `.github/PULL_REQUEST_TEMPLATE.md`          | PR checklist with testing/docs sections                                       |
+| 17 | `.github/CODEOWNERS`                        | Auto-assign @LarsArtmann                                                      |
+| 18 | Migration guide                             | `docs/migration-guide.md` with mkGoFlake + go-flake-parts + manual migration  |
+| 19 | Architecture diagram                        | `docs/architecture.d2` + `docs/architecture.svg`, inlined in README           |
+| 20 | README FAQ/Troubleshooting                  | SSH errors, vendorHash, GOPRIVATE, validation errors                          |
+| 21 | Module test suite                           | `test-module.nix` with **43 assertions** on options, types, defaults, outputs |
+| 22 | `generate-flake.sh` rewrite                 | `--dir`, `--template`, `--no-push` (default), `--help`, `PROJECTS_DIR`        |
+| 23 | Man pages                                   | `docs/man/go-standard.5` and `docs/man/mkPreparedSource.5`                    |
+| 24 | `enableCompletions` option                  | Option exists with correct type/default (but see bugs below)                  |
+| 25 | Monorepo `packages` option                  | Option exists, generates extra buildGoModule + apps (but see bugs below)      |
+| 26 | FEATURES.md updated                         | All statuses current                                                          |
+| 27 | CHANGELOG.md updated                        | All changes documented under [Unreleased]                                     |
+| 28 | TODO_LIST.md updated                        | 24 DONE, 2 BLOCKED, 1 TODO                                                    |
+| 29 | AGENTS.md updated                           | New options, gotchas, key files table                                         |
 
 **Test verification:**
 
@@ -78,11 +78,11 @@ The plan called for a real consumer `flake.nix` that imports `go-standard` and e
 
 ## C) NOT STARTED / BLOCKED
 
-| #   | Task                                          | Why blocked                                                            |
-| --- | --------------------------------------------- | ---------------------------------------------------------------------- |
-| C1  | Register `maintainers.larsartmann` in nixpkgs | Requires external PR to nixpkgs repo                                   |
-| C2  | Real private-repo integration test in CI      | Requires SSH key secret configuration in GitHub                        |
-| C3  | Audit all downstream consumers                | Requires access to 7+ downstream repos (BuildFlow, mr-sync, PMA, etc.) |
+| #  | Task                                          | Why blocked                                                            |
+| -- | --------------------------------------------- | ---------------------------------------------------------------------- |
+| C1 | Register `maintainers.larsartmann` in nixpkgs | Requires external PR to nixpkgs repo                                   |
+| C2 | Real private-repo integration test in CI      | Requires SSH key secret configuration in GitHub                        |
+| C3 | Audit all downstream consumers                | Requires access to 7+ downstream repos (BuildFlow, mr-sync, PMA, etc.) |
 
 ---
 

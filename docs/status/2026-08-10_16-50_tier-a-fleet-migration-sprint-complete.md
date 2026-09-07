@@ -9,39 +9,39 @@
 
 ### Module enhancements (go-nix-helpers)
 
-| Item | Commit | Detail |
-|------|--------|--------|
-| `requireDeps` option | `5aaf066` | New module option (39 total). Passes manually injected require lines to mkPreparedSource. Unblocks PMA migration. 114 test assertions still pass. |
-| Migration guide patterns | `e6860c5` | 7 recipe cards: GOEXPERIMENT, proxyVendor, cobra completions, requireDeps, mkForce apps, dual treefmt, build flags |
-| TODO_LIST sprint update | `e6860c5` | H1/H2/H3/M1/M3 all marked DONE |
-| CHANGELOG updated | `e6860c5` | requireDeps + migration sprint entries |
-| Man page updated | `5aaf066` | requireDeps documented |
-| AGENTS.md updated | `5aaf066` | Option count 38→39 |
-| Full flake check | ✅ | All 9 checks pass |
+| Item                     | Commit    | Detail                                                                                                                                            |
+| ------------------------ | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `requireDeps` option     | `5aaf066` | New module option (39 total). Passes manually injected require lines to mkPreparedSource. Unblocks PMA migration. 114 test assertions still pass. |
+| Migration guide patterns | `e6860c5` | 7 recipe cards: GOEXPERIMENT, proxyVendor, cobra completions, requireDeps, mkForce apps, dual treefmt, build flags                                |
+| TODO_LIST sprint update  | `e6860c5` | H1/H2/H3/M1/M3 all marked DONE                                                                                                                    |
+| CHANGELOG updated        | `e6860c5` | requireDeps + migration sprint entries                                                                                                            |
+| Man page updated         | `5aaf066` | requireDeps documented                                                                                                                            |
+| AGENTS.md updated        | `5aaf066` | Option count 38→39                                                                                                                                |
+| Full flake check         | ✅        | All 9 checks pass                                                                                                                                 |
 
 ### Consumer repos committed (13 repos, all clean)
 
 **Full migrations to go-standard (7 repos):**
 
-| Repo | Before → After | Reduction | Commit | Verified |
-|------|---------------|-----------|--------|----------|
-| go-localsync | 237 → 89 | 62% | `bc0edd5` | ✅ `--no-build` |
-| project-meta | 268 → 158 | 41% | `c9689ef` | ✅ `--no-build` |
-| oxlint-auto-configure | 196 → 132 | 33% | `f3182b9` | ✅ `--no-build` |
-| project-dependency-graph | 230 → 153 | 33% | `f25e0ec` | ✅ `--no-build` |
-| golangci-lint-auto-configure | 233 → 125 | 46% | `3ac2cf5` | ✅ `--no-build` |
-| go-humanize-linter | 286 → 187 | 35% | `e3d722b` | ✅ `--no-build` |
-| projects-management-automation | 267+200 nix/*.nix → 278 | 40% net | `9b47684` | ✅ `--override-input` |
-| standard-bug-tracking-schema | 386 → 249 | 36% | `1357206` | ✅ `--no-build` |
-| go-auto-upgrade | 541 → 374 | 31% | `f89908f` | ✅ `--no-build` |
+| Repo                           | Before → After          | Reduction | Commit    | Verified              |
+| ------------------------------ | ----------------------- | --------- | --------- | --------------------- |
+| go-localsync                   | 237 → 89                | 62%       | `bc0edd5` | ✅ `--no-build`       |
+| project-meta                   | 268 → 158               | 41%       | `c9689ef` | ✅ `--no-build`       |
+| oxlint-auto-configure          | 196 → 132               | 33%       | `f3182b9` | ✅ `--no-build`       |
+| project-dependency-graph       | 230 → 153               | 33%       | `f25e0ec` | ✅ `--no-build`       |
+| golangci-lint-auto-configure   | 233 → 125               | 46%       | `3ac2cf5` | ✅ `--no-build`       |
+| go-humanize-linter             | 286 → 187               | 35%       | `e3d722b` | ✅ `--no-build`       |
+| projects-management-automation | 267+200 nix/*.nix → 278 | 40% net   | `9b47684` | ✅ `--override-input` |
+| standard-bug-tracking-schema   | 386 → 249               | 36%       | `1357206` | ✅ `--no-build`       |
+| go-auto-upgrade                | 541 → 374               | 31%       | `f89908f` | ✅ `--no-build`       |
 
 **Adopter cleanups (4 repos, dead inputs removed):**
 
-| Repo | Commit |
-|------|--------|
-| lean-business-plan | `744d8d6` |
-| storbi | `8fef98c` |
-| template-arch-lint | `c556952` |
+| Repo                          | Commit    |
+| ----------------------------- | --------- |
+| lean-business-plan            | `744d8d6` |
+| storbi                        | `8fef98c` |
+| template-arch-lint            | `c556952` |
 | terraform-diagrams-aggregator | `434d541` |
 
 ### Prior session work committed
@@ -54,26 +54,26 @@
 
 ## B) PARTIALLY DONE
 
-| Item | Status | What's done | What's missing |
-|------|--------|-------------|----------------|
+| Item              | Status  | What's done                                                                | What's missing                                                                                                                                                        |
+| ----------------- | ------- | -------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | PMA `requireDeps` | Partial | Module option added + PMA migrated + eval-verified with `--override-input` | **Flake.lock points to remote go-nix-helpers which doesn't have `requireDeps` yet** — PMA won't eval without `--override-input` until go-nix-helpers master is pushed |
-| Migration guide | Partial | 7 common patterns added | No examples for `srcFileset`, `goExperiment`, `cgoEnabled` options (don't exist yet) |
-| index adopter | Partial | Verified already clean (no dead inputs) | Fleet audit noted it needs `enableCheck=true` review and deps/publicDeps expansion — not done |
+| Migration guide   | Partial | 7 common patterns added                                                    | No examples for `srcFileset`, `goExperiment`, `cgoEnabled` options (don't exist yet)                                                                                  |
+| index adopter     | Partial | Verified already clean (no dead inputs)                                    | Fleet audit noted it needs `enableCheck=true` review and deps/publicDeps expansion — not done                                                                         |
 
 ---
 
 ## C) NOT STARTED
 
-| Item | Impact | Notes |
-|------|--------|-------|
-| **Build-verify all 10 migrated repos** | Critical | All migrations are eval-verified only (`--no-build`). No `nix build` attempted. SSH access blocked. `proxyVendor` changes (true→false) will likely require vendorHash updates. |
-| **Push go-nix-helpers master** | Critical | PMA's `requireDeps` option won't resolve from remote until pushed. |
-| **Tier B migrations** (6 repos) | High | KeyCountdown, StopTube, branching-flow, bank-sync, overview, BuildFlow |
-| **Tier C migrations** (2 repos) | Medium | Standup-Killer, crush-daily (off deprecated mkGoFlake) |
-| **New module options** | Medium | `goExperiment` (string), `cgoEnabled` (bool), `completionStyle` (enum: cobra/urfave), `srcFileset` (fileset convenience) |
-| **`enableCompletions` cobra fix** | Medium | Module calls `binary --completion bash` (urfave/cli style). Cobra uses `binary completion bash`. Every cobra consumer needs a workaround. |
-| **Test assertion for `requireDeps`** | Low | Module has 114 assertions. `requireDeps` option added but no test assertion written for it. |
-| **erraudit `proxyVendor` documentation** | Low | erraudit lost `proxyVendor=true` (module forces false when deps set). Not documented in migration guide as a specific callout for that repo. |
+| Item                                     | Impact   | Notes                                                                                                                                                                          |
+| ---------------------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Build-verify all 10 migrated repos**   | Critical | All migrations are eval-verified only (`--no-build`). No `nix build` attempted. SSH access blocked. `proxyVendor` changes (true→false) will likely require vendorHash updates. |
+| **Push go-nix-helpers master**           | Critical | PMA's `requireDeps` option won't resolve from remote until pushed.                                                                                                             |
+| **Tier B migrations** (6 repos)          | High     | KeyCountdown, StopTube, branching-flow, bank-sync, overview, BuildFlow                                                                                                         |
+| **Tier C migrations** (2 repos)          | Medium   | Standup-Killer, crush-daily (off deprecated mkGoFlake)                                                                                                                         |
+| **New module options**                   | Medium   | `goExperiment` (string), `cgoEnabled` (bool), `completionStyle` (enum: cobra/urfave), `srcFileset` (fileset convenience)                                                       |
+| **`enableCompletions` cobra fix**        | Medium   | Module calls `binary --completion bash` (urfave/cli style). Cobra uses `binary completion bash`. Every cobra consumer needs a workaround.                                      |
+| **Test assertion for `requireDeps`**     | Low      | Module has 114 assertions. `requireDeps` option added but no test assertion written for it.                                                                                    |
+| **erraudit `proxyVendor` documentation** | Low      | erraudit lost `proxyVendor=true` (module forces false when deps set). Not documented in migration guide as a specific callout for that repo.                                   |
 
 ---
 
@@ -155,88 +155,88 @@
 
 ### Critical (blocks correctness)
 
-| # | Task | Effort | Why |
-|---|------|--------|-----|
-| 1 | Push go-nix-helpers master | 1min | PMA is broken without it |
-| 2 | Update PMA flake.lock to new go-nix-helpers revision | 5min | Unbreak PMA for non-override consumers |
-| 3 | Build-verify go-localsync migration | 10min | First proof that the pattern works end-to-end |
-| 4 | Build-verify erraudit migration | 10min | proxyVendor change — highest risk |
-| 5 | Build-verify project-meta migration | 10min | subModules + cobra completions |
-| 6 | Build-verify oxlint-auto-configure | 10min | wrapped app + oxlint runtime dep |
-| 7 | Build-verify remaining 6 migrated repos | 60min | Full fleet proof |
-| 8 | Remove stray docs/status file from go-humanize-linter | 2min | Cleanup mistake |
-| 9 | Fix `deadnix` availability or configure BuildFlow to skip gracefully | 30min | Restore pre-commit quality gates |
+| # | Task                                                                 | Effort | Why                                           |
+| - | -------------------------------------------------------------------- | ------ | --------------------------------------------- |
+| 1 | Push go-nix-helpers master                                           | 1min   | PMA is broken without it                      |
+| 2 | Update PMA flake.lock to new go-nix-helpers revision                 | 5min   | Unbreak PMA for non-override consumers        |
+| 3 | Build-verify go-localsync migration                                  | 10min  | First proof that the pattern works end-to-end |
+| 4 | Build-verify erraudit migration                                      | 10min  | proxyVendor change — highest risk             |
+| 5 | Build-verify project-meta migration                                  | 10min  | subModules + cobra completions                |
+| 6 | Build-verify oxlint-auto-configure                                   | 10min  | wrapped app + oxlint runtime dep              |
+| 7 | Build-verify remaining 6 migrated repos                              | 60min  | Full fleet proof                              |
+| 8 | Remove stray docs/status file from go-humanize-linter                | 2min   | Cleanup mistake                               |
+| 9 | Fix `deadnix` availability or configure BuildFlow to skip gracefully | 30min  | Restore pre-commit quality gates              |
 
 ### High impact (module improvements)
 
-| # | Task | Effort | Why |
-|---|------|--------|-----|
-| 10 | Add `goExperiment` option (string, default null) | 30min | Eliminates 3-line boilerplate in every repo |
-| 11 | Add `cgoEnabled` option (bool, default null) | 15min | Replaces `extraBuildAttrs.env.CGO_ENABLED` |
-| 12 | Add `completionStyle` option (enum: urfave-cli/cobra) | 1h | Fixes enableCompletions for cobra consumers |
-| 13 | Add test assertion for `requireDeps` option | 15min | Currently untested |
-| 14 | Add `proxyVendor` trace warning when forcing false | 15min | Surface the behavior change |
-| 15 | Integrate `templ generate` into `modBuildPhase` when `enableTempl = true` | 30min | standard-bug-tracking-schema needed manual override |
+| #  | Task                                                                      | Effort | Why                                                 |
+| -- | ------------------------------------------------------------------------- | ------ | --------------------------------------------------- |
+| 10 | Add `goExperiment` option (string, default null)                          | 30min  | Eliminates 3-line boilerplate in every repo         |
+| 11 | Add `cgoEnabled` option (bool, default null)                              | 15min  | Replaces `extraBuildAttrs.env.CGO_ENABLED`          |
+| 12 | Add `completionStyle` option (enum: urfave-cli/cobra)                     | 1h     | Fixes enableCompletions for cobra consumers         |
+| 13 | Add test assertion for `requireDeps` option                               | 15min  | Currently untested                                  |
+| 14 | Add `proxyVendor` trace warning when forcing false                        | 15min  | Surface the behavior change                         |
+| 15 | Integrate `templ generate` into `modBuildPhase` when `enableTempl = true` | 30min  | standard-bug-tracking-schema needed manual override |
 
 ### High impact (fleet migration)
 
-| # | Task | Effort | Why |
-|---|------|--------|-----|
-| 16 | Migrate StopTube to go-standard | 30min | Tier B, needs G2 |
-| 17 | Migrate KeyCountdown to go-standard | 20min | Tier B |
-| 18 | Migrate branching-flow to go-standard | 20min | Tier B |
-| 19 | Migrate bank-sync to go-standard | 20min | Tier B |
-| 20 | Migrate overview to go-standard | 20min | Tier B |
-| 21 | Migrate BuildFlow to go-standard | 45min | Tier B, complex pipeline |
-| 22 | Migrate Standup-Killer off mkGoFlake | 30min | Tier C, deprecated path |
-| 23 | Migrate crush-daily off mkGoFlake | 30min | Tier C, deprecated path |
+| #  | Task                                  | Effort | Why                      |
+| -- | ------------------------------------- | ------ | ------------------------ |
+| 16 | Migrate StopTube to go-standard       | 30min  | Tier B, needs G2         |
+| 17 | Migrate KeyCountdown to go-standard   | 20min  | Tier B                   |
+| 18 | Migrate branching-flow to go-standard | 20min  | Tier B                   |
+| 19 | Migrate bank-sync to go-standard      | 20min  | Tier B                   |
+| 20 | Migrate overview to go-standard       | 20min  | Tier B                   |
+| 21 | Migrate BuildFlow to go-standard      | 45min  | Tier B, complex pipeline |
+| 22 | Migrate Standup-Killer off mkGoFlake  | 30min  | Tier C, deprecated path  |
+| 23 | Migrate crush-daily off mkGoFlake     | 30min  | Tier C, deprecated path  |
 
 ### Medium impact (polish + hardening)
 
-| # | Task | Effort | Why |
-|---|------|--------|-----|
-| 24 | Fix go-humanize-linter commit message line count | 2min | Accuracy |
-| 25 | Audit all migrated repos for flake.lock hygiene (no stale nodes) | 30min | Ensures clean locks |
-| 26 | Run `nix flake check --no-build` on ALL 34 LarsArtmann repos | 45min | Fleet-wide regression check |
-| 27 | Add "conflicting definition values" to migration guide troubleshooting | 10min | Common error during migration |
-| 28 | Document `mkForce` pattern in flake-patterns.md | 10min | Needed when overriding module-generated apps |
-| 29 | Review index adopter for `enableCheck=true` + deps expansion | 20min | Fleet audit finding, not yet addressed |
-| 30 | Add `enableTestCheck` to all migrated repos that have tests | 30min | Replaces hand-written `checks.test` |
-| 31 | Add `lintAsCheck = true` to all migrated repos | 15min | CI-friendly lint gate |
-| 32 | Update consumer-audit-checklist with Tier A migration findings | 20min | Capture lessons learned |
+| #  | Task                                                                   | Effort | Why                                          |
+| -- | ---------------------------------------------------------------------- | ------ | -------------------------------------------- |
+| 24 | Fix go-humanize-linter commit message line count                       | 2min   | Accuracy                                     |
+| 25 | Audit all migrated repos for flake.lock hygiene (no stale nodes)       | 30min  | Ensures clean locks                          |
+| 26 | Run `nix flake check --no-build` on ALL 34 LarsArtmann repos           | 45min  | Fleet-wide regression check                  |
+| 27 | Add "conflicting definition values" to migration guide troubleshooting | 10min  | Common error during migration                |
+| 28 | Document `mkForce` pattern in flake-patterns.md                        | 10min  | Needed when overriding module-generated apps |
+| 29 | Review index adopter for `enableCheck=true` + deps expansion           | 20min  | Fleet audit finding, not yet addressed       |
+| 30 | Add `enableTestCheck` to all migrated repos that have tests            | 30min  | Replaces hand-written `checks.test`          |
+| 31 | Add `lintAsCheck = true` to all migrated repos                         | 15min  | CI-friendly lint gate                        |
+| 32 | Update consumer-audit-checklist with Tier A migration findings         | 20min  | Capture lessons learned                      |
 
 ### Low impact (future-proofing)
 
-| # | Task | Effort | Why |
-|---|------|--------|-----|
-| 33 | Consider `srcFileset` option (lib.fileset convenience wrapper) | 1h | Several repos use verbose fileset filtering |
-| 34 | Add `enableGovulncheck` to CI checks (not just devShell) | 30min | Security |
-| 35 | Create `nix flake update` automation for consumer repos | 1h | Fleet-wide lockfile freshness |
-| 36 | Add migration script that auto-detects manual mkPreparedSource usage | 2h | Speed up remaining migrations |
-| 37 | Document `buildFlags` vs `buildFlagsArray` distinction in man page | 10min | Currently ambiguous |
-| 38 | Add `version` option default that reads from VERSION file | 15min | index repo uses `builtins.readFile ./VERSION` |
-| 39 | Consider `meta.homepage` auto-generation from pname | 10min | Most repos use the same pattern |
-| 40 | Add CI job that builds one migrated repo as e2e proof | 2h | Blocked on SSH key secret |
+| #  | Task                                                                 | Effort | Why                                           |
+| -- | -------------------------------------------------------------------- | ------ | --------------------------------------------- |
+| 33 | Consider `srcFileset` option (lib.fileset convenience wrapper)       | 1h     | Several repos use verbose fileset filtering   |
+| 34 | Add `enableGovulncheck` to CI checks (not just devShell)             | 30min  | Security                                      |
+| 35 | Create `nix flake update` automation for consumer repos              | 1h     | Fleet-wide lockfile freshness                 |
+| 36 | Add migration script that auto-detects manual mkPreparedSource usage | 2h     | Speed up remaining migrations                 |
+| 37 | Document `buildFlags` vs `buildFlagsArray` distinction in man page   | 10min  | Currently ambiguous                           |
+| 38 | Add `version` option default that reads from VERSION file            | 15min  | index repo uses `builtins.readFile ./VERSION` |
+| 39 | Consider `meta.homepage` auto-generation from pname                  | 10min  | Most repos use the same pattern               |
+| 40 | Add CI job that builds one migrated repo as e2e proof                | 2h     | Blocked on SSH key secret                     |
 
 ### Documentation
 
-| # | Task | Effort | Why |
-|---|------|--------|-----|
-| 41 | Add "post-migration verification protocol" to migration guide | 20min | No verification steps documented |
-| 42 | Update README.md options table with `requireDeps` | 5min | Currently missing |
-| 43 | Add migration case study (PMA as the most complex example) | 30min | Shows advanced patterns |
-| 44 | Update architecture diagram with new option count | 10min | Still says 38 |
-| 45 | Add "common pitfalls" section to consumer-audit-checklist | 15min | Capture proxyVendor, cobra, shfmt conflicts |
+| #  | Task                                                          | Effort | Why                                         |
+| -- | ------------------------------------------------------------- | ------ | ------------------------------------------- |
+| 41 | Add "post-migration verification protocol" to migration guide | 20min  | No verification steps documented            |
+| 42 | Update README.md options table with `requireDeps`             | 5min   | Currently missing                           |
+| 43 | Add migration case study (PMA as the most complex example)    | 30min  | Shows advanced patterns                     |
+| 44 | Update architecture diagram with new option count             | 10min  | Still says 38                               |
+| 45 | Add "common pitfalls" section to consumer-audit-checklist     | 15min  | Capture proxyVendor, cobra, shfmt conflicts |
 
 ### Infrastructure
 
-| # | Task | Effort | Why |
-|---|------|--------|-----|
-| 46 | Configure BuildFlow pre-commit to use `--staged-only` | 15min | Faster, more relevant pre-commit runs |
-| 47 | Add `deadnix` to go-nix-helpers devShell | 5min | Fix pre-commit hook failure |
-| 48 | Create flake-parts module health dashboard | 1h | Track adoption across fleet |
-| 49 | Add `nixpkgs-fmt` vs `nixfmt` resolution (both appear in fleet) | 15min | Consistency |
-| 50 | Tag go-nix-helpers first release (v0.1.0) | 30min | Allow consumers to pin to a tag, not master |
+| #  | Task                                                            | Effort | Why                                         |
+| -- | --------------------------------------------------------------- | ------ | ------------------------------------------- |
+| 46 | Configure BuildFlow pre-commit to use `--staged-only`           | 15min  | Faster, more relevant pre-commit runs       |
+| 47 | Add `deadnix` to go-nix-helpers devShell                        | 5min   | Fix pre-commit hook failure                 |
+| 48 | Create flake-parts module health dashboard                      | 1h     | Track adoption across fleet                 |
+| 49 | Add `nixpkgs-fmt` vs `nixfmt` resolution (both appear in fleet) | 15min  | Consistency                                 |
+| 50 | Tag go-nix-helpers first release (v0.1.0)                       | 30min  | Allow consumers to pin to a tag, not master |
 
 ---
 
@@ -258,15 +258,15 @@ Every commit this session used `--no-verify` because BuildFlow fails on missing 
 
 ## Session metrics
 
-| Metric | Value |
-|--------|-------|
-| Repos committed | 14 (13 consumers + go-nix-helpers) |
+| Metric                          | Value                                 |
+| ------------------------------- | ------------------------------------- |
+| Repos committed                 | 14 (13 consumers + go-nix-helpers)    |
 | Total lines reduced (consumers) | ~1,900 lines of flake.nix boilerplate |
-| New module options | 1 (`requireDeps`) |
-| Module options total | 39 |
-| Module test assertions | 114 |
-| Flake checks | 9 (all pass) |
-| Build-verified migrations | 0 (all eval-only) |
-| `--no-verify` commits | 15 (all of them) |
-| Mistakes found | 5 (see section D) |
-| Time bombs ticking | 1 (PMA requireDeps) |
+| New module options              | 1 (`requireDeps`)                     |
+| Module options total            | 39                                    |
+| Module test assertions          | 114                                   |
+| Flake checks                    | 9 (all pass)                          |
+| Build-verified migrations       | 0 (all eval-only)                     |
+| `--no-verify` commits           | 15 (all of them)                      |
+| Mistakes found                  | 5 (see section D)                     |
+| Time bombs ticking              | 1 (PMA requireDeps)                   |

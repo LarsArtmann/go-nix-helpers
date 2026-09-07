@@ -120,33 +120,33 @@ These are documented but intentionally NOT migrated:
 
 ## f) Top 25 Things to Get Done Next
 
-| #   | Priority | Task                                                                              | Impact                                   | Effort |
-| --- | -------- | --------------------------------------------------------------------------------- | ---------------------------------------- | ------ |
-| 1   | P0       | Fix Cyberdom: update go.mod to cqrs v3.3.0, then retry mkPreparedSource migration | Eliminates instance #6                   | 30min  |
-| 2   | P0       | Verify file-and-image-renamer `sync.go` deletion was intentional                  | Correctness                              | 10min  |
-| 3   | P1       | Add `excludeSubModuleDirs` passthrough in `mkGoFlake.nix`                         | API completeness                         | 15min  |
-| 4   | P1       | Make `validatePrivateDeps` smarter: skip repos available on Go proxy              | Removes 4× `validatePrivateDeps = false` | 60min  |
-| 5   | P1       | Fix overview + branching-flow pre-existing BuildFlow pre-commit failures          | Unblocks normal commits                  | 30min  |
-| 6   | P2       | Add `mkPreparedSource` sub-module-level replace support (for go-structure-linter) | Eliminates 1 instance                    | 90min  |
-| 7   | P2       | Add property-based tests for `stripVersionSuffix` edge cases                      | Regression prevention                    | 30min  |
-| 8   | P2       | Add property-based tests for recursive `discoverSubModules`                       | Regression prevention                    | 30min  |
-| 9   | P2       | Change Cyberdom `path:` input to `git+ssh://...ref=v3.3.0`                        | Reproducibility                          | 10min  |
-| 2   | P3       | Audit remaining ~80 flakes that DON'T use mkPreparedSource                        | Adoption                                 | 4h     |
-| 11  | P3       | Create migration guide: "How to adopt mkPreparedSource" in README                 | Adoption                                 | 30min  |
-| 12  | P3       | Add `nix flake check` to go-nix-helpers CI                                        | CI quality                               | 15min  |
-| 13  | P3       | Consider go.sum auto-generation for stripped replaces (ast-state-analyzer)        | Eliminates 2 instances                   | 2h     |
-| 14  | P3       | Migrate ast-state-analyzer overlay `postPatch` to use shared var                  | DRY                                      | 15min  |
-| 15  | P3       | Document `overrideModAttrs` pattern for `go mod tidy` in FOD                      | Knowledge                                | 15min  |
-| 16  | P4       | Explore go.work support for buildGoModule (Nixpkgs upstream)                      | Future-proofing                          | 8h+    |
-| 17  | P4       | Add `nix build` smoke test to all consumer CI pipelines                           | CI quality                               | 2h     |
-| 18  | P4       | Create `mkMultiModuleFlake` for repos like go-structure-linter                    | New capability                           | 4h     |
-| 19  | P4       | Add vendorHash update helper script (`nix run .#update-vendor-hash`)              | DX                                       | 2h     |
-| 20  | P4       | Collect all go-nix-helpers consumers into a flake aggregate                       | Visibility                               | 1h     |
-| 21  | P4       | Add versioning policy for go-nix-helpers (semver tags)                            | Safety                                   | 30min  |
-| 22  | P4       | Consider flake-parts module for Cyberdom-style CGO+sqlc+templ projects            | DX                                       | 4h     |
-| 23  | P4       | Add `autoSubModules` exclusion for `cmd/` directories (cqrs-gen, api-stability)   | Correctness                              | 15min  |
-| 24  | P4       | Document migration path from `cleanSourceWith` to `lib.fileset`                   | Modernization                            | 30min  |
-| 25  | P4       | Write ADR: "Why we use replace directives instead of go.work for Nix builds"      | Knowledge                                | 30min  |
+| #  | Priority | Task                                                                              | Impact                                   | Effort |
+| -- | -------- | --------------------------------------------------------------------------------- | ---------------------------------------- | ------ |
+| 1  | P0       | Fix Cyberdom: update go.mod to cqrs v3.3.0, then retry mkPreparedSource migration | Eliminates instance #6                   | 30min  |
+| 2  | P0       | Verify file-and-image-renamer `sync.go` deletion was intentional                  | Correctness                              | 10min  |
+| 3  | P1       | Add `excludeSubModuleDirs` passthrough in `mkGoFlake.nix`                         | API completeness                         | 15min  |
+| 4  | P1       | Make `validatePrivateDeps` smarter: skip repos available on Go proxy              | Removes 4× `validatePrivateDeps = false` | 60min  |
+| 5  | P1       | Fix overview + branching-flow pre-existing BuildFlow pre-commit failures          | Unblocks normal commits                  | 30min  |
+| 6  | P2       | Add `mkPreparedSource` sub-module-level replace support (for go-structure-linter) | Eliminates 1 instance                    | 90min  |
+| 7  | P2       | Add property-based tests for `stripVersionSuffix` edge cases                      | Regression prevention                    | 30min  |
+| 8  | P2       | Add property-based tests for recursive `discoverSubModules`                       | Regression prevention                    | 30min  |
+| 9  | P2       | Change Cyberdom `path:` input to `git+ssh://...ref=v3.3.0`                        | Reproducibility                          | 10min  |
+| 2  | P3       | Audit remaining ~80 flakes that DON'T use mkPreparedSource                        | Adoption                                 | 4h     |
+| 11 | P3       | Create migration guide: "How to adopt mkPreparedSource" in README                 | Adoption                                 | 30min  |
+| 12 | P3       | Add `nix flake check` to go-nix-helpers CI                                        | CI quality                               | 15min  |
+| 13 | P3       | Consider go.sum auto-generation for stripped replaces (ast-state-analyzer)        | Eliminates 2 instances                   | 2h     |
+| 14 | P3       | Migrate ast-state-analyzer overlay `postPatch` to use shared var                  | DRY                                      | 15min  |
+| 15 | P3       | Document `overrideModAttrs` pattern for `go mod tidy` in FOD                      | Knowledge                                | 15min  |
+| 16 | P4       | Explore go.work support for buildGoModule (Nixpkgs upstream)                      | Future-proofing                          | 8h+    |
+| 17 | P4       | Add `nix build` smoke test to all consumer CI pipelines                           | CI quality                               | 2h     |
+| 18 | P4       | Create `mkMultiModuleFlake` for repos like go-structure-linter                    | New capability                           | 4h     |
+| 19 | P4       | Add vendorHash update helper script (`nix run .#update-vendor-hash`)              | DX                                       | 2h     |
+| 20 | P4       | Collect all go-nix-helpers consumers into a flake aggregate                       | Visibility                               | 1h     |
+| 21 | P4       | Add versioning policy for go-nix-helpers (semver tags)                            | Safety                                   | 30min  |
+| 22 | P4       | Consider flake-parts module for Cyberdom-style CGO+sqlc+templ projects            | DX                                       | 4h     |
+| 23 | P4       | Add `autoSubModules` exclusion for `cmd/` directories (cqrs-gen, api-stability)   | Correctness                              | 15min  |
+| 24 | P4       | Document migration path from `cleanSourceWith` to `lib.fileset`                   | Modernization                            | 30min  |
+| 25 | P4       | Write ADR: "Why we use replace directives instead of go.work for Nix builds"      | Knowledge                                | 30min  |
 
 ---
 

@@ -78,8 +78,8 @@ Nothing is broken. All tests pass, the feature works as designed. The gaps are o
 
 ~~The real problem the feedback describes is "treating public repos as private." I fixed the **validation** layer but not the **runtime behavior** layer (`GOPRIVATE` in devShells). A truly complete fix would make the system consistently treat public repos as public everywhere:~~
 
-~~Build validation:  publicDeps excluded  ✓ FIXED~~
-~~DevShell GOPRIVATE: publicDeps ignored  ✗ NOT FIXED~~
+~~Build validation: publicDeps excluded ✓ FIXED~~
+~~DevShell GOPRIVATE: publicDeps ignored ✗ NOT FIXED~~
 
 **Resolution:** Decided at `052d92d` — broad glob kept as safer default (marking public repos as private = minor perf hit; failing to mark private repos = hard build failure). `privateGlobPattern` option added at `c510d7c` for non-LarsArtmann consumers. `publicDeps` scope clarified: only affects validation, NOT GOPRIVATE.
 

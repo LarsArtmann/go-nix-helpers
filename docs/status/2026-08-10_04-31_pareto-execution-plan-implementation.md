@@ -15,6 +15,7 @@ assertions (up from 74), 22 pure function assertions (new), 8 flake checks
 ## A) FULLY DONE
 
 ### P1: Merge protection fix (H3) — CRITICAL BUG FIX
+
 - **What:** Extended `extraBuildAttrs` concatenation to `buildInputs`,
   `checkInputs`, `configureFlags` in addition to the existing
   `nativeBuildInputs`, `preBuild`, `postInstall`.
@@ -29,6 +30,7 @@ assertions (up from 74), 22 pure function assertions (new), 8 flake checks
   extraction tests.
 
 ### P2: CI shell tooling (H5, H4)
+
 - **What:** Added `shfmt` to treefmt (both this repo's own config and as a
   new `enableShfmt` option in go-standard), ran `nix fmt` to format all
   scripts, added `shellcheck` CI job, fixed 2 warnings (unused `CYAN`
@@ -40,6 +42,7 @@ assertions (up from 74), 22 pure function assertions (new), 8 flake checks
 - **Verified:** `shellcheck` exits 0 on all scripts; `nix fmt -- --ci` clean.
 
 ### P3: CI smoke-test flags (H1, L8)
+
 - **What:** Added `--go-mod`, `--private-deps`, and combined
   `--go-mod --private-deps --templ` variants to CI smoke-test job. Added
   Nix installer + magic-nix-cache to the smoke-test job (was missing).
@@ -48,6 +51,7 @@ assertions (up from 74), 22 pure function assertions (new), 8 flake checks
   produces correct files for each variant.
 
 ### P4: Behavioral test deepening (M7, M9)
+
 - **What:** Added 5 behavioral tests proving `buildFlags`, `ldflags` (with
   version injection), `custom ldflags`, `proxyVendor` reach the derivation
   (not just eval-level). Added integration Test 7: `publicDeps` with `/v2`
@@ -58,6 +62,7 @@ assertions (up from 74), 22 pure function assertions (new), 8 flake checks
   scenarios pass.
 
 ### L5: Temp file cleanup in trap
+
 - **What:** Added `trap 'rm -f go.mod.requires.tmp' EXIT` around the temp
   file lifecycle in `mkPreparedSource.nix` postPatch. If any command between
   creation and cleanup fails, the trap ensures cleanup.
@@ -66,6 +71,7 @@ assertions (up from 74), 22 pure function assertions (new), 8 flake checks
   flow).
 
 ### P5: Pure function property tests (M1, M2, L6)
+
 - **What:** Extracted `stripVersionSuffix` and `repoName` from
   `mkPreparedSource.nix` into `pure-functions.nix` (importable, testable).
   Created `test-pure-functions.nix` with 22 assertions covering:
@@ -78,6 +84,7 @@ assertions (up from 74), 22 pure function assertions (new), 8 flake checks
 - **Verified:** `nix build .#checks.x86_64-linux.pureFunctions` — 22/22 pass.
 
 ### P6: Detection and safety nets (M3, M4, L5)
+
 - **What:**
   - **M3 (vendorHash placeholder):** Added `builtins.trace` warning in
     `go-standard.nix` when `vendorHash` matches the `sha256-AAA...` placeholder
@@ -92,6 +99,7 @@ assertions (up from 74), 22 pure function assertions (new), 8 flake checks
   log). Structural check passes.
 
 ### P7: GOPRIVATE behavioral test (H2)
+
 - **What:** Added 4 behavioral assertions proving GOPRIVATE injection into
   devShell: (1) GOPRIVATE present when `deps` set, (2) uses default
   `privateGlobPattern`, (3) uses custom `privateGlobPattern`, (4) NOT set
@@ -100,6 +108,7 @@ assertions (up from 74), 22 pure function assertions (new), 8 flake checks
 - **Verified:** All 4 assertions pass.
 
 ### P8: Docs and diagram sync (M5, L2, L4)
+
 - **What:**
   - Updated `docs/architecture.d2` to show `privateGlobPattern`, `enableNixfmt`,
     `enableShfmt` options (was showing "+20 more"). Regenerated `.svg`.
@@ -110,6 +119,7 @@ assertions (up from 74), 22 pure function assertions (new), 8 flake checks
 - **Files:** `docs/architecture.d2`, `docs/architecture.svg`, `README.md`.
 
 ### P10: Test infrastructure (M8, M10)
+
 - **What:**
   - **M8 (enableCompletions negative test):** Added 2 assertions verifying
     the warning text ("does not support the --completion subcommand") is
@@ -122,6 +132,7 @@ assertions (up from 74), 22 pure function assertions (new), 8 flake checks
 - **Verified:** All assertions pass.
 
 ### P11: CI expansion (L7, L9)
+
 - **What:** Extended `integration-tests` job from `ubuntu-latest` only to a
   matrix of `[ubuntu-latest, macos-latest]`. Uses `nix eval --raw --impure
   --expr 'builtins.currentSystem'` for dynamic system detection.
@@ -136,6 +147,7 @@ assertions (up from 74), 22 pure function assertions (new), 8 flake checks
 ## B) PARTIALLY DONE
 
 ### P9: Script UX improvements (M6, L1, L3) — 90% done
+
 - **Done:** `--dry-run`, `--verbose`, `--list-templates` flags all
   implemented and tested. Help text updated with new flags + template
   listing.
@@ -148,6 +160,7 @@ assertions (up from 74), 22 pure function assertions (new), 8 flake checks
 ## C) NOT STARTED
 
 ### P12: Refactoring (L10) — DELIBERATELY SKIPPED
+
 - **Task:** Extract `postPatch` script from `mkPreparedSource.nix` into a
   separate `.sh` file.
 - **Decision:** After studying the `postPatch` string, it interpolates 8
@@ -163,6 +176,7 @@ assertions (up from 74), 22 pure function assertions (new), 8 flake checks
 ## D) TOTALLY FUCKED UP
 
 ### D1: Uncommitted CI YAML change
+
 The `.github/workflows/ci.yml` file has an uncommitted diff. The auto-git
 daemon committed a version using GitHub Actions expression syntax
 (`${{ runner.arch == 'X64' && ... }}`) for system detection. I then changed
@@ -174,6 +188,7 @@ committed because the daemon committed first.
 version, uncommitted. The daemon's version is committed. Needs reconcile.
 
 ### D2: TODO_LIST.md is now stale
+
 The TODO_LIST still shows all 30 items as `TODO`. Every actionable item from
 the Pareto plan (H1-H5, M1-M10, L1-L10 except L10) has been completed in
 this session, but the TODO_LIST was not updated. This is a docs-health
@@ -181,10 +196,12 @@ violation per the project's own conventions — completed items should be
 removed (they live in CHANGELOG, not TODO_LIST).
 
 ### D3: No CHANGELOG entries
+
 16 commits shipped new features and tests but no CHANGELOG.md entries were
 written. The project convention says completed work goes in CHANGELOG.
 
 ### D4: shellcheck CI job uses external action
+
 The `shellcheck` job uses `ludeeus/action-shellcheck@2.0.0` from the GitHub
 Actions marketplace. This is a third-party action that could be supply-chain
 risk. A more conservative approach would be to install shellcheck via Nix
@@ -236,6 +253,7 @@ and run it directly. Minor, but worth noting.
 ## F) Up to 50 Things to Get Done Next
 
 ### Immediate (fix damage from this session)
+
 1. Update TODO_LIST.md — mark all completed items as done (delete them)
 2. Write CHANGELOG entries for all 16 commits
 3. Commit the uncommitted `ci.yml` change
@@ -245,6 +263,7 @@ and run it directly. Minor, but worth noting.
 7. Annotate the Pareto plan: mark P1-P11 as shipped, P12 as skipped with rationale
 
 ### Short-term (fill remaining gaps)
+
 8. Add `--dry-run` and `--verbose` to CI smoke-test job
 9. Add `enableShfmt` to the man page (`docs/man/go-standard.5`)
 10. Add `enableShfmt` to the README options table
@@ -254,6 +273,7 @@ and run it directly. Minor, but worth noting.
 14. Add behavioral test for `enableShfmt = true` producing `shfmt.enable = true` in treefmt (done, but could be deeper)
 
 ### CI hardening
+
 15. Replace `ludeeus/action-shellcheck` with Nix-installed shellcheck
 16. Add `nix flake check --no-build` step to the smoke-test job
 17. Add CI step for `nix build .#checks.x86_64-linux.structural`
@@ -265,6 +285,7 @@ and run it directly. Minor, but worth noting.
 23. Add CI step that verifies `nix fmt -- --ci` passes on macOS too
 
 ### Test deepening
+
 24. Add property test: `repoName` output never contains `/vN`
 25. Add property test: `stripVersionSuffix` preserves non-version path segments
 26. Add test: `extraBuildAttrs` with ALL list attrs simultaneously
@@ -284,6 +305,7 @@ and run it directly. Minor, but worth noting.
 40. Add test: `stripLocalReplaces` with no existing replaces (no-op)
 
 ### Documentation
+
 41. Update `docs/migration-guide.md` to mention `enableShfmt`
 42. Update `docs/flake-patterns.md` with the new `extraBuildAttrs` merge pattern
 43. Add `docs/man/go-standard.5` entry for `enableShfmt`
@@ -292,6 +314,7 @@ and run it directly. Minor, but worth noting.
 46. Write a CONTRIBUTING.md for downstream consumers
 
 ### Polish
+
 47. Add `--force` flag to `generate-flake.sh` to overwrite existing files
 48. Add `--vendor-hash` flag to `generate-flake.sh` for post-build hash injection
 49. Consider adding `golangci-lint` config template to `generate-flake.sh`
@@ -302,16 +325,19 @@ and run it directly. Minor, but worth noting.
 ## G) Questions I Cannot Answer Myself
 
 ### Q1: Should `pure-functions.nix` be a public API?
+
 `pure-functions.nix` was created to make `stripVersionSuffix` and `repoName`
 testable. It's currently not exported via `flake.lib` and not documented. Should
 it be:
+
 - (a) Exported as `flake.lib.pure` for consumer use (e.g., downstream tools
   that need to parse Go module paths), or
 - (b) Kept as an internal test utility with no public surface?
-This affects whether to document it, version it, and maintain backward
-compatibility.
+  This affects whether to document it, version it, and maintain backward
+  compatibility.
 
 ### Q2: Should the vendorHash placeholder warning be a hard error?
+
 Currently it's a `builtins.trace` warning (non-blocking). Some CI setups
 capture `trace` output differently. Should an unfilled `sha256-AAA...`
 placeholder be a hard eval error (forcing the consumer to set a real hash or
@@ -319,6 +345,7 @@ explicitly acknowledge with `vendorHash = null`), or keep it as a warning?
 This is a breaking-change decision for 7+ downstream consumers.
 
 ### Q3: Should P12 (postPatch extraction) be revisited with a different approach?
+
 I skipped P12 because interpolating 8 Nix variables into a `.sh` file would
 increase complexity. An alternative approach would be to use `pkgs.writeText`
 to generate the script at eval time and `source` it in postPatch. This trades

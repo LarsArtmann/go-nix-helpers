@@ -1,6 +1,6 @@
 # Status Report — README & GitHub Metadata Refresh
 
-**Date:** 2026-07-24 21:31 CEST  
+**Date:** 2026-07-24 21:31 CEST\
 **Session focus:** Make `README.md` and the GitHub repository description/topics superb.
 
 ---
@@ -34,7 +34,7 @@ The second commit also picked up adjacent documentation grooming (`AGENTS.md`, `
    - Related projects + link to `docs/flake-patterns.md`.
 
 2. **GitHub repository metadata updated live**
-   - Description set to:  
+   - Description set to:\
      "Zero-config flake-parts module for Go projects: packaging, devShells, formatting, linting, CI, and private dependency injection in ~20 lines of Nix."
    - Homepage URL cleared (left empty).
    - Topics added: `nix`, `nix-flakes`, `flake-parts`, `go`, `golang`, `build-tool`, `devshell`, `private-dependencies`, `reproducible-builds`, `nixos`.
@@ -152,58 +152,58 @@ If forced to name the biggest lingering smell: **the "nix flake check" badge in 
 
 Sorted by a rough Pareto mix of impact, effort, and urgency.
 
-| #   | Task                                                               | Category     | Impact | Effort  |
-| --- | ------------------------------------------------------------------ | ------------ | ------ | ------- |
-| 1   | Add a `LICENSE` file (MIT) and license badge                       | Legal        | High   | 5 min   |
-| 2   | Set up GitHub Actions CI for `nix flake check`                     | Trust/QA     | High   | 30 min  |
-| 3   | Replace static "nix flake check" badge with dynamic CI badge       | Trust        | High   | 5 min   |
-| 4   | Add `.github/ISSUE_TEMPLATE/bug.yml` and `feature.yml`             | Community    | Medium | 30 min  |
-| 5   | Add `.github/pull_request_template.md`                             | Community    | Medium | 15 min  |
-| 6   | Write `CONTRIBUTING.md`                                            | Community    | Medium | 30 min  |
-| 7   | Create a repo social preview image (Open Graph)                    | Presence     | Medium | 1 h     |
-| 8   | Add `SECURITY.md`                                                  | Governance   | Medium | 20 min  |
-| 9   | Write a migration guide from `mkGoFlake.nix` to `go-standard`      | Docs         | High   | 1 h     |
-| 10  | Add a troubleshooting/FAQ section to README                        | Docs         | High   | 45 min  |
-| 11  | Add architecture diagram to README                                 | Clarity      | Medium | 45 min  |
-| 12  | Add unit/integration tests for the `go-standard` module            | Quality      | High   | 2 h     |
-| 13  | Add CI test for `templates/go-standard/flake.nix`                  | Quality      | High   | 1 h     |
-| 14  | Add CI test for `templates/go-flake-parts/flake.nix`               | Quality      | High   | 1 h     |
-| 15  | Set up automated `flake.lock` updates (Dependabot or workflow)     | Maintenance  | High   | 1 h     |
-| 16  | Publish a documentation site (GitHub Pages / Astro / Starlight)    | Presence     | High   | 4 h     |
-| 17  | Add release tags and `CHANGELOG.md`                                | Process      | Medium | 1 h     |
-| 18  | Add release automation (tag + notes)                               | Process      | Medium | 1 h     |
-| 19  | Add property-based tests for `mkPreparedSource`                    | Quality      | Medium | 2 h     |
-| 20  | Add real private-repo integration test in CI                       | Quality      | High   | 2 h     |
-| 21  | Add `nix run .#docs` app to preview docs locally                   | DX           | Medium | 30 min  |
-| 22  | Add man pages for `mkPreparedSource` and `go-standard` options     | Docs         | Low    | 2 h     |
-| 23  | Add shell completions for generated apps                           | DX           | Low    | 1 h     |
-| 24  | Add cross-compilation example to README/docs                       | Capability   | Medium | 1 h     |
-| 25  | Add a "Recipes" page to docs (templ, govulncheck, gopls toggles)   | Docs         | Medium | 1 h     |
-| 26  | Audit all `docs/status/` reports for drift and annotate or archive | Maintenance  | Medium | 1 h     |
-| 27  | Rename `mkGoFlake.nix` usage in old downstream repos               | Migration    | Medium | ongoing |
-| 28  | Add support for Go workspace projects (`go.work`)                  | Capability   | Medium | 2 h     |
-| 29  | Add option for custom Go toolchain per package                     | Capability   | Low    | 1 h     |
-| 30  | Add `enableGolangciLint` toggle (currently always on)              | Config       | Low    | 30 min  |
-| 31  | Add `enableGofumpt` / `enableGoimports` toggles in treefmt         | Config       | Low    | 30 min  |
-| 32  | Add built-in `nix run .#fmt` alias app                             | DX           | Low    | 15 min  |
-| 33  | Add `meta.longDescription` and `meta.maintainers` fix              | Quality      | Low    | 30 min  |
-| 34  | Run a full code review of `modules/go-standard.nix`                | Quality      | Medium | 1 h     |
-| 35  | Run a naming review across the public API                          | Quality      | Medium | 1 h     |
-| 36  | Run a duplication review after recent unification work             | Quality      | Medium | 1 h     |
-| 37  | Add telemetry-free usage stats via GitHub traffic only             | Insights     | Low    | 0 min   |
-| 38  | Register `maintainers.larsartmann` in nixpkgs                      | Correctness  | Low    | 30 min  |
-| 39  | Write a blog post announcing go-standard                           | Marketing    | Medium | 2 h     |
-| 40  | Create a 60-second demo video/GIF                                  | Marketing    | Medium | 2 h     |
-| 41  | Add repo to nixpkgs or nix-community                               | Distribution | High   | 2 h     |
-| 42  | Add `nix run .#ci` app that runs the same checks as CI             | DX           | Low    | 15 min  |
-| 43  | Add pre-commit hook example in docs                                | DX           | Low    | 30 min  |
-| 44  | Document how to override `treefmt` programs per consumer           | Docs         | Low    | 30 min  |
-| 45  | Document how to pin `goPkg` to a different Go version              | Docs         | Low    | 20 min  |
-| 46  | Add a "Comparison with other Go+Nix tools" section                 | Docs         | Medium | 1 h     |
-| 47  | Add a public roadmap file (`ROADMAP.md`)                           | Planning     | Low    | 30 min  |
-| 48  | Add issue labels and milestones in GitHub                          | Process      | Low    | 20 min  |
-| 49  | Set up a Discord/Matrix channel for support                        | Community    | Low    | 30 min  |
-| 50  | Record a longer tutorial video or livestream                       | Marketing    | Low    | 4 h     |
+| #  | Task                                                               | Category     | Impact | Effort  |
+| -- | ------------------------------------------------------------------ | ------------ | ------ | ------- |
+| 1  | Add a `LICENSE` file (MIT) and license badge                       | Legal        | High   | 5 min   |
+| 2  | Set up GitHub Actions CI for `nix flake check`                     | Trust/QA     | High   | 30 min  |
+| 3  | Replace static "nix flake check" badge with dynamic CI badge       | Trust        | High   | 5 min   |
+| 4  | Add `.github/ISSUE_TEMPLATE/bug.yml` and `feature.yml`             | Community    | Medium | 30 min  |
+| 5  | Add `.github/pull_request_template.md`                             | Community    | Medium | 15 min  |
+| 6  | Write `CONTRIBUTING.md`                                            | Community    | Medium | 30 min  |
+| 7  | Create a repo social preview image (Open Graph)                    | Presence     | Medium | 1 h     |
+| 8  | Add `SECURITY.md`                                                  | Governance   | Medium | 20 min  |
+| 9  | Write a migration guide from `mkGoFlake.nix` to `go-standard`      | Docs         | High   | 1 h     |
+| 10 | Add a troubleshooting/FAQ section to README                        | Docs         | High   | 45 min  |
+| 11 | Add architecture diagram to README                                 | Clarity      | Medium | 45 min  |
+| 12 | Add unit/integration tests for the `go-standard` module            | Quality      | High   | 2 h     |
+| 13 | Add CI test for `templates/go-standard/flake.nix`                  | Quality      | High   | 1 h     |
+| 14 | Add CI test for `templates/go-flake-parts/flake.nix`               | Quality      | High   | 1 h     |
+| 15 | Set up automated `flake.lock` updates (Dependabot or workflow)     | Maintenance  | High   | 1 h     |
+| 16 | Publish a documentation site (GitHub Pages / Astro / Starlight)    | Presence     | High   | 4 h     |
+| 17 | Add release tags and `CHANGELOG.md`                                | Process      | Medium | 1 h     |
+| 18 | Add release automation (tag + notes)                               | Process      | Medium | 1 h     |
+| 19 | Add property-based tests for `mkPreparedSource`                    | Quality      | Medium | 2 h     |
+| 20 | Add real private-repo integration test in CI                       | Quality      | High   | 2 h     |
+| 21 | Add `nix run .#docs` app to preview docs locally                   | DX           | Medium | 30 min  |
+| 22 | Add man pages for `mkPreparedSource` and `go-standard` options     | Docs         | Low    | 2 h     |
+| 23 | Add shell completions for generated apps                           | DX           | Low    | 1 h     |
+| 24 | Add cross-compilation example to README/docs                       | Capability   | Medium | 1 h     |
+| 25 | Add a "Recipes" page to docs (templ, govulncheck, gopls toggles)   | Docs         | Medium | 1 h     |
+| 26 | Audit all `docs/status/` reports for drift and annotate or archive | Maintenance  | Medium | 1 h     |
+| 27 | Rename `mkGoFlake.nix` usage in old downstream repos               | Migration    | Medium | ongoing |
+| 28 | Add support for Go workspace projects (`go.work`)                  | Capability   | Medium | 2 h     |
+| 29 | Add option for custom Go toolchain per package                     | Capability   | Low    | 1 h     |
+| 30 | Add `enableGolangciLint` toggle (currently always on)              | Config       | Low    | 30 min  |
+| 31 | Add `enableGofumpt` / `enableGoimports` toggles in treefmt         | Config       | Low    | 30 min  |
+| 32 | Add built-in `nix run .#fmt` alias app                             | DX           | Low    | 15 min  |
+| 33 | Add `meta.longDescription` and `meta.maintainers` fix              | Quality      | Low    | 30 min  |
+| 34 | Run a full code review of `modules/go-standard.nix`                | Quality      | Medium | 1 h     |
+| 35 | Run a naming review across the public API                          | Quality      | Medium | 1 h     |
+| 36 | Run a duplication review after recent unification work             | Quality      | Medium | 1 h     |
+| 37 | Add telemetry-free usage stats via GitHub traffic only             | Insights     | Low    | 0 min   |
+| 38 | Register `maintainers.larsartmann` in nixpkgs                      | Correctness  | Low    | 30 min  |
+| 39 | Write a blog post announcing go-standard                           | Marketing    | Medium | 2 h     |
+| 40 | Create a 60-second demo video/GIF                                  | Marketing    | Medium | 2 h     |
+| 41 | Add repo to nixpkgs or nix-community                               | Distribution | High   | 2 h     |
+| 42 | Add `nix run .#ci` app that runs the same checks as CI             | DX           | Low    | 15 min  |
+| 43 | Add pre-commit hook example in docs                                | DX           | Low    | 30 min  |
+| 44 | Document how to override `treefmt` programs per consumer           | Docs         | Low    | 30 min  |
+| 45 | Document how to pin `goPkg` to a different Go version              | Docs         | Low    | 20 min  |
+| 46 | Add a "Comparison with other Go+Nix tools" section                 | Docs         | Medium | 1 h     |
+| 47 | Add a public roadmap file (`ROADMAP.md`)                           | Planning     | Low    | 30 min  |
+| 48 | Add issue labels and milestones in GitHub                          | Process      | Low    | 20 min  |
+| 49 | Set up a Discord/Matrix channel for support                        | Community    | Low    | 30 min  |
+| 50 | Record a longer tutorial video or livestream                       | Marketing    | Low    | 4 h     |
 
 ---
 
@@ -235,37 +235,37 @@ The next session (2026-07-24 22:45, `7415763`) executed 24/27 TODOs from TODO_LI
 
 ### NOT STARTED items — resolved since this report
 
-| #   | Item                 | Status                                            | Evidence                                                |
-| --- | -------------------- | ------------------------------------------------- | ------------------------------------------------------- |
-| 1   | LICENSE file + badge | ~~done~~ `ce35aa5`                                | MIT license in repo root, badge in README               |
-| 2   | GitHub Actions CI    | ~~done~~ `7415763`                                | `.github/workflows/ci.yml`                              |
-| 5   | CONTRIBUTING.md      | ~~done~~ `7415763`                                | Full dev setup, testing, PR guide                       |
-| 6   | Issue/PR templates   | ~~done~~ `7415763`                                | Bug report, feature request, PR checklist, CODEOWNERS   |
-| 8   | Migration guide      | ~~done~~ `7415763`                                | `docs/migration-guide.md`                               |
-| 9   | FAQ/troubleshooting  | ~~done~~ `7415763`                                | SSH errors, vendorHash, GOPRIVATE, validation errors    |
-| 18  | Shell completions    | ~~done~~ `7415763`                                | `enableCompletions` option                              |
-| 19  | Man pages            | ~~done~~ `d8574df`, wired into devShell `ef2361f` | `docs/man/go-standard.5`, `docs/man/mkPreparedSource.5` |
+| #  | Item                 | Status                                            | Evidence                                                |
+| -- | -------------------- | ------------------------------------------------- | ------------------------------------------------------- |
+| 1  | LICENSE file + badge | ~~done~~ `ce35aa5`                                | MIT license in repo root, badge in README               |
+| 2  | GitHub Actions CI    | ~~done~~ `7415763`                                | `.github/workflows/ci.yml`                              |
+| 5  | CONTRIBUTING.md      | ~~done~~ `7415763`                                | Full dev setup, testing, PR guide                       |
+| 6  | Issue/PR templates   | ~~done~~ `7415763`                                | Bug report, feature request, PR checklist, CODEOWNERS   |
+| 8  | Migration guide      | ~~done~~ `7415763`                                | `docs/migration-guide.md`                               |
+| 9  | FAQ/troubleshooting  | ~~done~~ `7415763`                                | SSH errors, vendorHash, GOPRIVATE, validation errors    |
+| 18 | Shell completions    | ~~done~~ `7415763`                                | `enableCompletions` option                              |
+| 19 | Man pages            | ~~done~~ `d8574df`, wired into devShell `ef2361f` | `docs/man/go-standard.5`, `docs/man/mkPreparedSource.5` |
 
 ### Top 50 next tasks — resolved since this report
 
-| #   | Task                            | Status                                 | Evidence                                         |
-| --- | ------------------------------- | -------------------------------------- | ------------------------------------------------ |
-| 1   | LICENSE file                    | ~~done~~ `ce35aa5`                     | See above                                        |
-| 2   | GitHub Actions CI               | ~~done~~ `7415763`                     | See above                                        |
-| 3   | Dynamic CI badge                | ~~done~~ `7415763`                     | GitHub Actions badge in README                   |
-| 4   | Issue templates                 | ~~done~~ `7415763`                     | See above                                        |
-| 5   | PR template                     | ~~done~~ `7415763`                     | See above                                        |
-| 6   | CONTRIBUTING.md                 | ~~done~~ `7415763`                     | See above                                        |
-| 9   | Migration guide                 | ~~done~~ `7415763`                     | See above                                        |
-| 10  | FAQ/troubleshooting             | ~~done~~ `7415763`                     | See above                                        |
-| 11  | Architecture diagram            | ~~done~~ `d8574df`                     | `docs/architecture.svg` inlined in README        |
-| 12  | Module tests                    | ~~done~~ `7415763`, deepened `50fd2c3` | `test-module.nix` with 54 assertions             |
-| 17  | CHANGELOG.md                    | ~~done~~ `7415763`                     | Exists, consolidated `ef2361f`                   |
-| 22  | Man pages                       | ~~done~~ `d8574df`                     | See above                                        |
-| 23  | Shell completions               | ~~done~~ `7415763`                     | See above                                        |
-| 30  | enableGolangciLint toggle       | ~~done~~ `7415763`                     | Conditionally included in devShells and lint app |
-| 31  | enableGofumpt/Goimports toggles | ~~done~~ `7415763`                     | Conditionally enabled in treefmt                 |
-| 32  | nix run .#fmt app               | ~~done~~ `7415763`                     | `apps.fmt` wraps treefmt                         |
-| 47  | ROADMAP.md                      | ~~done~~ `7415763`                     | Exists, cleaned 2026-08-03                       |
+| #  | Task                            | Status                                 | Evidence                                         |
+| -- | ------------------------------- | -------------------------------------- | ------------------------------------------------ |
+| 1  | LICENSE file                    | ~~done~~ `ce35aa5`                     | See above                                        |
+| 2  | GitHub Actions CI               | ~~done~~ `7415763`                     | See above                                        |
+| 3  | Dynamic CI badge                | ~~done~~ `7415763`                     | GitHub Actions badge in README                   |
+| 4  | Issue templates                 | ~~done~~ `7415763`                     | See above                                        |
+| 5  | PR template                     | ~~done~~ `7415763`                     | See above                                        |
+| 6  | CONTRIBUTING.md                 | ~~done~~ `7415763`                     | See above                                        |
+| 9  | Migration guide                 | ~~done~~ `7415763`                     | See above                                        |
+| 10 | FAQ/troubleshooting             | ~~done~~ `7415763`                     | See above                                        |
+| 11 | Architecture diagram            | ~~done~~ `d8574df`                     | `docs/architecture.svg` inlined in README        |
+| 12 | Module tests                    | ~~done~~ `7415763`, deepened `50fd2c3` | `test-module.nix` with 54 assertions             |
+| 17 | CHANGELOG.md                    | ~~done~~ `7415763`                     | Exists, consolidated `ef2361f`                   |
+| 22 | Man pages                       | ~~done~~ `d8574df`                     | See above                                        |
+| 23 | Shell completions               | ~~done~~ `7415763`                     | See above                                        |
+| 30 | enableGolangciLint toggle       | ~~done~~ `7415763`                     | Conditionally included in devShells and lint app |
+| 31 | enableGofumpt/Goimports toggles | ~~done~~ `7415763`                     | Conditionally enabled in treefmt                 |
+| 32 | nix run .#fmt app               | ~~done~~ `7415763`                     | `apps.fmt` wraps treefmt                         |
+| 47 | ROADMAP.md                      | ~~done~~ `7415763`                     | Exists, cleaned 2026-08-03                       |
 
 Items not listed above remain open — see TODO_LIST.md and ROADMAP.md for current state.

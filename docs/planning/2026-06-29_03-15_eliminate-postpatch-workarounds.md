@@ -14,12 +14,12 @@ The core problem: `buildGoModule` does NOT support `go.work` — it builds from 
 
 ## Root Causes
 
-| #   | Gap                                                           | Location                       | Forces workarounds in              |
-| --- | ------------------------------------------------------------- | ------------------------------ | ---------------------------------- |
-| 1   | `stripVersionSuffix` only strips TRAILING `/vN`, not mid-path | `mkPreparedSource.nix:94-100`  | crush-daily, DiscordSync, overview |
-| 2   | `discoverSubModules` scans depth-1 only                       | `mkPreparedSource.nix:136-156` | crush-daily, DiscordSync, overview |
-| 3   | `stripLocalReplacesScript` misses `=> ../` relative paths     | `mkPreparedSource.nix:229-232` | BuildFlow                          |
-| 4   | branching-flow strips phantom enum/envdetect (dead code)      | `branching-flow/flake.nix:117` | branching-flow                     |
+| # | Gap                                                           | Location                       | Forces workarounds in              |
+| - | ------------------------------------------------------------- | ------------------------------ | ---------------------------------- |
+| 1 | `stripVersionSuffix` only strips TRAILING `/vN`, not mid-path | `mkPreparedSource.nix:94-100`  | crush-daily, DiscordSync, overview |
+| 2 | `discoverSubModules` scans depth-1 only                       | `mkPreparedSource.nix:136-156` | crush-daily, DiscordSync, overview |
+| 3 | `stripLocalReplacesScript` misses `=> ../` relative paths     | `mkPreparedSource.nix:229-232` | BuildFlow                          |
+| 4 | branching-flow strips phantom enum/envdetect (dead code)      | `branching-flow/flake.nix:117` | branching-flow                     |
 
 ## Pareto Breakdown
 
@@ -67,32 +67,32 @@ The single root-cause fix. Changes 2 functions in `mkPreparedSource.nix`:
 
 ## Level 1: Coarse Task Breakdown (30–100 min each)
 
-| #   | Priority | Task                                                                | Est   | Depends On |
-| --- | -------- | ------------------------------------------------------------------- | ----- | ---------- |
-| 1   | P0       | Fix `stripVersionSuffix` to filter all `/vN` segments               | 30min | —          |
-| 2   | P0       | Make `discoverSubModules` recursive with exclusion list             | 60min | —          |
-| 3   | P0       | Update test.nix: add nested eventtest-like mock + mid-path /vN test | 30min | 1,2        |
-| 4   | P0       | Run `nix-build test.nix -A verify` to verify core fixes             | 15min | 3          |
-| 5   | P1       | Fix `stripLocalReplacesScript` to strip `=> ../` paths              | 15min | —          |
-| 6   | P0       | Remove `postPatchExtra` from crush-daily                            | 30min | 4          |
-| 7   | P0       | Remove `postPatchExtra` from DiscordSync                            | 30min | 4          |
-| 8   | P0       | Remove `postPatchExtra` from overview                               | 30min | 4          |
-| 9   | P1       | Remove `postPatchExtra` from BuildFlow                              | 15min | 5          |
-| 10  | P1       | Delete stale `postPatchExtra` from branching-flow                   | 15min | —          |
-| 11  | P0       | Update mkPreparedSource.nix header comments                         | 15min | 1,2,5      |
-| 12  | P0       | Update go-nix-helpers README.md                                     | 30min | 1,2,5      |
-| 13  | P0       | Update go-nix-helpers AGENTS.md                                     | 15min | 1,2        |
-| 14  | P0       | Commit + push go-nix-helpers changes                                | 15min | 4,11,12,13 |
-| 15  | P0       | Commit + push crush-daily, DiscordSync, overview changes            | 30min | 6,7,8,14   |
-| 16  | P0       | Commit + push BuildFlow, branching-flow changes                     | 15min | 9,10,14    |
-| 17  | P0       | Verify builds: `nix build` on all 5 modified consumers              | 60min | 15,16      |
-| 18  | P2       | Migrate Cyberdom to use subModules (simplest manual-postPatch)      | 60min | 14         |
-| 19  | P2       | Migrate golangci-lint-auto-configure to mkPreparedSource deps       | 60min | 14         |
-| 20  | P2       | Migrate hierarchical-errors to mkPreparedSource deps                | 90min | 14         |
-| 21  | P2       | Migrate go-auto-upgrade to mkPreparedSource deps                    | 90min | 14         |
-| 22  | P2       | Migrate file-and-image-renamer to mkPreparedSource deps             | 90min | 14         |
-| 23  | P3       | Add explanatory comments to 4 genuinely-necessary postPatch cases   | 30min | 17         |
-| 24  | P0       | Final verification: nix flake check on go-nix-helpers               | 15min | all        |
+| #  | Priority | Task                                                                | Est   | Depends On |
+| -- | -------- | ------------------------------------------------------------------- | ----- | ---------- |
+| 1  | P0       | Fix `stripVersionSuffix` to filter all `/vN` segments               | 30min | —          |
+| 2  | P0       | Make `discoverSubModules` recursive with exclusion list             | 60min | —          |
+| 3  | P0       | Update test.nix: add nested eventtest-like mock + mid-path /vN test | 30min | 1,2        |
+| 4  | P0       | Run `nix-build test.nix -A verify` to verify core fixes             | 15min | 3          |
+| 5  | P1       | Fix `stripLocalReplacesScript` to strip `=> ../` paths              | 15min | —          |
+| 6  | P0       | Remove `postPatchExtra` from crush-daily                            | 30min | 4          |
+| 7  | P0       | Remove `postPatchExtra` from DiscordSync                            | 30min | 4          |
+| 8  | P0       | Remove `postPatchExtra` from overview                               | 30min | 4          |
+| 9  | P1       | Remove `postPatchExtra` from BuildFlow                              | 15min | 5          |
+| 10 | P1       | Delete stale `postPatchExtra` from branching-flow                   | 15min | —          |
+| 11 | P0       | Update mkPreparedSource.nix header comments                         | 15min | 1,2,5      |
+| 12 | P0       | Update go-nix-helpers README.md                                     | 30min | 1,2,5      |
+| 13 | P0       | Update go-nix-helpers AGENTS.md                                     | 15min | 1,2        |
+| 14 | P0       | Commit + push go-nix-helpers changes                                | 15min | 4,11,12,13 |
+| 15 | P0       | Commit + push crush-daily, DiscordSync, overview changes            | 30min | 6,7,8,14   |
+| 16 | P0       | Commit + push BuildFlow, branching-flow changes                     | 15min | 9,10,14    |
+| 17 | P0       | Verify builds: `nix build` on all 5 modified consumers              | 60min | 15,16      |
+| 18 | P2       | Migrate Cyberdom to use subModules (simplest manual-postPatch)      | 60min | 14         |
+| 19 | P2       | Migrate golangci-lint-auto-configure to mkPreparedSource deps       | 60min | 14         |
+| 20 | P2       | Migrate hierarchical-errors to mkPreparedSource deps                | 90min | 14         |
+| 21 | P2       | Migrate go-auto-upgrade to mkPreparedSource deps                    | 90min | 14         |
+| 22 | P2       | Migrate file-and-image-renamer to mkPreparedSource deps             | 90min | 14         |
+| 23 | P3       | Add explanatory comments to 4 genuinely-necessary postPatch cases   | 30min | 17         |
+| 24 | P0       | Final verification: nix flake check on go-nix-helpers               | 15min | all        |
 
 **Total estimated: ~16 hours**
 
@@ -121,13 +121,13 @@ The single root-cause fix. Changes 2 functions in `mkPreparedSource.nix`:
 
 ### Phase B: stripLocalReplacesScript fix + dead code (Tasks 5,10)
 
-| #   | Task                                                                    | Est  | L1# |
-| --- | ----------------------------------------------------------------------- | ---- | --- |
-| B1  | Read current `stripLocalReplacesScript` (lines 228-232)                 | 2min | 5   |
-| B2  | Add `sed -i '/=> \.\.\//d' go.mod` line                                 | 3min | 5   |
-| B3  | Read branching-flow postPatchExtra (lines 116-119)                      | 2min | 10  |
-| B4  | Verify enum/envdetect don't exist in go-output or branching-flow go.mod | 5min | 10  |
-| B5  | Delete the stale postPatchExtra block                                   | 3min | 10  |
+| #  | Task                                                                    | Est  | L1# |
+| -- | ----------------------------------------------------------------------- | ---- | --- |
+| B1 | Read current `stripLocalReplacesScript` (lines 228-232)                 | 2min | 5   |
+| B2 | Add `sed -i '/=> \.\.\//d' go.mod` line                                 | 3min | 5   |
+| B3 | Read branching-flow postPatchExtra (lines 116-119)                      | 2min | 10  |
+| B4 | Verify enum/envdetect don't exist in go-output or branching-flow go.mod | 5min | 10  |
+| B5 | Delete the stale postPatchExtra block                                   | 3min | 10  |
 
 ### Phase C: Consumer cleanup — remove postPatchExtra (Tasks 6–9)
 
@@ -148,28 +148,28 @@ The single root-cause fix. Changes 2 functions in `mkPreparedSource.nix`:
 
 ### Phase D: Documentation (Tasks 11–13)
 
-| #   | Task                                                                  | Est   | L1# |
-| --- | --------------------------------------------------------------------- | ----- | --- |
-| D1  | Update mkPreparedSource.nix header (recursive discovery mention)      | 10min | 11  |
-| D2  | Update mkPreparedSource.nix parameter docs (add excludeSubModuleDirs) | 5min  | 11  |
-| D3  | Update README.md: "Major version suffixes" section                    | 10min | 12  |
-| D4  | Update README.md: "Auto-discovery" section (mention recursion)        | 10min | 12  |
-| D5  | Update README.md: add "stripLocalReplaces" relative-path mention      | 5min  | 12  |
-| D6  | Update AGENTS.md: /vN handling bullet                                 | 5min  | 13  |
+| #  | Task                                                                  | Est   | L1# |
+| -- | --------------------------------------------------------------------- | ----- | --- |
+| D1 | Update mkPreparedSource.nix header (recursive discovery mention)      | 10min | 11  |
+| D2 | Update mkPreparedSource.nix parameter docs (add excludeSubModuleDirs) | 5min  | 11  |
+| D3 | Update README.md: "Major version suffixes" section                    | 10min | 12  |
+| D4 | Update README.md: "Auto-discovery" section (mention recursion)        | 10min | 12  |
+| D5 | Update README.md: add "stripLocalReplaces" relative-path mention      | 5min  | 12  |
+| D6 | Update AGENTS.md: /vN handling bullet                                 | 5min  | 13  |
 
 ### Phase E: Commits + pushes (Tasks 14–17)
 
-| #   | Task                                                 | Est   | L1# |
-| --- | ---------------------------------------------------- | ----- | --- |
-| E1  | Git diff review of go-nix-helpers changes            | 5min  | 14  |
-| E2  | Commit go-nix-helpers with detailed message          | 5min  | 14  |
-| E3  | Push go-nix-helpers                                  | 2min  | 14  |
-| E4  | Commit + push crush-daily                            | 5min  | 15  |
-| E5  | Commit + push DiscordSync                            | 5min  | 15  |
-| E6  | Commit + push overview                               | 5min  | 15  |
-| E7  | Commit + push BuildFlow                              | 5min  | 16  |
-| E8  | Commit + push branching-flow                         | 5min  | 16  |
-| E9  | Verify all 5 consumers build: `nix build .#` on each | 15min | 17  |
+| #  | Task                                                 | Est   | L1# |
+| -- | ---------------------------------------------------- | ----- | --- |
+| E1 | Git diff review of go-nix-helpers changes            | 5min  | 14  |
+| E2 | Commit go-nix-helpers with detailed message          | 5min  | 14  |
+| E3 | Push go-nix-helpers                                  | 2min  | 14  |
+| E4 | Commit + push crush-daily                            | 5min  | 15  |
+| E5 | Commit + push DiscordSync                            | 5min  | 15  |
+| E6 | Commit + push overview                               | 5min  | 15  |
+| E7 | Commit + push BuildFlow                              | 5min  | 16  |
+| E8 | Commit + push branching-flow                         | 5min  | 16  |
+| E9 | Verify all 5 consumers build: `nix build .#` on each | 15min | 17  |
 
 ### Phase F: Migrate manual-postPatch projects (Tasks 18–22)
 
@@ -203,21 +203,21 @@ The single root-cause fix. Changes 2 functions in `mkPreparedSource.nix`:
 
 ### Phase G: Document genuinely-necessary cases (Task 23)
 
-| #   | Task                                                                      | Est  | L1# |
-| --- | ------------------------------------------------------------------------- | ---- | --- |
-| G1  | Add comment to ast-state-analyzer postPatch explaining go.sum workaround  | 5min | 23  |
-| G2  | Add comment to standard-bug-tracking-schema postPatch explaining auth     | 5min | 23  |
-| G3  | Note monitor365 postPatch is Rust/WASM (already documented inline)        | 2min | 23  |
-| G4  | Add comment to go-structure-linter postPatchExtra explaining multi-module | 5min | 23  |
+| #  | Task                                                                      | Est  | L1# |
+| -- | ------------------------------------------------------------------------- | ---- | --- |
+| G1 | Add comment to ast-state-analyzer postPatch explaining go.sum workaround  | 5min | 23  |
+| G2 | Add comment to standard-bug-tracking-schema postPatch explaining auth     | 5min | 23  |
+| G3 | Note monitor365 postPatch is Rust/WASM (already documented inline)        | 2min | 23  |
+| G4 | Add comment to go-structure-linter postPatchExtra explaining multi-module | 5min | 23  |
 
 ### Phase H: Final verification (Task 24)
 
-| #   | Task                                                            | Est   | L1# |
-| --- | --------------------------------------------------------------- | ----- | --- |
-| H1  | Run `nix flake check` on go-nix-helpers                         | 10min | 24  |
-| H2  | Run `nix-build test.nix -A verify` one final time               | 10min | 24  |
-| H3  | Grep for remaining postPatch/postPatchExtra across all projects | 5min  | 24  |
-| H4  | Verify count reduced from 15 to 5 (genuinely necessary only)    | 5min  | 24  |
+| #  | Task                                                            | Est   | L1# |
+| -- | --------------------------------------------------------------- | ----- | --- |
+| H1 | Run `nix flake check` on go-nix-helpers                         | 10min | 24  |
+| H2 | Run `nix-build test.nix -A verify` one final time               | 10min | 24  |
+| H3 | Grep for remaining postPatch/postPatchExtra across all projects | 5min  | 24  |
+| H4 | Verify count reduced from 15 to 5 (genuinely necessary only)    | 5min  | 24  |
 
 **Total Level 2 tasks: 75**
 **Total estimated: ~14 hours**

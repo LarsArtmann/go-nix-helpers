@@ -10,14 +10,14 @@
 
 The user pasted output from a formatting/check run containing errors from multiple tools:
 
-| Tool         | Errors                                                                 | Severity     |
-| ------------ | ---------------------------------------------------------------------- | ------------ |
-| shfmt        | 3 shell scripts using spaces instead of tabs                           | Formatting   |
-| deadnix      | Unused lambda patterns in flake.nix, templates, test-module.nix        | Lint warning |
-| statix       | Assignment-instead-of-inherit, empty patterns                          | Lint warning |
-| nix          | `syntax error, unexpected end of file` at flake.nix:1:1                | Transient    |
-| nix (flake)  | `path 'mock-dep.drv' is not valid` during `nix flake check --no-build` | **Critical** |
-| prettier     | `exec: prettier: not found` in dev shell                               | Environmental|
+| Tool        | Errors                                                                 | Severity      |
+| ----------- | ---------------------------------------------------------------------- | ------------- |
+| shfmt       | 3 shell scripts using spaces instead of tabs                           | Formatting    |
+| deadnix     | Unused lambda patterns in flake.nix, templates, test-module.nix        | Lint warning  |
+| statix      | Assignment-instead-of-inherit, empty patterns                          | Lint warning  |
+| nix         | `syntax error, unexpected end of file` at flake.nix:1:1                | Transient     |
+| nix (flake) | `path 'mock-dep.drv' is not valid` during `nix flake check --no-build` | **Critical**  |
+| prettier    | `exec: prettier: not found` in dev shell                               | Environmental |
 
 The shfmt/deadnix/statix issues were **already fixed** in commit `c0a8290` (the working tree was clean when I started). The syntax error was transient (the file parses fine). The prettier error was from dprint trying to run outside the treefmt config.
 
@@ -34,12 +34,14 @@ The **real bug** was `nix flake check --no-build` failing because `mkPreparedSou
 **Fix:** Replaced the eval-time Nix tree-walk with a build-time shell script (`autoDiscoverScript`) that runs in `postPatch` after deps are copied to `_local_deps/`. The script uses `find` + `awk` to discover sub-modules, extract module paths from `go.mod` files, normalize pseudo-versions, and generate replace directives — all at build time.
 
 **Files changed:**
+
 - `mkPreparedSource.nix` — Removed `readModulePath`, `discoverSubModules`, `allDiscovered`, `allSubModules`, `subModuleVersionNormalize`, `allSubModuleReplace`. Added `explicitSubModuleReplace`, `explicitVersionNormalize`, `autoDiscoverScript`. Updated `postPatch` to run the script and merge discovered replaces with explicit ones (deduped).
 - `flake.nix` — Removed `self` from `test-module.nix` import (mismatch with the prior commit that removed `self` from the parameter list).
 - `AGENTS.md` — Updated architecture bullet and gotchas section.
 - `mkPreparedSource.nix` header comment — Updated to reflect build-time discovery.
 
 **Verification:**
+
 - `nix flake check --no-build` — **all checks passed**
 - `nix fmt -- --ci` — 0 changed files
 - `nix build .#checks.x86_64-linux.verify` — all success-path tests passed
@@ -53,12 +55,12 @@ The **real bug** was `nix flake check --no-build` failing because `mkPreparedSou
 
 ### 2. Confirmed Already-Fixed Items (from commit c0a8290)
 
-| Issue                  | Status          |
-| ---------------------- | --------------- |
-| shfmt: spaces → tabs   | Already fixed   |
-| deadnix: unused vars   | Already fixed   |
-| statix: inherit/patterns| Already fixed  |
-| flake.nix syntax error | Transient/state |
+| Issue                    | Status          |
+| ------------------------ | --------------- |
+| shfmt: spaces → tabs     | Already fixed   |
+| deadnix: unused vars     | Already fixed   |
+| statix: inherit/patterns | Already fixed   |
+| flake.nix syntax error   | Transient/state |
 
 ---
 

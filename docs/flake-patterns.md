@@ -221,14 +221,14 @@ Reference implementations: `go-structure-linter`, `mr-sync`.
 Six attributes in `extraBuildAttrs` are **concatenated** with the module's
 values (not overridden). All other attributes override via `//`.
 
-| Attribute             | Direction  | Module provides                                     |
-| --------------------- | ---------- | --------------------------------------------------- |
-| `nativeBuildInputs`   | Appended   | `templ`, `installShellFiles` (when enabled)         |
-| `buildInputs`         | Appended   | (none by default)                                   |
-| `checkInputs`         | Appended   | (none by default)                                   |
-| `configureFlags`      | Appended   | (none by default)                                   |
-| `preBuild`            | Appended   | Auto dep-sync logic when `deps` are set (runs first) |
-| `postInstall`         | Appended   | Shell completion installation when `enableCompletions` (runs first) |
+| Attribute           | Direction | Module provides                                                     |
+| ------------------- | --------- | ------------------------------------------------------------------- |
+| `nativeBuildInputs` | Appended  | `templ`, `installShellFiles` (when enabled)                         |
+| `buildInputs`       | Appended  | (none by default)                                                   |
+| `checkInputs`       | Appended  | (none by default)                                                   |
+| `configureFlags`    | Appended  | (none by default)                                                   |
+| `preBuild`          | Appended  | Auto dep-sync logic when `deps` are set (runs first)                |
+| `postInstall`       | Appended  | Shell completion installation when `enableCompletions` (runs first) |
 
 **Correct — your values are added to the module's:**
 

@@ -11,24 +11,24 @@
 
 These items are implemented, pass `nix flake check`, and have no known issues:
 
-| #   | Task                                                          | Evidence                                                                                                                                                              |
-| --- | ------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1   | **D1 Fix:** Monorepo overlay maps each package correctly      | `modules/go-standard.nix:545` — uses `${name}` not `${cfg.pname}`. Tested by `monorepoOverlayCheck` assertion.                                                        |
-| 2   | **D2 Fix:** Dead `completionAttrs` removed                    | `modules/go-standard.nix` — 0 occurrences of `completionAttrs`. Completions now wired into `mkGoPackage` via `completionPostInstall` with proper `postInstall` merge. |
-| 3   | **D4 Fix:** `generate-flake.sh --templ` works for go-standard | `scripts/generate-flake.sh:104` — sed uncomments `# enableTempl = true;` line in template.                                                                            |
-| 4   | CHANGELOG.md consolidated                                     | Merged 3 duplicate "Added" sections into one clean set under `[Unreleased]`.                                                                                          |
-| 5   | Man pages wired into devShell                                 | `flake.nix:77` — `manPages` derivation installs `.5` files to `share/man/man5/`. DevShell includes `man` + `manPages`.                                                |
-| 6   | `enableCompletions` description improved                      | Now documents cobra/urfave/cli requirement and silent-no-op behavior.                                                                                                 |
-| 7   | Monorepo test: `packages.worker` exists                       | `test-module.nix` — assertion evaluates perSystem with `packages.worker` config.                                                                                      |
-| 8   | Monorepo test: `apps.worker` exists                           | Same config — verifies app generation for extra packages.                                                                                                             |
-| 9   | Monorepo overlay test: D1 regression                          | Dedicated `monorepoOverlayCheck` — evaluates overlay with mock packages, verifies `overlayResult.worker == "mock-worker-derivation"`.                                 |
-| 10  | `enableGolangciLint=false` test                               | Asserts `apps.lint` disappears when toggle is false.                                                                                                                  |
-| 11  | `enableGofumpt=false` test                                    | Asserts `treefmt.programs.gofumpt.enable == false`.                                                                                                                   |
-| 12  | `enableGoimports=false` test                                  | Asserts `treefmt.programs.goimports.enable == false`.                                                                                                                 |
-| 13  | `version` override test                                       | Asserts custom version `"1.0.0-test"` appears in package derivation name.                                                                                             |
-| 14  | `enableCompletions=true` test                                 | Asserts package evaluates successfully with completions enabled.                                                                                                      |
-| 15  | `buildFlags` test                                             | Asserts package evaluates with custom `buildFlags = [ "-tags" "integration" ]`.                                                                                       |
-| 16  | `extraBuildAttrs.postInstall` merge                           | `userExtraBuildAttrs` now strips both `preBuild` AND `postInstall` to avoid double-application.                                                                       |
+| #  | Task                                                          | Evidence                                                                                                                                                              |
+| -- | ------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1  | **D1 Fix:** Monorepo overlay maps each package correctly      | `modules/go-standard.nix:545` — uses `${name}` not `${cfg.pname}`. Tested by `monorepoOverlayCheck` assertion.                                                        |
+| 2  | **D2 Fix:** Dead `completionAttrs` removed                    | `modules/go-standard.nix` — 0 occurrences of `completionAttrs`. Completions now wired into `mkGoPackage` via `completionPostInstall` with proper `postInstall` merge. |
+| 3  | **D4 Fix:** `generate-flake.sh --templ` works for go-standard | `scripts/generate-flake.sh:104` — sed uncomments `# enableTempl = true;` line in template.                                                                            |
+| 4  | CHANGELOG.md consolidated                                     | Merged 3 duplicate "Added" sections into one clean set under `[Unreleased]`.                                                                                          |
+| 5  | Man pages wired into devShell                                 | `flake.nix:77` — `manPages` derivation installs `.5` files to `share/man/man5/`. DevShell includes `man` + `manPages`.                                                |
+| 6  | `enableCompletions` description improved                      | Now documents cobra/urfave/cli requirement and silent-no-op behavior.                                                                                                 |
+| 7  | Monorepo test: `packages.worker` exists                       | `test-module.nix` — assertion evaluates perSystem with `packages.worker` config.                                                                                      |
+| 8  | Monorepo test: `apps.worker` exists                           | Same config — verifies app generation for extra packages.                                                                                                             |
+| 9  | Monorepo overlay test: D1 regression                          | Dedicated `monorepoOverlayCheck` — evaluates overlay with mock packages, verifies `overlayResult.worker == "mock-worker-derivation"`.                                 |
+| 10 | `enableGolangciLint=false` test                               | Asserts `apps.lint` disappears when toggle is false.                                                                                                                  |
+| 11 | `enableGofumpt=false` test                                    | Asserts `treefmt.programs.gofumpt.enable == false`.                                                                                                                   |
+| 12 | `enableGoimports=false` test                                  | Asserts `treefmt.programs.goimports.enable == false`.                                                                                                                 |
+| 13 | `version` override test                                       | Asserts custom version `"1.0.0-test"` appears in package derivation name.                                                                                             |
+| 14 | `enableCompletions=true` test                                 | Asserts package evaluates successfully with completions enabled.                                                                                                      |
+| 15 | `buildFlags` test                                             | Asserts package evaluates with custom `buildFlags = [ "-tags" "integration" ]`.                                                                                       |
+| 16 | `extraBuildAttrs.postInstall` merge                           | `userExtraBuildAttrs` now strips both `preBuild` AND `postInstall` to avoid double-application.                                                                       |
 
 **Test verification:**
 
@@ -75,12 +75,12 @@ The `|| true` in `installShellCompletion` silently swallows failures. A user who
 
 ## C) NOT STARTED / BLOCKED
 
-| #   | Task                                          | Why blocked                                                                                                                                                |
-| --- | --------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| C1  | Register `maintainers.larsartmann` in nixpkgs | Requires external PR to nixpkgs repo                                                                                                                       |
-| C2  | Real private-repo integration test in CI      | Requires SSH key secret configuration in GitHub                                                                                                            |
-| C3  | Audit all downstream consumers                | Requires access to 7+ downstream repos (BuildFlow, mr-sync, PMA, etc.)                                                                                     |
-| C4  | Real e2e consumer test                        | Requires creating a mock Go project + flake.nix that imports go-standard and building it through the full pipeline. Not blocked externally, just not done. |
+| #  | Task                                          | Why blocked                                                                                                                                                |
+| -- | --------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| C1 | Register `maintainers.larsartmann` in nixpkgs | Requires external PR to nixpkgs repo                                                                                                                       |
+| C2 | Real private-repo integration test in CI      | Requires SSH key secret configuration in GitHub                                                                                                            |
+| C3 | Audit all downstream consumers                | Requires access to 7+ downstream repos (BuildFlow, mr-sync, PMA, etc.)                                                                                     |
+| C4 | Real e2e consumer test                        | Requires creating a mock Go project + flake.nix that imports go-standard and building it through the full pipeline. Not blocked externally, just not done. |
 
 ---
 
