@@ -251,7 +251,11 @@ let
       )
       ${publicDepsFilter}
       for mod in $REQUIRED; do
-        if ! grep -qF "  $mod => " go.mod; then
+        # Whitespace-tolerant: gofmt indents replace-block entries with tabs,
+        # mkPreparedSource injects two-space entries, and single-line
+        # `replace x => y` directives have no indent. A fixed two-space grep
+        # false-positives on all pre-existing in-tree replaces.
+        if ! grep -qE "^[[:space:]]*(replace[[:space:]]+)?${mod}[[:space:]]+=>" go.mod; then
           MISSING="''${MISSING}
       $mod"
         fi
