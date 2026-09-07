@@ -243,6 +243,27 @@ let
   # publicDeps entry with the BASE path (no /vN suffix) correctly excludes
   # versioned module paths (e.g. "foo/bar" matches "foo/bar/v2" in go.mod).
   # ---------------------------------------------------------------------------
+  # ---------------------------------------------------------------------------
+  # Test 8: in-tree replaces with gofmt tab indentation — validation must NOT
+  # flag modules that already have a replace directive in the consumer's own
+  # go.mod (tab-indented replace block, as written by gofmt). Regression test
+  # for the fixed two-space grep that false-positived here.
+  # ---------------------------------------------------------------------------
+  mockInTreeReplaceSrc = pkgs.runCommandLocal "mock-in-tree-replace" { } ''
+    mkdir -p $out/types
+    printf 'module github.com/larsartmann/mock-in-tree\n\ngo 1.26\n\nrequire (\n\tgithub.com/larsartmann/mock-self/types v0.0.0\n)\n\nreplace (\n\tgithub.com/larsartmann/mock-self/types => ./types\n)\n' > $out/go.mod
+    printf 'module github.com/larsartmann/mock-self/types\ngo 1.26\n' > $out/types/go.mod
+  '';
+
+  inTreeReplaceTest = mkPreparedSource {
+    name = "test-in-tree-replace";
+    version = "test";
+    src = mockInTreeReplaceSrc;
+    deps = { };
+    autoSubModules = false;
+    validatePrivateDeps = true;
+  };
+
   mockVersionedPublicSrc = pkgs.writeTextDir "go.mod" ''
     module github.com/larsartmann/mock-versioned-public
 
@@ -280,6 +301,7 @@ in
     requireDedupTest
     multiDepsTest
     versionedPublicDepsTest
+    inTreeReplaceTest
     ;
 
   # Verification script: checks the success-path test outputs.
@@ -476,6 +498,20 @@ in
       echo "PASS: private dep still has replace"
     else
       echo "FAIL: private dep missing replace"
+      exit 1
+    fi
+
+    echo ""
+    echo "=== Test 8: in-tree tab-indented replaces satisfy validation ==="
+    # Build succeeded (we got here) — validation accepted the consumer's own
+    # tab-indented replace block instead of flagging a missing dep.
+    GOMOD7=${inTreeReplaceTest}/go.mod
+    cat "$GOMOD7"
+    echo ""
+    if grep -qF "mock-self/types => ./types" "$GOMOD7"; then
+      echo "PASS: pre-existing in-tree replace preserved"
+    else
+      echo "FAIL: in-tree replace was stripped"
       exit 1
     fi
 

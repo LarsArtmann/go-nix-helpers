@@ -255,7 +255,7 @@ let
         # mkPreparedSource injects two-space entries, and single-line
         # `replace x => y` directives have no indent. A fixed two-space grep
         # false-positives on all pre-existing in-tree replaces.
-        if ! grep -qE "^[[:space:]]*(replace[[:space:]]+)?${mod}[[:space:]]+=>" go.mod; then
+        if ! grep -qE "^[[:space:]]*(replace[[:space:]]+)?''${mod}[[:space:]]+=>" go.mod; then
           MISSING="''${MISSING}
       $mod"
         fi
