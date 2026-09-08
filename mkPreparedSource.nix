@@ -214,7 +214,7 @@ let
       # unknown escape and the backslash is DROPPED — the pattern must stay a
       # literal-dot regex either way (see explicitVersionNormalize NOTE 1/2:
       # -E + `#` delimiter matches both pseudo-version shapes).
-      sed -E -i "s#${modulePath} v[0-9]+[.][0-9]+[.][0-9]+(-0[.][0-9]+-[0-9a-f]+|-[0-9]+-[0-9a-f]+)#${modulePath} ${subModuleVersion}#g" go.mod
+      sed -E -i "s#$modulePath v[0-9]+[.][0-9]+[.][0-9]+(-0[.][0-9]+-[0-9a-f]+|-[0-9]+-[0-9a-f]+)#$modulePath ${subModuleVersion}#g" go.mod
       printf '  %s => ./_local_deps/%s/%s\n' "$modulePath" "$basename" "$subdir" >> go.mod.discovered
     done
   '';
