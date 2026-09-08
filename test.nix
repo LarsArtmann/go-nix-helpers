@@ -290,6 +290,40 @@ let
     # matches "github.com/larsartmann/mock-versioned-pub/v2" in go.mod.
     publicDeps = [ "github.com/larsartmann/mock-versioned-pub" ];
   };
+
+  # ---------------------------------------------------------------------------
+  # Test 8: pseudo-version normalization covers BOTH shapes
+  #   - no-base form:     v0.0.0-<ts>-<rev>
+  #   - base form:        vX.Y.Z-0.<ts>-<rev>  (go-cqrs-lite master pins, e.g.
+  #     v4.8.2-0.20260906141959-6f9dfa8add64 — previously NOT normalized)
+  # Both must normalize to subModuleVersion so replace directives match.
+  # ---------------------------------------------------------------------------
+  mockPseudoVersionSrc = pkgs.writeTextDir "go.mod" ''
+    module github.com/larsartmann/mock-pseudo
+
+    go 1.26
+
+    require (
+      github.com/larsartmann/mock-dep/codec/v2 v0.0.0-20260101000000-abcdef123456
+      github.com/larsartmann/mock-dep/storage/v2 v4.8.2-0.20260906141959-6f9dfa8add64
+    )
+  '';
+
+  pseudoVersionNormalizeTest = mkPreparedSource {
+    name = "test-pseudo-version-normalize";
+    version = "test";
+    src = mockPseudoVersionSrc;
+    deps = {
+      "github.com/larsartmann/mock-dep" = mockDep;
+    };
+    autoSubModules = false;
+    subModules = {
+      "github.com/larsartmann/mock-dep" = [
+        "codec/v2"
+        "storage/v2"
+      ];
+    };
+  };
 in
 {
   # nix-build test.nix -A autoDiscovery -o result-auto
@@ -302,6 +336,7 @@ in
     multiDepsTest
     versionedPublicDepsTest
     inTreeReplaceTest
+    pseudoVersionNormalizeTest
     ;
 
   # Verification script: checks the success-path test outputs.
@@ -513,6 +548,35 @@ in
     else
       echo "FAIL: in-tree replace was stripped"
       exit 1
+    fi
+
+    echo ""
+    echo "=== Test 9: pseudo-version normalization covers both shapes ==="
+    GOMOD8=${pseudoVersionNormalizeTest}/go.mod
+    cat "$GOMOD8"
+    echo ""
+    # no-base form: v0.0.0-<ts>-<rev>
+    if grep -qF "github.com/larsartmann/mock-dep/codec/v2 v0.0.0" "$GOMOD8"; then
+      echo "PASS: no-base pseudo (v0.0.0-<ts>-<rev>) normalized to subModuleVersion"
+    else
+      echo "FAIL: no-base pseudo-version was not normalized"
+      grep "codec/v2" "$GOMOD8"
+      exit 1
+    fi
+    # base form: vX.Y.Z-0.<ts>-<rev> (go-cqrs-lite master pin shape)
+    if grep -qF "github.com/larsartmann/mock-dep/storage/v2 v0.0.0" "$GOMOD8"; then
+      echo "PASS: base pseudo (vX.Y.Z-0.<ts>-<rev>) normalized to subModuleVersion"
+    else
+      echo "FAIL: base pseudo-version (vX.Y.Z-0.<ts>-<rev>) was not normalized"
+      grep "storage/v2" "$GOMOD8"
+      exit 1
+    fi
+    # no leftover pseudo fragments anywhere
+    if grep -qE "v[0-9]+[.][0-9]+[.][0-9]+-0[.][0-9]+-[0-9a-f]+|v0[.]0[.]0-[0-9]{14}-[0-9a-f]+" "$GOMOD8"; then
+      echo "FAIL: pseudo-version fragments survived normalization"
+      exit 1
+    else
+      echo "PASS: no pseudo-version fragments remain"
     fi
 
     echo ""

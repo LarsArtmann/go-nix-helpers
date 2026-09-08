@@ -179,13 +179,17 @@ let
 
   # Normalize pseudo-versions for EXPLICIT sub-modules so replace directives match.
   # Auto-discovered modules are normalized at build time (see autoDiscoverScript).
-  # NOTE: `[.]` not `\.` — in a Nix double-quoted string an unknown escape like
+  # NOTE 1: `[.]` not `\.` — in a Nix double-quoted string an unknown escape like
   # `\.` is DROPPED ("v0\.0" becomes the wildcard-dot regex), while indented
   # strings keep it. `[.]` is regex-equivalent and spelling-safe in BOTH string
   # styles, so this line and autoDiscoverScript's sed stay provably identical.
+  # NOTE 2: ERE (-E) with `#` delimiter (module paths contain `/`, and the
+  # alternation needs `|`). Matches BOTH pseudo-version shapes: the no-base
+  # form `v0.0.0-<ts>-<rev>` AND the base form `vX.Y.Z-0.<ts>-<rev>`
+  # (e.g. v4.8.2-0.20260906141959-6f9dfa8add64 from go-cqrs-lite master pins).
   explicitVersionNormalize = lib.concatStringsSep "\n" (
     map (sm: ''
-      sed -i 's|${sm.modulePath} v0[.]0[.]0-[^ ]*|${sm.modulePath} ${subModuleVersion}|g' go.mod
+      sed -E -i 's#${sm.modulePath} v[0-9]+[.][0-9]+[.][0-9]+(-0[.][0-9]+-[0-9a-f]+|-[0-9]+-[0-9a-f]+)#${sm.modulePath} ${subModuleVersion}#g' go.mod
     '') explicitSubModules
   );
 
@@ -208,8 +212,9 @@ let
       [ -z "$modulePath" ] && continue
       # `[.]` not `\.`: this is a Nix DOUBLE-quoted string where `\.` is an
       # unknown escape and the backslash is DROPPED — the pattern must stay a
-      # literal-dot regex either way (see explicitVersionNormalize note).
-      sed -i "s|$modulePath v0[.]0[.]0-[^ ]*|$modulePath ${subModuleVersion}|g" go.mod
+      # literal-dot regex either way (see explicitVersionNormalize NOTE 1/2:
+      # -E + `#` delimiter matches both pseudo-version shapes).
+      sed -E -i "s#${modulePath} v[0-9]+[.][0-9]+[.][0-9]+(-0[.][0-9]+-[0-9a-f]+|-[0-9]+-[0-9a-f]+)#${modulePath} ${subModuleVersion}#g" go.mod
       printf '  %s => ./_local_deps/%s/%s\n' "$modulePath" "$basename" "$subdir" >> go.mod.discovered
     done
   '';
