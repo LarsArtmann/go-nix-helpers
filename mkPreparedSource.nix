@@ -116,6 +116,17 @@ let
   pureFuncs = import ./pure-functions.nix { inherit lib; };
   inherit (pureFuncs) stripVersionSuffix repoName;
 
+  # Normalized require-version for a module path. Go rejects the literal
+  # `v0.0.0` for a major-versioned module path (e.g. `.../command/v4` demands a
+  # `v4.x.y` version), so derive `vN.0.0` from a trailing `/vN` suffix.
+  # Unversioned paths keep the configured `subModuleVersion` (default v0.0.0).
+  normalizedVersionFor =
+    modulePath:
+    let
+      m = builtins.match ".*/v([0-9]+)" modulePath;
+    in
+    if m == null then subModuleVersion else "v${builtins.head m}.0.0";
+
   # ---------------------------------------------------------------------------
   # Shell script generation
   # ---------------------------------------------------------------------------
@@ -189,7 +200,7 @@ let
   # (e.g. v4.8.2-0.20260906141959-6f9dfa8add64 from go-cqrs-lite master pins).
   explicitVersionNormalize = lib.concatStringsSep "\n" (
     map (sm: ''
-      sed -E -i 's#${sm.modulePath} v[0-9]+[.][0-9]+[.][0-9]+(-0[.][0-9]+-[0-9a-f]+|-[0-9]+-[0-9a-f]+)#${sm.modulePath} ${subModuleVersion}#g' go.mod
+      sed -E -i 's#${sm.modulePath} v[0-9]+[.][0-9]+[.][0-9]+(-0[.][0-9]+-[0-9a-f]+|-[0-9]+-[0-9a-f]+)#${sm.modulePath} ${normalizedVersionFor sm.modulePath}#g' go.mod
     '') explicitSubModules
   );
 
@@ -200,6 +211,15 @@ let
   # derivations to be built during evaluation (breaking `nix flake check --no-build`).
   autoDiscoverScript = lib.optionalString autoSubModules ''
     rm -f go.mod.discovered
+    # Per-module normalized version: `/vN` paths must become `vN.0.0` (Go
+    # rejects `v0.0.0` for a major-versioned module path); everything else
+    # falls back to the configured `subModuleVersion` default.
+    module_version() {
+      case "$1" in
+        */v[0-9]|*/v[0-9][0-9]) printf 'v%s.0.0' "''${1##*/v}" ;;
+        *) printf '%s' "${subModuleVersion}" ;;
+      esac
+    }
     find _local_deps/ -mindepth 3 -name go.mod | sort | while IFS= read -r gomod; do
       case "$gomod" in
         ${lib.concatStringsSep "|" (map (d: "*/${d}/*") excludeSubModuleDirs)}) continue ;;
@@ -210,11 +230,12 @@ let
       subdir=$(printf '%s' "$rel" | cut -d/ -f2-)
       modulePath=$(awk '/^module /{print $2; exit}' "$gomod")
       [ -z "$modulePath" ] && continue
+      ver=$(module_version "$modulePath")
       # `[.]` not `\.`: this is a Nix DOUBLE-quoted string where `\.` is an
       # unknown escape and the backslash is DROPPED — the pattern must stay a
       # literal-dot regex either way (see explicitVersionNormalize NOTE 1/2:
       # -E + `#` delimiter matches both pseudo-version shapes).
-      sed -E -i "s#$modulePath v[0-9]+[.][0-9]+[.][0-9]+(-0[.][0-9]+-[0-9a-f]+|-[0-9]+-[0-9a-f]+)#$modulePath ${subModuleVersion}#g" go.mod
+      sed -E -i "s#$modulePath v[0-9]+[.][0-9]+[.][0-9]+(-0[.][0-9]+-[0-9a-f]+|-[0-9]+-[0-9a-f]+)#$modulePath $ver#g" go.mod
       printf '  %s => ./_local_deps/%s/%s\n' "$modulePath" "$basename" "$subdir" >> go.mod.discovered
     done
   '';
