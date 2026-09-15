@@ -296,7 +296,9 @@ let
   #   - no-base form:     v0.0.0-<ts>-<rev>
   #   - base form:        vX.Y.Z-0.<ts>-<rev>  (go-cqrs-lite master pins, e.g.
   #     v4.8.2-0.20260906141959-6f9dfa8add64 — previously NOT normalized)
-  # Both must normalize to subModuleVersion so replace directives match.
+  # Both normalize to a major-consistent version: /vN module paths require
+  # vN.0.0 (a bare v0.0.0 is INVALID: "should be vN, not v0" — the
+  # 2026-09-15 preserve-major fix); plain modules keep subModuleVersion.
   # ---------------------------------------------------------------------------
   mockPseudoVersionSrc = pkgs.writeTextDir "go.mod" ''
     module github.com/larsartmann/mock-pseudo
@@ -555,19 +557,19 @@ in
     GOMOD8=${pseudoVersionNormalizeTest}/go.mod
     cat "$GOMOD8"
     echo ""
-    # no-base form: v0.0.0-<ts>-<rev>
-    if grep -qF "github.com/larsartmann/mock-dep/codec/v2 v0.0.0" "$GOMOD8"; then
-      echo "PASS: no-base pseudo (v0.0.0-<ts>-<rev>) normalized to subModuleVersion"
+    # no-base form: v0.0.0-<ts>-<rev> on a /v2 module -> v2.0.0 (major preserved)
+    if grep -qF "github.com/larsartmann/mock-dep/codec/v2 v2.0.0" "$GOMOD8"; then
+      echo "PASS: no-base pseudo (v0.0.0-<ts>-<rev>) normalized major-consistently"
     else
-      echo "FAIL: no-base pseudo-version was not normalized"
+      echo "FAIL: no-base pseudo-version was not normalized to v2.0.0"
       grep "codec/v2" "$GOMOD8"
       exit 1
     fi
-    # base form: vX.Y.Z-0.<ts>-<rev> (go-cqrs-lite master pin shape)
-    if grep -qF "github.com/larsartmann/mock-dep/storage/v2 v0.0.0" "$GOMOD8"; then
-      echo "PASS: base pseudo (vX.Y.Z-0.<ts>-<rev>) normalized to subModuleVersion"
+    # base form: vX.Y.Z-0.<ts>-<rev> (go-cqrs-lite master pin shape) -> v2.0.0
+    if grep -qF "github.com/larsartmann/mock-dep/storage/v2 v2.0.0" "$GOMOD8"; then
+      echo "PASS: base pseudo (vX.Y.Z-0.<ts>-<rev>) normalized major-consistently"
     else
-      echo "FAIL: base pseudo-version (vX.Y.Z-0.<ts>-<rev>) was not normalized"
+      echo "FAIL: base pseudo-version (vX.Y.Z-0.<ts>-<rev>) was not normalized to v2.0.0"
       grep "storage/v2" "$GOMOD8"
       exit 1
     fi
