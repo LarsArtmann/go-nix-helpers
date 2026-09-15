@@ -177,6 +177,17 @@ let
 
   hasRequires = requireDeps != { };
 
+  # Normalized require versions must stay major-consistent with the module
+  # path: a /vN module rejects v0.0.0 ("should be vN, not v0"). Derive the
+  # normalized version from the /vN suffix (mid-path included, e.g.
+  # event/v3/eventtest); non-/vN modules keep subModuleVersion.
+  versionForPath =
+    path:
+    let
+      m = builtins.match ".*/v([0-9]+)(/.*)?" path;
+    in
+    if m == null then subModuleVersion else "v${builtins.head m}.0.0";
+
   # Normalize pseudo-versions for EXPLICIT sub-modules so replace directives match.
   # Auto-discovered modules are normalized at build time (see autoDiscoverScript).
   # NOTE 1: `[.]` not `\.` — in a Nix double-quoted string an unknown escape like
@@ -187,9 +198,11 @@ let
   # alternation needs `|`). Matches BOTH pseudo-version shapes: the no-base
   # form `v0.0.0-<ts>-<rev>` AND the base form `vX.Y.Z-0.<ts>-<rev>`
   # (e.g. v4.8.2-0.20260906141959-6f9dfa8add64 from go-cqrs-lite master pins).
+  # NOTE 3: the replacement preserves the module-path major (versionForPath)
+  # — a bare subModuleVersion (v0.0.0) is INVALID for /vN modules.
   explicitVersionNormalize = lib.concatStringsSep "\n" (
     map (sm: ''
-      sed -E -i 's#${sm.modulePath} v[0-9]+[.][0-9]+[.][0-9]+(-0[.][0-9]+-[0-9a-f]+|-[0-9]+-[0-9a-f]+)#${sm.modulePath} ${subModuleVersion}#g' go.mod
+      sed -E -i 's#${sm.modulePath} v[0-9]+[.][0-9]+[.][0-9]+(-0[.][0-9]+-[0-9a-f]+|-[0-9]+-[0-9a-f]+)#${sm.modulePath} ${versionForPath sm.modulePath}#g' go.mod
     '') explicitSubModules
   );
 
@@ -214,7 +227,12 @@ let
       # unknown escape and the backslash is DROPPED — the pattern must stay a
       # literal-dot regex either way (see explicitVersionNormalize NOTE 1/2:
       # -E + `#` delimiter matches both pseudo-version shapes).
-      sed -E -i "s#$modulePath v[0-9]+[.][0-9]+[.][0-9]+(-0[.][0-9]+-[0-9a-f]+|-[0-9]+-[0-9a-f]+)#$modulePath ${subModuleVersion}#g" go.mod
+      # The replacement preserves the module-path major: /vN modules reject
+      # v0.0.0 ("should be vN, not v0"); mid-path /vN (event/v3/eventtest)
+      # extracts the segment, not the suffix.
+      major=$(printf '%s' "$modulePath" | sed -n 's#^.*/v\([0-9][0-9]*\)\(/.*\)\?$#\1#p')
+      if [ -n "$major" ]; then normVer="v$major.0.0"; else normVer="${subModuleVersion}"; fi
+      sed -E -i "s#$modulePath v[0-9]+[.][0-9]+[.][0-9]+(-0[.][0-9]+-[0-9a-f]+|-[0-9]+-[0-9a-f]+)#$modulePath $normVer#g" go.mod
       printf '  %s => ./_local_deps/%s/%s\n' "$modulePath" "$basename" "$subdir" >> go.mod.discovered
     done
   '';
