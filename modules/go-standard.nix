@@ -478,6 +478,19 @@ in
                     url = "https://go.dev/dl/go${finalAttrs.version}.src.tar.gz";
                     hash = cfg.goTarballHash;
                   };
+                  # The tarball's source tree is goTarballVersion's, but
+                  # pkgs.${goPkgAttr} is the nixpkgs default (e.g. 1.26) —
+                  # its version-suffixed patches (go_no_vendor_checks-1.26)
+                  # do not apply to a newer tree. Swap for the matching
+                  # nixpkgs patch when one exists.
+                  patches =
+                    let
+                      vendorChecks = p: builtins.match "go_no_vendor_checks-.*[.]patch" (baseNameOf p) != null;
+                      majorMinor = builtins.concatStringsSep "." (lib.lists.sublist 0 2 (lib.splitVersion cfg.goTarballVersion));
+                      matching = pkgs.path + "/pkgs/development/compilers/go/go_no_vendor_checks-${majorMinor}.patch";
+                    in
+                    builtins.filter (p: !vendorChecks p) _prev.patches
+                    ++ lib.optionals (builtins.pathExists matching) [ matching ];
                 }
               )
           else
