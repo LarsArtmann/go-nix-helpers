@@ -179,25 +179,25 @@
             # Legacy entrypoints kept for discoverability.
             dashboard = {
               type = "app";
-              program = pkgs.writeShellApplication {
+              program = lib.getExe (pkgs.writeShellApplication {
                 name = "dashboard";
                 runtimeInputs = [ pkgs.nix ];
                 text = ''
                   exec ${./scripts/dashboard.sh} "$@"
                 '';
-              };
+              });
               meta.description = "Overview of flake check status across all projects";
             };
 
             lint = {
               type = "app";
-              program = pkgs.writeShellApplication {
+              program = lib.getExe (pkgs.writeShellApplication {
                 name = "nix-lint";
                 runtimeInputs = [ pkgs.nix ];
                 text = ''
                   exec ${./scripts/nix-lint.sh} "$@"
                 '';
-              };
+              });
               meta.description = "Lint flake.nix files for common error patterns";
             };
           };
