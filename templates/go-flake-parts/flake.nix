@@ -134,23 +134,23 @@
 
             test = {
               type = "app";
-              program = pkgs.writeShellApplication {
+              program = pkgs.lib.getExe (pkgs.writeShellApplication {
                 name = "run-test";
                 runtimeInputs = [ goPkg ];
                 text = "go test -race -v -coverprofile=coverage.out ./...";
-              };
+              });
             };
 
             lint = {
               type = "app";
-              program = pkgs.writeShellApplication {
+              program = pkgs.lib.getExe (pkgs.writeShellApplication {
                 name = "run-lint";
                 runtimeInputs = [
                   goPkg
                   pkgs.golangci-lint
                 ];
                 text = "golangci-lint run ./...";
-              };
+              });
             };
           };
 
