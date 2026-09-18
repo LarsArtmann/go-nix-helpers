@@ -40,12 +40,14 @@
 let
   cfg = config.go-standard;
 
-  # Default systems matching github:nix-systems/default
-  # Consumers no longer need a `systems` flake input.
+  # Default systems matching github:nix-systems/default, minus x86_64-darwin:
+  # Nixpkgs 26.11 (current nixos-unstable) dropped x86_64-darwin support, so
+  # evaluating that system fails outright. Consumers no longer need a
+  # `systems` flake input (several already overrode systems for exactly
+  # this reason — see go-health, go-taskqueue).
   defaultSystems = [
     "x86_64-linux"
     "aarch64-linux"
-    "x86_64-darwin"
     "aarch64-darwin"
   ];
 in
