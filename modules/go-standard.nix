@@ -488,7 +488,9 @@ in
                   patches =
                     let
                       vendorChecks = p: builtins.match "go_no_vendor_checks-.*[.]patch" (baseNameOf p) != null;
-                      majorMinor = builtins.concatStringsSep "." (lib.lists.sublist 0 2 (lib.splitVersion cfg.goTarballVersion));
+                      majorMinor = builtins.concatStringsSep "." (
+                        lib.lists.sublist 0 2 (lib.splitVersion cfg.goTarballVersion)
+                      );
                       matching = pkgs.path + "/pkgs/development/compilers/go/go_no_vendor_checks-${majorMinor}.patch";
                     in
                     builtins.filter (p: !vendorChecks p) _prev.patches
@@ -778,7 +780,16 @@ in
         };
 
         checks = {
-          format = config.treefmt.build.check self;
+          # goimports shells out to `go` for module metadata when it formats
+          # files inside a module. The check sandbox has no network, so the
+          # `go` on PATH must match the repo's floor exactly (goPkg) and must
+          # never try a toolchain auto-download (GOTOOLCHAIN=local) — a floor
+          # above the ambient toolchain otherwise fails the check with
+          # "go: downloading goX.Y.Z" DNS errors.
+          format = (config.treefmt.build.check self).overrideAttrs (old: {
+            nativeBuildInputs = [ goPkg ] ++ (old.nativeBuildInputs or [ ]);
+            GOTOOLCHAIN = "local";
+          });
           build = config.packages.default;
         }
         // lib.optionalAttrs (cfg.lintAsCheck && cfg.enableGolangciLint) {
