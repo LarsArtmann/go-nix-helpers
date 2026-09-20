@@ -779,99 +779,106 @@ in
           );
         };
 
-        checks = {
-          # goimports shells out to `go` for module metadata when it formats
-          # files inside a module. The check sandbox has no network, so the
-          # `go` on PATH must match the repo's floor exactly (goPkg) and must
-          # never try a toolchain auto-download (GOTOOLCHAIN=local) — a floor
-          # above the ambient toolchain otherwise fails the check with
-          # "go: downloading goX.Y.Z" DNS errors.
-          format = (config.treefmt.build.check self).overrideAttrs (old: {
-            nativeBuildInputs = [ goPkg ] ++ (old.nativeBuildInputs or [ ]);
-            GOTOOLCHAIN = "local";
-          });
-          build = config.packages.default;
-        }
-        // lib.optionalAttrs (cfg.lintAsCheck && cfg.enableGolangciLint) {
-          lint =
-            let
-              pkg = config.packages.default.overrideAttrs (_old: {
-                pname = "${cfg.pname}-lint";
-                nativeBuildInputs = [
-                  goPkg
-                  pkgs.golangci-lint
-                ];
-                buildPhase = ''
-                  runHook preBuild
-                  export HOME=$TMPDIR
-                  golangci-lint run ./...
-                  runHook postBuild
-                '';
-                doCheck = false;
-                installPhase = "touch $out";
-              });
-            in
-            pkg;
-        }
-        // lib.optionalAttrs cfg.enableTestCheck {
-          test = config.packages.default.overrideAttrs (_old: {
-            doCheck = true;
-          });
-        }
-        // (
+        checks =
           let
-            # Every .templ file in the flake source must ship its generated
-            # *_templ.go sibling. Nix builds vendor the source WITHOUT running
-            # `templ generate`, so an untracked generated file breaks the build
-            # with `undefined: someFragment`. The flake source contains only
-            # TRACKED files, so a missing sibling here means it is not
-            # committed to git.
-            walkTempl =
-              dir:
-              lib.concatLists (
-                lib.mapAttrsToList (
-                  name: type:
-                  let
-                    path = dir + "/${name}";
-                  in
-                  if type == "directory" then
-                    # `test-assets` hosts this library's OWN templ-check fixtures
-                    # (modules/../test-module.nix walks them via a mock self);
-                    # the missing-generated fixture deliberately lacks a
-                    # sibling, which must not fail the host repo's own check.
-                    (if name == ".git" || name == "test-assets" then [ ] else walkTempl path)
-                  else if lib.hasSuffix ".templ" name then
-                    [
-                      {
-                        templ = path;
-                        # Path arithmetic ONLY: `dir + "/${...}"` keeps the value
-                        # a Nix PATH. Coercing the path to a string first
-                        # (`removeSuffix path + "_templ.go"`) builds a
-                        # context-carrying STRING, and `builtins.pathExists` on
-                        # that realises the context — fatal under
-                        # `nix flake check --no-build` on current Nix.
-                        generated = dir + "/${lib.removeSuffix ".templ" name}_templ.go";
-                      }
-                    ]
-                  else
-                    [ ]
-                ) (builtins.readDir dir)
-              );
-            templFiles = walkTempl self.outPath;
-            missing = builtins.filter (f: !builtins.pathExists f.generated) templFiles;
+            # goimports shells out to `go` for module metadata when it formats
+            # files inside a module. The check sandbox has no network, so the
+            # `go` on PATH must match the repo's floor exactly (goPkg) and must
+            # never try a toolchain auto-download (GOTOOLCHAIN=local) — a floor
+            # above the ambient toolchain otherwise fails the check with
+            # "go: downloading goX.Y.Z" DNS errors. Applies to BOTH
+            # go-standard's checks.format and treefmt-nix's own checks.treefmt
+            # (one underlying check, registered twice).
+            hermeticTreefmtCheck = (config.treefmt.build.check self).overrideAttrs (old: {
+              nativeBuildInputs = [ goPkg ] ++ (old.nativeBuildInputs or [ ]);
+              GOTOOLCHAIN = "local";
+            });
           in
-          lib.optionalAttrs (missing != [ ]) {
-            templ-committed = builtins.throw ''
-              go-standard: ${toString (builtins.length missing)} .templ file(s) without a committed *_templ.go sibling:
-              ${lib.concatStringsSep "\n" (map (f: "  ${toString f.templ}") missing)}
-
-              Nix builds vendor the source without running `templ generate` —
-              the build fails with `undefined: someFragment`. Run `templ generate`
-              and commit the generated *_templ.go files:
-                git add -- '*_templ.go'
-            '';
+          {
+            format = hermeticTreefmtCheck;
+            treefmt = lib.mkForce hermeticTreefmtCheck;
+            build = config.packages.default;
           }
-        );
+          // lib.optionalAttrs (cfg.lintAsCheck && cfg.enableGolangciLint) {
+            lint =
+              let
+                pkg = config.packages.default.overrideAttrs (_old: {
+                  pname = "${cfg.pname}-lint";
+                  nativeBuildInputs = [
+                    goPkg
+                    pkgs.golangci-lint
+                  ];
+                  buildPhase = ''
+                    runHook preBuild
+                    export HOME=$TMPDIR
+                    golangci-lint run ./...
+                    runHook postBuild
+                  '';
+                  doCheck = false;
+                  installPhase = "touch $out";
+                });
+              in
+              pkg;
+          }
+          // lib.optionalAttrs cfg.enableTestCheck {
+            test = config.packages.default.overrideAttrs (_old: {
+              doCheck = true;
+            });
+          }
+          // (
+            let
+              # Every .templ file in the flake source must ship its generated
+              # *_templ.go sibling. Nix builds vendor the source WITHOUT running
+              # `templ generate`, so an untracked generated file breaks the build
+              # with `undefined: someFragment`. The flake source contains only
+              # TRACKED files, so a missing sibling here means it is not
+              # committed to git.
+              walkTempl =
+                dir:
+                lib.concatLists (
+                  lib.mapAttrsToList (
+                    name: type:
+                    let
+                      path = dir + "/${name}";
+                    in
+                    if type == "directory" then
+                      # `test-assets` hosts this library's OWN templ-check fixtures
+                      # (modules/../test-module.nix walks them via a mock self);
+                      # the missing-generated fixture deliberately lacks a
+                      # sibling, which must not fail the host repo's own check.
+                      (if name == ".git" || name == "test-assets" then [ ] else walkTempl path)
+                    else if lib.hasSuffix ".templ" name then
+                      [
+                        {
+                          templ = path;
+                          # Path arithmetic ONLY: `dir + "/${...}"` keeps the value
+                          # a Nix PATH. Coercing the path to a string first
+                          # (`removeSuffix path + "_templ.go"`) builds a
+                          # context-carrying STRING, and `builtins.pathExists` on
+                          # that realises the context — fatal under
+                          # `nix flake check --no-build` on current Nix.
+                          generated = dir + "/${lib.removeSuffix ".templ" name}_templ.go";
+                        }
+                      ]
+                    else
+                      [ ]
+                  ) (builtins.readDir dir)
+                );
+              templFiles = walkTempl self.outPath;
+              missing = builtins.filter (f: !builtins.pathExists f.generated) templFiles;
+            in
+            lib.optionalAttrs (missing != [ ]) {
+              templ-committed = builtins.throw ''
+                go-standard: ${toString (builtins.length missing)} .templ file(s) without a committed *_templ.go sibling:
+                ${lib.concatStringsSep "\n" (map (f: "  ${toString f.templ}") missing)}
+
+                Nix builds vendor the source without running `templ generate` —
+                the build fails with `undefined: someFragment`. Run `templ generate`
+                and commit the generated *_templ.go files:
+                  git add -- '*_templ.go'
+              '';
+            }
+          );
 
         treefmt = {
           projectRootFile = "go.mod";
