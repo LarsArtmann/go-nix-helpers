@@ -234,7 +234,24 @@
         projectRootFile = "go.mod";
         programs = {
           gofumpt.enable = true;
-          goimports.enable = true;
+          goimports = {
+            enable = true;
+            # goimports resolves imports through the `go` tool (exec.LookPath),
+            # and nixpkgs' goTools binary is built with an older Go than the
+            # consumer's go.mod may declare — once go.mod's directive exceeds
+            # the formatter's own toolchain, goimports probes for `go` and
+            # dies with exit 2 in the bare check sandbox (reproduced
+            # 2026-09-23: go.mod `go 1.27.1` vs goTools built on 1.26.x).
+            # Merging the project's own Go (the same goPkg the build uses)
+            # into the formatter's PATH fixes resolution for ANY floor.
+            package = pkgs.symlinkJoin {
+              name = "goimports-with-go";
+              paths = [
+                pkgs.goimports
+                goPkg
+              ];
+            };
+          };
           nixfmt.enable = true;
         };
       };
