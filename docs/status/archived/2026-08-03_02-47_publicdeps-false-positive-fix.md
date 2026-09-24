@@ -19,7 +19,7 @@ However, I missed several documentation updates and one significant functional g
 ## A) Fully Done
 
 | Item                             | Details                                                                                                                                                                       |
-| -------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| --- | --- |
 | `publicDeps` in mkPreparedSource | New parameter added, filtering implemented via `grep -vFx` in validateScript, documented in header comments                                                                   |
 | Improved error message           | Changed "private modules without local replace" → "modules without local replace", added 3 remediation options (add to deps / set validatePrivateDeps=false / use publicDeps) |
 | go-standard.nix options          | Added `publicDeps` (list str) and `privateDepPattern` (str) options with defaults, forwarded to mkPreparedSource call                                                         |
@@ -60,8 +60,8 @@ However, I missed several documentation updates and one significant functional g
 
 | ~~**README.md troubleshooting section**~~ done at `9b376b3`, `274cb35` | ~~Line 273 still references old error text~~ Fixed: error text updated, `publicDeps` added as remediation option |
 | ~~**AGENTS.md key files table**~~ done — now 32 options | ~~Line 107 still says "28 options"~~ Updated through successive sessions to 32 |
-| **nix-private-go-repos SKILL.md** | Still open — skill has 0 mentions of `publicDeps`. → tracked in ROADMAP (Theme 5) |
-| **docs/flake-patterns.md** | Still open — no mention of `publicDeps` patterns |
+| ~~**nix-private-go-repos SKILL.md**~~| ~~Still open — skill has 0 mentions of `publicDeps`. → tracked in ROADMAP (Theme 5)~~|
+| ~~**docs/flake-patterns.md**~~| ~~Still open — no mention of `publicDeps` patterns~~|
 | ~~**CI workflow**~~ partially addressed | ~~CI runs `nix flake check --no-build`~~ `verify` check builds publicDepsTest indirectly; explicit CI build not added |
 
 ---

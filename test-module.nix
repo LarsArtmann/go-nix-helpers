@@ -861,7 +861,8 @@ let
         (mkPerSystemConfig {
           lintAsCheck = true;
           enableGolangciLint = false;
-        }).checks ? lint
+        }).checks
+          ? lint
       )
     ) "no checks.lint when enableGolangciLint=false")
     # --- templ-committed eval check -----------------------------------------

@@ -10,7 +10,7 @@
 ## 1. Executive Summary
 
 | Metric                                                          | Count                                             |
-| --------------------------------------------------------------- | ------------------------------------------------- |
+| --- | --- |
 | Repos using go-standard module                                  | **5 / 34** (15%)                                  |
 | Repos on legacy manual `mkPreparedSource`                       | **27 / 34** (79%)                                 |
 | Repos on deprecated `mkGoFlake.nix`                             | **2 / 34** (6%)                                   |
@@ -39,7 +39,7 @@ custom Go derivation, no `postPatchExtra`, no NixOS modules, no multi-package
 subtlety. They can move to go-standard with only the module's config surface:
 
 | Repo                             | Lines | Private requires        | Notes                                                                   |
-| -------------------------------- | ----- | ----------------------- | ----------------------------------------------------------------------- |
+| --- | --- | --- | --- |
 | `go-localsync`                   | 237   | 3 covered               | 1 package, clean deps, GOEXPERIMENT via env-only                        |
 | `go-humanize-linter`             | 286   | 5 covered               | custom source filter (module supports src), app coverage                |
 | `golangci-lint-auto-configure`   | 233   | 3/4 covered             | validatePrivateDeps=false, custom apps                                  |
@@ -57,7 +57,7 @@ subtlety. They can move to go-standard with only the module's config surface:
 ### Tier B — Modest migration (GOEXPERIMENT / env / custom multi-package)
 
 | Repo                | Lines | Why B                                                        |
-| ------------------- | ----- | ------------------------------------------------------------ |
+| --- | --- | --- |
 | `KeyCountdown`      | 250   | custom modBuildPhase + buildTools, apps                      |
 | `KeyHolderAI`       | 354   | custom modFod + many apps                                    |
 | `StopTube`          | 262   | custom modFod + 2 packages with different subPackages + tags |
@@ -72,7 +72,7 @@ subtlety. They can move to go-standard with only the module's config surface:
 ### Tier C — Complex (needs module feature work first) or leave as-is
 
 | Repo                     | Why C                                                                                                                                                                  |
-| ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| --- | --- |
 | `Standup-Killer`         | deprecated `mkGoFlake` + `doCheck=false` + postPatch hacks + many subModules                                                                                           |
 | `crush-daily`            | deprecated `mkGoFlake` + huge custom nixosModule + extraFlake checks + extraApps                                                                                       |
 | `Code-Quality-Agent`     | **custom Go 1.26.4 built from source** — go-standard `goPkgAttr` can't express this                                                                                    |
@@ -83,7 +83,7 @@ subtlety. They can move to go-standard with only the module's config surface:
 ### Module adopters (already migrated — review quality)
 
 | Repo                            | Flake lines | Issues found                                                                                                                                                                                                                                         |
-| ------------------------------- | ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| --- | --- | --- |
 | `index`                         | 363         | `enableCheck=true` redundant; `enableTempl=true` but treefmt excludes *templ.go; GOPRIVATE manually set (harmless, auto when deps); 5 private requires w/ 1 dep mapping — **needs publicDeps or deps expansion**; custom checks ok                   |
 | `lean-business-plan`            | 83          | **unused `systems` + `treefmt-nix` inputs** (module bundles); src via fileset good; `extraBuildAttrs.preBuild="templ generate"` good; missing GOPRIVATE (auto when deps — none here, correct)                                                        |
 | `storbi`                        | 95          | **unused `systems`+`treefmt-nix` inputs**; GOPRIVATE manual (harmless); `deps` only covers 3/4 private requires — **go-error-family etc. verify**; extraBuildAttrs env.CGO_ENABLED=0 — module supports via extraBuildAttrs/env                       |
@@ -124,12 +124,12 @@ time. Two gaps (G1, G3) were fixed immediately after the audit; two (G2, G5)
 remain open:
 
 | #  | Gap                                                                                                                                                                                                                        | Affected repos                                                                                                     | Status                                                                                                                                        |
-| -- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------- |
-| G1 | **Custom Go derivation** (`goPkgAttr` is a string attr name, can't pass `pkgs.go_1_26.overrideAttrs { version=...; src=...; }`)                                                                                            | Code-Quality-Agent (go 1.26.4 custom build)                                                                        | ✅ **FIXED** — new `goPkgOverride` option (function applied to the pkg from `goPkgAttr`), tested (106 module assertions)                      |
-| G2 | **Per-package `extraBuildAttrs`** (monorepo `packages` entries can't carry custom preBuild/postInstall/env per binary)                                                                                                     | StopTube (2 pkgs diff attrs), browser-history (2 pkgs), BuildFlow (multi-tool), go-structure-linter (multi-module) | ~~❌ Open — extend `packages` submodule with the same extraBuildAttrs surface~~ done — shipped `2f3b6b2` with 4 test assertions                                                                   |
-| G3 | **`checks.lint` not generated** — module makes `apps.lint` only; consumers expecting a CI `checks.lint` derivation must hand-write it (bank-sync, index have custom ones).                                                 | Several                                                                                                            | ✅ **FIXED** — new `lintAsCheck` option (default: false) exposes a hermetic `checks.lint` derivation                                          |
-| G4 | **`overrideModAttrs` / `modBuildPhase`** custom FOD phases are NOT expressible as extraBuildAttrs because they're nested inside `autoDepFodAttrs` which is `//`-merged _after_ user extraBuildAttrs (user can't override). | bank-sync, StopTube, KeyCountdown, go-localsync (all use custom modBuildPhase)                                     | ⚪ No action — module's autoDepFodAttrs already does `go mod tidy` + `go mod vendor` + copy-back, functionally identical to the manual phases |
-| G5 | **`subPackages` with `packages` monorepo complements** — multi-binary repos building several `cmd/*` with different flags                                                                                                  | browser-history, BuildFlow                                                                                         | ~~❌ Open — covered by G2 once per-package attrs exist~~ done — covered by G2 (`2f3b6b2`)                                                                                          |
+| --- | --- | --- | --- |
+| ~~G1~~| ~~**Custom Go derivation** (`goPkgAttr` is a string attr name, can't pass `pkgs.go_1_26.overrideAttrs { version=...; src=...; }`)~~| ~~Code-Quality-Agent (go 1.26.4 custom build)~~| ~~✅ **FIXED** — new `goPkgOverride` option (function applied to the pkg from `goPkgAttr`), tested (106 module assertions)~~|
+| ~~G2~~ | ~~**Per-package `extraBuildAttrs`** (monorepo `packages` entries can't carry custom preBuild/postInstall/env per binary)~~ | ~~StopTube (2 pkgs diff attrs), browser-history (2 pkgs), BuildFlow (multi-tool), go-structure-linter (multi-module)~~ | ~~❌ Open — extend `packages` submodule with the same extraBuildAttrs surface~~ done — shipped `2f3b6b2` with 4 test assertions                                                                   |
+| ~~G3~~| ~~**`checks.lint` not generated** — module makes `apps.lint` only; consumers expecting a CI `checks.lint` derivation must hand-write it (bank-sync, index have custom ones).~~| ~~Several~~| ~~✅ **FIXED** — new `lintAsCheck` option (default: false) exposes a hermetic `checks.lint` derivation~~|
+| ~~G4~~| ~~**`overrideModAttrs` / `modBuildPhase`** custom FOD phases are NOT expressible as extraBuildAttrs because they're nested inside `autoDepFodAttrs` which is `//`-merged _after_ user extraBuildAttrs (user can't override).~~| ~~bank-sync, StopTube, KeyCountdown, go-localsync (all use custom modBuildPhase)~~| ~~⚪ No action — module's autoDepFodAttrs already does `go mod tidy` + `go mod vendor` + copy-back, functionally identical to the manual phases~~|
+| ~~G5~~ | ~~**`subPackages` with `packages` monorepo complements** — multi-binary repos building several `cmd/*` with different flags~~ | ~~browser-history, BuildFlow~~ | ~~❌ Open — covered by G2 once per-package attrs exist~~ done — covered by G2 (`2f3b6b2`)                                                                                          |
 
 **G4 audit correction:** the module's `autoDepFodAttrs` (go mod tidy + go mod vendor + copy back) is _functionally identical_ to the custom `modBuildPhase`/`modInstallPhase` in bank-sync/StopTube/KeyCountdown/go-localsync. Migration from those repos is simpler than feared — the only remaining diff is `GOEXPERIMENT` handling (needs `extraBuildAttrs.env.GOEXPERIMENT = "jsonv2"`, which module supports) and `cp go.mod/go.sum` already done.
 

@@ -11,7 +11,7 @@
 The user pasted output from a formatting/check run containing errors from multiple tools:
 
 | Tool        | Errors                                                                 | Severity      |
-| ----------- | ---------------------------------------------------------------------- | ------------- |
+| --- | --- | --- |
 | shfmt       | 3 shell scripts using spaces instead of tabs                           | Formatting    |
 | deadnix     | Unused lambda patterns in flake.nix, templates, test-module.nix        | Lint warning  |
 | statix      | Assignment-instead-of-inherit, empty patterns                          | Lint warning  |
@@ -56,7 +56,7 @@ The **real bug** was `nix flake check --no-build` failing because `mkPreparedSou
 ### 2. Confirmed Already-Fixed Items (from commit c0a8290)
 
 | Issue                    | Status          |
-| ------------------------ | --------------- |
+| --- | --- |
 | shfmt: spaces → tabs     | Already fixed   |
 | deadnix: unused vars     | Already fixed   |
 | statix: inherit/patterns | Already fixed   |
@@ -161,7 +161,7 @@ Nothing. All changes are verified working.
 31.~~Add a CI step that runs `nix-build test.nix -A autoDiscovery` and inspects the go.mod~~ **Won't implement — dormant — dropped.**
 32.~~Consider adding a golden file test (compare go.mod output to a known-good reference)~~ **Won't implement — dormant — dropped.**
 33.~~Explore whether `nix flake check` (without `--no-build`) would catch issues `--no-build` misses~~ **Won't implement — dormant — dropped.**
-34.~~Review the `sed` escaping in `subModuleVersionNormalize` — the `|` delimiter could conflict with module paths containing `|`~~ **Won't implement — dormant — dropped.**
+34.~~Review the `sed` escaping in `subModuleVersionNormalize` — the `| ~~` delimiter could conflict with module paths containing `~~|`~~ **Won't implement — dormant — dropped.**
 35.~~Add error handling in `autoDiscoverScript` for malformed go.mod files~~ **Won't implement — dormant — dropped.**
 36.~~Consider whether `awk '/^module /{print $2; exit}'` should be more robust (handle `module\t<path>`, comments, etc.)~~ **Won't implement — dormant — dropped.**
 37.~~Add a test for module paths containing dots (e.g. `github.com/x/y.z/v2`)~~ **Won't implement — dormant — dropped.**

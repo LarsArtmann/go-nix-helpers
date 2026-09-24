@@ -130,25 +130,25 @@ intellectual shortcut of trusting the prior session's analysis.
 ### High impact (prevents real breakage)
 
 | # | Task                                                                                            | Why                                                                | Effort |
-| - | ----------------------------------------------------------------------------------------------- | ------------------------------------------------------------------ | ------ |
-| ~~1~~ | ~~Unblocks Blocked item: set up `DEPLOY_SSH_KEY` secret in GitHub~~ | ~~Enables real private-repo CI test — the highest-value blocked item~~ | ~~15min~~ | done — moved to TODO_LIST Blocked (SSH secret)
-| ~~2~~ | ~~Create mock Go project + flake.nix importing go-standard, build via `nix build` in CI~~ | ~~E2e consumer test catches breaking changes before they ship~~ | ~~2h~~ | done — moved to TODO_LIST Blocked (E2E)
-| ~~3~~ | ~~Prototype L10 extraction empirically (extract to `.sh`, run all tests, document result, revert)~~ | ~~Converts theoretical skip rationale into empirical evidence~~ | ~~45min~~ | done — done — 09:23 session prototyped, measured, reverted, documented
-| ~~4~~ | ~~Add `go mod tidy` check to mkPreparedSource postPatch~~ | ~~Catches malformed replaces at preparation time, not vendor time~~ | ~~30min~~ | done — subsumed — the FOD runs `go mod tidy` when deps are set
-| ~~5~~ | ~~Fix `publicDeps` to support versioned-path matching (prefix or glob)~~ | ~~Eliminates false-positive validation failures for `/v2+` modules~~ | ~~30min~~ | done — done `a199f6b` (09:23 session)
+| --- | --- | --- | --- |
+| ~~1~~ | ~~Unblocks Blocked item: set up `DEPLOY_SSH_KEY` secret in GitHub~~ | ~~Enables real private-repo CI test — the highest-value blocked item~~ | ~~15min~~ done — moved to TODO_LIST Blocked (SSH secret) |
+| ~~2~~ | ~~Create mock Go project + flake.nix importing go-standard, build via `nix build` in CI~~ | ~~E2e consumer test catches breaking changes before they ship~~ | ~~2h~~ done — moved to TODO_LIST Blocked (E2E) |
+| ~~3~~ | ~~Prototype L10 extraction empirically (extract to `.sh`, run all tests, document result, revert)~~ | ~~Converts theoretical skip rationale into empirical evidence~~ | ~~45min~~ done — done — 09:23 session prototyped, measured, reverted, documented |
+| ~~4~~ | ~~Add `go mod tidy` check to mkPreparedSource postPatch~~ | ~~Catches malformed replaces at preparation time, not vendor time~~ | ~~30min~~ done — subsumed — the FOD runs `go mod tidy` when deps are set |
+| ~~5~~ | ~~Fix `publicDeps` to support versioned-path matching (prefix or glob)~~ | ~~Eliminates false-positive validation failures for `/v2+` modules~~ | ~~30min~~ done — done `a199f6b` (09:23 session) |
 
 ### Medium impact (quality and maintainability)
 
 | #  | Task                                                                                  | Why                                                               | Effort |
-| -- | ------------------------------------------------------------------------------------- | ----------------------------------------------------------------- | ------ |
+| --- | --- | --- | --- |
 | ~~6~~ | ~~Make `privateDepPattern` default empty/wildcard, document LarsArtmann override~~ | ~~General correctness for non-LarsArtmann consumers~~ | ~~20min~~ |
-| ~~7~~ | ~~Remove `goPkg` dead-weight parameter (major version bump)~~ | ~~Eliminates misleading API surface~~ | ~~30min~~ | done — gated on a major bump (TODO_LIST Blocked)
-| ~~8~~ | ~~Delete `mkGoFlake.nix` (major version bump, post-migration-guide)~~ | ~~Removes parallel maintenance burden~~ | ~~20min~~ | done — gated on a major bump (TODO_LIST Blocked)
-| ~~9~~ | ~~Delete `templates/go-flake-parts/` (major version bump)~~ | ~~Removes deprecated path from shipped templates~~ | ~~10min~~ | done — gated on a major bump (TODO_LIST Blocked)
+| ~~7~~ | ~~Remove `goPkg` dead-weight parameter (major version bump)~~ | ~~Eliminates misleading API surface~~ | ~~30min~~ done — gated on a major bump (TODO_LIST Blocked) |
+| ~~8~~ | ~~Delete `mkGoFlake.nix` (major version bump, post-migration-guide)~~ | ~~Removes parallel maintenance burden~~ | ~~20min~~ done — gated on a major bump (TODO_LIST Blocked) |
+| ~~9~~ | ~~Delete `templates/go-flake-parts/` (major version bump)~~ | ~~Removes deprecated path from shipped templates~~ | ~~10min~~ done — gated on a major bump (TODO_LIST Blocked) |
 | ~~10~~ | ~~Suppress or document the expected `vendorHash` placeholder warning in module tests~~ | ~~Reduces CI noise alarm~~ | ~~15min~~ |
-| ~~11~~ | ~~Add CI comment documenting why `--all-systems` is infeasible from Linux~~ | ~~Prevents future contributors from re-attempting a known dead end~~ | ~~5min~~ | done — done — CI comment added (09:23 session)
-| ~~12~~ | ~~Verify man pages (`docs/man/go-standard.5`) match all 35 current options~~ | ~~Man pages drift silently; last verified in a prior session~~ | ~~30min~~ | done — done — verified in the 09:23 session (35/35 options)
-| ~~13~~ | ~~Verify architecture diagram (`docs/architecture.d2`) matches current module structure~~ | ~~Diagram drifts silently~~ | ~~20min~~ | done — done — verified in the 09:23 session
+| ~~11~~ | ~~Add CI comment documenting why `--all-systems` is infeasible from Linux~~ | ~~Prevents future contributors from re-attempting a known dead end~~ | ~~5min~~ done — done — CI comment added (09:23 session) |
+| ~~12~~ | ~~Verify man pages (`docs/man/go-standard.5`) match all 35 current options~~ | ~~Man pages drift silently; last verified in a prior session~~ | ~~30min~~ done — done — verified in the 09:23 session (35/35 options) |
+| ~~13~~ | ~~Verify architecture diagram (`docs/architecture.d2`) matches current module structure~~ | ~~Diagram drifts silently~~ | ~~20min~~ done — done — verified in the 09:23 session |
 | ~~14~~ | ~~Add a `nix flake show` consumer-orientation test (verify expected outputs by name)~~ | ~~Structural test exists but could be deepened~~ | ~~30min~~ |
 | ~~15~~ | ~~Pin `nixpkgs` to a specific unstable commit for reproducibility tracking~~ | ~~Currently `nixos-unstable` (rolling); a pin makes bisect possible~~ | ~~15min~~ |
 | ~~16~~ | ~~Add `nix flake update` CI job (weekly) with auto-PR if checks pass~~ | ~~Keeps deps fresh without manual toil~~ | ~~45min~~ |
@@ -156,38 +156,38 @@ intellectual shortcut of trusting the prior session's analysis.
 ### Low impact (polish)
 
 | #  | Task                                                                                                             | Why                                                             | Effort |
-| -- | ---------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------- | ------ |
+| --- | --- | --- | --- |
 | ~~17~~ | ~~Register `maintainers.larsartmann` in nixpkgs (external PR)~~ | ~~Full correctness for `meta.maintainers`~~ | ~~30min~~ |
-| 18 | Fix empty commit message in `df9a5ff` (needs rebase + force-push)                                                | Git history hygiene                                             | 15min  |
+| ~~18~~ | ~~Fix empty commit message in `df9a5ff` (needs rebase + force-push)~~ | ~~Git history hygiene~~ | ~~15min~~ done — moved to TODO_LIST Blocked (df9a5ff) |
 | ~~19~~ | ~~Add shell completion for `generate-flake.sh` flags~~ | ~~UX polish for the bootstrap script~~ | ~~30min~~ |
 | ~~20~~ | ~~Add a `--check` flag to `generate-flake.sh` that validates an existing flake.nix against go-standard conventions~~ | ~~Helps consumers self-diagnose misconfiguration~~ | ~~1h~~ |
-| ~~21~~ | ~~Document the 6-concatenated-attrs behavior in the man page (`extraBuildAttrs`)~~ | ~~Man page may not reflect P1's extension to 6 attrs~~ | ~~15min~~ | done — done — man page lists all 6 attrs (verified 06:51 session)
-| 22 | Add integration test for `postPatchExtra` consumer hook                                                          | Currently relies on unit-level verification only                | 30min  |
-| 23 | Add test for `excludeSubModuleDirs` custom value                                                                 | Option exists but custom values are untested                    | 20min  |
-| 24 | Add test for `subModuleVersion` custom value                                                                     | Option exists but non-default is untested                       | 20min  |
-| 25 | Add test for `stripLocalReplaces = false`                                                                        | Option exists but disabled state is untested                    | 15min  |
+| ~~21~~ | ~~Document the 6-concatenated-attrs behavior in the man page (`extraBuildAttrs`)~~ | ~~Man page may not reflect P1's extension to 6 attrs~~ | ~~15min~~ done — done — man page lists all 6 attrs (verified 06:51 session) |
+| ~~22~~ | ~~Add integration test for `postPatchExtra` consumer hook~~ | ~~Currently relies on unit-level verification only~~ | ~~30min~~ **Won't implement — dormant — dropped (reopen on demand).** |
+| ~~23~~ | ~~Add test for `excludeSubModuleDirs` custom value~~ | ~~Option exists but custom values are untested~~ | ~~20min~~ **Won't implement — dormant — dropped (reopen on demand).** |
+| ~~24~~ | ~~Add test for `subModuleVersion` custom value~~ | ~~Option exists but non-default is untested~~ | ~~20min~~ **Won't implement — dormant — dropped (reopen on demand).** |
+| ~~25~~ | ~~Add test for `stripLocalReplaces = false`~~ | ~~Option exists but disabled state is untested~~ | ~~15min~~ **Won't implement — dormant — dropped (reopen on demand).** |
 | ~~26~~ | ~~Add test for `validatePrivateDeps = false`~~ | ~~Option exists but disabled state is untested~~ | ~~15min~~ |
 | ~~27~~ | ~~Add test for `autoSubModules = false`~~ | ~~Option exists but disabled state is untested~~ | ~~15min~~ |
 | ~~28~~ | ~~Add test for monorepo + deps interaction (packages + deps together)~~ | ~~Two features tested separately, not combined~~ | ~~30min~~ |
 | ~~29~~ | ~~Add test for monorepo + extraBuildAttrs concatenation~~ | ~~Ensures merge logic works in multi-package mode~~ | ~~30min~~ |
-| ~~30~~ | ~~Add test for `version` override affecting all packages in monorepo~~ | ~~Ensures version propagates correctly~~ | ~~20min~~ | done — done — monorepo version propagation test (09:23 session)
+| ~~30~~ | ~~Add test for `version` override affecting all packages in monorepo~~ | ~~Ensures version propagates correctly~~ | ~~20min~~ done — done — monorepo version propagation test (09:23 session) |
 | ~~31~~ | ~~Add test for `shellExtraBuildInputs`, `shellExtraEnv` propagation~~ | ~~devShell extras may be under-tested~~ | ~~20min~~ |
-| 32 | Add test for `extraMeta` propagation to all packages in monorepo                                                 | Ensures meta flows to each package                              | 20min  |
-| ~~33~~ | ~~Add test for `enableGolangciLint = false` (golangci-lint absent from devShell)~~ | ~~Toggle exists, disabled state untested~~ | ~~15min~~ | done — done — enableGolangciLint=false test (23:04 session)
-| ~~34~~ | ~~Add test for `enableGopls = false` (gopls absent from devShell)~~ | ~~Toggle exists, disabled state untested~~ | ~~15min~~ | done — done — enableGopls=false test (09:23 session)
-| ~~35~~ | ~~Add test for `enableGovulncheck = false`~~ | ~~Toggle exists, disabled state untested~~ | ~~15min~~ | done — done — enableGovulncheck=false test (09:23 session)
-| ~~36~~ | ~~Add test for `enableTempl = false` (templ absent from devShell + treefmt)~~ | ~~Toggle exists, disabled state untested~~ | ~~15min~~ | done — done — enableTempl=false test (09:23 session)
-| 37 | Add test for `buildFlags` with multiple flags                                                                    | Currently single-flag tested                                    | 15min  |
-| 38 | Add test for `ldflags` without version injection (pure consumer ldflags)                                         | Version-injection path tested; pure path may not be             | 15min  |
-| 39 | Add test for `proxyVendor = true` behavioral effect                                                              | Currently eval-only, not behavioral                             | 30min  |
-| 40 | Add test for `completionsPackage` (per-package completion binary selection in monorepo)                          | Monorepo + completions interaction untested                     | 30min  |
-| ~~41~~ | ~~Add a CHANGELOG entry for the L10 resolution~~ | ~~This session's change is not yet in CHANGELOG~~ | ~~5min~~ | done — recorded — TODO_LIST 'Decided against' section
-| ~~42~~ | ~~Add a CHANGELOG entry category for "decisions" (skipped-on-merit items)~~ | ~~Currently no place to record deliberate non-actions~~ | ~~10min~~ | done — recorded — TODO_LIST 'Decided against' section
-| 43 | Add a `CONTRIBUTORS.md` or contributor section                                                                   | Onboarding for external contributors                            | 20min  |
-| ~~44~~ | ~~Add versioned tags/releases (first tagged release)~~ | ~~Project is all `[Unreleased]`; consumers have no version to pin~~ | ~~30min~~ | done — moved to TODO_LIST Blocked (v0.1.0)
+| ~~32~~ | ~~Add test for `extraMeta` propagation to all packages in monorepo~~ | ~~Ensures meta flows to each package~~ | ~~20min~~ **Won't implement — dormant — dropped (reopen on demand).** |
+| ~~33~~ | ~~Add test for `enableGolangciLint = false` (golangci-lint absent from devShell)~~ | ~~Toggle exists, disabled state untested~~ | ~~15min~~ done — done — enableGolangciLint=false test (23:04 session) |
+| ~~34~~ | ~~Add test for `enableGopls = false` (gopls absent from devShell)~~ | ~~Toggle exists, disabled state untested~~ | ~~15min~~ done — done — enableGopls=false test (09:23 session) |
+| ~~35~~ | ~~Add test for `enableGovulncheck = false`~~ | ~~Toggle exists, disabled state untested~~ | ~~15min~~ done — done — enableGovulncheck=false test (09:23 session) |
+| ~~36~~ | ~~Add test for `enableTempl = false` (templ absent from devShell + treefmt)~~ | ~~Toggle exists, disabled state untested~~ | ~~15min~~ done — done — enableTempl=false test (09:23 session) |
+| ~~37~~ | ~~Add test for `buildFlags` with multiple flags~~ | ~~Currently single-flag tested~~ | ~~15min~~ **Won't implement — dormant — dropped (reopen on demand).** |
+| ~~38~~ | ~~Add test for `ldflags` without version injection (pure consumer ldflags)~~ | ~~Version-injection path tested; pure path may not be~~ | ~~15min~~ **Won't implement — dormant — dropped (reopen on demand).** |
+| ~~39~~ | ~~Add test for `proxyVendor = true` behavioral effect~~ | ~~Currently eval-only, not behavioral~~ | ~~30min~~ **Won't implement — dormant — dropped (reopen on demand).** |
+| ~~40~~ | ~~Add test for `completionsPackage` (per-package completion binary selection in monorepo)~~ | ~~Monorepo + completions interaction untested~~ | ~~30min~~ **Won't implement — dormant — dropped (reopen on demand).** |
+| ~~41~~ | ~~Add a CHANGELOG entry for the L10 resolution~~ | ~~This session's change is not yet in CHANGELOG~~ | ~~5min~~ done — recorded — TODO_LIST 'Decided against' section |
+| ~~42~~ | ~~Add a CHANGELOG entry category for "decisions" (skipped-on-merit items)~~ | ~~Currently no place to record deliberate non-actions~~ | ~~10min~~ done — recorded — TODO_LIST 'Decided against' section |
+| ~~43~~ | ~~Add a `CONTRIBUTORS.md` or contributor section~~ | ~~Onboarding for external contributors~~ | ~~20min~~ **Won't implement — dormant — dropped (reopen on demand).** |
+| ~~44~~ | ~~Add versioned tags/releases (first tagged release)~~ | ~~Project is all `[Unreleased]`; consumers have no version to pin~~ | ~~30min~~ done — moved to TODO_LIST Blocked (v0.1.0) |
 | ~~45~~ | ~~Add a `flake.lock` update policy to CONTRIBUTING.md~~ | ~~Clarifies when/how to update nixpkgs pin~~ | ~~15min~~ |
-| ~~46~~ | ~~Audit `.github/workflows/ci.yml` for action version pinning (SHA vs tag)~~ | ~~Tag-pinned actions can be rerouted; SHA is safer~~ | ~~20min~~ | done — done — dependabot.yml added 2026-09
-| ~~47~~ | ~~Add dependabot config for GitHub Actions~~ | ~~Keeps action versions current~~ | ~~15min~~ | done — done — dependabot.yml added 2026-09
+| ~~46~~ | ~~Audit `.github/workflows/ci.yml` for action version pinning (SHA vs tag)~~ | ~~Tag-pinned actions can be rerouted; SHA is safer~~ | ~~20min~~ done — done — dependabot.yml added 2026-09 |
+| ~~47~~ | ~~Add dependabot config for GitHub Actions~~ | ~~Keeps action versions current~~ | ~~15min~~ done — done — dependabot.yml added 2026-09 |
 | ~~48~~ | ~~Add a `CODE_OF_CONDUCT.md`~~ | ~~Standard for public repos expecting contributors~~ | ~~10min~~ |
 | ~~49~~ | ~~Add `SECURITY.md` (vulnerability reporting policy)~~ | ~~Standard for public repos~~ | ~~10min~~ |
 | ~~50~~ | ~~Run `nix flake check --all-systems` on a macOS machine to verify cross-platform~~ | ~~Linux can't eval darwin; only a real macOS runner proves it~~ | ~~30min~~ |
@@ -196,19 +196,19 @@ intellectual shortcut of trusting the prior session's analysis.
 
 ## G) QUESTIONS I CANNOT FIGURE OUT MYSELF ❓
 
-1. **Should I empirically prototype the L10 extraction (extract to `.sh`,
+1.~~**Should I empirically prototype the L10 extraction (extract to `.sh`,~~ **Won't implement — dormant — dropped (reopen on demand).**
    run all tests, document the result, then revert) to convert the theoretical
    skip rationale into hard evidence?** I closed it based on prior-session
    reasoning, but I did not actually try it. If you want rigor over velocity,
    say the word and I'll do the experiment.
 
-2. **Should I make a first tagged release (e.g. `v0.1.0`) now that P1-P11 are
+2.~~**Should I make a first tagged release (e.g. `v0.1.0`) now that P1-P11 are~~ **Won't implement — dormant — dropped (reopen on demand).**
    shipped and the project is stable?** The entire CHANGELOG is
    `[Unreleased]`. Downstream consumers pin `ref=master` (rolling). A tag
    would let them pin a stable point — but it also implies a support/maintenance
    commitment I can't assess without knowing your release strategy.
 
-3. **Do you want me to delete `mkGoFlake.nix` and
+3.~~**Do you want me to delete `mkGoFlake.nix` and~~ **Won't implement — dormant — dropped (reopen on demand).**
    `templates/go-flake-parts/` now, or wait for v1.0.0 as the deprecation
    warning states?** They're maintenance burden (any go-standard change
    requires parallel updates), but removing them is a breaking change that

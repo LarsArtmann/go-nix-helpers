@@ -48,7 +48,7 @@
 Two projects use versioned deps via mkPreparedSource and will need `vendorHash` recalculated after this fix:
 
 | Project                          | Versioned Deps                        | Risk                                                   |
-| -------------------------------- | ------------------------------------- | ------------------------------------------------------ |
+| --- | --- | --- |
 | `projects-management-automation` | `go-filewatcher/v2`, `gogenfilter/v3` | Low — `_local_deps` names change but no hardcoded refs |
 | `go-structure-linter`            | `gogenfilter/v3`                      | Low — `_local_deps` names change but no hardcoded refs |
 
@@ -133,7 +133,7 @@ The `templates/go-flake-parts/` template is manually maintained. Consider genera
 ## f) Top 25 Things We Should Get Done Next
 
 | #  | Priority | Task                                                                                                                              | Impact               |
-| -- | -------- | --------------------------------------------------------------------------------------------------------------------------------- | -------------------- |
+| --- | --- | --- | --- |
 | ~~1~~ | ~~P0~~ | ~~Recalculate `vendorHash` in `projects-management-automation` after `/v2` fix~~ | ~~Unblocks downstream~~ |
 | ~~2~~ | ~~P0~~ | ~~Recalculate `vendorHash` in `go-structure-linter` after `/v2` fix~~ | ~~Unblocks downstream~~ |
 | ~~3~~ | ~~P0~~ | ~~Recalculate `vendorHash` in `BuildFlow` if it has versioned deps~~ | ~~Unblocks downstream~~ |
@@ -184,7 +184,7 @@ I cannot determine whether cross-namespace same-name deps exist in your ecosyste
 ## File Inventory
 
 | File                                 | Lines | Status                                              |
-| ------------------------------------ | ----- | --------------------------------------------------- |
+| --- | --- | --- |
 | `mkPreparedSource.nix`               | 164   | Modified (added `repoName`, `/v2` fix)              |
 | `README.md`                          | 81    | Modified (added `/v2` docs, sub-modules section)    |
 | `templates/go-flake-parts/flake.nix` | 188   | New (template with `/v2` and `subModules` examples) |
@@ -196,7 +196,7 @@ I cannot determine whether cross-namespace same-name deps exist in your ecosyste
 ## Downstream Consumers
 
 | Project                        | Uses `/vN` deps               | Uses `subModules` | Uses `requireDeps` | Uses `postPatchExtra` | Needs `vendorHash` update |
-| ------------------------------ | ----------------------------- | ----------------- | ------------------ | --------------------- | ------------------------- |
+| --- | --- | --- | --- | --- | --- |
 | BuildFlow                      | No                            | Yes               | No                 | No                    | Unlikely                  |
 | mr-sync                        | No                            | Yes               | No                 | No                    | Unlikely                  |
 | projects-management-automation | Yes (v2, v3)                  | Yes               | Yes                | No (empty)            | **Yes**                   |

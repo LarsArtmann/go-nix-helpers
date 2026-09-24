@@ -20,7 +20,7 @@ consistent (32 options, 74 assertions, 6 scenarios).
 ### VERIFY — counts verified against code
 
 | Claim                        | Verified value | Source                                                                                         |
-| ---------------------------- | -------------- | ---------------------------------------------------------------------------------------------- |
+| --- | --- | --- |
 | Module assertions            | 74             | `grep -cE 'assertCheck "' test-module.nix`                                                     |
 | Module options               | 32             | `grep mkOption modules/go-standard.nix` (34 total, 2 duplicated: `subPackages`, `description`) |
 | Integration scenarios        | 6              | Test 1–6 in `test.nix`                                                                         |
@@ -42,7 +42,7 @@ retained (structural decay eliminated).
 ### BUILD/VERIFY — Living docs fixed
 
 | Doc         | Fix                                                                                                                                                                          |
-| ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| --- | --- |
 | FEATURES.md | `enableCompletions`: "silently does nothing" → "emits build-time warning with `timeout 10`" (stale description; code changed at `c510d7c`)                                   |
 | FEATURES.md | Integration test description: named 4 old scenarios → "6 scenarios: auto-discovery, explicit-only, validation, publicDeps exclusion, requireDeps dedup, multi-deps monorepo" |
 | ROADMAP.md  | Added `goPkg` as `lib.types.package` and `lib.mkForce` support to Theme 1 (v2 API ideas harvested from reports)                                                              |
@@ -217,7 +217,7 @@ name). This will rot less than line numbers but still couples to file structure.
 ### Critical (fix this session's gaps)
 
 | # | Task                                                              | Impact | Effort |
-| - | ----------------------------------------------------------------- | ------ | ------ |
+| --- | --- | --- | --- |
 | ~~1~~ | ~~Annotate report 02-51 section C (C1–C3) inline~~ | ~~Med~~ | ~~10min~~ |
 | ~~2~~ | ~~Annotate report 07-38 section C table inline~~ | ~~Med~~ | ~~10min~~ |
 | ~~3~~ | ~~Annotate report 02-51 section E items inline (or explicitly SKIP)~~ | ~~Low~~ | ~~15min~~ |
@@ -227,7 +227,7 @@ name). This will rot less than line numbers but still couples to file structure.
 ### High impact (from TODO_LIST, carried forward)
 
 | #  | Task                                                               | Impact | Effort |
-| -- | ------------------------------------------------------------------ | ------ | ------ |
+| --- | --- | --- | --- |
 | ~~6~~ | ~~Add `--go-mod` and `--private-deps` variants to CI smoke-test job~~ | ~~High~~ | ~~30min~~ |
 | ~~7~~ | ~~Add behavioral test for GOPRIVATE with custom `privateGlobPattern`~~ | ~~High~~ | ~~1h~~ |
 | ~~8~~ | ~~Extend `extraBuildAttrs` merge protection to `buildInputs`, etc.~~ | ~~High~~ | ~~30min~~ |
@@ -237,7 +237,7 @@ name). This will rot less than line numbers but still couples to file structure.
 ### Medium impact (from TODO_LIST)
 
 | #  | Task                                                                    | Impact | Effort |
-| -- | ----------------------------------------------------------------------- | ------ | ------ |
+| --- | --- | --- | --- |
 | ~~11~~ | ~~Property test for `stripVersionSuffix`~~ | ~~Med~~ | ~~30min~~ |
 | ~~12~~ | ~~Property test for `repoName`~~ | ~~Med~~ | ~~30min~~ |
 | ~~13~~ | ~~`vendorHash` placeholder detection~~ | ~~Med~~ | ~~30min~~ |
@@ -252,7 +252,7 @@ name). This will rot less than line numbers but still couples to file structure.
 ### Low impact / Polish
 
 | #  | Task                                                | Impact | Effort |
-| -- | --------------------------------------------------- | ------ | ------ |
+| --- | --- | --- | --- |
 | ~~21~~ | ~~`--verbose` flag for `generate-flake.sh`~~ | ~~Low~~ | ~~15min~~ |
 | ~~22~~ | ~~macOS CI badge in README~~ | ~~Low~~ | ~~10min~~ |
 | ~~23~~ | ~~`--template` listing in help text~~ | ~~Low~~ | ~~10min~~ |
@@ -267,7 +267,7 @@ name). This will rot less than line numbers but still couples to file structure.
 ### Blocked
 
 | #  | Task                                          | Impact | Effort |
-| -- | --------------------------------------------- | ------ | ------ |
+| --- | --- | --- | --- |
 | ~~31~~ | ~~Register `maintainers.larsartmann` in nixpkgs~~ | ~~Low~~ | ~~30min~~ |
 | ~~32~~ | ~~Real private-repo integration test in CI~~ | ~~High~~ | ~~2h~~ |
 | ~~33~~ | ~~Audit all downstream consumers~~ | ~~Med~~ | ~~2h~~ |
@@ -277,7 +277,7 @@ name). This will rot less than line numbers but still couples to file structure.
 ### Long-term / ROADMAP
 
 | #  | Task                                                     | Impact | Effort |
-| -- | -------------------------------------------------------- | ------ | ------ |
+| --- | --- | --- | --- |
 | ~~36~~ | ~~Auto-detect public repos via `proxy.golang.org` query~~ | ~~High~~ | ~~3h~~ |
 | ~~37~~ | ~~Curate default `publicDeps` list~~ | ~~Med~~ | ~~30min~~ |
 | ~~38~~ | ~~Auto-detect `enableTempl` by scanning for `.templ` files~~ | ~~Med~~ | ~~1h~~ |
@@ -292,7 +292,7 @@ name). This will rot less than line numbers but still couples to file structure.
 ### Fill remaining slots (deduped ideas from all sessions)
 
 | #  | Task                                                                             | Impact | Effort |
-| -- | -------------------------------------------------------------------------------- | ------ | ------ |
+| --- | --- | --- | --- |
 | ~~46~~ | ~~Add `--impure` flag warning in `generate-flake.sh` for SSH deps~~ | ~~Low~~ | ~~15min~~ |
 | ~~47~~ | ~~Consider `publicDepPattern` (regex exclusion) vs `publicDeps` (list)~~ | ~~Med~~ | ~~30min~~ |
 | ~~48~~ | ~~Consider GONOPROXY/GONOSUMDB as alternative to GOPRIVATE~~ | ~~Low~~ | ~~30min~~ |

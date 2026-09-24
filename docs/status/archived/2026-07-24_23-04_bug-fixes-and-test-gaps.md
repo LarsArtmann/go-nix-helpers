@@ -12,7 +12,7 @@
 These items are implemented, pass `nix flake check`, and have no known issues:
 
 | #  | Task                                                          | Evidence                                                                                                                                                              |
-| -- | ------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| --- | --- | --- |
 | 1  | **D1 Fix:** Monorepo overlay maps each package correctly      | `modules/go-standard.nix:545` — uses `${name}` not `${cfg.pname}`. Tested by `monorepoOverlayCheck` assertion.                                                        |
 | 2  | **D2 Fix:** Dead `completionAttrs` removed                    | `modules/go-standard.nix` — 0 occurrences of `completionAttrs`. Completions now wired into `mkGoPackage` via `completionPostInstall` with proper `postInstall` merge. |
 | 3  | **D4 Fix:** `generate-flake.sh --templ` works for go-standard | `scripts/generate-flake.sh:104` — sed uncomments `# enableTempl = true;` line in template.                                                                            |
@@ -76,7 +76,7 @@ The `|| true` in `installShellCompletion` silently swallows failures. A user who
 ## C) NOT STARTED / BLOCKED
 
 | #  | Task                                          | Why blocked                                                                                                                                                |
-| -- | --------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| --- | --- | --- |
 | C1 | Register `maintainers.larsartmann` in nixpkgs | Requires external PR to nixpkgs repo                                                                                                                       |
 | C2 | Real private-repo integration test in CI      | Requires SSH key secret configuration in GitHub                                                                                                            |
 | C3 | Audit all downstream consumers                | Requires access to 7+ downstream repos (BuildFlow, mr-sync, PMA, etc.)                                                                                     |
@@ -305,13 +305,13 @@ This depends on whether you want incremental fixes or a comprehensive docs overh
 ### Section F "next tasks" — item-by-item status
 
 | Items                                  | Status                         | Evidence                                                                                                        |
-| -------------------------------------- | ------------------------------ | --------------------------------------------------------------------------------------------------------------- |
-| F 1–8 (documentation sync)             | ~~done~~ 2026-08-03            | This docs-health pass: TODO_LIST rebuilt, FEATURES fixed, CHANGELOG updated, ROADMAP cleaned, AGENTS.md current |
-| F 9–11 (deepen tests to behavioral)    | Still open                     | TODO_LIST "Deepen module tests from eval-only to behavioral"                                                    |
-| F 12–20 (remaining test gaps)          | Still open                     | TODO_LIST "Add remaining module option tests"                                                                   |
-| F 21–22 (smoke-test generate-flake.sh) | Still open                     | TODO_LIST "Add generate-flake.sh smoke test to CI"                                                              |
-| F 23–28 (design improvements)          | Still open                     | TODO_LIST high/medium impact                                                                                    |
-| F 29–33 (E2E / integration testing)    | Still open — BLOCKED           | TODO_LIST blocked items                                                                                         |
-| F 34–38 (CI improvements)              | Still open                     | TODO_LIST medium impact                                                                                         |
-| F 39–45 (feature additions)            | Still open — long-term         | ROADMAP                                                                                                         |
-| F 46–50 (ecosystem)                    | Still open — blocked/long-term | TODO_LIST (blocked) + ROADMAP                                                                                   |
+| --- | --- | --- |
+| ~~F 1–8 (documentation sync)~~ | ~~done~~ 2026-08-03            | ~~This docs-health pass: TODO_LIST rebuilt, FEATURES fixed, CHANGELOG updated, ROADMAP cleaned, AGENTS.md current~~ |
+| ~~F 9–11 (deepen tests to behavioral)~~| ~~Still open~~| ~~TODO_LIST "Deepen module tests from eval-only to behavioral"~~|
+| ~~F 12–20 (remaining test gaps)~~| ~~Still open~~| ~~TODO_LIST "Add remaining module option tests"~~|
+| ~~F 21–22 (smoke-test generate-flake.sh)~~| ~~Still open~~| ~~TODO_LIST "Add generate-flake.sh smoke test to CI"~~|
+| ~~F 23–28 (design improvements)~~| ~~Still open~~| ~~TODO_LIST high/medium impact~~|
+| ~~F 29–33 (E2E / integration testing)~~| ~~Still open — BLOCKED~~| ~~TODO_LIST blocked items~~|
+| ~~F 34–38 (CI improvements)~~| ~~Still open~~| ~~TODO_LIST medium impact~~|
+| ~~F 39–45 (feature additions)~~| ~~Still open — long-term~~| ~~ROADMAP~~|
+| ~~F 46–50 (ecosystem)~~| ~~Still open — blocked/long-term~~| ~~TODO_LIST (blocked) + ROADMAP~~|

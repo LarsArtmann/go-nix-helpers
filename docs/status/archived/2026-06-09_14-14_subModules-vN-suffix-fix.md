@@ -75,7 +75,7 @@ The sed command `s|${depPath}/${sub} v0\.0\.0-[^ ]*|${depPath}/${sub} ${subModul
 Projects currently listing `go-cqrs-lite` sub-modules as individual deps can now consolidate:
 
 | Project        | Current Pattern                                                        | Can Migrate To                                                                              |
-| -------------- | ---------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| --- | --- | --- |
 | crush-daily    | 14 individual deps `"go-cqrs-lite/codec/v2" = "${go-cqrs-lite}/codec"` | `subModules = { ".../go-cqrs-lite" = [ "catalog/v2" "codec/v2" ... ]; }` + single dep entry |
 | Standup-Killer | `subModules = { ".../go-cqrs-lite" = [ "core" "memory" ]; }`           | `subModules = { ".../go-cqrs-lite" = [ "core" "memory/v2" ]; }`                             |
 
@@ -84,7 +84,7 @@ Projects currently listing `go-cqrs-lite` sub-modules as individual deps can now
 Projects using versioned deps via mkPreparedSource need `vendorHash` recalculated:
 
 | Project                        | Versioned Deps                        | Risk                                                          |
-| ------------------------------ | ------------------------------------- | ------------------------------------------------------------- |
+| --- | --- | --- |
 | projects-management-automation | `go-filewatcher/v2`, `gogenfilter/v3` | Low — `_local_deps` names change from `v2`/`v3` to real names |
 | go-structure-linter            | `gogenfilter/v3`                      | Low — same                                                    |
 
@@ -177,7 +177,7 @@ The `templates/go-flake-parts/flake.nix` is manually maintained. When `mkPrepare
 ## f) Top 25 Things We Should Get Done Next
 
 | #  | Priority | Task                                                                                              | Impact                             |
-| -- | -------- | ------------------------------------------------------------------------------------------------- | ---------------------------------- |
+| --- | --- | --- | --- |
 | ~~1~~ | ~~P0~~ | ~~Commit the subModules `/vN` fix~~ | ~~Unblocks go-cqrs-lite consumers~~ |
 | ~~2~~ | ~~P0~~ | ~~Migrate `crush-daily` from 14 individual deps to `subModules` with versioned paths~~ | ~~Eliminates 14 lines of boilerplate~~ |
 | ~~3~~ | ~~P0~~ | ~~Migrate `Standup-Killer` to use `memory/v2` in subModules~~ | ~~Correctness — memory module IS v2~~ |
@@ -239,7 +239,7 @@ This same question applies to every consumer using `go-cqrs-lite` sub-modules �
 ## File Inventory
 
 | File                                 | Lines | Status                                                              |
-| ------------------------------------ | ----- | ------------------------------------------------------------------- |
+| --- | --- | --- |
 | `mkPreparedSource.nix`               | 174   | **Modified** (added `stripVersionSuffix`, fixed `subModuleReplace`) |
 | `README.md`                          | 81    | Unchanged (already has `/vN` docs from previous fix)                |
 | `templates/go-flake-parts/flake.nix` | 207   | Unchanged                                                           |
@@ -256,7 +256,7 @@ This same question applies to every consumer using `go-cqrs-lite` sub-modules �
 ## Downstream Consumers
 
 | Project                        | Uses `/vN` deps               | Uses `subModules`      | Can Migrate to versioned subModules           | Needs vendorHash Update |
-| ------------------------------ | ----------------------------- | ---------------------- | --------------------------------------------- | ----------------------- |
+| --- | --- | --- | --- | --- |
 | crush-daily                    | Yes (14 go-cqrs-lite/v2 deps) | No                     | **Yes — consolidate 14 deps into subModules** | After migration         |
 | Standup-Killer                 | Yes (go-cqrs-lite)            | Yes (`core`, `memory`) | **Yes — add `/v2` suffixes**                  | After migration         |
 | browser-history                | Yes (go-cqrs-lite imports)    | —                      | Needs investigation                           | Unknown                 |

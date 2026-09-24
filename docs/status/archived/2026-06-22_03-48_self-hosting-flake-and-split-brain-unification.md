@@ -263,7 +263,7 @@ discoverability. The raw import path still works for backwards compatibility.
 ## f) Top 25 Things We Should Get Done Next
 
 | #  | Priority | Task                                                                           | Impact                        |
-| -- | -------- | ------------------------------------------------------------------------------ | ----------------------------- |
+| --- | --- | --- | --- |
 | ~~1~~ | ~~P0~~ | ~~Commit the staged round 2 changes (flake.nix + unification + AGENTS.md)~~ | ~~Unblocks everything below~~ |
 | ~~2~~ | ~~P0~~ | ~~Add GitHub Actions CI workflow for the repo itself (`nix flake check` on push)~~ | ~~Automated quality gate~~ |
 | ~~3~~ | ~~P1~~ | ~~Deprecate/drop `goPkg` parameter (dead weight — derivation never invokes `go`)~~ | ~~Cleaner API, smaller closures~~ |
@@ -317,7 +317,7 @@ and consumer-migration cadence. This is a one-person ecosystem decision.
 ## File Inventory
 
 | File | Lines | Status |
-| ----------------------------------------------- | ----- | ------------------------------------------------------------------- | --- | ------ |
+| --- | --- | --- | --- | --- |
 | `mkPreparedSource.nix` | 311 | **Modified** (round 2: unified sub-module pipeline, -22 lines) |
 | `flake.nix` | 117 | **New** (round 2: self-hosting) |
 | `flake.lock` | 85 | **New** (round 2: flake lock) |
@@ -339,7 +339,7 @@ and consumer-migration cadence. This is a one-person ecosystem decision.
 ## Downstream Consumers
 
 | Project                        | Uses `/vN` deps               | Uses `subModules`  | Status  |
-| ------------------------------ | ----------------------------- | ------------------ | ------- |
+| --- | --- | --- | --- |
 | BuildFlow                      | No                            | Yes (go-output)    | Working |
 | mr-sync                        | No                            | Yes (go-output)    | Working |
 | projects-management-automation | Yes (v2, v3)                  | Yes (go-output)    | Working |

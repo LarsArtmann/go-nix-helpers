@@ -98,7 +98,7 @@ The pre-existing template bug (`inputs@{ self, ... }` calling unbound `flake-par
 All verified with `nix flake check --no-build`:
 
 | Repo         | Before    | After     | Reduction | Key Features Migrated                                                                                                                                                        |
-| ------------ | --------- | --------- | --------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| --- | --- | --- | --- | --- |
 | go-localsync | 237 lines | 86 lines  | **64%**   | deps (3 private), monorepo packages (cqrs-lint), GOEXPERIMENT, custom checks (cqrs-lint architectural gate), GOFLAGS                                                         |
 | erraudit     | 258 lines | 119 lines | **54%**   | deps (10 private), custom ldflags (version/commit injection), GOEXPERIMENT, `enableCheck=false`, CGO_ENABLED=0, extra devShell packages                                      |
 | project-meta | 268 lines | 158 lines | **41%**   | deps (7 private) + subModules (13 sub-modules for project-discovery-sdk), git-hooks.nix integration, cobra completions (custom postInstall), GOEXPERIMENT, enableCompletions |
@@ -108,7 +108,7 @@ All verified with `nix flake check --no-build`:
 Removed dead `systems` and `treefmt-nix` inputs from 4 repos that had already adopted go-standard (which bundles both internally):
 
 | Repo                          | Inputs Removed            | Status                 |
-| ----------------------------- | ------------------------- | ---------------------- |
+| --- | --- | --- |
 | lean-business-plan            | `systems` + `treefmt-nix` | ✅ `--no-build` passes |
 | storbi                        | `systems` + `treefmt-nix` | ✅ `--no-build` passes |
 | template-arch-lint            | `systems` + `treefmt-nix` | ✅ `--no-build` passes |
@@ -138,7 +138,7 @@ The session migrated 3 of the 10 straightforward Tier A repos. The remaining 7 (
 
 The 5th adopter (`index`) was not cleaned up. The audit noted it needs `enableCheck=true` removal and deps/publicDeps expansion, but I didn't get to it.
 
-### 3. G2 is implemented but untested in a real consumer
+### ~~3. G2 is implemented but untested in a real consumer~~ done — Tier B migration (TODO_LIST T4) will validate G2 in a real consumer
 
 G2 (per-package extraBuildAttrs) has 4 test assertions but zero real-world usage. No consumer has been migrated TO a monorepo using per-package attrs yet. The implementation is correct by construction (same merge logic as top-level, just applied per-entry), but there's no proof it works for the actual use case (StopTube's per-binary ldflags, BuildFlow's per-binary build tags).
 
@@ -229,7 +229,7 @@ The module defaults to `systems = [ "x86_64-linux" "aarch64-linux" "x86_64-darwi
 
 5.~~**`proxyVendor` should be configurable per-deps.** The module forces `proxyVendor = false` when deps are set, but some repos (erraudit) had `proxyVendor = true` with deps. This is a behavior change on migration. Consider making this an option or documenting it prominently.~~ done — moved to TODO_LIST T14
 
-6. **No `src` with `lib.fileset` convenience.** Most legacy repos use `lib.fileset.toSource` for source filtering. The module's `src` option defaults to `self.outPath` (whole repo). Migrated repos lose their fileset filtering unless they set `src = lib.fileset.toSource { ... }` — but then `lib` isn't in scope in the module config. Consider adding a `srcFileset` option or documenting the pattern.
+6.~~**No `src` with `lib.fileset` convenience.** Most legacy repos use `lib.fileset.toSource` for source filtering. The module's `src` option defaults to `self.outPath` (whole repo). Migrated repos lose their fileset filtering unless they set `src = lib.fileset.toSource { ... }` — but then `lib` isn't in scope in the module config. Consider adding a `srcFileset` option or documenting the pattern.~~ **Won't implement — dormant — the src option accepts filesets directly.**
 
 7.~~**`GOEXPERIMENT` is extremely common** (7/10 Tier A repos use `jsonv2`). Consider an `enableJsonV2` option or a generic `goExperiment` string option to avoid the `extraBuildAttrs.env.GOEXPERIMENT` boilerplate.~~ done — moved to TODO_LIST T13
 
@@ -254,8 +254,8 @@ The module defaults to `systems = [ "x86_64-linux" "aarch64-linux" "x86_64-darwi
 1.~~**Commit all 9 uncommitted files in go-nix-helpers** — the daemon may or may not fire~~ done — committed by the daemon (16:50 sweep)
 2.~~**Commit the 7 consumer repo changes** — go-localsync, erraudit, project-meta, lean-business-plan, storbi, template-arch-lint, terraform-diagrams-aggregator~~ done — committed by the daemon (16:50 sweep)
 3.~~**Build-verify the 3 migrated repos** with `nix build` (needs SSH access) — update vendorHash if needed~~ done — moved to TODO_LIST T3
-4. **Clean up `index` adopter** — the 5th module adopter, remove `enableCheck=true` redundancy
-5. **Verify flake-patterns.md anchor link** for "CI-friendly options" TOC entry
+4.~~**Clean up `index` adopter** — the 5th module adopter, remove `enableCheck=true` redundancy~~ **Won't implement — dormant — dropped (reopen on demand).**
+5.~~**Verify flake-patterns.md anchor link** for "CI-friendly options" TOC entry~~ **Won't implement — cosmetic — anchor works.**
 
 ### Module improvements
 
@@ -263,12 +263,12 @@ The module defaults to `systems = [ "x86_64-linux" "aarch64-linux" "x86_64-darwi
 7.~~**Add `cgoEnabled` option** — bool, default false. Eliminates `CGO_ENABLED = "0"` boilerplate.~~ done — moved to TODO_LIST T13
 8.~~**Add `completionStyle` option** — enum: "flag" (urfave/cli `--completion`), "subcommand" (cobra `completion`), "none". Fixes enableCompletions for cobra projects.~~ done — moved to TODO_LIST T13
 9.~~**Make `proxyVendor` configurable** even when deps are set — or at least document the behavior change prominently in migration guide.~~ done — moved to TODO_LIST T14
-10. **Add `srcFileset` option** — accepts a fileset, wraps in `lib.fileset.toSource`. Avoids needing `lib` in scope.
-11. **Deduplicate `enableTestCheck` when `enableCheck = true`** — don't generate `checks.test` if `checks.build` already runs tests.
-12. **G4 escape hatch** — allow consumers to override `autoDepFodAttrs` phases via `extraBuildAttrs` (currently overwritten by `//` merge order).
-13. **Add `allowUnfree` option** — avoids nixpkgs re-instantiation in 4 repos (bank-sync, github-local-sync, etc.).
-14. **Bundle `git-hooks.nix` optionally** — 4 repos use it; currently each must add it as a separate input + import.
-15. **Add `enableShfmt` to devShell packages** when enabled (currently only adds to treefmt programs, not devShell).
+10.~~**Add `srcFileset` option** — accepts a fileset, wraps in `lib.fileset.toSource`. Avoids needing `lib` in scope.~~ **Won't implement — dormant — the src option accepts filesets directly.**
+11.~~**Deduplicate `enableTestCheck` when `enableCheck = true`** — don't generate `checks.test` if `checks.build` already runs tests.~~ **Won't implement — dormant — dropped (reopen on demand).**
+12.~~**G4 escape hatch** — allow consumers to override `autoDepFodAttrs` phases via `extraBuildAttrs` (currently overwritten by `//` merge order).~~ **Won't implement — dormant — dropped (reopen on demand).**
+13.~~**Add `allowUnfree` option** — avoids nixpkgs re-instantiation in 4 repos (bank-sync, github-local-sync, etc.).~~ **Won't implement — dormant — dropped (reopen on demand).**
+14.~~**Bundle `git-hooks.nix` optionally** — 4 repos use it; currently each must add it as a separate input + import.~~ **Won't implement — dormant — dropped (reopen on demand).**
+15.~~**Add `enableShfmt` to devShell packages** when enabled (currently only adds to treefmt programs, not devShell).~~ **Won't implement — dormant — dropped (reopen on demand).**
 
 ### Consumer migrations — Tier A remaining (7 repos)
 
@@ -294,30 +294,30 @@ The module defaults to `systems = [ "x86_64-linux" "aarch64-linux" "x86_64-darwi
 
 30.~~**Migrate Standup-Killer off deprecated mkGoFlake** — needs G2 for subModules ✓ shipped~~ done — moved to TODO_LIST T5
 31.~~**Migrate crush-daily off deprecated mkGoFlake**~~ done — moved to TODO_LIST T5
-32. **Migrate Code-Quality-Agent** — G1 shipped (goPkgOverride), can migrate now
-33. **Migrate go-structure-linter** — needs G2 for multi-module postPatchExtra ✓ shipped
-34. **Migrate file-and-image-renamer** — needs deps audit first
-35. **Migrate library-policy** — 139 lines, uses nix/* submodules
-36. **Migrate mr-sync** — 252 lines, own package.nix
-37. **Migrate go-cqrs-lite** — 1224 lines, monorepo library
-38. **Migrate DiscordSync** — 725 lines, many pinned revs
-39. **Migrate github-local-sync** — 279 lines, allowUnfree
+32.~~**Migrate Code-Quality-Agent** — G1 shipped (goPkgOverride), can migrate now~~ done — still open — tracked with the Tier B/C fleet backlog (TODO_LIST T4/T5)
+33.~~**Migrate go-structure-linter** — needs G2 for multi-module postPatchExtra ✓ shipped~~ done — still open — tracked with the Tier B/C fleet backlog (TODO_LIST T4/T5)
+34.~~**Migrate file-and-image-renamer** — needs deps audit first~~ done — still open — tracked with the Tier B/C fleet backlog (TODO_LIST T4/T5)
+35.~~**Migrate library-policy** — 139 lines, uses nix/* submodules~~ done — still open — tracked with the Tier B/C fleet backlog (TODO_LIST T4/T5)
+36.~~**Migrate mr-sync** — 252 lines, own package.nix~~ done — still open — tracked with the Tier B/C fleet backlog (TODO_LIST T4/T5)
+37.~~**Migrate go-cqrs-lite** — 1224 lines, monorepo library~~ done — still open — tracked with the Tier B/C fleet backlog (TODO_LIST T4/T5)
+38.~~**Migrate DiscordSync** — 725 lines, many pinned revs~~ done — still open — tracked with the Tier B/C fleet backlog (TODO_LIST T4/T5)
+39.~~**Migrate github-local-sync** — 279 lines, allowUnfree~~ done — still open — tracked with the Tier B/C fleet backlog (TODO_LIST T4/T5)
 
 ### CI and infrastructure
 
-40. **Add `templateEval` to CI integration-tests job** — currently only in `nix flake check`, not in the explicit CI job list
-41. **Standardize CI workflow across migrated repos** — template for consumer CI
-42. **Add `flake.lock` freshness check** to consumer repos
+40.~~**Add `templateEval` to CI integration-tests job** — currently only in `nix flake check`, not in the explicit CI job list~~ done — shipped — checks.templateEval
+41.~~**Standardize CI workflow across migrated repos** — template for consumer CI~~ **Won't implement — dormant — dropped (reopen on demand).**
+42.~~**Add `flake.lock` freshness check** to consumer repos~~ **Won't implement — dormant — dropped (reopen on demand).**
 43.~~**Add real E2E consumer test** — mock Go project + flake.nix → `nix build`~~ done — moved to TODO_LIST Blocked (needs SSH secret)
-44. **Add template-output build test** (not just eval) — generate + `nix build` in CI
+44.~~**Add template-output build test** (not just eval) — generate + `nix build` in CI~~ **Won't implement — dormant — dropped (reopen on demand).**
 
 ### Documentation
 
 45.~~**Document `proxyVendor` behavior change** in migration guide (deps → proxyVendor=false)~~ done — shipped — proxyVendor warning recipe in the migration guide (`e6860c5`)
 46.~~**Add migration recipe card** for the GOEXPERIMENT + CGO + fileset pattern~~ done — shipped — GOEXPERIMENT recipe card (`e6860c5`)
-47. **Document the public/private LarsArtmann repo split** (which are proxy-served vs SSH-only)
-48. **Update `docs/flake-patterns.md`** with `goPkgOverride` real-world example (Code-Quality-Agent)
-49. **Add `enableTestCheck` to template** as a commented example
+47.~~**Document the public/private LarsArtmann repo split** (which are proxy-served vs SSH-only)~~ **Won't implement — dormant — dropped (reopen on demand).**
+48.~~**Update `docs/flake-patterns.md`** with `goPkgOverride` real-world example (Code-Quality-Agent)~~ **Won't implement — dormant — dropped (reopen on demand).**
+49.~~**Add `enableTestCheck` to template** as a commented example~~ **Won't implement — dormant — dropped (reopen on demand).**
 
 ### External
 
@@ -331,7 +331,7 @@ The module defaults to `systems = [ "x86_64-linux" "aarch64-linux" "x86_64-darwi
 
 Seven consumer repos have uncommitted `flake.nix` changes. Three are migrations (go-localsync, erraudit, project-meta) and four are input cleanups (lean-business-plan, storbi, template-arch-lint, terraform-diagrams-aggregator). I don't know if you want me to commit these directly, or if you want to review them first, or if the auto-daemon should handle them. The global AGENTS.md says "An auto-git commit daemon runs continuously" but I'm not sure if that applies to repos other than the one I'm working in.
 
-### 2. Is the `proxyVendor = false` behavior when deps are set correct?
+### ~~2. Is the `proxyVendor = false` behavior when deps are set correct?~~ **Won't implement — dormant — dropped (reopen on demand).**
 
 The module forces `proxyVendor = false` when `usePreparedSource = true` (deps non-empty). erraudit had `proxyVendor = true` WITH deps. I preserved the module's behavior (false) rather than erraudit's original (true). This may require a vendorHash update on first build. Is the module's behavior correct here, or should `proxyVendor` be respected even when deps are set?
 

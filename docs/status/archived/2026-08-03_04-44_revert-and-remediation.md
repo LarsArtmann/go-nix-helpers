@@ -21,7 +21,7 @@ scenarios), module tests pass (70 assertions), format check clean.
 ### Autonomous Decisions (resolved Q1–Q3 without user input)
 
 | Question                                                      | Decision                   | Rationale                                                                                                                                                                                            |
-| ------------------------------------------------------------- | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| --- | --- | --- |
 | **Q1: Keep or revert `repoName` breaking change?**            | **REVERTED**               | Library consumed by 7+ repos. Collision risk is theoretical (all same owner). Breaking all consumers' vendor hashes without a major version bump is irresponsible. Reverted to `<repo>` only naming. |
 | **Q2: Is `autoGoPrivateEnv` publicDeps tradeoff acceptable?** | **REVERTED to broad glob** | Asymmetric risk: marking public repos as private = minor perf hit (Go tries SSH first, falls back to proxy). Failing to mark private repos = hard build failure. Broad glob is the safer default.    |
 | **Q3: Delete `mkGoFlake.nix` now or later?**                  | **KEPT with removal date** | Deleting would break unmigrated consumers. Deprecation warning now states concrete removal target: v1.0.0.                                                                                           |
@@ -29,7 +29,7 @@ scenarios), module tests pass (70 assertions), format check clean.
 ### Code Changes
 
 | Task                            | What was done                                                                                                                                                                                    | File:Line                               |
-| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------- |
+| --- | --- | --- |
 | **Revert repoName**             | Removed owner prefix from `_local_deps/` dir names. Back to `<repo>` only.                                                                                                                       | `mkPreparedSource.nix:124-136`          |
 | **Revert autoGoPrivateEnv**     | Always uses broad glob `github.com/larsartmann/*,github.com/LarsArtmann/*` regardless of publicDeps. Eliminates the risk of non-deps private repos losing GOPRIVATE coverage.                    | `modules/go-standard.nix:503-507`       |
 | **Fix stale autoGoPrivate doc** | Option description now matches code (removed publicDeps-specific language that described reverted behavior).                                                                                     | `modules/go-standard.nix:249-257`       |
@@ -40,7 +40,7 @@ scenarios), module tests pass (70 assertions), format check clean.
 ### Test Changes
 
 | Task                                   | What was done                                                                                                                                                                                                                               | File                               |
-| -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------- |
+| --- | --- | --- |
 | **requireDeps dedup integration test** | New Test 5 in verify script: passes `requireDeps` with entries already in go.mod + entries not in go.mod. Verifies dedup (existing entry appears once) AND injection (new entry appears once). Excludes replace directive lines from count. | `test.nix:136-163, 295-318`        |
 | **nativeBuildInputs merge eval test**  | New assertion: `extraBuildAttrs.nativeBuildInputs = [ pkgs.git ]` evaluates without error alongside `enableTempl = true`.                                                                                                                   | `test-module.nix:307-311, 459-461` |
 | **Revert test assertion**              | Updated `event/v3/eventtest` path assertion back to `_local_deps/mock-dep/` (was `larsartmann-mock-dep/`).                                                                                                                                  | `test.nix:217`                     |
@@ -48,13 +48,13 @@ scenarios), module tests pass (70 assertions), format check clean.
 ### CI Fix
 
 | Task                         | What was done                                                                                                                                        | File                          |
-| ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------- |
+| --- | --- | --- |
 | **Fix treefmt format check** | Changed `nix fmt -- --check` to `nix fmt -- --ci`. Treefmt 2.x has no `--check` flag; uses `--ci` (which implies `--fail-on-change` + `--no-cache`). | `.github/workflows/ci.yml:28` |
 
 ### Documentation Changes
 
 | Task                             | What was done                                                                                                                                                                                                                                                                                                  | File                          |
-| -------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------- |
+| --- | --- | --- |
 | **README apps.fmt row**          | Added `apps.fmt` to "What you get" table with conditional note.                                                                                                                                                                                                                                                | `README.md:66`                |
 | **README enableNixfmt FAQ**      | New FAQ entry: "How do I disable Nix formatting (nixfmt)?" with instructions for partial and full formatter disable.                                                                                                                                                                                           | `README.md:362-371`           |
 | **Migration guide enableNixfmt** | Added `enableNixfmt` to parameter mapping table.                                                                                                                                                                                                                                                               | `docs/migration-guide.md:107` |
@@ -98,7 +98,7 @@ action might provide a different treefmt.
 ## C) NOT STARTED (from broader backlog)
 
 | Task                                                 | Status   | Blocker                               |
-| ---------------------------------------------------- | -------- | ------------------------------------- |
+| --- | --- | --- |
 | Register `maintainers.larsartmann` in nixpkgs        | BLOCKED  | External PR to nixpkgs                |
 | Real private-repo integration test in CI             | BLOCKED  | Needs SSH key secret                  |
 | Audit all downstream consumers                       | BLOCKED  | Needs access to 7+ repos              |

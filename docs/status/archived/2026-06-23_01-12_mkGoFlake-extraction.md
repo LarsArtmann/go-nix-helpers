@@ -31,7 +31,7 @@ A flake-parts module that generates standard flake outputs from a single config 
 ### Migrations
 
 | Project                    | Before    | After     | Reduction            |
-| -------------------------- | --------- | --------- | -------------------- |
+| --- | --- | --- | --- |
 | Standup-Killer `flake.nix` | 229 lines | 118 lines | **-111 lines (48%)** |
 | crush-daily `flake.nix`    | 387 lines | 296 lines | **-91 lines (24%)**  |
 

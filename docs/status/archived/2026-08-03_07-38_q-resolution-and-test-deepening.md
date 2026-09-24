@@ -20,7 +20,7 @@ scenarios, 24 assertions), module tests pass (74 assertions), format check clean
 ### Autonomous Decisions (resolved Q1–Q3 without user input)
 
 | Question                                                 | Decision                              | Rationale                                                                                                                                                                                                                                |
-| -------------------------------------------------------- | ------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| --- | --- | --- |
 | **Q1: Rename `publicDeps` to clarify scope?**            | **KEEP name, improve docs**           | The name is semantically correct. Renaming is breaking for no behavioral benefit. Option description now explicitly states it only affects validation, NOT GOPRIVATE. Added to main README options table with scope clarification.       |
 | **Q2: Make GOPRIVATE glob configurable?**                | **ADDED `privateGlobPattern` option** | New option (default: LarsArtmann globs) makes the library usable by non-LarsArtmann consumers. `autoGoPrivateEnv` now uses `cfg.privateGlobPattern` instead of hardcoded string. Backward compatible — existing consumers see no change. |
 | **Q3: Re-add owner-namespaced dirs behind opt-in flag?** | **YAGNI — do not add**                | Collision risk is theoretical (all consumers same-owner). Adding an option for a hypothetical need violates premature generalization anti-pattern. If someone hits this, they can open an issue.                                         |
@@ -28,13 +28,13 @@ scenarios, 24 assertions), module tests pass (74 assertions), format check clean
 ### New Feature
 
 | Task                            | What was done                                                                                                                                                   | File:Line                              |
-| ------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------- |
+| --- | --- | --- |
 | **`privateGlobPattern` option** | New option (32 total). GOPRIVATE glob pattern used by `autoGoPrivate`. Default: `"github.com/larsartmann/*,github.com/LarsArtmann/*"`. Override for other orgs. | `modules/go-standard.nix:259-267, 514` |
 
 ### Code Quality Improvements
 
 | Task                                            | What was done                                                                                                                              | File:Line                         |
-| ----------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------- |
+| --- | --- | --- |
 | **Timeout on completion check**                 | Binary calls in `enableCompletions` postInstall now use `timeout 10` to prevent hanging binaries from blocking the build indefinitely.     | `modules/go-standard.nix:444-462` |
 | **Clarified `publicDeps` scope**                | Option description now explicitly says "This does NOT affect GOPRIVATE" and clarifies it only suppresses false-positive validation errors. | `modules/go-standard.nix:286-298` |
 | **Documented `extraBuildAttrs` merge strategy** | Option description now lists which attrs concatenate (nativeBuildInputs, preBuild, postInstall) vs override (all others).                  | `modules/go-standard.nix:322-330` |
@@ -42,7 +42,7 @@ scenarios, 24 assertions), module tests pass (74 assertions), format check clean
 ### Test Improvements
 
 | Task                                          | What was done                                                                                                                                                                                                                                                                     | File                                |
-| --------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------- |
+| --- | --- | --- |
 | **D5: Deepened nativeBuildInputs merge test** | Previous test only proved evaluation. New assertions extract the actual `nativeBuildInputs` list from the derivation and verify BOTH `templ` AND `git` are present — proving concatenation, not silent override. This is a **behavioral test**, not just eval-only.               | `test-module.nix:438-455`           |
 | **E10: Multi-deps integration test**          | New Test 6 in `test.nix`: two different private dep repos (`mock-dep` + `mock-second`) with sub-modules. Verifies auto-discovery across multiple deps, separate `_local_deps/` directories, and correct replace directives for both.                                              | `test.nix:199-248, 395-430`         |
 | **privateGlobPattern tests**                  | New option default assertion + custom value eval test.                                                                                                                                                                                                                            | `test-module.nix:168, 297-299, 438` |
@@ -51,7 +51,7 @@ scenarios, 24 assertions), module tests pass (74 assertions), format check clean
 ### Documentation Changes
 
 | Task                                  | What was done                                                                                                                                                                             | File                                               |
-| ------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------- |
+| --- | --- | --- |
 | **README options table**              | Added `privateGlobPattern`, `publicDeps`, `privateDepPattern` rows. Added `extraBuildAttrs` merge rules subsection documenting concatenation vs override behavior.                        | `README.md:176-202`                                |
 | **CHANGELOG updated**                 | Added entries for: privateGlobPattern, timeout on completion check, publicDeps scope clarification, extraBuildAttrs merge docs, monorepo integration test. Updated assertion count 70→74. | `CHANGELOG.md`                                     |
 | **AGENTS.md updated**                 | Option count 31→32. Test count 57→74. Test scenarios documented.                                                                                                                          | `AGENTS.md:79, 111, 114`                           |
@@ -64,7 +64,7 @@ scenarios, 24 assertions), module tests pass (74 assertions), format check clean
 ## B) TEST COUNT SUMMARY
 
 | Test Suite                                | Before | After | Delta |
-| ----------------------------------------- | ------ | ----- | ----- |
+| --- | --- | --- | --- |
 | Module assertions (`test-module.nix`)     | 70     | 74    | +4    |
 | Integration scenarios (`test.nix` verify) | 5      | 6     | +1    |
 | Integration PASS lines                    | 17     | 24    | +7    |
@@ -85,7 +85,7 @@ New integration scenario:
 ## C) NOT STARTED (blocked or low priority)
 
 | Task                                               | Status   | Blocker                                                      |
-| -------------------------------------------------- | -------- | ------------------------------------------------------------ |
+| --- | --- | --- |
 | ~~Register `maintainers.larsartmann` in nixpkgs~~ | ~~BLOCKED~~ | ~~External PR to nixpkgs~~ |
 | ~~Real private-repo integration test in CI~~ | ~~BLOCKED~~ | ~~Needs SSH key secret~~ |
 | ~~Audit all downstream consumers~~ | ~~BLOCKED~~ | ~~Needs access to 7+ repos~~ |
