@@ -26,25 +26,32 @@ Move the whole LarsArtmann Go portfolio onto the `go-standard` module and retire
 
 Raw ideas:
 
-- Migrate all 7+ downstream consumers from raw `mkPreparedSource` import or `mkGoFlake.nix` to `flakeModules.go-standard`
+- Migrate the remaining consumer fleet to `flakeModules.go-standard` (10 Tier A
+  repos done 2026-08-10; Tier B + Tier C remain — see TODO_LIST M2/M4)
 - Add a migration script that rewrites a 5-input manual flake.nix to the 3-input module
-- Fully remove `mkGoFlake.nix` once all consumers have migrated (currently emits deprecation trace warning)
-- Remove `templates/go-flake-parts/` once consumers no longer need it (currently marked deprecated with banner)
+- Fully remove `mkGoFlake.nix` once all consumers have migrated (currently emits deprecation trace warning; removal target is the first tagged release)
+- Remove `templates/go-flake-parts/` once consumers no longer need it (currently marked deprecated with banner; still pins `go_1_26`)
 - Provide a shared overlay surface so projects can compose each other's packages cleanly
+- Make "eval one real consumer" part of the definition of done for changes to shared
+  defaults (the `goPkgAttr` auto-default flip shipped without any consumer smoke-eval)
 
 ### 3. Testing and reliability
 
 Make the module trustworthy enough that a consumer can adopt it without manual end-to-end verification.
 
-Raw ideas:
+Shipped here: property tests for `repoName`/`stripVersionSuffix`/`newestGoAttrName`
+(`checks.pureFunctions`, 41 assertions), behavioral module tests proving option
+values reach `buildGoModule` (`checks.moduleTest`, 121 assertions), structural
+output checks, template eval check, and `generate-flake.sh` smoke tests in CI.
 
-- Property-based tests for `repoName`, `stripVersionSuffix`, and `discoverSubModules`
-- Behavioral module tests that verify option values actually reach `buildGoModule` (not just evaluation)
-- CI matrix that evaluates `go-standard` with common consumer configurations (with deps, without deps, with templ, with overlays, monorepo)
+Raw ideas still open:
+
 - Real private-dependency integration test using an actual GitHub private repo or a local mock with SSH semantics
-- Nix-level checks that assert the composite module produces expected output structure
+- Template build-smoke in CI: copy `templates/go-standard` into a scratch project and `nix build` it (eval-only today)
+- Harden the templ-committed negative test to assert the throw MESSAGE (intended-throw vs accidental-eval-error)
+- Escape ERE metacharacters in `publicDeps` entries before the `grep -vE` filter (dots are wildcards today)
 - Dry-run mode for `mkPreparedSource` so consumers can inspect generated replaces without building
-- Smoke test for `generate-flake.sh` in CI to catch script regressions
+- Test for the `pkgs.go` fallback branch of `newestGoAttrName` resolution (zero coverage today)
 
 ### 4. Distribution and discoverability
 
@@ -61,8 +68,9 @@ Raw ideas:
 ### 5. Smart private-dep detection
 
 `mkPreparedSource` previously treated every `github.com/larsartmann/*` repo as
-private. The `publicDeps` exclusion list and forwarded escape hatches
-(`validatePrivateDeps`, `privateDepPattern`) are now shipped. The remaining
+private. The `publicDeps` exclusion list (now versioned-path aware: listing the
+base path also excludes `/v2`, `/v3`, …) and forwarded escape hatches
+(`validatePrivateDeps`, `privateDepPattern`) are shipped. The remaining
 vision is full automation.
 
 Raw ideas:
@@ -72,6 +80,25 @@ Raw ideas:
   `publicDeps` configuration)
 - Curate a default `publicDeps` list of known-public LarsArtmann repos so
   consumers don't need to discover them individually
+
+### 6. Docs that cannot rot
+
+Every default change touches 6+ doc files by hand, and the 2026-09-24 session
+proved each can rot independently behind a green test suite (4-systems claim vs
+3-system reality survived for weeks). The end state is derivation, not
+transcription.
+
+Raw ideas:
+
+- Generate the man page option sections and the README option table from the
+  module's `mkOption` descriptions/defaults (single source of truth)
+- Derive assertion/option counts from test output instead of hand-typing them
+  in AGENTS.md/README
+- Eval-time go.mod floor check: parse the consumer's `go.mod` (readable at
+  eval, not IFD) and warn/throw when the resolved toolchain is below the
+  floor — converts a silent build breaker into an actionable eval error
+- CI guard that fails when `*_templ.go` files are committed under
+  `test-assets/mock-templ-missing-generated/` (the auto-commit daemon WILL retry)
 
 ## Non-goals
 

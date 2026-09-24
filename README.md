@@ -61,7 +61,7 @@ nix flake check # formats, builds, and runs checks
 
 | Output              | What it gives you                                        |
 | ------------------- | -------------------------------------------------------- |
-| `packages.default`  | Compiled binary via `buildGoModule` (Go 1.26)            |
+| `packages.default`  | Compiled binary via `buildGoModule` (newest packaged Go)   |
 | `packages.<pname>`  | Same package under its own name                          |
 | `apps.fmt`          | `treefmt` wrapper (only if >=1 formatter enabled)        |
 | `apps.default`      | `nix run .#<pname>`                                      |
@@ -160,6 +160,8 @@ See the full option table below, or copy one of the [templates](#templates).
 | `subPackages`           | `[ "." ]`                    | Subpackages to build                                                                            |
 | `goPkgAttr`             | `null` (auto)                | Go package attribute in nixpkgs; `null` = newest packaged `go_1_XX` branch                      |
 | `goPkgOverride`         | identity                     | Function applied to the Go package (custom toolchains, e.g. newer patch version)                |
+| `goTarballVersion`      | `null`                       | Exact Go version to build from the go.dev source tarball (when nixpkgs' newest branch is too old) |
+| `goTarballHash`         | `null`                       | SRI hash of the go.dev source tarball (required when `goTarballVersion` is set)                 |
 | `lintAsCheck`           | `false`                      | Also expose golangci-lint as a hermetic `checks.lint` derivation (for CI)                       |
 | `enableCheck`           | `true`                       | Run `go test` during the Nix build (`doCheck`)                                                  |
 | `enableTestCheck`       | `false`                      | Generate `checks.test` — force `go test` in CI even when `enableCheck = false`                  |
@@ -177,6 +179,7 @@ See the full option table below, or copy one of the [templates](#templates).
 | `packages`              | `{}`                         | Additional packages for monorepo support                                                        |
 | `deps`                  | `{}`                         | Private Go deps for `mkPreparedSource`                                                          |
 | `subModules`            | `{}`                         | Explicit sub-modules (merged with auto-discovered)                                              |
+| `requireDeps`           | `{}`                         | Manually inject `require` lines (deduped against go.mod; for sub-modules not yet required)      |
 | `postPatchExtra`        | `""`                         | Extra `postPatch` commands for `mkPreparedSource`                                               |
 | `autoGoPrivate`         | `true`                       | Auto-inject `GOPRIVATE` when deps are set                                                       |
 | `privateGlobPattern`    | LarsArtmann globs            | GOPRIVATE glob pattern used by `autoGoPrivate`                                                  |
@@ -218,7 +221,7 @@ Use this when you want to wire `buildGoModule` yourself but still need private-d
 ```nix
 mkPreparedSource = import (go-nix-helpers + "/mkPreparedSource.nix") {
   inherit pkgs lib;
-  goPkg = pkgs.go_1_26;
+  goPkg = pkgs.go; # vestigial API param — the derivation never invokes go
 };
 
 preparedSrc = mkPreparedSource {

@@ -12,6 +12,16 @@ This project has not made a tagged release yet; all changes below are in
 
 ### Added
 
+- `goTarballVersion` / `goTarballHash` options — build the Go toolchain from
+  the go.dev source tarball (`go<version>.src.tar.gz`) when the consumer's
+  go.mod floor is newer than the newest nixpkgs `go_1_XX` branch and
+  `GOTOOLCHAIN=local` forbids toolchain downloads (`58f7257`). Version-suffixed
+  patches are swapped correctly when the tarball version outruns nixpkgs' Go
+  (`19fc8e5`).
+- Integration Test 8 (in-tree, tab-indented `replace` stripping) and Test 9
+  (pseudo-version normalization) in `test.nix` — 9 scenarios total.
+- `.github/dependabot.yml` — weekly `gomod` updates for the three `test-assets`
+  mock projects plus `github-actions` updates.
 - `checks.templ-committed` (eval-time) — throws at `nix flake check` when any
   `.templ` file in the flake source lacks its `*_templ.go` sibling. Nix builds
   vendor the source without running `templ generate`, so an untracked
@@ -352,6 +362,29 @@ This project has not made a tagged release yet; all changes below are in
 
 ### Fixed
 
+- Documentation drift sweep (docs-health audit 2026-09-24): option count
+  39 → 41 (`goTarballVersion`/`goTarballHash` were never counted), integration
+  scenarios 7 → 9 (Tests 8 and 9 undocumented), `nix flake check` command list
+  now includes `templateEval`, man page gained the missing
+  `goTarballVersion`/`goTarballHash` entries (with the SRI-hash recipe),
+  README's "Go 1.26" / `goPkg = pkgs.go_1_26` examples updated to the auto
+  default, FEATURES.md assertion counts 99/22 → 121/41.
+- `templ-committed` check no longer realizes string context — `builtins.pathExists`
+  on a path coerced to a context-carrying string was fatal under
+  `nix flake check --no-build` for ANY consumer with `.templ` files. The walk
+  now uses pure path arithmetic (`dir + "/${base}_templ.go"`).
+- Module tests use committed static fixture dirs (`test-assets/mock-project`,
+  `mock-templ-committed`, `mock-templ-missing-generated`) instead of raw
+  derivations as `self.outPath` — fixes the
+  `path 'mock-dep.drv' is not valid` eval breakage that made `--no-build`
+  checks red.
+- `extraBuildAttrs.preBuild`/`postInstall` snippets are newline-joined
+  (`joinSnippet`) — a top-level snippet not ending in `\n` no longer merges
+  with the per-package snippet's first line into one broken command (monorepo
+  `packages.*` path).
+- Pseudo-version sed patterns unified to regex-equivalent `v0[.]0[.]0-` with
+  comments — the double-quoted-Nix-string copy had its backslashes dropped at
+  parse time, turning escaped dots into wildcards.
 - Removed committed `test-result` symlink from git tracking and added it to
   `.gitignore`.
 - `repoName` extraction for versioned deps to avoid `_local_deps/v2` collisions
