@@ -100,7 +100,12 @@
       # newest branch, go.dev source tarball — lives in
       # pure-functions.goBaseFrom (shared with the go-standard module).
       goPkg = pure.goBaseFrom {
-        inherit pkgs goPkgAttr goTarballVersion goTarballHash;
+        inherit
+          pkgs
+          goPkgAttr
+          goTarballVersion
+          goTarballHash
+          ;
       };
 
       mkPreparedSource = import (inputs.go-nix-helpers + "/mkPreparedSource.nix") {

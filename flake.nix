@@ -92,6 +92,25 @@
             inherit (tests) verify;
             inherit (moduleTests) moduleTest moduleTestNoOverlay;
             pureFunctions = pureFunctionTests;
+            # Fixture-integrity tripwire: test-assets/mock-templ-missing-generated
+            # must NEVER contain generated *_templ.go files — the
+            # templ-committed check depends on their absence, and the
+            # auto-commit daemon has re-added them before (they are
+            # gitignored for exactly this reason). Flake source copies
+            # contain only git-tracked files, so absence here == absence
+            # in git; scanning the store path is the sandbox-safe
+            # equivalent of `git ls-files | grep _templ.go`.
+            templFixtureGuard = pkgs.runCommand "templ-fixture-guard" { } ''
+              committed=$(find ${self}/test-assets/mock-templ-missing-generated -name '*_templ.go' 2>/dev/null || true)
+              if [ -n "$committed" ]; then
+                echo "FAIL: generated *_templ.go files are tracked under test-assets/mock-templ-missing-generated:" >&2
+                echo "$committed" >&2
+                echo "The templ-committed fixture requires them absent; git rm them and commit." >&2
+                exit 1
+              fi
+              echo "PASS: templ fixture clean (no tracked *_templ.go)"
+              mkdir $out
+            '';
             # Structural test: verify all expected flake outputs exist
             structural = pkgs.runCommand "structural-test" { } ''
               ${lib.concatStringsSep "\n" (

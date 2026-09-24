@@ -177,9 +177,12 @@ let
     };
     # codec/v2 is already in go.mod (should be deduped).
     # storage/v2 is NOT in go.mod (should be injected).
+    # codec (no /vN) is a DISTINCT module from codec/v2 — the space-guarded
+    # grep must not treat it as present just because codec/v2 is.
     requireDeps = {
       "github.com/larsartmann/mock-dep/codec/v2" = "v0.0.0";
       "github.com/larsartmann/mock-dep/storage/v2" = "v0.0.0";
+      "github.com/larsartmann/mock-dep/codec" = "v0.0.0";
     };
   };
 
@@ -481,6 +484,15 @@ in
       echo "PASS: storage/v2 appears exactly once in requires (injected correctly)"
     else
       echo "FAIL: storage/v2 appears $storage_count times in requires (expected 1)"
+      exit 1
+    fi
+    # codec (no /vN) is distinct from codec/v2: injected exactly ONCE even
+    # though its /v2 sibling already sat in go.mod
+    codec_plain_count=$(grep -F "github.com/larsartmann/mock-dep/codec " "$GOMOD4" | grep -cvF "=> ")
+    if [ "$codec_plain_count" -eq 1 ]; then
+      echo "PASS: plain codec injected once despite codec/v2 sibling in go.mod"
+    else
+      echo "FAIL: plain codec appears $codec_plain_count times in requires (expected 1)"
       exit 1
     fi
 

@@ -174,6 +174,113 @@ let
     )
   ];
 
+  # --- goBaseFrom tests (stub pkgs attrsets — no nixpkgs evaluation) ---
+  # overrideAttrs is emulated: f is applied as (finalAttrs: prevAttrs:) with
+  # self as both arguments, and the delta is merged back onto the stub.
+  stubPkg =
+    name:
+    let
+      self = {
+        inherit name;
+        version = "1.26.7";
+        patches = [
+          "go_no_vendor_checks-1.26.patch"
+          "unrelated.patch"
+        ];
+        overrideAttrs =
+          f:
+          let
+            delta = f self self;
+          in
+          self // delta // { _overridden = true; };
+      };
+    in
+    self;
+
+  stubPkgs = {
+    go = stubPkg "go-fallback";
+    go_1_24 = stubPkg "go_1_24";
+    go_1_26 = stubPkg "go_1_26";
+    go_1_27 = stubPkg "go_1_27";
+    fetchurl = args: { fetchurl-args = args; };
+    path = /stub-nixpkgs-without-matching-patch;
+  };
+
+  stubPkgsNoBranch = {
+    go = stubPkg "go-fallback";
+    gopls = stubPkg "gopls";
+  };
+
+  goBaseFrom = pure.goBaseFrom;
+
+  goBaseBasic = [
+    (assertEq "goBaseFrom: explicit pin wins over auto"
+      (goBaseFrom {
+        pkgs = stubPkgs;
+        goPkgAttr = "go_1_26";
+      }).name
+      "go_1_26"
+    )
+    (assertEq "goBaseFrom: null attr picks newest branch" (goBaseFrom { pkgs = stubPkgs; }).name
+      "go_1_27"
+    )
+    (assertEq "goBaseFrom: no branch attrs falls back to pkgs.go"
+      (goBaseFrom {
+        pkgs = stubPkgsNoBranch;
+      }).name
+      "go-fallback"
+    )
+    (assertEq "goBaseFrom: override hook applied over auto default"
+      (goBaseFrom {
+        pkgs = stubPkgs;
+        goPkgOverride = p: { name = "overridden-${p.name}"; };
+      }).name
+      "overridden-go_1_27"
+    )
+    (assertEq "goBaseFrom: override hook applied over explicit pin"
+      (goBaseFrom {
+        pkgs = stubPkgs;
+        goPkgAttr = "go_1_26";
+        goPkgOverride = p: { name = "overridden-${p.name}"; };
+      }).name
+      "overridden-go_1_26"
+    )
+    (assertEq "goBaseFrom: tarball overrides the base"
+      (goBaseFrom {
+        pkgs = stubPkgs;
+        goTarballVersion = "1.28.0";
+        goTarballHash = "sha256-STUB";
+      }).version
+      "1.28.0"
+    )
+    (assertEq "goBaseFrom: tarball drops version-suffixed vendor-check patches"
+      (goBaseFrom {
+        pkgs = stubPkgs;
+        goTarballVersion = "1.28.0";
+        goTarballHash = "sha256-STUB";
+      }).patches
+      [ "unrelated.patch" ]
+    )
+    (assertEq "goBaseFrom: tarball wins over override hook"
+      (goBaseFrom {
+        pkgs = stubPkgs;
+        goPkgOverride = p: { name = "overridden-${p.name}"; };
+        goTarballVersion = "1.28.0";
+        goTarballHash = "sha256-STUB";
+      })._overridden
+      true
+    )
+    (assertEq "goBaseFrom: tarball without hash throws"
+      (builtins.tryEval
+        (goBaseFrom {
+          pkgs = stubPkgs;
+          goTarballVersion = "1.28.0";
+        }).name
+      ).success
+      false
+    )
+  ];
+
   allChecks =
     stripBasic
     ++ stripIdempotence
@@ -181,7 +288,8 @@ let
     ++ repoBasic
     ++ repoDeterminism
     ++ repoNoSlash
-    ++ newestGoBasic;
+    ++ newestGoBasic
+    ++ goBaseBasic;
 in
 pkgs.runCommand "test-pure-functions" { } ''
   ${builtins.concatStringsSep "\n" allChecks}

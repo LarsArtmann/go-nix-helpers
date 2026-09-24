@@ -60,7 +60,9 @@ let
         if goPkgAttr != null then
           pkgs.${goPkgAttr}
         else
-          let newest = newestGoAttrName (builtins.attrNames pkgs); in
+          let
+            newest = newestGoAttrName (builtins.attrNames pkgs);
+          in
           if newest == null then pkgs.go else pkgs.${newest};
     in
     if goTarballVersion != null then
@@ -81,9 +83,7 @@ let
             patches =
               let
                 vendorChecks = p: builtins.match "go_no_vendor_checks-.*[.]patch" (baseNameOf p) != null;
-                majorMinor = lib.concatStringsSep "." (
-                  lib.lists.sublist 0 2 (lib.splitVersion goTarballVersion)
-                );
+                majorMinor = lib.concatStringsSep "." (lib.lists.sublist 0 2 (lib.splitVersion goTarballVersion));
                 matching = pkgs.path + "/pkgs/development/compilers/go/go_no_vendor_checks-${majorMinor}.patch";
               in
               builtins.filter (p: !vendorChecks p) prevAttrs.patches
@@ -94,5 +94,10 @@ let
       goPkgOverride goBase;
 in
 {
-  inherit stripVersionSuffix repoName newestGoAttrName goBaseFrom;
+  inherit
+    stripVersionSuffix
+    repoName
+    newestGoAttrName
+    goBaseFrom
+    ;
 }

@@ -159,6 +159,7 @@ let
     (assertCheck "enableGovulncheck default is true" (cfg.enableGovulncheck == true) "true")
     (assertCheck "enableGopls default is true" (cfg.enableGopls == true) "true")
     (assertCheck "deps default is empty" (cfg.deps == { }) "{}")
+    (assertCheck "requireDeps default is empty" (cfg.requireDeps == { }) "{}")
     (assertCheck "enableCheck default is true" (cfg.enableCheck == true) "true")
     (assertCheck "enableOverlay default is true" (cfg.enableOverlay == true) "true")
     (assertCheck "buildFlags default is empty" (cfg.buildFlags == [ ]) "[]")
@@ -337,6 +338,18 @@ let
   goprivateCfg = mkPerSystemConfig {
     deps = {
       "github.com/larsartmann/mock-dep" = mockSrc;
+    };
+  };
+
+  # --- requireDeps forwarding test -------------------------------------------
+  # With deps + requireDeps set, the injected require lines must reach the
+  # prepared source's postPatch (the module forwards the option verbatim).
+  requireDepsCfg = mkPerSystemConfig {
+    deps = {
+      "github.com/larsartmann/mock-dep" = mockSrc;
+    };
+    requireDeps = {
+      "github.com/larsartmann/mock-require-dep" = "v0.0.0";
     };
   };
 
@@ -819,6 +832,11 @@ let
     (assertCheck "GOPRIVATE not set when deps empty" (
       !(psCfg.devShells.default ? GOPRIVATE)
     ) "no GOPRIVATE without deps")
+    # --- Behavioral: requireDeps entries reach mkPreparedSource postPatch ---
+    (assertCheck "requireDeps entries reach mkPreparedSource postPatch"
+      (lib.hasInfix "github.com/larsartmann/mock-require-dep" requireDepsCfg.packages.default.src.postPatch)
+      "require line in postPatch"
+    )
     # --- Behavioral: goPkgAttr null auto-resolves to the newest branch ---
     (assertCheck "goPkgAttr null resolves to newest go_1_XX branch" (
       expectedAutoGoAttr != null && psCfg.packages.default.go == pkgs.${expectedAutoGoAttr}

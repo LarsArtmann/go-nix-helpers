@@ -479,7 +479,12 @@ in
         # pure-functions.goBaseFrom (shared with mkGoFlake).
         goPkg = pure.goBaseFrom {
           inherit pkgs;
-          inherit (cfg) goPkgAttr goPkgOverride goTarballVersion goTarballHash;
+          inherit (cfg)
+            goPkgAttr
+            goPkgOverride
+            goTarballVersion
+            goTarballHash
+            ;
         };
 
         usePreparedSource = cfg.deps != { };
