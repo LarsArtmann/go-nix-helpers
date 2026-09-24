@@ -12,6 +12,26 @@ This project has not made a tagged release yet; all changes below are in
 
 ### Added
 
+- `checks.templFixtureGuard` — fails `nix flake check` when generated
+  `*_templ.go` files become tracked under `test-assets/mock-templ-missing-generated/`
+  (the auto-commit daemon re-added them once and turned `moduleTest` red; the
+  guard turns that failure mode into a named, actionable error). Verified red
+  with a staged fixture file and green after removal.
+- `pure-functions.goBaseFrom` — single declaration site for toolchain
+  resolution (`goPkgAttr` pin, auto newest branch, `pkgs.go` fallback, go.dev
+  tarball with version-suffixed patch swap, `goPkgOverride` hook); replaces
+  the split-brain blocks in `modules/go-standard.nix` and `mkGoFlake.nix`
+  (mkGoFlake gains the tarball patch swap it was missing). 9 property tests
+  with stub `pkgs` attrsets; pureFunctions now 50 checks.
+- `requireDeps` module coverage — default `{}`, forwarding into
+  mkPreparedSource postPatch, and a sibling-module dedup case in `test.nix`
+  Test 5 (plain `codec` injected exactly once despite `codec/v2` already in
+  go.mod). moduleTest now 123 assertions.
+- `goPkgAttr` auto-default fleet verification — 3 real consumers (erraudit,
+  projects-management-automation, go-auto-upgrade) eval- AND build-verified
+  against master; vendorHash intact everywhere. 14 repos' redundant
+  `goPkgAttr = "go_1_27"` pins removed after proving no consumer nixpkgs
+  carries a newer `go_1_XX` branch (resolution is toolchain-neutral).
 - `goTarballVersion` / `goTarballHash` options — build the Go toolchain from
   the go.dev source tarball (`go<version>.src.tar.gz`) when the consumer's
   go.mod floor is newer than the newest nixpkgs `go_1_XX` branch and
