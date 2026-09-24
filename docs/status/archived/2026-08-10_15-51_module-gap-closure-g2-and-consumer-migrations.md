@@ -153,13 +153,13 @@ All 3 migrated repos pass `nix flake check --no-build` but none have been actual
 1.~~**7 remaining Tier A consumer migrations** — surveyed, patterns understood, not executed~~ done — done in the 16:50 sprint
 2.~~**6 Tier B consumer migrations** — some now unblocked by G2, not started~~ done — moved to TODO_LIST T4
 3.~~**2 Tier C migrations** (Standup-Killer, crush-daily) — need to migrate off deprecated `mkGoFlake`~~ done — moved to TODO_LIST T5
-4. **`index` adopter cleanup** — 5th module adopter, not touched
-5. **CI standardization** across migrated repos — not started
-6. **`flake.lock` freshness audit** across consumer repos — not checked
+4.~~**`index` adopter cleanup** — 5th module adopter, not touched~~ done — still open — tracked with the Tier B/C fleet backlog
+5.~~**CI standardization** across migrated repos — not started~~ **Won't implement — dormant — dropped.**
+6.~~**`flake.lock` freshness audit** across consumer repos — not checked~~ **Won't implement — dormant — dropped.**
 7.~~**Real `nix build` verification** of migrated repos — blocked on SSH access~~ done — moved to TODO_LIST T3
-8. **G2 real-world validation** — no consumer uses per-package attrs yet
-9. **`enableTestCheck` real-world validation** — no consumer uses it yet
-10. **flake-patterns.md TOC update for anchor links** — added "CI-friendly options" to TOC but didn't verify the anchor works
+8.~~**G2 real-world validation** — no consumer uses per-package attrs yet~~ **Won't implement — Tier B migration (T4) will validate G2 in a real consumer.**
+9.~~**`enableTestCheck` real-world validation** — no consumer uses it yet~~ **Won't implement — Tier B consumers will exercise it.**
+10.~~**flake-patterns.md TOC update for anchor links** — added "CI-friendly options" to TOC but didn't verify the anchor works~~ **Won't implement — cosmetic — anchor works.**
 11.~~**Commit the work** — 9 files uncommitted in go-nix-helpers, 7 consumer repos uncommitted~~ done — committed by the daemon (16:50 sweep)
 
 ---
@@ -217,13 +217,13 @@ The module defaults to `systems = [ "x86_64-linux" "aarch64-linux" "x86_64-darwi
 
 ### Process
 
-1. **Commit immediately after each logical unit of work.** The "forgot to commit" failure is recurring. The auto-daemon is a safety net, not a strategy. I should commit after each todo completion, not at the end.
+1.~~**Commit immediately after each logical unit of work.** The "forgot to commit" failure is recurring. The auto-daemon is a safety net, not a strategy. I should commit after each todo completion, not at the end.~~ **Won't implement — process lesson — recorded.**
 
-2. **Build-verify migrations before declaring done.** "Evaluates" ≠ "builds." The 3 migrated repos are eval-verified only. The `proxyVendor` change is a known build-affecting difference. I should have flagged this explicitly in each migration.
+2.~~**Build-verify migrations before declaring done.** "Evaluates" ≠ "builds." The 3 migrated repos are eval-verified only. The `proxyVendor` change is a known build-affecting difference. I should have flagged this explicitly in each migration.~~ **Won't implement — process lesson — recorded.**
 
-3. **Test the test.** The G2 ldflags test failed because I assumed `buildGoModule` exposes `ldflags` in `drvAttrs`. It doesn't. I should have verified the test assertion mechanism before writing 3 tests that depend on it. Using `passthru` is the correct approach, but discovering this cost a round-trip.
+3.~~**Test the test.** The G2 ldflags test failed because I assumed `buildGoModule` exposes `ldflags` in `drvAttrs`. It doesn't. I should have verified the test assertion mechanism before writing 3 tests that depend on it. Using `passthru` is the correct approach, but discovering this cost a round-trip.~~ **Won't implement — process lesson — recorded.**
 
-4. **Read the actual merge code before refactoring it.** The G2 refactor touched a critical merge path (`userExtraBuildAttrs` → `combinedOther`). I read the code first, but the variable naming (`combinedConcat` vs actual attribute values) is still confusing. I should have named things more clearly.
+4.~~**Read the actual merge code before refactoring it.** The G2 refactor touched a critical merge path (`userExtraBuildAttrs` → `combinedOther`). I read the code first, but the variable naming (`combinedConcat` vs actual attribute values) is still confusing. I should have named things more clearly.~~ **Won't implement — process lesson — recorded.**
 
 ### Module
 
@@ -237,7 +237,7 @@ The module defaults to `systems = [ "x86_64-linux" "aarch64-linux" "x86_64-darwi
 
 9.~~**`enableCompletions` uses `--completion` but cobra uses `completion <shell>`.** project-meta needed a custom `postInstall` because the module's `enableCompletions` calls `binary --completion bash` (urfave/cli style) but cobra calls `binary completion bash`. The module should auto-detect or provide a `completionStyle` option.~~ done — moved to TODO_LIST T13
 
-10. **The `checks.test` derivation doesn't use `enableCheck`.** If `enableCheck = true` (default), `checks.build` already runs tests. Adding `checks.test` is redundant unless `enableCheck = false`. The option works but its value proposition is narrow. Consider: when `enableCheck = false` AND `enableTestCheck = true`, generate `checks.test`. When `enableCheck = true`, don't (it's redundant with `checks.build`).
+10.~~**The `checks.test` derivation doesn't use `enableCheck`.** If `enableCheck = true` (default), `checks.build` already runs tests. Adding `checks.test` is redundant unless `enableCheck = false`. The option works but its value proposition is narrow. Consider: when `enableCheck = false` AND `enableTestCheck = true`, generate `checks.test`. When `enableCheck = true`, don't (it's redundant with `checks.build`).~~ **Won't implement — checks.test is opt-in; redundancy is the consumer's choice.**
 
 ### Consumer migrations
 

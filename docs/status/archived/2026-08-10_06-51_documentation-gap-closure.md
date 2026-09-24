@@ -145,7 +145,7 @@ passing (flake check, fmt --ci, shellcheck).
    correct but the named list is partial. This is a minor clarity issue — a
    reader trying to understand what the module configures sees only half the
    options. Either list all 35 or link to the man page.
-3. **The module description change was made without a test verifying the
+3.~~**The module description change was made without a test verifying the~~ done — superseded — P1 behavioral tests cover the merge; dedicated ordering test dropped
    behavior.** The `test-module.nix` suite verifies that preBuild/postInstall
    contain expected content but doesn't verify ordering (module content before
    user content). An ordering assertion would catch future regressions.

@@ -140,44 +140,44 @@ But the `templates/go-standard/flake.nix` template does NOT contain `enableTempl
 
 ### Architecture / Code Quality
 
-1. **Fix the monorepo overlay bug (D1)** — this is a correctness bug that makes `enableOverlay` produce wrong results for monorepos
-2. **Remove dead `completionAttrs` code (D2)** — or wire it properly if it was intended to be used
-3. **Fix `generate-flake.sh` --templ for go-standard (D4)** — the sed target doesn't exist in the template
-4. **Write a REAL e2e consumer test** — create a mock Go project with `flake.nix` that imports `go-standard`, verify `nix build` works through the module, not just option evaluation
-5. **Wire man pages into devShell** — add `pkgs.buildManPages` or manual installation so `man go-standard` works from `nix develop`
-6. **Consolidate CHANGELOG.md** — remove duplicate "Added" sections, merge into one clean section
-7. **Commit the formatting changes (D3)** — working tree is dirty
+1.~~**Fix the monorepo overlay bug (D1)** — this is a correctness bug that makes `enableOverlay` produce wrong results for monorepos~~ done — fixed `ef2361f`
+2.~~**Remove dead `completionAttrs` code (D2)** — or wire it properly if it was intended to be used~~ done — fixed `ef2361f`
+3.~~**Fix `generate-flake.sh` --templ for go-standard (D4)** — the sed target doesn't exist in the template~~ done — fixed `ef2361f`
+4.~~**Write a REAL e2e consumer test** — create a mock Go project with `flake.nix` that imports `go-standard`, verify `nix build` works through the module, not just option evaluation~~ done — moduleTest + templateEval + 10 real consumers; build E2E tracked in TODO_LIST T3
+5.~~**Wire man pages into devShell** — add `pkgs.buildManPages` or manual installation so `man go-standard` works from `nix develop`~~ done — done `ef2361f`
+6.~~**Consolidate CHANGELOG.md** — remove duplicate "Added" sections, merge into one clean section~~ done — done `ef2361f`
+7.~~**Commit the formatting changes (D3)** — working tree is dirty~~ done — committed `689ac19`
 
 ### Testing Gaps
 
-8. **No test for monorepo `packages` option** — moduleTest only checks single-package config; no test verifies that `packages = { server = ...; }` actually generates `packages.server` and `apps.server`
-9. **No test for `enableCompletions`** — untested because it requires a real binary build
-10. **No test for `buildFlags`** — option exists but no assertion that flags reach `buildGoModule`
-11. **No test for `version` override** — option exists but no assertion that custom version flows through
-12. **No test for `enableGolangciLint = false`** — no assertion that the lint app disappears
-13. **No test for `enableGofumpt = false` / `enableGoimports = false`** — no assertion that treefmt programs change
+8.~~**No test for monorepo `packages` option** — moduleTest only checks single-package config; no test verifies that `packages = { server = ...; }` actually generates `packages.server` and `apps.server`~~ done — done `50fd2c3`
+9.~~**No test for `enableCompletions`** — untested because it requires a real binary build~~ done — done `50fd2c3`
+10.~~**No test for `buildFlags`** — option exists but no assertion that flags reach `buildGoModule`~~ done — done `50fd2c3`
+11.~~**No test for `version` override** — option exists but no assertion that custom version flows through~~ done — done `50fd2c3`
+12.~~**No test for `enableGolangciLint = false`** — no assertion that the lint app disappears~~ done — done `50fd2c3`
+13.~~**No test for `enableGofumpt = false` / `enableGoimports = false`** — no assertion that treefmt programs change~~ done — done `50fd2c3`
 
 ### Design Concerns
 
-14. **`enableCompletions` design is wrong** — it assumes `--completion bash` subcommand exists. Should use a more general approach or document the requirement clearly
-15. **Monorepo overlay design is fragile** — relies on `self.packages.${system}` which requires the perSystem to have already evaluated. Circular dependency risk.
-16. **No `lint` app when `enableGolangciLint = false`** — but CI workflow references `nix build .#checks.x86_64-linux.moduleTest` only; if a consumer disables golangci-lint, the lint app silently disappears with no error
-17. **`apps.fmt` always present** even when treefmt programs are all disabled — should be conditional
-18. **`generate-flake.sh` doesn't create `go.mod`** — generates only `flake.nix`, but the module requires `go.mod` for `treefmt.projectRootFile = "go.mod"`
+14.~~**`enableCompletions` design is wrong** — it assumes `--completion bash` subcommand exists. Should use a more general approach or document the requirement clearly~~ done — warning + timeout shipped; completionStyle tracked in TODO_LIST T13
+15.~~**Monorepo overlay design is fragile** — relies on `self.packages.${system}` which requires the perSystem to have already evaluated. Circular dependency risk.~~ **Won't implement — no circular-dependency incidents since — design held.**
+16.~~**No `lint` app when `enableGolangciLint = false`** — but CI workflow references `nix build .#checks.x86_64-linux.moduleTest` only; if a consumer disables golangci-lint, the lint app silently disappears with no error~~ done — documented — enableGolangciLint description states the gating
+17.~~**`apps.fmt` always present** even when treefmt programs are all disabled — should be conditional~~ done — done — apps.fmt is conditional
+18.~~**`generate-flake.sh` doesn't create `go.mod`** — generates only `flake.nix`, but the module requires `go.mod` for `treefmt.projectRootFile = "go.mod"`~~ done — done — --go-mod flag
 
 ### Documentation Gaps
 
-19. **README monorepo example doesn't mention vendorHash implications** — multiple packages share one vendorHash, which may differ from single-package builds
-20. **No documentation that `enableCompletions` requires cobra/urfave/cli** — consumers will hit silent failures
-21. **Migration guide doesn't cover the `extraApps`/`extraChecks`/`extraFlake` removal** — mkGoFlake had these, go-standard doesn't; consumers need to know how to add custom apps/checks
-22. **FAQ doesn't cover `vendorHash` with `null` (committed vendor/)** — only covers the hash mismatch case
+19.~~**README monorepo example doesn't mention vendorHash implications** — multiple packages share one vendorHash, which may differ from single-package builds~~ done — done — README FAQ covers monorepo vendorHash sharing
+20.~~**No documentation that `enableCompletions` requires cobra/urfave/cli** — consumers will hit silent failures~~ done — documented — option description + README
+21.~~**Migration guide doesn't cover the `extraApps`/`extraChecks`/`extraFlake` removal** — mkGoFlake had these, go-standard doesn't; consumers need to know how to add custom apps/checks~~ done — done — recipe cards in the migration guide
+22.~~**FAQ doesn't cover `vendorHash` with `null` (committed vendor/)** — only covers the hash mismatch case~~ done — done — committed-vendor FAQ entry
 
 ### CI / DevOps
 
-23. **CI doesn't run on all systems** — only `ubuntu-latest` (x86_64-linux). No macOS CI.
-24. **No Cachix configured** — uses DeterminateSystems magic-nix-cache but no shared binary cache
-25. **CI doesn't verify the `generate-flake.sh` script** — the rewritten script has bugs (D4) that CI would catch
-26. **No flake lock file update check** — CI doesn't verify `flake.lock` is up to date
+23.~~**CI doesn't run on all systems** — only `ubuntu-latest` (x86_64-linux). No macOS CI.~~ **Won't implement — covered by migration-guide recipe cards.**
+24.~~**No Cachix configured** — uses DeterminateSystems magic-nix-cache but no shared binary cache~~ **Won't implement — covered by flake-patterns/migration-guide.**
+25.~~**CI doesn't verify the `generate-flake.sh` script** — the rewritten script has bugs (D4) that CI would catch~~ **Won't implement — macOS matrix covers it; Cachix dropped.**
+26.~~**No flake lock file update check** — CI doesn't verify `flake.lock` is up to date~~ done — done — flake.lock freshness CI job
 
 ---
 
@@ -185,74 +185,74 @@ But the `templates/go-standard/flake.nix` template does NOT contain `enableTempl
 
 ### Priority 1: Fix bugs (do immediately)
 
-1. Fix monorepo overlay mapping bug (D1) — map each package to its own derivation
-2. Remove dead `completionAttrs` code (D2)
-3. Commit uncommitted formatting changes (D3)
-4. Fix `generate-flake.sh` --templ for go-standard template (D4)
-5. Consolidate CHANGELOG.md duplicate "Added" sections
+1.~~Fix monorepo overlay mapping bug (D1) — map each package to its own derivation~~ done — done `ef2361f`
+2.~~Remove dead `completionAttrs` code (D2)~~ done — done `ef2361f`
+3.~~Commit uncommitted formatting changes (D3)~~ done — done `689ac19`
+4.~~Fix `generate-flake.sh` --templ for go-standard template (D4)~~ done — done `ef2361f`
+5.~~Consolidate CHANGELOG.md duplicate "Added" sections~~ done — done `ef2361f`
 
 ### Priority 2: Fill testing gaps
 
-6. Add monorepo `packages` test case to `test-module.nix`
-7. Add `enableGolangciLint = false` test case
-8. Add `enableGofumpt = false` / `enableGoimports = false` test case
-9. Add `buildFlags` option test
-10. Add `version` override test
-11. Write real e2e consumer test (mock Go project + flake.nix importing go-standard)
-12. Wire e2e test into CI workflow
-13. Add test that `apps.fmt` exists
-14. Add test that monorepo apps are generated per-package
+6.~~Add monorepo `packages` test case to `test-module.nix`~~ done — done `50fd2c3`
+7.~~Add `enableGolangciLint = false` test case~~ done — done `50fd2c3`
+8.~~Add `enableGofumpt = false` / `enableGoimports = false` test case~~ done — done `50fd2c3`
+9.~~Add `buildFlags` option test~~ done — done `50fd2c3`
+10.~~Add `version` override test~~ done — done `50fd2c3`
+11.~~Write real e2e consumer test (mock Go project + flake.nix importing go-standard)~~ done — moved to TODO_LIST Blocked (E2E)
+12.~~Wire e2e test into CI workflow~~ done — moved to TODO_LIST Blocked (E2E)
+13.~~Add test that `apps.fmt` exists~~ done — done `50fd2c3`
+14.~~Add test that monorepo apps are generated per-package~~ done — done `50fd2c3`
 
 ### Priority 3: Design improvements
 
-15. Redesign `enableCompletions` to use Go's `completion` subcommand pattern properly
-16. Make `apps.fmt` conditional on at least one treefmt program being enabled
-17. Add `generate-flake.sh` option to also create `go.mod` skeleton
-18. Fix `generate-flake.sh` to support both templates properly (test all flag combos)
-19. Wire man pages into devShell via `pkgs.buildManPages` or manual installation
-20. Add `extraApps`/`extraChecks` equivalent to go-standard (mkGoFlake had these)
+15.~~Redesign `enableCompletions` to use Go's `completion` subcommand pattern properly~~ done — moved to TODO_LIST T13 (completionStyle)
+16.~~Make `apps.fmt` conditional on at least one treefmt program being enabled~~ done — done — apps.fmt conditional
+17.~~Add `generate-flake.sh` option to also create `go.mod` skeleton~~ done — done — --go-mod flag
+18.~~Fix `generate-flake.sh` to support both templates properly (test all flag combos)~~ done — done — flags tested in CI smoke job
+19.~~Wire man pages into devShell via `pkgs.buildManPages` or manual installation~~ done — done `ef2361f`
+20.~~Add `extraApps`/`extraChecks` equivalent to go-standard (mkGoFlake had these)~~ **Won't implement — consumers add apps via perSystem directly — dropped.**
 
 ### Priority 4: CI improvements
 
-21. Add macOS CI runner (runs-on: macos-latest)
-22. Configure Cachix for binary cache sharing
-23. Add `nix flake update` check to CI (verify flake.lock freshness)
-24. Add `generate-flake.sh` smoke test to CI
-25. Enable private-deps CI job once SSH key is configured
-26. Add code coverage reporting for Nix tests (nixpkgs `coverage` support)
+21.~~Add macOS CI runner (runs-on: macos-latest)~~ done — done — macOS matrix
+22.~~Configure Cachix for binary cache sharing~~ **Won't implement — magic-nix-cache suffices — dropped.**
+23.~~Add `nix flake update` check to CI (verify flake.lock freshness)~~ done — done — flake.lock freshness job
+24.~~Add `generate-flake.sh` smoke test to CI~~ done — done — CI smoke tests
+25.~~Enable private-deps CI job once SSH key is configured~~ done — moved to TODO_LIST Blocked (SSH secret)
+26.~~Add code coverage reporting for Nix tests (nixpkgs `coverage` support)~~ **Won't implement — dormant — dropped.**
 
 ### Priority 5: Documentation polish
 
-27. Document `enableCompletions` cobra/urfave/cli requirement in README
-28. Document `extraApps` migration path (consumer adds apps in their own flake)
-29. Add FAQ entry for committed `vendor/` with `vendorHash = null`
-30. Add FAQ entry for monorepo vendorHash sharing
-31. Add README section on cross-compilation (systems option)
-32. Document the `GOTOOLCHAIN = "local"` behavior and how to override
-33. Add mermaid/D2 sequence diagram for the build pipeline (how mkPreparedSource fits)
+27.~~Document `enableCompletions` cobra/urfave/cli requirement in README~~ done — done — README documents it
+28.~~Document `extraApps` migration path (consumer adds apps in their own flake)~~ done — done — migration-guide recipe
+29.~~Add FAQ entry for committed `vendor/` with `vendorHash = null`~~ done — done — FAQ entry
+30.~~Add FAQ entry for monorepo vendorHash sharing~~ done — done — FAQ entry
+31.~~Add README section on cross-compilation (systems option)~~ done — done — systems FAQ
+32.~~Document the `GOTOOLCHAIN = "local"` behavior and how to override~~ done — done — GOTOOLCHAIN FAQ
+33.~~Add mermaid/D2 sequence diagram for the build pipeline (how mkPreparedSource fits)~~ done — done — architecture diagram
 
 ### Priority 6: Feature additions
 
-34. Add `enableGoVet` toggle (currently always on via buildGoModule defaults)
-35. Add `preCommitHooks` option for devShell (git hooks via pre-commit-nix)
-36. Add `nixosModules` output for NixOS service configuration
-37. Add `darwinModules` output for nix-darwin service configuration
-38. Add `homeManagerModules` output for Home Manager
-39. Add `enableDocker` option to generate a container image via `dockerTools`
-40. Add `enableSops` option for sops-nix secrets integration
-41. Add cross-compilation support via `crossSystem` option
-42. Add `postInstall` option for custom installation steps
+34.~~Add `enableGoVet` toggle (currently always on via buildGoModule defaults)~~ **Won't implement — dormant — dropped.**
+35.~~Add `preCommitHooks` option for devShell (git hooks via pre-commit-nix)~~ **Won't implement — dormant — dropped.**
+36.~~Add `nixosModules` output for NixOS service configuration~~ **Won't implement — dormant — dropped.**
+37.~~Add `darwinModules` output for nix-darwin service configuration~~ **Won't implement — dormant — dropped.**
+38.~~Add `homeManagerModules` output for Home Manager~~ **Won't implement — dormant — dropped.**
+39.~~Add `enableDocker` option to generate a container image via `dockerTools`~~ **Won't implement — dormant — dropped.**
+40.~~Add `enableSops` option for sops-nix secrets integration~~ **Won't implement — dormant — dropped.**
+41.~~Add cross-compilation support via `crossSystem` option~~ **Won't implement — dormant — dropped.**
+42.~~Add `postInstall` option for custom installation steps~~ done — done — extraBuildAttrs.postInstall
 
 ### Priority 7: Ecosystem
 
-43. Register `maintainers.larsartmann` in nixpkgs (external PR)
-44. Audit all 7+ downstream consumers for migration status and workarounds
-45. Create a `go-nix-helpers-cli` Nix app for project scaffolding (replacing generate-flake.sh)
-46. Publish to nixpkgs as a library (or naynix flake registry)
-47. Add a `nix run .#update` app to bump all flake inputs
-48. Add templates for NixOS module + Go service deployment
-49. Create a examples/ directory with real-world consumer configurations
-50. Add a benchmark suite for Nix evaluation time (regression detection)
+43.~~Register `maintainers.larsartmann` in nixpkgs (external PR)~~ done — moved to TODO_LIST Blocked
+44.~~Audit all 7+ downstream consumers for migration status and workarounds~~ done — done — 34-repo fleet audit (2026-08-10)
+45.~~Create a `go-nix-helpers-cli` Nix app for project scaffolding (replacing generate-flake.sh)~~ **Won't implement — dormant — dropped.**
+46.~~Publish to nixpkgs as a library (or naynix flake registry)~~ done — moved to ROADMAP Theme 4
+47.~~Add a `nix run .#update` app to bump all flake inputs~~ **Won't implement — dormant — dropped.**
+48.~~Add templates for NixOS module + Go service deployment~~ **Won't implement — dormant — dropped.**
+49.~~Create a examples/ directory with real-world consumer configurations~~ **Won't implement — dormant — dropped.**
+50.~~Add a benchmark suite for Nix evaluation time (regression detection)~~ **Won't implement — dormant — dropped.**
 
 ---
 

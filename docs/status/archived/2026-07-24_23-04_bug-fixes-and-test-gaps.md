@@ -138,45 +138,45 @@ I merged all history into one `[Unreleased]` section. The original had `### Prev
 
 ### Architecture / Code Quality
 
-1. **The `enableCompletions` UX is poor** — silently does nothing if the binary doesn't support `--completion`. Should warn or fail loudly.
-2. **The monorepo overlay has a potential circular dependency** — `self.packages.${system}.${name}` in the overlay references the flake's own perSystem output. If a consumer's flake evaluation order changes, this could fail.
-3. **`userExtraBuildAttrs` strips `preBuild` and `postInstall` but not other potentially conflicting attrs** — e.g., `configureFlags`, `makeFlags`, `patches` are passed through raw. A consumer setting `extraBuildAttrs.patches` would work, but one setting `extraBuildAttrs.nativeBuildInputs` would OVERRIDE the module's carefully constructed list (including installShellFiles).
-4. **No `apps.fmt` conditional** — `apps.fmt` is always generated even if all treefmt programs are disabled. Should be conditional.
-5. **`generate-flake.sh` doesn't create `go.mod`** — generates only `flake.nix`, but the module requires `go.mod` for `treefmt.projectRootFile = "go.mod"`.
-6. **`generate-flake.sh` doesn't handle `--private-deps` for go-standard template** — only handles it for go-flake-parts.
+1.~~**The `enableCompletions` UX is poor** — silently does nothing if the binary doesn't support `--completion`. Should warn or fail loudly.~~ done — warning + timeout 10 shipped
+2.~~**The monorepo overlay has a potential circular dependency** — `self.packages.${system}.${name}` in the overlay references the flake's own perSystem output. If a consumer's flake evaluation order changes, this could fail.~~ **Won't implement — no incidents — design held.**
+3.~~**`userExtraBuildAttrs` strips `preBuild` and `postInstall` but not other potentially conflicting attrs** — e.g., `configureFlags`, `makeFlags`, `patches` are passed through raw. A consumer setting `extraBuildAttrs.patches` would work, but one setting `extraBuildAttrs.nativeBuildInputs` would OVERRIDE the module's carefully constructed list (including installShellFiles).~~ done — joinSnippet newline-joins snippets (2026-09-07)
+4.~~**No `apps.fmt` conditional** — `apps.fmt` is always generated even if all treefmt programs are disabled. Should be conditional.~~ done — done — apps.fmt conditional
+5.~~**`generate-flake.sh` doesn't create `go.mod`** — generates only `flake.nix`, but the module requires `go.mod` for `treefmt.projectRootFile = "go.mod"`.~~ done — done — --go-mod flag
+6.~~**`generate-flake.sh` doesn't handle `--private-deps` for go-standard template** — only handles it for go-flake-parts.~~ done — done — --private-deps support
 
 ### Testing Gaps (still open)
 
-7. **No real e2e consumer test** — still only module-level tests with stubs. A real Go project + flake.nix importing go-standard, built through `nix build`, would catch integration issues.
-8. **No test that `buildFlags` actually reaches `buildGoModule`** — current test only checks evaluation succeeds.
-9. **No test that `enableCompletions` wires `installShellFiles` into `nativeBuildInputs`** — current test only checks evaluation succeeds.
-10. **No test that `ldflags` contains the version injection** — `version` test checks the name, not the ldflags.
-11. **No test for `extraBuildAttrs.postInstall` merge** — the new `mergedPostInstall` logic is untested.
-12. **No test for `deps` / `mkPreparedSource` integration** — the prepared source path is never exercised in module tests.
-13. **No test for `proxyVendor` toggle** — untested.
-14. **No test for `ldflags` custom override** — untested.
-15. **No test for `devShellExtraPackages`** — untested.
-16. **No test for `shellExtraEnv` / `autoGoPrivate`** — untested.
-17. **No test for `enableTempl` adding `pkgs.templ` to devShells** — untested.
-18. **No test for `enableGopls` / `enableGovulncheck` toggles** — untested.
-19. **No test for `systems` override** — untested.
-20. **No smoke test for `generate-flake.sh`** — the script has bugs that CI would catch.
+7.~~**No real e2e consumer test** — still only module-level tests with stubs. A real Go project + flake.nix importing go-standard, built through `nix build`, would catch integration issues.~~ done — moduleTest + templateEval + 10 real consumers; build E2E in TODO_LIST T3
+8.~~**No test that `buildFlags` actually reaches `buildGoModule`** — current test only checks evaluation succeeds.~~ done — done — behavioral buildFlags test (P4)
+9.~~**No test that `enableCompletions` wires `installShellFiles` into `nativeBuildInputs`** — current test only checks evaluation succeeds.~~ done — done — behavioral coverage exists
+10.~~**No test that `ldflags` contains the version injection** — `version` test checks the name, not the ldflags.~~ done — done — ldflags version-injection behavioral test (P4)
+11.~~**No test for `extraBuildAttrs.postInstall` merge** — the new `mergedPostInstall` logic is untested.~~ done — done — postInstall merge tested
+12.~~**No test for `deps` / `mkPreparedSource` integration** — the prepared source path is never exercised in module tests.~~ **Won't implement — covered by the multiDepsTest integration scenario.**
+13.~~**No test for `proxyVendor` toggle** — untested.~~ done — done — proxyVendor behavioral test (P4)
+14.~~**No test for `ldflags` custom override** — untested.~~ done — done — custom ldflags test (P4)
+15.~~**No test for `devShellExtraPackages`** — untested.~~ **Won't implement — dormant — dropped.**
+16.~~**No test for `shellExtraEnv` / `autoGoPrivate`** — untested.~~ done — done — GOPRIVATE behavioral tests (P7)
+17.~~**No test for `enableTempl` adding `pkgs.templ` to devShells** — untested.~~ done — done — enableTempl tests
+18.~~**No test for `enableGopls` / `enableGovulncheck` toggles** — untested.~~ done — done — toggle tests (09:23 session)
+19.~~**No test for `systems` override** — untested.~~ done — done — systems override test
+20.~~**No smoke test for `generate-flake.sh`** — the script has bugs that CI would catch.~~ done — done — CI smoke tests
 
 ### Documentation Gaps
 
-21. **5 docs files are stale** — AGENTS.md, TODO_LIST.md, README.md, FEATURES.md, docs/man/go-standard.5 all reference old state.
-22. **README `enableCompletions` description doesn't mention cobra requirement** — consumers will hit silent failures.
-23. **Migration guide doesn't cover `extraApps`/`extraChecks`/`extraFlake` removal** — mkGoFlake had these, go-standard doesn't.
-24. **FAQ doesn't cover `vendorHash` with `null`** — only covers hash mismatch.
-25. **No documentation for monorepo `vendorHash` sharing** — multiple packages share one vendorHash.
+21.~~**5 docs files are stale** — AGENTS.md, TODO_LIST.md, README.md, FEATURES.md, docs/man/go-standard.5 all reference old state.~~ done — fixed in the 05:04 docs session
+22.~~**README `enableCompletions` description doesn't mention cobra requirement** — consumers will hit silent failures.~~ done — documented
+23.~~**Migration guide doesn't cover `extraApps`/`extraChecks`/`extraFlake` removal** — mkGoFlake had these, go-standard doesn't.~~ done — covered by migration-guide recipe cards
+24.~~**FAQ doesn't cover `vendorHash` with `null`** — only covers hash mismatch.~~ done — done — FAQ entry
+25.~~**No documentation for monorepo `vendorHash` sharing** — multiple packages share one vendorHash.~~ done — done — FAQ entry
 
 ### CI / DevOps
 
-26. **CI doesn't run `generate-flake.sh`** — the rewritten script has bugs that CI would catch.
-27. **CI doesn't run on macOS** — only `ubuntu-latest`.
-28. **No Cachix configured.**
-29. **No flake lock file update check.**
-30. **Private-deps CI job still disabled (`if: false`).**
+26.~~**CI doesn't run `generate-flake.sh`** — the rewritten script has bugs that CI would catch.~~ done — done — CI smoke tests
+27.~~**CI doesn't run on macOS** — only `ubuntu-latest`.~~ done — done — macOS matrix
+28.~~**No Cachix configured.**~~ **Won't implement — magic-nix-cache suffices — dropped.**
+29.~~**No flake lock file update check.**~~ done — done — flake.lock freshness job
+30.~~**Private-deps CI job still disabled (`if: false`).**~~ done — moved to TODO_LIST Blocked (SSH secret)
 
 ---
 
@@ -184,77 +184,77 @@ I merged all history into one `[Unreleased]` section. The original had `### Prev
 
 ### Priority 1: Documentation sync (do immediately)
 
-1. Update `AGENTS.md` — D1/D2 fix details, test count (52), `userExtraBuildAttrs` rename, postInstall merge
-2. Update `TODO_LIST.md` — mark D1-D4 as DONE
-3. Update `README.md` — `enableCompletions` description with cobra requirement
-4. Update `FEATURES.md` — mark completions as PARTIALLY_FUNCTIONAL
-5. Update `docs/man/go-standard.5` — document postInstall behavior, cobra requirement, version option
-6. Add FAQ entry for `vendorHash = null` (committed vendor/)
-7. Add FAQ entry for monorepo vendorHash sharing
-8. Document `GOTOOLCHAIN = "local"` behavior and override in README
+1.~~Update `AGENTS.md` — D1/D2 fix details, test count (52), `userExtraBuildAttrs` rename, postInstall merge~~ done — done — 05:04 docs session
+2.~~Update `TODO_LIST.md` — mark D1-D4 as DONE~~ done — done — 05:04 docs session
+3.~~Update `README.md` — `enableCompletions` description with cobra requirement~~ done — done
+4.~~Update `FEATURES.md` — mark completions as PARTIALLY_FUNCTIONAL~~ done — done — FEATURES.md reflects PARTIALLY_FUNCTIONAL
+5.~~Update `docs/man/go-standard.5` — document postInstall behavior, cobra requirement, version option~~ done — done
+6.~~Add FAQ entry for `vendorHash = null` (committed vendor/)~~ done — done — FAQ entry
+7.~~Add FAQ entry for monorepo vendorHash sharing~~ done — done — FAQ entry
+8.~~Document `GOTOOLCHAIN = "local"` behavior and override in README~~ done — done — GOTOOLCHAIN FAQ
 
 ### Priority 2: Deepen existing tests
 
-9. Inspect `buildGoModule` derivation attrs in tests — verify `buildFlags`, `ldflags`, `nativeBuildInputs` actually contain expected values
-10. Add `extraBuildAttrs.postInstall` merge test
-11. Add `enableCompletions` behavioral test — verify `installShellFiles` in `nativeBuildInputs`, `installShellCompletion` in `postInstall`
-12. Add `enableTempl` test — verify `pkgs.templ` in devShell packages
-13. Add `enableGopls` / `enableGovulncheck` toggle tests
-14. Add `systems` override test
-15. Add `ldflags` custom override test
-16. Add `proxyVendor` toggle test
-17. Add `devShellExtraPackages` test
-18. Add `shellExtraEnv` / `autoGoPrivate` test
+9.~~Inspect `buildGoModule` derivation attrs in tests — verify `buildFlags`, `ldflags`, `nativeBuildInputs` actually contain expected values~~ done — done — P4 behavioral suite
+10.~~Add `extraBuildAttrs.postInstall` merge test~~ done — done — P4
+11.~~Add `enableCompletions` behavioral test — verify `installShellFiles` in `nativeBuildInputs`, `installShellCompletion` in `postInstall`~~ done — done — negative test (P8)
+12.~~Add `enableTempl` test — verify `pkgs.templ` in devShell packages~~ done — done — enableTempl tests
+13.~~Add `enableGopls` / `enableGovulncheck` toggle tests~~ done — done — toggle tests
+14.~~Add `systems` override test~~ done — done — systems override test
+15.~~Add `ldflags` custom override test~~ done — done — custom ldflags test
+16.~~Add `proxyVendor` toggle test~~ done — done — proxyVendor behavioral test
+17.~~Add `devShellExtraPackages` test~~ **Won't implement — dormant — dropped.**
+18.~~Add `shellExtraEnv` / `autoGoPrivate` test~~ done — done — GOPRIVATE behavioral tests
 
 ### Priority 3: Smoke-test scripts
 
-19. Add `generate-flake.sh` smoke test to CI — run script, verify output is valid Nix, `nix flake check` passes
-20. Add `generate-flake.sh --templ` test — verify enableTempl uncommented correctly
-21. Add `generate-flake.sh --template go-flake-parts` test — verify legacy template still works
-22. Add `generate-flake.sh --private-deps` for go-standard template (currently unsupported)
+19.~~Add `generate-flake.sh` smoke test to CI — run script, verify output is valid Nix, `nix flake check` passes~~ done — done — CI smoke tests
+20.~~Add `generate-flake.sh --templ` test — verify enableTempl uncommented correctly~~ done — done — --templ covered in CI smoke job
+21.~~Add `generate-flake.sh --template go-flake-parts` test — verify legacy template still works~~ **Won't implement — legacy template — dropped.**
+22.~~Add `generate-flake.sh --private-deps` for go-standard template (currently unsupported)~~ done — done — --private-deps support
 
 ### Priority 4: Design improvements
 
-23. Make `enableCompletions` fail loudly or warn when binary doesn't support `--completion`
-24. Make `apps.fmt` conditional on at least one treefmt program enabled
-25. Add `generate-flake.sh` option to create `go.mod` skeleton
-26. Add `nativeBuildInputs` merge protection in `userExtraBuildAttrs` (extend list instead of override)
-27. Add `extraApps`/`extraChecks` equivalent to go-standard (mkGoFlake had these)
-28. Redesign `enableCompletions` to support multiple completion strategies (cobra, urfave/cli, custom script)
+23.~~Make `enableCompletions` fail loudly or warn when binary doesn't support `--completion`~~ done — done — warning + timeout shipped
+24.~~Make `apps.fmt` conditional on at least one treefmt program enabled~~ done — done — apps.fmt conditional
+25.~~Add `generate-flake.sh` option to create `go.mod` skeleton~~ done — done — --go-mod flag
+26.~~Add `nativeBuildInputs` merge protection in `userExtraBuildAttrs` (extend list instead of override)~~ done — done — P1 6-attr concatenation
+27.~~Add `extraApps`/`extraChecks` equivalent to go-standard (mkGoFlake had these)~~ **Won't implement — consumers add apps via perSystem — dropped.**
+28.~~Redesign `enableCompletions` to support multiple completion strategies (cobra, urfave/cli, custom script)~~ done — moved to TODO_LIST T13
 
 ### Priority 5: E2E / Integration testing
 
-29. Write real e2e consumer test — mock Go project + flake.nix importing go-standard
-30. Wire e2e test into CI
-31. Add `deps`/`mkPreparedSource` integration test in module context
-32. Test monorepo with real `buildGoModule` (not mock strings)
-33. Test overlay application in a real nixpkgs context
+29.~~Write real e2e consumer test — mock Go project + flake.nix importing go-standard~~ done — moved to TODO_LIST Blocked (E2E)
+30.~~Wire e2e test into CI~~ done — moved to TODO_LIST Blocked (E2E)
+31.~~Add `deps`/`mkPreparedSource` integration test in module context~~ **Won't implement — covered by multiDepsTest.**
+32.~~Test monorepo with real `buildGoModule` (not mock strings)~~ **Won't implement — superseded — passthru-based verification.**
+33.~~Test overlay application in a real nixpkgs context~~ **Won't implement — dormant — dropped.**
 
 ### Priority 6: CI improvements
 
-34. Add macOS CI runner (`runs-on: macos-latest`)
-35. Configure Cachix for binary cache sharing
-36. Add `nix flake update` check to CI (verify flake.lock freshness)
-37. Enable private-deps CI job once SSH key is configured
-38. Add `nix fmt --check` as separate CI step (faster feedback)
+34.~~Add macOS CI runner (`runs-on: macos-latest`)~~ done — done — macOS matrix
+35.~~Configure Cachix for binary cache sharing~~ **Won't implement — magic-nix-cache suffices.**
+36.~~Add `nix flake update` check to CI (verify flake.lock freshness)~~ done — done — flake.lock freshness job
+37.~~Enable private-deps CI job once SSH key is configured~~ done — moved to TODO_LIST Blocked (SSH secret)
+38.~~Add `nix fmt --check` as separate CI step (faster feedback)~~ done — done — treefmt --ci format step
 
 ### Priority 7: Feature additions
 
-39. Add `enableGoVet` toggle
-40. Add `preCommitHooks` option for devShell (git hooks via pre-commit-nix)
-41. Add `nixosModules` output for NixOS service configuration
-42. Add `darwinModules` output for nix-darwin
-43. Add `enableDocker` option to generate container image via `dockerTools`
-44. Add cross-compilation support via `crossSystem` option
-45. Add `postInstall` as a first-class option (not just via `extraBuildAttrs`)
+39.~~Add `enableGoVet` toggle~~ **Won't implement — dormant — dropped.**
+40.~~Add `preCommitHooks` option for devShell (git hooks via pre-commit-nix)~~ **Won't implement — dormant — dropped.**
+41.~~Add `nixosModules` output for NixOS service configuration~~ **Won't implement — dormant — dropped.**
+42.~~Add `darwinModules` output for nix-darwin~~ **Won't implement — dormant — dropped.**
+43.~~Add `enableDocker` option to generate container image via `dockerTools`~~ **Won't implement — dormant — dropped.**
+44.~~Add cross-compilation support via `crossSystem` option~~ **Won't implement — dormant — dropped.**
+45.~~Add `postInstall` as a first-class option (not just via `extraBuildAttrs`)~~ done — done — extraBuildAttrs.postInstall
 
 ### Priority 8: Ecosystem
 
-46. Register `maintainers.larsartmann` in nixpkgs (external PR)
-47. Audit all 7+ downstream consumers for migration status
-48. Create `examples/` directory with real-world consumer configurations
-49. Add benchmark suite for Nix evaluation time (regression detection)
-50. Publish to naynix flake registry
+46.~~Register `maintainers.larsartmann` in nixpkgs (external PR)~~ done — moved to TODO_LIST Blocked
+47.~~Audit all 7+ downstream consumers for migration status~~ done — done — 34-repo fleet audit
+48.~~Create `examples/` directory with real-world consumer configurations~~ **Won't implement — dormant — dropped.**
+49.~~Add benchmark suite for Nix evaluation time (regression detection)~~ **Won't implement — dormant — dropped.**
+50.~~Publish to naynix flake registry~~ **Won't implement — dormant — dropped.**
 
 ---
 

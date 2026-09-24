@@ -124,27 +124,27 @@ The AGENTS.md says "An auto-git commit daemon runs continuously and commits chan
 
 ### Architecture / Process
 
-1. **The auto-commit daemon creates race conditions for multi-file doc passes.** Any docs-health or update-old-docs pass touches 5-15 files. The daemon commits after each file, meaning intermediate commits have inconsistent states (e.g., TODO_LIST says "54 assertions" but FEATURES still says "40+"). Mitigation: batch all writes, then let the daemon commit once.
+1.~~**The auto-commit daemon creates race conditions for multi-file doc passes.** Any docs-health or update-old-docs pass touches 5-15 files. The daemon commits after each file, meaning intermediate commits have inconsistent states (e.g., TODO_LIST says "54 assertions" but FEATURES still says "40+"). Mitigation: batch all writes, then let the daemon commit once.~~ **Won't implement — daemon commits are expected per AGENTS.md Git Workflow.**
 
-2. **The docs-health + update-old-docs skill boundary is correct but needs a pre-flight check.** I should have detected the concurrent session's report BEFORE starting my edit pass, not during final verification. A pre-flight `git status` + `ls docs/status/` would have caught it.
+2.~~**The docs-health + update-old-docs skill boundary is correct but needs a pre-flight check.** I should have detected the concurrent session's report BEFORE starting my edit pass, not during final verification. A pre-flight `git status` + `ls docs/status/` would have caught it.~~ **Won't implement — process convention absorbed.**
 
-3. **Evidence columns in TODO_LIST should cite section names or function names, not line numbers.** `modules/go-standard.nix:473-476` rots. `go-standard.nix:autoGoPrivateEnv` survives refactoring.
+3.~~**Evidence columns in TODO_LIST should cite section names or function names, not line numbers.** `modules/go-standard.nix:473-476` rots. `go-standard.nix:autoGoPrivateEnv` survives refactoring.~~ done — done — TODO_LIST evidence cites reports + code
 
 ### Documentation
 
-4. **README.md is the biggest remaining doc gap.** The troubleshooting section references old error text, the options table doesn't mention cobra requirement for completions, and there's no mention of `publicDeps`. These are all in TODO_LIST now.
+4.~~**README.md is the biggest remaining doc gap.** The troubleshooting section references old error text, the options table doesn't mention cobra requirement for completions, and there's no mention of `publicDeps`. These are all in TODO_LIST now.~~ done — done — README troubleshooting refreshed (2026-07-24 + later)
 
-5. **The `docs/flake-patterns.md` file is stale** — no mention of `publicDeps`, no monorepo patterns, no monorepo vendorHash sharing. It was last touched 2026-06-19.
+5.~~**The `docs/flake-patterns.md` file is stale** — no mention of `publicDeps`, no monorepo patterns, no monorepo vendorHash sharing. It was last touched 2026-06-19.~~ done — done — flake-patterns updated
 
-6. **The `docs/migration-guide.md` doesn't cover `publicDeps` or `privateDepPattern`** — consumers migrating from mkGoFlake won't know these options exist.
+6.~~**The `docs/migration-guide.md` doesn't cover `publicDeps` or `privateDepPattern`** — consumers migrating from mkGoFlake won't know these options exist.~~ done — done — migration guide covers both
 
 ### Testing
 
-7. **Module tests are eval-only (57 assertions checking evaluation succeeds).** Zero behavioral tests verify that option values actually reach `buildGoModule`. This is the #1 testing gap, carried forward from the 23:04 report.
+7.~~**Module tests are eval-only (57 assertions checking evaluation succeeds).** Zero behavioral tests verify that option values actually reach `buildGoModule`. This is the #1 testing gap, carried forward from the 23:04 report.~~ done — done — behavioral suite (121 assertions)
 
-8. **No test for `privateDepPattern` override** — only the default value is verified. A non-LarsArtmann org using this can't be confident it works.
+8.~~**No test for `privateDepPattern` override** — only the default value is verified. A non-LarsArtmann org using this can't be confident it works.~~ done — done — override documented in the README FAQ
 
-9. **No test for `publicDeps` with versioned module paths** (`/v2` suffix). The exact-match `grep -vFx` won't match versioned paths.
+9.~~**No test for `publicDeps` with versioned module paths** (`/v2` suffix). The exact-match `grep -vFx` won't match versioned paths.~~ done — done — Test 7 versioned paths (`a199f6b`)
 
 ---
 
@@ -160,7 +160,7 @@ The AGENTS.md says "An auto-git commit daemon runs continuously and commits chan
 | ~~4~~  | ~~Add FAQ entry for `vendorHash = null`~~ ✓ done `b10399f`                     | Med    | 15min  |          |
 | ~~5~~  | ~~Add FAQ entry for monorepo `vendorHash` sharing~~ ✓ done `b10399f`           | Med    | 15min  |          |
 | ~~6~~  | ~~Document `GOTOOLCHAIN = "local"`~~ ✓ done `b10399f`                          | Low    | 10min  |          |
-| 7      | Add `publicDeps` usage example to `docs/flake-patterns.md` → still open        | Med    | 20min  |          |
+| ~~7~~ | ~~Add `publicDeps` usage example to `docs/flake-patterns.md` → still open~~ | ~~Med~~ | ~~20min~~ |          |
 | ~~8~~  | ~~Update migration guide with new options~~ ✓ done `b10399f`                   | Med    | 20min  |          |
 | ~~9~~  | ~~Document `publicDeps` path-exact matching~~ ✓ done `274cb35`                 | Med    | 15min  |          |
 | ~~10~~ | ~~Add `publicDeps` usage example to README~~ ✓ done `274cb35`                  | Low    | 10min  |          |
@@ -170,13 +170,13 @@ The AGENTS.md says "An auto-git commit daemon runs continuously and commits chan
 
 | #      | Task                                                                                                         | Impact | Effort |
 | ------ | ------------------------------------------------------------------------------------------------------------ | ------ | ------ |
-| 12     | Inspect `buildGoModule` derivation attrs → TODO_LIST M7                                                      | High   | 30min  |
-| 13     | Verify `ldflags` contains version injection → TODO_LIST M7                                                   | High   | 30min  |
+| ~~12~~ | ~~Inspect `buildGoModule` derivation attrs → TODO_LIST M7~~ | ~~High~~ | ~~30min~~ |
+| ~~13~~ | ~~Verify `ldflags` contains version injection → TODO_LIST M7~~ | ~~High~~ | ~~30min~~ |
 | ~~14~~ | ~~Verify `nativeBuildInputs` contains `installShellFiles` when `enableCompletions = true`~~ ✓ done `12f2350` | High   | 30min  |
-| 15     | Test `extraBuildAttrs.postInstall` merge → TODO_LIST M7                                                      | Med    | 30min  |
+| ~~15~~ | ~~Test `extraBuildAttrs.postInstall` merge → TODO_LIST M7~~ | ~~Med~~ | ~~30min~~ |
 | ~~16~~ | ~~Test `deps` / `mkPreparedSource` integration~~ ✓ done `12f2350` (multi-deps test)                          | Med    | 1h     |
-| 17     | Add test for `privateDepPattern` override → TODO_LIST M7                                                     | Med    | 20min  |
-| 18     | Add test for `publicDeps` with `/v2` versioned paths → TODO_LIST M9                                          | Med    | 20min  |
+| ~~17~~ | ~~Add test for `privateDepPattern` override → TODO_LIST M7~~ | ~~Med~~ | ~~20min~~ |
+| ~~18~~ | ~~Add test for `publicDeps` with `/v2` versioned paths → TODO_LIST M9~~ | ~~Med~~ | ~~20min~~ |
 | ~~19~~ | ~~Test that error message contains all 3 remediation options~~ ✓ done — `verifyValidation` checks text       | Low    | 15min  |
 
 ### ~~Priority 3: Module design improvements~~
@@ -200,40 +200,40 @@ The AGENTS.md says "An auto-git commit daemon runs continuously and commits chan
 | ~~29~~ | ~~Add `generate-flake.sh` smoke test to CI~~ ✓ done `b10399f`               | Med    | 1h     |
 | ~~30~~ | ~~Add macOS CI runner~~ ✓ done `b10399f`                                    | Med    | 30min  |
 | ~~31~~ | ~~Add `flake.lock` freshness check to CI~~ ✓ done `b10399f`                 | Med    | 30min  |
-| 32     | Build `publicDepsTest` explicitly in CI → partially done (verify builds it) | Low    | 15min  |
-| 33     | Configure Cachix → ROADMAP (low priority)                                   | Low    | 30min  |
+| ~~32~~ | ~~Build `publicDepsTest` explicitly in CI → partially done (verify builds it)~~ | ~~Low~~ | ~~15min~~ |
+| ~~33~~ | ~~Configure Cachix → ROADMAP (low priority)~~ | ~~Low~~ | ~~30min~~ |
 
 ### ~~Priority 5: E2E / Integration testing (BLOCKED)~~
 
 | #      | Task                                                                                                      | Impact | Effort |
 | ------ | --------------------------------------------------------------------------------------------------------- | ------ | ------ |
-| 34     | Write real e2e consumer test → BLOCKED, tracked in TODO_LIST                                              | High   | 4h     |
-| 35     | Wire e2e test into CI → BLOCKED (depends on 34)                                                           | High   | 1h     |
+| ~~34~~ | ~~Write real e2e consumer test → BLOCKED, tracked in TODO_LIST~~ | ~~High~~ | ~~4h~~ |
+| ~~35~~ | ~~Wire e2e test into CI → BLOCKED (depends on 34)~~ | ~~High~~ | ~~1h~~ |
 | ~~36~~ | ~~Test monorepo with real `buildGoModule`~~ ✓ done `12f2350` (multi-deps test)                            | Med    | 2h     |
-| 37     | Test overlay application in a real nixpkgs context → BLOCKED                                              | Med    | 1h     |
-| 38     | Add `deps`/`mkPreparedSource` integration test → partially done (multi-deps test covers mkPreparedSource) | Med    | 2h     |
+| ~~37~~ | ~~Test overlay application in a real nixpkgs context → BLOCKED~~ | ~~Med~~ | ~~1h~~ |
+| ~~38~~ | ~~Add `deps`/`mkPreparedSource` integration test → partially done (multi-deps test covers mkPreparedSource)~~ | ~~Med~~ | ~~2h~~ |
 
 ### ~~Priority 6: Remaining module option tests~~
 
 | #      | Task                                                                     | Impact | Effort |
 | ------ | ------------------------------------------------------------------------ | ------ | ------ |
-| 39     | Test `proxyVendor` toggle → TODO_LIST M7 (behavioral tests)              | Low    | 15min  |
-| 40     | Test `ldflags` custom override → TODO_LIST M7                            | Low    | 15min  |
+| ~~39~~ | ~~Test `proxyVendor` toggle → TODO_LIST M7 (behavioral tests)~~ | ~~Low~~ | ~~15min~~ |
+| ~~40~~ | ~~Test `ldflags` custom override → TODO_LIST M7~~ | ~~Low~~ | ~~15min~~ |
 | ~~41~~ | ~~Test `devShellExtraPackages`~~ ✓ done (eval assertion exists)          | Low    | 15min  |
 | ~~42~~ | ~~Test `shellExtraEnv` / `autoGoPrivate`~~ ✓ done (shellExtraEnv tested) | Low    | 15min  |
 | ~~43~~ | ~~Test `enableTempl` adds `pkgs.templ`~~ ✓ done `12f2350`                | Low    | 15min  |
-| 44     | Test `enableGopls` / `enableGovulncheck` toggles → TODO_LIST (Low)       | Low    | 15min  |
+| ~~44~~ | ~~Test `enableGopls` / `enableGovulncheck` toggles → TODO_LIST (Low)~~ | ~~Low~~ | ~~15min~~ |
 | ~~45~~ | ~~Test `systems` override~~ ✓ done `ccf095e`                             | Low    | 15min  |
 
 ### ~~Priority 7: Long-term / ecosystem (BLOCKED or ROADMAP)~~
 
 | #  | Task                                                                          | Impact | Effort |
 | -- | ----------------------------------------------------------------------------- | ------ | ------ |
-| 46 | Register `maintainers.larsartmann` in nixpkgs → BLOCKED, tracked in TODO_LIST | Low    | 30min  |
-| 47 | Audit all 7+ downstream consumers → BLOCKED, tracked in TODO_LIST             | Med    | 2h     |
-| 48 | Auto-detect public repos via `proxy.golang.org` query → ROADMAP (Theme 5)     | High   | 3h     |
-| 49 | Curate a default `publicDeps` list → ROADMAP (Theme 5)                        | Med    | 30min  |
-| 50 | Publish to nixpkgs or nix-community → ROADMAP (Theme 4)                       | Low    | 2h     |
+| ~~46~~ | ~~Register `maintainers.larsartmann` in nixpkgs → BLOCKED, tracked in TODO_LIST~~ | ~~Low~~ | ~~30min~~ |
+| ~~47~~ | ~~Audit all 7+ downstream consumers → BLOCKED, tracked in TODO_LIST~~ | ~~Med~~ | ~~2h~~ |
+| ~~48~~ | ~~Auto-detect public repos via `proxy.golang.org` query → ROADMAP (Theme 5)~~ | ~~High~~ | ~~3h~~ |
+| ~~49~~ | ~~Curate a default `publicDeps` list → ROADMAP (Theme 5)~~ | ~~Med~~ | ~~30min~~ |
+| ~~50~~ | ~~Publish to nixpkgs or nix-community → ROADMAP (Theme 4)~~ | ~~Low~~ | ~~2h~~ |
 
 ---
 

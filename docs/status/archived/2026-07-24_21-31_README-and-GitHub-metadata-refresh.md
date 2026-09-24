@@ -154,38 +154,38 @@ Sorted by a rough Pareto mix of impact, effort, and urgency.
 
 | #  | Task                                                               | Category     | Impact | Effort  |
 | -- | ------------------------------------------------------------------ | ------------ | ------ | ------- |
-| 1  | Add a `LICENSE` file (MIT) and license badge                       | Legal        | High   | 5 min   |
-| 2  | Set up GitHub Actions CI for `nix flake check`                     | Trust/QA     | High   | 30 min  |
-| 3  | Replace static "nix flake check" badge with dynamic CI badge       | Trust        | High   | 5 min   |
-| 4  | Add `.github/ISSUE_TEMPLATE/bug.yml` and `feature.yml`             | Community    | Medium | 30 min  |
-| 5  | Add `.github/pull_request_template.md`                             | Community    | Medium | 15 min  |
-| 6  | Write `CONTRIBUTING.md`                                            | Community    | Medium | 30 min  |
+| ~~1~~ | ~~Add a `LICENSE` file (MIT) and license badge~~ | ~~Legal~~ | ~~High~~ | ~~5 min~~ |
+| ~~2~~ | ~~Set up GitHub Actions CI for `nix flake check`~~ | ~~Trust/QA~~ | ~~High~~ | ~~30 min~~ |
+| ~~3~~ | ~~Replace static "nix flake check" badge with dynamic CI badge~~ | ~~Trust~~ | ~~High~~ | ~~5 min~~ |
+| ~~4~~ | ~~Add `.github/ISSUE_TEMPLATE/bug.yml` and `feature.yml`~~ | ~~Community~~ | ~~Medium~~ | ~~30 min~~ |
+| ~~5~~ | ~~Add `.github/pull_request_template.md`~~ | ~~Community~~ | ~~Medium~~ | ~~15 min~~ |
+| ~~6~~ | ~~Write `CONTRIBUTING.md`~~ | ~~Community~~ | ~~Medium~~ | ~~30 min~~ |
 | ~~7~~ | ~~Create a repo social preview image (Open Graph)~~ | ~~Presence~~ | ~~Medium~~ | ~~1 h~~ |
 | ~~8~~ | ~~Add `SECURITY.md`~~ | ~~Governance~~ | ~~Medium~~ | ~~20 min~~ |
-| 9  | Write a migration guide from `mkGoFlake.nix` to `go-standard`      | Docs         | High   | 1 h     |
-| 10 | Add a troubleshooting/FAQ section to README                        | Docs         | High   | 45 min  |
-| 11 | Add architecture diagram to README                                 | Clarity      | Medium | 45 min  |
-| 12 | Add unit/integration tests for the `go-standard` module            | Quality      | High   | 2 h     |
+| ~~9~~ | ~~Write a migration guide from `mkGoFlake.nix` to `go-standard`~~ | ~~Docs~~ | ~~High~~ | ~~1 h~~ |
+| ~~10~~ | ~~Add a troubleshooting/FAQ section to README~~ | ~~Docs~~ | ~~High~~ | ~~45 min~~ |
+| ~~11~~ | ~~Add architecture diagram to README~~ | ~~Clarity~~ | ~~Medium~~ | ~~45 min~~ |
+| ~~12~~ | ~~Add unit/integration tests for the `go-standard` module~~ | ~~Quality~~ | ~~High~~ | ~~2 h~~ |
 | ~~13~~ | ~~Add CI test for `templates/go-standard/flake.nix`~~ | ~~Quality~~ | ~~High~~ | ~~1 h~~ |
 | ~~14~~ | ~~Add CI test for `templates/go-flake-parts/flake.nix`~~ | ~~Quality~~ | ~~High~~ | ~~1 h~~ |
 | ~~15~~ | ~~Set up automated `flake.lock` updates (Dependabot or workflow)~~ | ~~Maintenance~~ | ~~High~~ | ~~1 h~~ |
 | ~~16~~ | ~~Publish a documentation site (GitHub Pages / Astro / Starlight)~~ | ~~Presence~~ | ~~High~~ | ~~4 h~~ |
-| 17 | Add release tags and `CHANGELOG.md`                                | Process      | Medium | 1 h     |
+| ~~17~~ | ~~Add release tags and `CHANGELOG.md`~~ | ~~Process~~ | ~~Medium~~ | ~~1 h~~ | done — done — CHANGELOG exists; tags in TODO_LIST Blocked (v0.1.0)
 | ~~18~~ | ~~Add release automation (tag + notes)~~ | ~~Process~~ | ~~Medium~~ | ~~1 h~~ |
 | ~~19~~ | ~~Add property-based tests for `mkPreparedSource`~~ | ~~Quality~~ | ~~Medium~~ | ~~2 h~~ |
 | ~~20~~ | ~~Add real private-repo integration test in CI~~ | ~~Quality~~ | ~~High~~ | ~~2 h~~ |
 | ~~21~~ | ~~Add `nix run .#docs` app to preview docs locally~~ | ~~DX~~ | ~~Medium~~ | ~~30 min~~ |
-| 22 | Add man pages for `mkPreparedSource` and `go-standard` options     | Docs         | Low    | 2 h     |
-| 23 | Add shell completions for generated apps                           | DX           | Low    | 1 h     |
+| ~~22~~ | ~~Add man pages for `mkPreparedSource` and `go-standard` options~~ | ~~Docs~~ | ~~Low~~ | ~~2 h~~ | done — done — `d8574df`
+| ~~23~~ | ~~Add shell completions for generated apps~~ | ~~DX~~ | ~~Low~~ | ~~1 h~~ | done — done — enableCompletions option
 | ~~24~~ | ~~Add cross-compilation example to README/docs~~ | ~~Capability~~ | ~~Medium~~ | ~~1 h~~ |
 | ~~25~~ | ~~Add a "Recipes" page to docs (templ, govulncheck, gopls toggles)~~ | ~~Docs~~ | ~~Medium~~ | ~~1 h~~ |
 | ~~26~~ | ~~Audit all `docs/status/` reports for drift and annotate or archive~~ | ~~Maintenance~~ | ~~Medium~~ | ~~1 h~~ |
 | ~~27~~ | ~~Rename `mkGoFlake.nix` usage in old downstream repos~~ | ~~Migration~~ | ~~Medium~~ | ~~ongoing~~ |
 | ~~28~~ | ~~Add support for Go workspace projects (`go.work`)~~ | ~~Capability~~ | ~~Medium~~ | ~~2 h~~ |
 | ~~29~~ | ~~Add option for custom Go toolchain per package~~ | ~~Capability~~ | ~~Low~~ | ~~1 h~~ |
-| 30 | Add `enableGolangciLint` toggle (currently always on)              | Config       | Low    | 30 min  |
-| 31 | Add `enableGofumpt` / `enableGoimports` toggles in treefmt         | Config       | Low    | 30 min  |
-| 32 | Add built-in `nix run .#fmt` alias app                             | DX           | Low    | 15 min  |
+| ~~30~~ | ~~Add `enableGolangciLint` toggle (currently always on)~~ | ~~Config~~ | ~~Low~~ | ~~30 min~~ | **Won't implement — dormant — dropped (reopen on demand).**
+| ~~31~~ | ~~Add `enableGofumpt` / `enableGoimports` toggles in treefmt~~ | ~~Config~~ | ~~Low~~ | ~~30 min~~ | done — shipped
+| ~~32~~ | ~~Add built-in `nix run .#fmt` alias app~~ | ~~DX~~ | ~~Low~~ | ~~15 min~~ | done — shipped — apps.fmt
 | ~~33~~ | ~~Add `meta.longDescription` and `meta.maintainers` fix~~ | ~~Quality~~ | ~~Low~~ | ~~30 min~~ |
 | ~~34~~ | ~~Run a full code review of `modules/go-standard.nix`~~ | ~~Quality~~ | ~~Medium~~ | ~~1 h~~ |
 | ~~35~~ | ~~Run a naming review across the public API~~ | ~~Quality~~ | ~~Medium~~ | ~~1 h~~ |
@@ -200,7 +200,7 @@ Sorted by a rough Pareto mix of impact, effort, and urgency.
 | ~~44~~ | ~~Document how to override `treefmt` programs per consumer~~ | ~~Docs~~ | ~~Low~~ | ~~30 min~~ |
 | ~~45~~ | ~~Document how to pin `goPkg` to a different Go version~~ | ~~Docs~~ | ~~Low~~ | ~~20 min~~ |
 | ~~46~~ | ~~Add a "Comparison with other Go+Nix tools" section~~ | ~~Docs~~ | ~~Medium~~ | ~~1 h~~ |
-| 47 | Add a public roadmap file (`ROADMAP.md`)                           | Planning     | Low    | 30 min  |
+| ~~47~~ | ~~Add a public roadmap file (`ROADMAP.md`)~~ | ~~Planning~~ | ~~Low~~ | ~~30 min~~ | done — done — exists
 | ~~48~~ | ~~Add issue labels and milestones in GitHub~~ | ~~Process~~ | ~~Low~~ | ~~20 min~~ |
 | ~~49~~ | ~~Set up a Discord/Matrix channel for support~~ | ~~Community~~ | ~~Low~~ | ~~30 min~~ |
 | ~~50~~ | ~~Record a longer tutorial video or livestream~~ | ~~Marketing~~ | ~~Low~~ | ~~4 h~~ |

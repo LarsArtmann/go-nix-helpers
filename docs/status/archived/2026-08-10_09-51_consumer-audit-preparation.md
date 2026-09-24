@@ -154,13 +154,13 @@
    usage. A commented-out monorepo example would help consumers discover
    the capability.
 
-5. **`shellExtraEnv` example could be more useful.** I replaced the
+5.~~**`shellExtraEnv` example could be more useful.** I replaced the~~ **Won't implement — example replaced — GOPRIVATE comment fixed.**
    GOPRIVATE example with `GOTOOLCHAIN = "local"` — but `GOTOOLCHAIN` is
    already set by default in all devShells (per AGENTS.md gotchas). A
    better example would be something consumers actually need to set, like
    `GOFLAGS = "-mod=mod"` or `GOPRIVATE` for a non-LarsArtmann org override.
 
-6. **The checklist's Section 5 (redundant overrides) lists 11 defaults**
+6.~~**The checklist's Section 5 (redundant overrides) lists 11 defaults**~~ **Won't implement — wording acceptable.**
    but misses `goPkgAttr = "go_1_26"` being redundant if the consumer
    doesn't need a different Go version — it IS listed, but the wording
    could clarify that `goPkgAttr` should only be set when pinning a
@@ -186,10 +186,10 @@
 | #  | Task                                                                      | Why                                               | Effort |
 | -- | ------------------------------------------------------------------------- | ------------------------------------------------- | ------ |
 | ~~7~~ | ~~Add commented monorepo example to the template~~ | ~~Consumers discover the `packages` option~~ | ~~5min~~ | done — shipped `26b7620`
-| 8  | Replace `GOTOOLCHAIN` example in template with something non-default      | GOTOOLCHAIN is already set by default; misleading | 2min   |
+| ~~8~~ | ~~Replace `GOTOOLCHAIN` example in template with something non-default~~ | ~~GOTOOLCHAIN is already set by default; misleading~~ | ~~2min~~ |
 | ~~9~~ | ~~Fix duplicate `### Added` section in CHANGELOG~~ | ~~Structural confusion~~ | ~~5min~~ | done — fixed in the 14:39 session
 | ~~10~~ | ~~Test the template by creating a throwaway project and running `nix build`~~ | ~~Confirm template produces a working derivation~~ | ~~15min~~ | done — shipped — `templateEval` (`2f3b6b2`) + end-to-end template verification (`26b7620`)
-| 11 | Add checklist link to README troubleshooting/FAQ section                  | Consumer discoverability                          | 5min   |
+| ~~11~~ | ~~Add checklist link to README troubleshooting/FAQ section~~ | ~~Consumer discoverability~~ | ~~5min~~ |
 
 ### Tier 3: Consumer audit execution (once repos are available)
 
@@ -200,13 +200,13 @@
 | ~~14~~ | ~~Deep audit each consumer using the 8-section checklist~~ | ~~Systematic verification~~ | ~~20min each~~ | done — done — fleet audit (11:02)
 | ~~15~~ | ~~Document findings per consumer (migration status, issues found)~~ | ~~Track what needs fixing~~ | ~~10min each~~ | done — done — fleet audit report (11:02)
 | ~~16~~ | ~~Fix consumers still using mkGoFlake.nix~~ | ~~Deprecated path, maintenance burden~~ | ~~30min each~~ | done — moved to TODO_LIST T5
-| 17 | Fix consumers still using go-flake-parts template                                                                           | Deprecated path                            | 20min each |
+| ~~17~~ | ~~Fix consumers still using go-flake-parts template~~ | ~~Deprecated path~~ | ~~20min each~~ |
 | ~~18~~ | ~~Remove unnecessary treefmt-nix input from consumers~~ | ~~Bundled internally now~~ | ~~10min each~~ | done — done — inputs removed in the 16:50 sweep
 | ~~19~~ | ~~Remove unnecessary systems input from consumers~~ | ~~Configurable via go-standard.systems~~ | ~~10min each~~ | done — done — inputs removed in the 16:50 sweep
-| 20 | Fix placeholder vendorHash in any consumer                                                                                  | Build correctness                          | 5min each  |
-| 21 | Fix missing `nixpkgs.follows` chains in consumer inputs                                                                     | Reproducibility                            | 5min each  |
+| ~~20~~ | ~~Fix placeholder vendorHash in any consumer~~ | ~~Build correctness~~ | ~~5min each~~ |
+| ~~21~~ | ~~Fix missing `nixpkgs.follows` chains in consumer inputs~~ | ~~Reproducibility~~ | ~~5min each~~ |
 | ~~22~~ | ~~Add `publicDeps` to consumers with public LarsArtmann deps~~ | ~~Prevent false-positive validation failures~~ | ~~10min each~~ | done — addressed per-repo during migration; gaps tracked in TODO_LIST T4
-| 23 | Remove redundant default overrides from consumer flake.nix files                                                            | Cleanliness, reduce noise                  | 5min each  |
+| ~~23~~ | ~~Remove redundant default overrides from consumer flake.nix files~~ | ~~Cleanliness, reduce noise~~ | ~~5min each~~ |
 | ~~24~~ | ~~Verify `nix flake check` passes in every consumer after fixes~~ | ~~End-to-end validation~~ | ~~5min each~~ | done — spot-checked in the fleet audit; full build-verify in TODO_LIST T3
 | ~~25~~ | ~~Verify `nix build` succeeds in every consumer after fixes~~ | ~~Build correctness~~ | ~~5min each~~ | done — folded into TODO_LIST T3
 

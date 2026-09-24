@@ -96,8 +96,8 @@ The "BLOCKED" audit item in `TODO_LIST.md` still says "Requires access to 7+ dow
 2.~~**Module adopter cleanups** (5 repos need unused inputs removed, redundant overrides cleaned, deps expanded)~~ done — 4 of 5 cleaned (16:50); index still pending
 3.~~**G2 implementation** (per-package extraBuildAttrs in monorepo `packages`)~~ done — shipped `2f3b6b2`
 4.~~**G5 implementation** (multi-binary subPackages with different flags — blocked by G2)~~ done — G5 covered by G2 (`2f3b6b2`)
-5. **CI standardization** across consumer repos (30/34 have some CI, but formats vary wildly)
-6. **flake.lock freshness** audit across consumer repos (not checked)
+5.~~**CI standardization** across consumer repos (30/34 have some CI, but formats vary wildly)~~ **Won't implement — dormant — dropped.**
+6.~~**flake.lock freshness** audit across consumer repos (not checked)~~ **Won't implement — dormant — dropped.**
 7.~~**`maintainers.larsartmann` nixpkgs registration** (external PR, mentioned in prior reports)~~ done — moved to TODO_LIST Blocked
 
 ---
@@ -130,19 +130,19 @@ The metric counted `github.com/larsartmann/*` strings in flake.nix vs go.mod, fl
 ### Process
 
 1.~~**Template CI**: add a check that evaluates a freshly-generated project from each template. The template bug would have been caught on day 1.~~ done — shipped — `checks.templateEval` (`2f3b6b2`)
-2. **Batch edits before daemon fires**: when adding code + tests for a feature, save both files before the daemon's next poll cycle, or disable the daemon during multi-file logical units.
+2.~~**Batch edits before daemon fires**: when adding code + tests for a feature, save both files before the daemon's next poll cycle, or disable the daemon during multi-file logical units.~~ **Won't implement — process lesson — recorded.**
 3.~~**Audit metric accuracy**: the triage script should cross-reference `publicDeps` and known-public repo lists before flagging "uncovered" requires as issues.~~ done — fixed this session (POSIX grep + single-pass awk)
 
 ### Module
 
 4.~~**G2 (per-package attrs)** is the remaining blocker for 4+ monorepo repos. Extending the `packages` submodule with the same `extraBuildAttrs` surface would unblock StopTube, browser-history, BuildFlow migration.~~ done — shipped `2f3b6b2`
 5.~~**`checks.test` not provided by module**: most consumers hand-write a `checks.test = config.packages.default.overrideAttrs { doCheck = true; }`. The module could provide this as an option (`enableTestCheck` or fold into `enableCheck`).~~ done — shipped as `enableTestCheck` (`2f3b6b2`)
-6. **`overrideModAttrs` user escape hatch**: while G4 was found to be a non-issue (module's autoDepFodAttrs is equivalent), there's no way for a consumer to override the FOD phases if they truly need different behavior. The `extraBuildAttrs` `//`-merge happens before `autoDepFodAttrs`, so user values get overwritten.
+6.~~**`overrideModAttrs` user escape hatch**: while G4 was found to be a non-issue (module's autoDepFodAttrs is equivalent), there's no way for a consumer to override the FOD phases if they truly need different behavior. The `extraBuildAttrs` `//`-merge happens before `autoDepFodAttrs`, so user values get overwritten.~~ **Won't implement — G4 audit found it a non-issue — dropped.**
 
 ### Audit follow-through
 
 7.~~**The audit identified 22 repos with manual GOPRIVATE** — after migration these become dead config. A migration sprint should batch-remove them.~~ done — done — 10 Tier A repos migrated with auto-GOPRIVATE (16:50)
-8. **4 repos re-instantiate nixpkgs** for `allowUnfree` — the module could provide an `allowUnfree` option to avoid this.
+8.~~**4 repos re-instantiate nixpkgs** for `allowUnfree` — the module could provide an `allowUnfree` option to avoid this.~~ **Won't implement — dormant — dropped.**
 9. **29 repos declare `go-nix-helpers` with `flake = false`** — all need `flake = false` removed + `inputs.nixpkgs.follows = "nixpkgs"` added for migration.
 
 ---
@@ -158,10 +158,10 @@ The metric counted `github.com/larsartmann/*` strings in flake.nix vs go.mod, fl
 ### Module improvements
 
 4.~~Implement G2: per-package `extraBuildAttrs` in monorepo `packages` submodule~~ done — shipped `2f3b6b2`
-5. Add `allowUnfree` option to go-standard (avoids nixpkgs re-instantiation in 4 repos)
+5.~~Add `allowUnfree` option to go-standard (avoids nixpkgs re-instantiation in 4 repos)~~ **Won't implement — dormant — allowUnfree dropped.**
 6.~~Add `enableTestCheck` option or auto-generate `checks.test` when `enableCheck = true`~~ done — shipped `2f3b6b2`
-7. Add user escape hatch for `autoDepFodAttrs` override (edge case)
-8. Add `pre-commit` (git-hooks) optional bundling (4 repos use git-hooks.nix)
+7.~~Add user escape hatch for `autoDepFodAttrs` override (edge case)~~ **Won't implement — dormant — dropped.**
+8.~~Add `pre-commit` (git-hooks) optional bundling (4 repos use git-hooks.nix)~~ **Won't implement — dormant — dropped.**
 
 ### Consumer migrations — Tier A (straightforward, ~30 min each)
 
@@ -205,7 +205,7 @@ The metric counted `github.com/larsartmann/*` strings in flake.nix vs go.mod, fl
 37.~~`storbi`: remove unused inputs + expand deps for 4th private require~~ done — done `8fef98c` (inputs removed)
 38.~~`template-arch-lint`: remove unused inputs + verify private requires~~ done — done `c556952`
 39.~~`terraform-diagrams-aggregator`: remove unused inputs + expand publicDeps~~ done — done `434d541`
-40. `index`: remove `enableCheck=true` + expand deps/publicDeps
+40.~~`index`: remove `enableCheck=true` + expand deps/publicDeps~~ done — still open — tracked with the Tier B/C fleet backlog (TODO_LIST T4/T5)
 
 ### CI and infrastructure
 

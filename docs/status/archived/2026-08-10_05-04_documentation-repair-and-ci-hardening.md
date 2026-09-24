@@ -202,7 +202,7 @@ is simply absent).
 
 ## E) WHAT WE SHOULD IMPROVE
 
-1. **Execute trivial TODOs immediately, don't defer them.** I created
+1.~~**Execute trivial TODOs immediately, don't defer them.** I created~~ **Won't implement — process lesson — recorded.**
    D1 and D2 as TODO items, then didn't do them. The time spent writing
    the TODO entries exceeded the time to execute them. If a task is
    under 15 minutes and you're already in the file, DO IT.
@@ -214,12 +214,12 @@ is simply absent).
    add a single "All tasks in sections P1–P11 are shipped; P12 skipped"
    banner at the top of the detailed breakdown.
 
-3. **Cross-reference claims against actual CI YAML.** The previous
+3.~~**Cross-reference claims against actual CI YAML.** The previous~~ **Won't implement — process lesson — recorded.**
    report's shellcheck claim was never verified against the actual
    `ci.yml`. When a status report says "X is in CI," verify by reading
    the CI file, not by trusting the report.
 
-4. **Audit documentation completeness when adding entries.** When I
+4.~~**Audit documentation completeness when adding entries.** When I~~ **Won't implement — process lesson — recorded.**
    added `enableShfmt` to the man page, I should have diffed the man
    page's option list against the module's option list to find other
    gaps. `postPatchExtra` would have been caught.
@@ -229,7 +229,7 @@ is simply absent).
    confuse a reader trying to understand what the module configures.
    Consider listing all 35 or removing the count.
 
-6. **CHANGELOG entry categorization could be cleaner.** Some behavioral
+6.~~**CHANGELOG entry categorization could be cleaner.** Some behavioral~~ **Won't implement — process lesson — recorded.**
    test additions went under "Changed" (module test suite deepened) when
    they could arguably be "Added" (new test coverage). Not wrong, just
    inconsistent with how test-only additions were categorized elsewhere.
