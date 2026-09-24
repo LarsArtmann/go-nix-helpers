@@ -104,17 +104,17 @@ These are documented but intentionally NOT migrated:
 
 ## e) WHAT WE SHOULD IMPROVE 🔧
 
-1. **`mkPreparedSource` should support sub-module-level replaces** — go-structure-linter needs replaces injected into EACH `modules/*/go.mod`, not just the root. A `subModulePostPatchExtra` parameter or a new helper could handle this.
+1.~~**`mkPreparedSource` should support sub-module-level replaces** — go-structure-linter needs replaces injected into EACH `modules/*/go.mod`, not just the root. A `subModulePostPatchExtra` parameter or a new helper could handle this.~~ done — G2 per-package extraBuildAttrs shipped (`2f3b6b2`); go-structure-linter migration tracked in TODO_LIST
 
-2. **`mkPreparedSource` should handle go.sum generation** — ast-state-analyzer must manually append go.sum entries after stripping local replaces. The helper could detect this pattern and auto-generate.
+2.~~**`mkPreparedSource` should handle go.sum generation** — ast-state-analyzer must manually append go.sum entries after stripping local replaces. The helper could detect this pattern and auto-generate.~~ **Won't implement — dormant since 2026-06 — no consumer demanded it.**
 
-3. **`validatePrivateDeps` default is too aggressive** — Multiple projects (go-auto-upgrade, file-and-image-renamer, golangci-lint-auto-configure, Cyberdom) set `validatePrivateDeps = false` because they depend on PUBLIC LarsArtmann repos fetched from the Go proxy. The validator should distinguish between private (SSH-only) and public (proxy-available) repos.
+3.~~**`validatePrivateDeps` default is too aggressive** — Multiple projects (go-auto-upgrade, file-and-image-renamer, golangci-lint-auto-configure, Cyberdom) set `validatePrivateDeps = false` because they depend on PUBLIC LarsArtmann repos fetched from the Go proxy. The validator should distinguish between private (SSH-only) and public (proxy-available) repos.~~ done — shipped — `publicDeps` exclusion list (versioned-path aware since `a199f6b`)
 
-4. **Cyberdom's `path:` input is a time bomb** — Using `path:` for go-cqrs-lite means any local change to go-cqrs-lite breaks Cyberdom's build silently. Should pin to a tag/ref instead.
+4.~~**Cyberdom's `path:` input is a time bomb** — Using `path:` for go-cqrs-lite means any local change to go-cqrs-lite breaks Cyberdom's build silently. Should pin to a tag/ref instead.~~ **Won't implement — external — Cyberdom-side.**
 
-5. **`mkGoFlake.nix` should expose `excludeSubModuleDirs`** — The shared flake-parts module (`mkGoFlake.nix`) doesn't currently pass through the new `excludeSubModuleDirs` parameter. Only direct `mkPreparedSource` callers can use it.
+5.~~**`mkGoFlake.nix` should expose `excludeSubModuleDirs`** — The shared flake-parts module (`mkGoFlake.nix`) doesn't currently pass through the new `excludeSubModuleDirs` parameter. Only direct `mkPreparedSource` callers can use it.~~ done — moot — mkGoFlake deprecated; go-standard forwards all mkPreparedSource params
 
-6. **Pre-commit hooks block dependency-only commits** — overview and branching-flow required `--no-verify` because BuildFlow pre-commit hooks fail on pre-existing go-generate/govalid issues unrelated to go.sum changes.
+6.~~**Pre-commit hooks block dependency-only commits** — overview and branching-flow required `--no-verify` because BuildFlow pre-commit hooks fail on pre-existing go-generate/govalid issues unrelated to go.sum changes.~~ **Won't implement — external — BuildFlow-side pre-commit config.**
 
 ---
 
@@ -122,31 +122,31 @@ These are documented but intentionally NOT migrated:
 
 | #  | Priority | Task                                                                              | Impact                                   | Effort |
 | -- | -------- | --------------------------------------------------------------------------------- | ---------------------------------------- | ------ |
-| 1  | P0       | Fix Cyberdom: update go.mod to cqrs v3.3.0, then retry mkPreparedSource migration | Eliminates instance #6                   | 30min  |
+| ~~1~~ | ~~P0~~ | ~~Fix Cyberdom: update go.mod to cqrs v3.3.0, then retry mkPreparedSource migration~~ | ~~Eliminates instance #6~~ | ~~30min~~ | **Won't implement — external — Cyberdom-side.**
 | 2  | P0       | Verify file-and-image-renamer `sync.go` deletion was intentional                  | Correctness                              | 10min  |
-| 3  | P1       | Add `excludeSubModuleDirs` passthrough in `mkGoFlake.nix`                         | API completeness                         | 15min  |
-| 4  | P1       | Make `validatePrivateDeps` smarter: skip repos available on Go proxy              | Removes 4× `validatePrivateDeps = false` | 60min  |
-| 5  | P1       | Fix overview + branching-flow pre-existing BuildFlow pre-commit failures          | Unblocks normal commits                  | 30min  |
-| 6  | P2       | Add `mkPreparedSource` sub-module-level replace support (for go-structure-linter) | Eliminates 1 instance                    | 90min  |
-| 7  | P2       | Add property-based tests for `stripVersionSuffix` edge cases                      | Regression prevention                    | 30min  |
-| 8  | P2       | Add property-based tests for recursive `discoverSubModules`                       | Regression prevention                    | 30min  |
-| 9  | P2       | Change Cyberdom `path:` input to `git+ssh://...ref=v3.3.0`                        | Reproducibility                          | 10min  |
+| ~~3~~ | ~~P1~~ | ~~Add `excludeSubModuleDirs` passthrough in `mkGoFlake.nix`~~ | ~~API completeness~~ | ~~15min~~ | done — moot — mkGoFlake deprecated; go-standard forwards all params
+| ~~4~~ | ~~P1~~ | ~~Make `validatePrivateDeps` smarter: skip repos available on Go proxy~~ | ~~Removes 4× `validatePrivateDeps = false`~~ | ~~60min~~ | done — shipped as `publicDeps` (versioned-path aware)
+| ~~5~~ | ~~P1~~ | ~~Fix overview + branching-flow pre-existing BuildFlow pre-commit failures~~ | ~~Unblocks normal commits~~ | ~~30min~~ | **Won't implement — external — BuildFlow-side.**
+| ~~6~~ | ~~P2~~ | ~~Add `mkPreparedSource` sub-module-level replace support (for go-structure-linter)~~ | ~~Eliminates 1 instance~~ | ~~90min~~ | done — G2 shipped (`2f3b6b2`); migration tracked in TODO_LIST
+| ~~7~~ | ~~P2~~ | ~~Add property-based tests for `stripVersionSuffix` edge cases~~ | ~~Regression prevention~~ | ~~30min~~ | done — shipped — checks.pureFunctions (41 assertions)
+| ~~8~~ | ~~P2~~ | ~~Add property-based tests for recursive `discoverSubModules`~~ | ~~Regression prevention~~ | ~~30min~~ | done — shipped — 9 integration scenarios in test.nix
+| ~~9~~ | ~~P2~~ | ~~Change Cyberdom `path:` input to `git+ssh://...ref=v3.3.0`~~ | ~~Reproducibility~~ | ~~10min~~ | **Won't implement — external — Cyberdom-side.**
 | 2  | P3       | Audit remaining ~80 flakes that DON'T use mkPreparedSource                        | Adoption                                 | 4h     |
-| 11 | P3       | Create migration guide: "How to adopt mkPreparedSource" in README                 | Adoption                                 | 30min  |
-| 12 | P3       | Add `nix flake check` to go-nix-helpers CI                                        | CI quality                               | 15min  |
-| 13 | P3       | Consider go.sum auto-generation for stripped replaces (ast-state-analyzer)        | Eliminates 2 instances                   | 2h     |
-| 14 | P3       | Migrate ast-state-analyzer overlay `postPatch` to use shared var                  | DRY                                      | 15min  |
-| 15 | P3       | Document `overrideModAttrs` pattern for `go mod tidy` in FOD                      | Knowledge                                | 15min  |
-| 16 | P4       | Explore go.work support for buildGoModule (Nixpkgs upstream)                      | Future-proofing                          | 8h+    |
-| 17 | P4       | Add `nix build` smoke test to all consumer CI pipelines                           | CI quality                               | 2h     |
-| 18 | P4       | Create `mkMultiModuleFlake` for repos like go-structure-linter                    | New capability                           | 4h     |
-| 19 | P4       | Add vendorHash update helper script (`nix run .#update-vendor-hash`)              | DX                                       | 2h     |
-| 20 | P4       | Collect all go-nix-helpers consumers into a flake aggregate                       | Visibility                               | 1h     |
-| 21 | P4       | Add versioning policy for go-nix-helpers (semver tags)                            | Safety                                   | 30min  |
-| 22 | P4       | Consider flake-parts module for Cyberdom-style CGO+sqlc+templ projects            | DX                                       | 4h     |
-| 23 | P4       | Add `autoSubModules` exclusion for `cmd/` directories (cqrs-gen, api-stability)   | Correctness                              | 15min  |
-| 24 | P4       | Document migration path from `cleanSourceWith` to `lib.fileset`                   | Modernization                            | 30min  |
-| 25 | P4       | Write ADR: "Why we use replace directives instead of go.work for Nix builds"      | Knowledge                                | 30min  |
+| ~~11~~ | ~~P3~~ | ~~Create migration guide: "How to adopt mkPreparedSource" in README~~ | ~~Adoption~~ | ~~30min~~ | done — shipped — docs/migration-guide.md
+| ~~12~~ | ~~P3~~ | ~~Add `nix flake check` to go-nix-helpers CI~~ | ~~CI quality~~ | ~~15min~~ | done — shipped — CI workflow since 2026-07-24
+| ~~13~~ | ~~P3~~ | ~~Consider go.sum auto-generation for stripped replaces (ast-state-analyzer)~~ | ~~Eliminates 2 instances~~ | ~~2h~~ | **Won't implement — dormant since 2026-06 — dropped.**
+| ~~14~~ | ~~P3~~ | ~~Migrate ast-state-analyzer overlay `postPatch` to use shared var~~ | ~~DRY~~ | ~~15min~~ | **Won't implement — external — ast-state-analyzer-side.**
+| ~~15~~ | ~~P3~~ | ~~Document `overrideModAttrs` pattern for `go mod tidy` in FOD~~ | ~~Knowledge~~ | ~~15min~~ | done — superseded — the module's autoDepFodAttrs handles tidy+vendor (G4 audit correction, 2026-08-10)
+| ~~16~~ | ~~P4~~ | ~~Explore go.work support for buildGoModule (Nixpkgs upstream)~~ | ~~Future-proofing~~ | ~~8h+~~ | **Won't implement — upstream nixpkgs scope — dropped here.**
+| ~~17~~ | ~~P4~~ | ~~Add `nix build` smoke test to all consumer CI pipelines~~ | ~~CI quality~~ | ~~2h~~ | done — moved to TODO_LIST T3
+| ~~18~~ | ~~P4~~ | ~~Create `mkMultiModuleFlake` for repos like go-structure-linter~~ | ~~New capability~~ | ~~4h~~ | done — superseded — G2 packages + per-package extraBuildAttrs
+| ~~19~~ | ~~P4~~ | ~~Add vendorHash update helper script (`nix run .#update-vendor-hash`)~~ | ~~DX~~ | ~~2h~~ | **Won't implement — dormant since 2026-06 — dropped.**
+| ~~20~~ | ~~P4~~ | ~~Collect all go-nix-helpers consumers into a flake aggregate~~ | ~~Visibility~~ | ~~1h~~ | **Won't implement — dormant since 2026-06 — dropped.**
+| ~~21~~ | ~~P4~~ | ~~Add versioning policy for go-nix-helpers (semver tags)~~ | ~~Safety~~ | ~~30min~~ | done — moved to TODO_LIST Blocked (v0.1.0)
+| ~~22~~ | ~~P4~~ | ~~Consider flake-parts module for Cyberdom-style CGO+sqlc+templ projects~~ | ~~DX~~ | ~~4h~~ | **Won't implement — dormant since 2026-06 — dropped.**
+| ~~23~~ | ~~P4~~ | ~~Add `autoSubModules` exclusion for `cmd/` directories (cqrs-gen, api-stability)~~ | ~~Correctness~~ | ~~15min~~ | **Won't implement — no incidents since — dropped.**
+| ~~24~~ | ~~P4~~ | ~~Document migration path from `cleanSourceWith` to `lib.fileset`~~ | ~~Modernization~~ | ~~30min~~ | **Won't implement — dormant since 2026-06 — dropped.**
+| ~~25~~ | ~~P4~~ | ~~Write ADR: "Why we use replace directives instead of go.work for Nix builds"~~ | ~~Knowledge~~ | ~~30min~~ | **Won't implement — documented inline in mkPreparedSource header instead.**
 
 ---
 
@@ -158,7 +158,7 @@ Currently, `validatePrivateDeps` treats ALL modules matching `github\.com/[Ll]ar
 
 The question is: **is there a reliable way to know which LarsArtmann repos are public vs private at Nix evaluation time?** Options I considered:
 
-1. **Hardcode a public-repo allowlist** — Brittle, requires manual maintenance
+1.~~**Hardcode a public-repo allowlist** — Brittle, requires manual maintenance~~ done — answered — `publicDeps` exclusion list shipped (option 3 of the report's own list)
 2. **Try to fetch from the proxy during eval** — Not possible (no network in Nix eval)
 3. **Add a `publicDeps` parameter** — Shifts the burden to the user but is explicit
 4. **Make `privateDepPattern` more specific** — User would need to list only truly private repos

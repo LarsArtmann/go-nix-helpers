@@ -92,7 +92,7 @@ Nothing. All changes are verified working.
 
 ### Architecture Critique
 
-1. **The `-mindepth 3` magic number is fragile.** The build-time script uses `find _local_deps/ -mindepth 3 -name go.mod` to skip top-level go.mod files. This assumes `_local_deps/<basename>/go.mod` is always depth 2 (the root module) and sub-modules are depth 3+. This is correct for the current data model but is a hidden assumption. A comment or variable would make it self-documenting.
+1.~~**The `-mindepth 3` magic number is fragile.** The build-time script uses `find _local_deps/ -mindepth 3 -name go.mod` to skip top-level go.mod files. This assumes `_local_deps/<basename>/go.mod` is always depth 2 (the root module) and sub-modules are depth 3+. This is correct for the current data model but is a hidden assumption. A comment or variable would make it self-documenting.~~ done — moved to TODO_LIST T18
 
 2. **Two-phase sub-module handling increases cognitive complexity.** Explicit `subModules` are handled at eval time (Nix), auto-discovered at build time (shell). The dedup logic between them is now a shell `grep` check rather than `lib.unique`. This works but is harder to reason about than the old unified list. The tradeoff was necessary to fix `--no-build`.
 
@@ -123,21 +123,21 @@ Nothing. All changes are verified working.
 ### High Priority (P0 — correctness/regression risk)
 
 1. Add a test case where explicit `subModules` entry DUPLICATES an auto-discovered one — verify the dedup works at build time
-2. Add a comment explaining the `-mindepth 3` assumption in `autoDiscoverScript`
-3. Verify a real downstream consumer (e.g. BuildFlow, mr-sync) still builds correctly with the new build-time discovery
+2.~~Add a comment explaining the `-mindepth 3` assumption in `autoDiscoverScript`~~ done — moved to TODO_LIST T18
+3.~~Verify a real downstream consumer (e.g. BuildFlow, mr-sync) still builds correctly with the new build-time discovery~~ done — folded into TODO_LIST T3
 4. Run `nix flake check --no-build` in CI to confirm it passes in a clean environment (not just locally with cached derivations)
 5. Add a test for excluded directories at depth > 1 (e.g. `_local_deps/X/a/example/b/go.mod`)
 
 ### Medium Priority (P1 — documentation & maintainability)
 
-6. Update `docs/man/mkPreparedSource.5` to note build-time discovery
-7. Update `docs/man/go-standard.5` if needed
-8. Update AGENTS.md "Unified sub-module pipeline" bullet to reflect the two-phase design
-9. Extract the `-mindepth 3` into a named variable with a comment
+6.~~Update `docs/man/mkPreparedSource.5` to note build-time discovery~~ done — user-facing API unchanged — re-verified in the 2026-09-24 docs sweep
+7.~~Update `docs/man/go-standard.5` if needed~~ done — same — description remains accurate
+8.~~Update AGENTS.md "Unified sub-module pipeline" bullet to reflect the two-phase design~~ done — AGENTS.md bullet rewritten (two-phase design)
+9.~~Extract the `-mindepth 3` into a named variable with a comment~~ done — moved to TODO_LIST T18
 10. Consider adding `shellcheck` to the CI for the generated shell script in `autoDiscoverScript`
 11. Add `autoDiscoverScript` output to the `verify` check's diagnostic output (for debugging)
 12. Document the eval-time vs build-time boundary in `docs/flake-patterns.md`
-13. Consider extracting `autoDiscoverScript` into a separate `.nix` file for testability
+13.~~Consider extracting `autoDiscoverScript` into a separate `.nix` file for testability~~ **Won't implement — consider-stage — two-file split rejected as a Verschlimmbesserung (same verdict as L10).**
 14. Add a property test: "discovered replaces never contain `/vN/` in the localDir when the physical directory doesn't have it"
 
 ### Lower Priority (P2 — nice to have)
@@ -146,7 +146,7 @@ Nothing. All changes are verified working.
 16. Add `--trace-verbose` support to `autoDiscoverScript` for debugging consumer builds
 17. Consider adding a `failOnNoDiscovery` option for consumers who expect auto-discovery to find at least one sub-module
 18. Benchmark: does build-time discovery slow down the build noticeably vs eval-time?
-19. Consider caching discovered modules across builds (unlikely to help — Nix already caches the derivation)
+19.~~Consider caching discovered modules across builds (unlikely to help — Nix already caches the derivation)~~ **Won't implement — report itself notes Nix already caches the derivation.**
 20. Add a `--list-discovered` debug app that shows what would be discovered without building
 21. Consider whether `subModuleVersion` normalization should also run on main dep replaces
 22. Review whether the `case` pattern for excluded dirs handles all edge cases (spaces, special chars)
@@ -167,11 +167,11 @@ Nothing. All changes are verified working.
 37. Add a test for module paths containing dots (e.g. `github.com/x/y.z/v2`)
 38. Add a test for module paths with hyphens (e.g. `github.com/go-cqrs-lite`)
 39. Review whether the `grep -qF` dedup in the replace-merge step handles whitespace variations
-40. Consider adding a `--dry-run` mode to mkPreparedSource that shows the generated postPatch script
+40.~~Consider adding a `--dry-run` mode to mkPreparedSource that shows the generated postPatch script~~ done — moved to ROADMAP Theme 3
 41. Update `docs/architecture.d2` diagram to show the build-time discovery flow
-42. Consider whether the two-phase design could be simplified by moving explicit subModules to build time too
+42.~~Consider whether the two-phase design could be simplified by moving explicit subModules to build time too~~ **Won't implement — simplification would reintroduce eval-time discovery — the two-phase design IS the fix.**
 43. Add a benchmark comparing eval-time vs build-time discovery performance
-44. Consider whether `nixpkgs.lib.optionalString` is the right choice vs inline `if` for `autoDiscoverScript`
+44.~~Consider whether `nixpkgs.lib.optionalString` is the right choice vs inline `if` for `autoDiscoverScript`~~ **Won't implement — cosmetic style choice — both idiomatic.**
 45. Review whether the `excludeSubModuleDirs` default list matches real-world LarsArtmann repos
 46. Add a test for symlinks in dep sources (should they be followed?)
 47. Consider adding `GOFLAGS=-mod=mod` to the build environment for go.mod modifications

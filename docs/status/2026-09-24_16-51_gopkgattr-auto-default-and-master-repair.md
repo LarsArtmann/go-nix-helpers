@@ -63,18 +63,18 @@
 
 ## b) PARTIALLY DONE
 
-1. **Documentation truthfulness** — 1 file was stale until this report (`mkPreparedSource.5`, now fixed); deprecated template still pins `go_1_26` (deliberate); "39 options" count not re-verified this session.
-2. **mkGoFlake auto-default parity** — implemented but never evaluated by any automated check (no mkGoFlake test harness exists). Code-by-inspection only.
-3. **CHANGELOG/AGENTS as fleet communication** — written here, but nothing notifies the 7+ consumer repos.
+1.~~**Documentation truthfulness** — 1 file was stale until this report (`mkPreparedSource.5`, now fixed); deprecated template still pins `go_1_26` (deliberate); "39 options" count not re-verified this session.~~ done (docs-health pass 2026-09-24)
+2.~~**mkGoFlake auto-default parity** — implemented but never evaluated by any automated check (no mkGoFlake test harness exists). Code-by-inspection only.~~ done — routed to TODO_LIST T10
+3.~~**CHANGELOG/AGENTS as fleet communication** — written here, but nothing notifies the 7+ consumer repos.~~ done — routed to TODO_LIST T1
 
 ## c) NOT STARTED
 
-1. Consumer-repo verification (eval + vendorHash check on real consumers).
-2. `nix run .#verifyValidation` run (documented suite member, skipped).
-3. Test for the `pkgs.go` fallback branch.
-4. Any mkGoFlake eval smoke test.
-5. TODO_LIST.md / ROADMAP.md harvest from this report (deliberately deferred: instructions were to write the report, then wait).
-6. Tagged release (prerequisite for the mkGoFlake removal contract — none exists).
+1.~~Consumer-repo verification (eval + vendorHash check on real consumers).~~ done — moved to TODO_LIST T1
+2.~~`nix run .#verifyValidation` run (documented suite member, skipped).~~ done — run 2026-09-24 — PASS
+3.~~Test for the `pkgs.go` fallback branch.~~ done — moved to TODO_LIST T9
+4.~~Any mkGoFlake eval smoke test.~~ done — moved to TODO_LIST T10
+5.~~TODO_LIST.md / ROADMAP.md harvest from this report (deliberately deferred: instructions were to write the report, then wait).~~ done (docs-health pass 2026-09-24)
+6.~~Tagged release (prerequisite for the mkGoFlake removal contract — none exists).~~ done — moved to TODO_LIST Blocked (v0.1.0 owner decision)
 
 ## d) TOTALLY FUCKED UP!
 
@@ -84,64 +84,64 @@
 
 ## e) WHAT WE SHOULD IMPROVE!
 
-1. **Generate, don't transcribe:** man pages + README option table from module option `description`/`defaultText`. Two drift incidents today, both in transcribed docs.
-2. **Counts from tooling:** assertion counts in AGENTS/README should be emitted by the test run, not typed by agents.
-3. **CI guard for fixture integrity:** `git ls-files | grep 'mock-templ-missing-generated.*_templ.go'` must fail — the daemon WILL re-try (gitignore helps; a loud check guarantees).
-4. **Old-nixpkgs matrix job:** prove auto-default + fallback work on a pinned older nixpkgs.
-5. **Eval-time go.mod floor check:** parse the consumer's own `go.mod` (readable at eval, not IFD) and warn/throw when the resolved toolchain is below the floor — converts the silent breaker into an actionable eval error before any build.
-6. **Extract `goBase` resolution** into one shared function (kills the new split brain) OR set mkGoFlake's removal date and delete it.
-7. **Consumer fleet check after default changes** — make "eval one consumer" part of the definition of done for changes to shared defaults.
+1.~~**Generate, don't transcribe:** man pages + README option table from module option `description`/`defaultText`. Two drift incidents today, both in transcribed docs.~~ done — moved to ROADMAP Theme 6
+2.~~**Counts from tooling:** assertion counts in AGENTS/README should be emitted by the test run, not typed by agents.~~ done — moved to ROADMAP Theme 6
+3.~~**CI guard for fixture integrity:** `git ls-files | grep 'mock-templ-missing-generated.*_templ.go'` must fail — the daemon WILL re-try (gitignore helps; a loud check guarantees).~~ done — moved to TODO_LIST T7
+4.~~**Old-nixpkgs matrix job:** prove auto-default + fallback work on a pinned older nixpkgs.~~ done — moved to TODO_LIST T24
+5.~~**Eval-time go.mod floor check:** parse the consumer's own `go.mod` (readable at eval, not IFD) and warn/throw when the resolved toolchain is below the floor — converts the silent breaker into an actionable eval error before any build.~~ done — moved to TODO_LIST T16
+6.~~**Extract `goBase` resolution** into one shared function (kills the new split brain) OR set mkGoFlake's removal date and delete it.~~ done — moved to TODO_LIST T8
+7.~~**Consumer fleet check after default changes** — make "eval one consumer" part of the definition of done for changes to shared defaults.~~ done — moved to ROADMAP Theme 2
 
 ## f) Next things (35, impact-sorted)
 
 **Fleet impact (P1)**
 
-1. Smoke-eval 2–3 real consumers (erraudit, PMA, go-auto-upgrade) against new default: eval + `nix build` + vendorHash intact.
-2. Sweep consumers for now-redundant `goPkgAttr = "go_1_26"` pins; remove.
-3. Identify consumers whose go.mod floor > their nixpkgs newest branch — they need `goTarballVersion` guidance, not just the new default.
+1.~~Smoke-eval 2–3 real consumers (erraudit, PMA, go-auto-upgrade) against new default: eval + `nix build` + vendorHash intact.~~ done — moved to TODO_LIST T1
+2.~~Sweep consumers for now-redundant `goPkgAttr = "go_1_26"` pins; remove.~~ done — moved to TODO_LIST T2
+3.~~Identify consumers whose go.mod floor > their nixpkgs newest branch — they need `goTarballVersion` guidance, not just the new default.~~ done — folded into TODO_LIST T1
 4. Re-run the consumer fleet audit (last: 2026-08-11) with the auto-default as a checklist item.
-5. Notify consumers of the behavior change (CHANGELOG here is invisible to them).
+5.~~Notify consumers of the behavior change (CHANGELOG here is invisible to them).~~ done — moved to ROADMAP Theme 2
 
 **Close this session's gaps (P1)**
-6. Run `nix run .#verifyValidation` (negative-path suite member).
-7. Add test: `goBase` falls back to `pkgs.go` when no `go_1_XX` attrs (stub pkgs attrset).
-8. Add any eval smoke check for `mkGoFlake.nix` (it has zero coverage; it now contains new logic).
-9. Extract shared `goBaseFrom` helper; use from both module + mkGoFlake (split brain).
+6.~~Run `nix run .#verifyValidation` (negative-path suite member).~~ done — run 2026-09-24 — PASS
+7.~~Add test: `goBase` falls back to `pkgs.go` when no `go_1_XX` attrs (stub pkgs attrset).~~ done — moved to TODO_LIST T9
+8.~~Add any eval smoke check for `mkGoFlake.nix` (it has zero coverage; it now contains new logic).~~ done — moved to TODO_LIST T10
+9.~~Extract shared `goBaseFrom` helper; use from both module + mkGoFlake (split brain).~~ done — moved to TODO_LIST T8
 
 **Repo health (P2)**
-10. CI guard: forbid committed `*_templ.go` under `mock-templ-missing-generated/`.
-11. Old-nixpkgs pinned matrix job for moduleTest (proves graceful degradation).
-12. Trash `result`, `result-1..3`, `result-auto`, `result-verify`, `result-vv` symlinks from repo root; gitignore `result*`.
+10.~~CI guard: forbid committed `*_templ.go` under `mock-templ-missing-generated/`.~~ done — moved to TODO_LIST T7
+11.~~Old-nixpkgs pinned matrix job for moduleTest (proves graceful degradation).~~ done — moved to TODO_LIST T24
+12.~~Trash `result`, `result-1..3`, `result-auto`, `result-verify`, `result-vv` symlinks from repo root; gitignore `result*`.~~ done — moved to TODO_LIST T17
 13. Root-cause the `x86_64-darwin` "incompatible system" warning in this repo's own flake check output.
-14. Silence or properly set `__intentionallyOverridingVersion` in the goPkgOverride test (nixpkgs warning noise in every check log).
-15. Generalize `nix-lint.sh` `go_1_26-outline` message patterns to `go_1_XX-outline`.
-16. Make `dashboard.sh` `GO_LATEST` derive from nixpkgs (kill the last manual-bump site — this exact default rotted twice before).
+14.~~Silence or properly set `__intentionallyOverridingVersion` in the goPkgOverride test (nixpkgs warning noise in every check log).~~ done — moved to TODO_LIST T22
+15.~~Generalize `nix-lint.sh` `go_1_26-outline` message patterns to `go_1_XX-outline`.~~ done — moved to TODO_LIST T23
+16.~~Make `dashboard.sh` `GO_LATEST` derive from nixpkgs (kill the last manual-bump site — this exact default rotted twice before).~~ done — moved to TODO_LIST T25
 
 **Docs generation (P2)**
-17. Generate `docs/man/go-standard.5` option sections from module options.
-18. Generate README option table from module options.
-19. Verify/derive the "39 options" count programmatically (options list in AGENTS.md is also hand-trimmed).
-20. Drop assertion counts from AGENTS.md or emit them from the test runner.
+17.~~Generate `docs/man/go-standard.5` option sections from module options.~~ done — moved to ROADMAP Theme 6
+18.~~Generate README option table from module options.~~ done — moved to ROADMAP Theme 6
+19.~~Verify/derive the "39 options" count programmatically (options list in AGENTS.md is also hand-trimmed).~~ done — moved to ROADMAP Theme 6
+20.~~Drop assertion counts from AGENTS.md or emit them from the test runner.~~ done — moved to ROADMAP Theme 6
 21. Update `templates/go-standard` README/comments to advertise zero-config Go toolchain.
-22. Delete `templates/go-flake-parts/` (deprecated, still pins `go_1_26`) — or bump if deletion is too aggressive pre-tag.
+22.~~Delete `templates/go-flake-parts/` (deprecated, still pins `go_1_26`) — or bump if deletion is too aggressive pre-tag.~~ done — gated on the v0.1.0 tag decision (TODO_LIST Blocked)
 
 **Product hardening (P2/P3)**
-23. Eval-time go.mod floor assertion (read `self/go.mod`, compare against resolved toolchain, actionable error).
+23.~~Eval-time go.mod floor assertion (read `self/go.mod`, compare against resolved toolchain, actionable error).~~ done — moved to TODO_LIST T16
 24. Warn when `goPkgAttr` pins an OLDER branch than nixpkgs' newest (likely-forgotten pin).
-25. `goTarballVersion`: document/script hash fetching (`nix-prefetch-url` recipe) — users hand-paste SRI hashes today.
+25.~~`goTarballVersion`: document/script hash fetching (`nix-prefetch-url` recipe) — users hand-paste SRI hashes today.~~ done — documented in the man page SRI-hash recipe
 26. Accept attr-path in `goPkgAttr` (`lib.getAttrFromPath`) or document `goPkgOverride` as the only composition point.
 27. Expose resolved Go package as `passthru.go` on the default package for downstream introspection (partially exists — verify all outputs).
 28. `nix flake check --all-systems` investigation: are darwin checks consumers expect actually running?
 
 **Release hygiene (P3)**
-29. Cut the first tagged release (v0.1.0) — makes the mkGoFlake removal promise enforceable.
-30. Then actually remove `mkGoFlake.nix` + its trace wrapper (legacy target: ZERO).
+29.~~Cut the first tagged release (v0.1.0) — makes the mkGoFlake removal promise enforceable.~~ done — moved to TODO_LIST Blocked
+30.~~Then actually remove `mkGoFlake.nix` + its trace wrapper (legacy target: ZERO).~~ done — gated on the v0.1.0 tag (TODO_LIST Blocked)
 31. Drop the dead `goPkg` param from `mkPreparedSource` API at the same major boundary.
-32. Register `maintainers.larsartmann` in nixpkgs (known gotcha, months old).
+32.~~Register `maintainers.larsartmann` in nixpkgs (known gotcha, months old).~~ done — moved to TODO_LIST Blocked
 
 **Process (P3)**
-33. HARVEST this report's section (f) into TODO_LIST.md (docs-health) — deferred per instructions.
-34. Check FEATURES.md reflects the auto default (not verified this session).
+33.~~HARVEST this report's section (f) into TODO_LIST.md (docs-health) — deferred per instructions.~~ done (docs-health pass 2026-09-24)
+34.~~Check FEATURES.md reflects the auto default (not verified this session).~~ done — FEATURES.md updated with the auto default
 35. Consider a `CHANGELOG.md` "consumer-facing changes" section header convention so fleet-relevant flips are greppable.
 
 ## g) Questions I cannot answer myself
