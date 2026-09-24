@@ -61,3 +61,7 @@ go.work.sum
 ## Nix
 .envrc
 # <<< buildflow-managed (.gitignore) <<<
+
+# Fixture for the templ-committed check: generated sibling must stay absent
+# (the auto-commit daemon must never re-add it — it defeats the test).
+test-assets/mock-templ-missing-generated/web/home_templ.go
