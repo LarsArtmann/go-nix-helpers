@@ -173,6 +173,7 @@ let
       "github.com/larsartmann/mock-dep" = [
         "codec/v2"
         "storage/v2"
+        "codec"
       ];
     };
     # codec/v2 is already in go.mod (should be deduped).

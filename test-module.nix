@@ -36,6 +36,12 @@ let
     outPath = ./test-assets/mock-project;
   };
 
+  # The module imports mkPreparedSource from inputs.go-nix-helpers; in the
+  # self-hosting test that is THIS repo's source root.
+  gnhInputs = inputs // {
+    go-nix-helpers.outPath = ./.;
+  };
+
   # Minimal flake-parts infrastructure stubs for module evaluation.
   flakePartsStub = {
     options = {
@@ -110,7 +116,7 @@ let
       }
     ];
     specialArgs = {
-      inherit inputs;
+      inputs = gnhInputs;
       self = mockSelf;
     };
   };
@@ -254,7 +260,7 @@ let
           }
         ];
         specialArgs = {
-          inherit inputs;
+          inputs = gnhInputs;
           self = mockSelf;
         };
       };
@@ -448,7 +454,7 @@ let
           }
         ];
         specialArgs = {
-          inherit inputs;
+          inputs = gnhInputs;
           self = templSelf;
         };
       };
@@ -531,7 +537,7 @@ let
           }
         ];
         specialArgs = {
-          inherit inputs;
+          inputs = gnhInputs;
           self = mockSelf;
         };
       };
@@ -565,7 +571,7 @@ let
           }
         ];
         specialArgs = {
-          inherit inputs;
+          inputs = gnhInputs;
           self = mockSelfMono;
         };
       };
@@ -912,7 +918,7 @@ let
             }
           ];
           specialArgs = {
-            inherit inputs;
+            inputs = gnhInputs;
             self = mockSelf;
           };
         };
@@ -971,7 +977,7 @@ in
           }
         ];
         specialArgs = {
-          inherit inputs;
+          inputs = gnhInputs;
           self = mockSelf;
         };
       };
