@@ -56,8 +56,10 @@ buildGoModule with its own subPackages, description, and extraBuildAttrs
 (per-binary customization with the same merge semantics as top-level
 extraBuildAttrs).
 .TP
-.BR goPkgAttr " (str, default: \"go_1_26\")"
-Go package attribute in nixpkgs.
+.BR goPkgAttr " (str or null, default: null)"
+Go package attribute in nixpkgs (e.g. "go_1_27"). null auto-selects
+the newest packaged go_1_XX branch from your nixpkgs, so a go.mod floor
+newer than a hardcoded default never breaks the build.
 .TP
 .BR goPkgOverride " (function, default: identity)"
 Function applied to the Go package selected by

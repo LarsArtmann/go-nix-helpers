@@ -158,7 +158,7 @@ See the full option table below, or copy one of the [templates](#templates).
 | `version`               | `self.rev or "dev"`          | Version string (defaults to git revision)                                        |
 | `systems`               | `[x86_64-linux, ...]`        | Systems to build for (matches `nix-systems/default`)                             |
 | `subPackages`           | `[ "." ]`                    | Subpackages to build                                                             |
-| `goPkgAttr`             | `"go_1_26"`                  | Go package attribute in nixpkgs                                                  |
+| `goPkgAttr`             | `null` (auto)               | Go package attribute in nixpkgs; `null` = newest packaged `go_1_XX` branch       |
 | `goPkgOverride`         | identity                     | Function applied to the Go package (custom toolchains, e.g. newer patch version) |
 | `lintAsCheck`           | `false`                      | Also expose golangci-lint as a hermetic `checks.lint` derivation (for CI)        |
 | `enableCheck`           | `true`                       | Run `go test` during the Nix build (`doCheck`)                                   |

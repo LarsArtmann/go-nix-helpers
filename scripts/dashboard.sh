@@ -26,8 +26,8 @@ NC='\033[0m'
 
 # Projects root is configurable; defaults to ~/projects.
 PROJECTS_DIR="${PROJECTS_DIR:-$HOME/projects}"
-# Go version considered current. Override with GO_LATEST=go_1_27 etc.
-GO_LATEST="${GO_LATEST:-go_1_26}"
+# Go version considered current. Override with GO_LATEST=go_1_28 etc.
+GO_LATEST="${GO_LATEST:-go_1_27}"
 
 pass=0
 fail=0

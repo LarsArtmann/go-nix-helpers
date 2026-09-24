@@ -124,13 +124,45 @@ let
         "mypkg"
       ];
 
+  # --- newestGoAttrName tests ---
+  newestGoBasic = [
+    (assertEq "newestGo: picks newest branch from realistic attr names"
+      (newestGoAttrName [ "gcc" "go" "go_1_24" "go_1_25" "go_1_26" "go_1_27" "gopls" "gotools" ])
+      "go_1_27"
+    )
+    (assertEq "newestGo: single branch" (newestGoAttrName [ "go_1_23" ]) "go_1_23")
+    (assertEq "newestGo: numeric not lexicographic (go_1_10 > go_1_9)"
+      (newestGoAttrName [ "go_1_9" "go_1_10" ])
+      "go_1_10"
+    )
+    (assertEq "newestGo: two-digit vs newer two-digit"
+      (newestGoAttrName [ "go_1_9" "go_1_27" "go_1_10" ])
+      "go_1_27"
+    )
+    (assertEq "newestGo: ignores non-branch go attrs"
+      (newestGoAttrName [ "go" "gopls" "go-tools" "go_1_26" ])
+      "go_1_26"
+    )
+    (assertEq "newestGo: ignores suffixed branch names"
+      (newestGoAttrName [ "go_1_26" "go_1_27-something" ])
+      "go_1_26"
+    )
+    (assertEq "newestGo: no branch attrs returns null" (newestGoAttrName [ "go" "gopls" "gcc" ]) null)
+    (assertEq "newestGo: empty list returns null" (newestGoAttrName [ ]) null)
+    (assertEq "newestGo: determinism"
+      (newestGoAttrName [ "go_1_26" "go_1_27" ])
+      (newestGoAttrName [ "go_1_27" "go_1_26" ])
+    )
+  ];
+
   allChecks =
     stripBasic
     ++ stripIdempotence
     ++ stripNoVersionInOutput
     ++ repoBasic
     ++ repoDeterminism
-    ++ repoNoSlash;
+    ++ repoNoSlash
+    ++ newestGoBasic;
 in
 pkgs.runCommand "test-pure-functions" { } ''
   ${builtins.concatStringsSep "\n" allChecks}

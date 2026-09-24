@@ -65,7 +65,7 @@ src = lib.fileset.toSource {
 ### Build
 
 ```nix
-buildGoModule = pkgs.buildGoModule.override { go = pkgs.go_1_26; };
+buildGoModule = pkgs.buildGoModule.override { go = pkgs.go_1_27; };
 ```
 
 - `proxyVendor = true` — recommended for all projects (ensures sandbox compatibility)

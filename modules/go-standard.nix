@@ -480,7 +480,7 @@ in
             pkgs.${cfg.goPkgAttr}
           else
             let
-              newest = (import ./pure-functions.nix { inherit lib; }).newestGoAttrName (
+              newest = (import ../pure-functions.nix { inherit lib; }).newestGoAttrName (
                 builtins.attrNames pkgs
               );
             in

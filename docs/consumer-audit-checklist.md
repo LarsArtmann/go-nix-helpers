@@ -48,7 +48,7 @@ These are all defaults — flag if set redundantly:
 - [ ] `enableGopls` not set to `true` (it's the default)
 - [ ] `enableGovulncheck` not set to `true` (it's the default)
 - [ ] `proxyVendor` not set to `true` (it's the default)
-- [ ] `goPkgAttr` not set to `"go_1_26"` (it's the default)
+- [ ] `goPkgAttr` not pinned to an older branch than needed (`null` auto-picks the newest `go_1_XX` in your nixpkgs)
 - [ ] `src` not set to `self.outPath` or `./.` (it's the default)
 - [ ] `subPackages` not set to `[ "." ]` (it's the default)
 

@@ -149,7 +149,7 @@ let
     (assertCheck "src option exists" (cfg ? src) "src attr")
     (assertCheck "description option exists" (cfg ? description) "description attr")
     (assertCheck "subPackages default is [\".\"]" (cfg.subPackages == [ "." ]) "[\".\"]")
-    (assertCheck "goPkgAttr default is go_1_26" (cfg.goPkgAttr == "go_1_26") "go_1_26")
+    (assertCheck "goPkgAttr default is null (auto)" (cfg.goPkgAttr == null) "null")
     (assertCheck "goPkgOverride default is identity" (
       (cfg.goPkgOverride pkgs.go_1_26) == pkgs.go_1_26
     ) "identity function")
@@ -373,6 +373,9 @@ let
   # --- enableTempl test -----------------------------------------------------
   templCfg = mkPerSystemConfig { enableTempl = true; };
 
+  # --- goPkgAttr explicit pin test -------------------------------------------
+  goPkgAttrCfg = mkPerSystemConfig { goPkgAttr = "go_1_26"; };
+
   # --- goPkgOverride test ---------------------------------------------------
   goPkgOverrideCfg = mkPerSystemConfig {
     goPkgOverride =
@@ -381,6 +384,11 @@ let
         version = "1.26.4-custom";
       });
   };
+
+  # Newest go_1_XX branch in the real nixpkgs used by these tests — the
+  # expected resolution of the default (null) goPkgAttr.
+  pure = import ./pure-functions.nix { inherit lib; };
+  expectedAutoGoAttr = pure.newestGoAttrName (builtins.attrNames pkgs);
 
   # --- lintAsCheck test ------------------------------------------------------
   lintAsCheckCfg = mkPerSystemConfig { lintAsCheck = true; };
@@ -803,6 +811,14 @@ let
     (assertCheck "GOPRIVATE not set when deps empty" (
       !(psCfg.devShells.default ? GOPRIVATE)
     ) "no GOPRIVATE without deps")
+    # --- Behavioral: goPkgAttr null auto-resolves to the newest branch ---
+    (assertCheck "goPkgAttr null resolves to newest go_1_XX branch" (
+      expectedAutoGoAttr != null && psCfg.packages.default.go == pkgs.${expectedAutoGoAttr}
+    ) "packages.default.go == pkgs.${expectedAutoGoAttr}")
+    # --- Behavioral: explicit goPkgAttr pin wins over auto ---
+    (assertCheck "explicit goPkgAttr pins the toolchain" (
+      goPkgAttrCfg.packages.default.go == pkgs.go_1_26
+    ) "packages.default.go == pkgs.go_1_26")
     # --- Behavioral: goPkgOverride applies to the package Go version ---
     (assertCheck "goPkgOverride applies to packages.default" (
       let

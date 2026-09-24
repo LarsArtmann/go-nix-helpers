@@ -69,7 +69,7 @@ let goPkg = goPkg; in
 **Right:**
 
 ```nix
-let goPkg = pkgs.go_1_26; in
+let goPkg = pkgs.go_1_27; in
 ```
 
 ### 4. Duplicate checks attributes
