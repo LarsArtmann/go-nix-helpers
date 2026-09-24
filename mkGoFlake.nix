@@ -100,9 +100,7 @@
           pkgs.${goPkgAttr}
         else
           let
-            newest = (import ./pure-functions.nix { inherit lib; }).newestGoAttrName (
-              builtins.attrNames pkgs
-            );
+            newest = (import ./pure-functions.nix { inherit lib; }).newestGoAttrName (builtins.attrNames pkgs);
           in
           if newest == null then pkgs.go else pkgs.${newest};
 

@@ -35,10 +35,7 @@ let
       branchAttrs = builtins.filter (name: builtins.match "go_1_[0-9]+" name != null) names;
       minor = name: builtins.fromJSON (lib.last (lib.splitString "_" name));
     in
-    if branchAttrs == [ ] then
-      null
-    else
-      lib.last (lib.sort (a: b: minor a < minor b) branchAttrs);
+    if branchAttrs == [ ] then null else lib.last (lib.sort (a: b: minor a < minor b) branchAttrs);
 in
 {
   inherit stripVersionSuffix repoName newestGoAttrName;
