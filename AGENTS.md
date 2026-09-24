@@ -68,7 +68,7 @@ nix fmt                            # format all .nix files with nixfmt
 nix-build test.nix -A verify       # success-path integration test
 nix run .#verifyValidation         # negative-case validation test (run outside sandbox)
 nix build .#checks.x86_64-linux.moduleTest  # module-level test (121 assertions)
-nix build .#checks.x86_64-linux.pureFunctions  # pure function property tests (31 assertions)
+nix build .#checks.x86_64-linux.pureFunctions  # pure function property tests (41 assertions)
 nix build .#checks.x86_64-linux.structural     # structural output verification
 ```
 
@@ -113,7 +113,7 @@ nix build .#checks.x86_64-linux.structural     # structural output verification
 | ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------ |
 | `mkPreparedSource.nix`               | Core helper — solves private Go dep injection for Nix sandbox builds                                                                       |
 | `pure-functions.nix`                 | `stripVersionSuffix`, `repoName`, `newestGoAttrName` — standalone, testable pure functions used by mkPreparedSource and the goPkgAttr auto default |
-| `test-pure-functions.nix`            | 31 assertions: idempotence, no-`/vN`-in-output, determinism, edge cases, newestGoAttrName — wired as `checks.pureFunctions`                 |
+| `test-pure-functions.nix`            | 41 assertions: idempotence, no-`/vN`-in-output, determinism, edge cases, newestGoAttrName — wired as `checks.pureFunctions`                 |
 | `mkGoFlake.nix`                      | DEPRECATED — function-based predecessor to go-standard module; emits trace warning                                                         |
 | `modules/go-standard.nix`            | Proper flake-parts module (exposed as `flakeModules.go-standard`) — 39 options, monorepo support, bundles treefmt-nix                      |
 | `flake.nix`                          | Self-hosting: checks, formatter, devShell, lib export, flakeModules export                                                                 |
