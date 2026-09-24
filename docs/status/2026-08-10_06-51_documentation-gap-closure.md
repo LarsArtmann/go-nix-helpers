@@ -137,11 +137,11 @@ passing (flake check, fmt --ci, shellcheck).
 
 ### What could be improved
 
-1. **The prepended/appended discrepancy existed in the module's own description
+1.~~**The prepended/appended discrepancy existed in the module's own description~~ done — fixed this session (Bonus 1)
    since P1 shipped.** Nobody caught it during P1's implementation or review.
    A CI meta-test that verifies module descriptions match code behavior would
    prevent this class of drift. (See recommendation below.)
-2. **AGENTS.md still lists only 18 of 35 options by name.** The count (35) is
+2.~~**AGENTS.md still lists only 18 of 35 options by name.** The count (35) is~~ done — fixed — AGENTS.md names all options and links the man page
    correct but the named list is partial. This is a minor clarity issue — a
    reader trying to understand what the module configures sees only half the
    options. Either list all 35 or link to the man page.
@@ -152,13 +152,13 @@ passing (flake check, fmt --ci, shellcheck).
 
 ### What I deliberately did NOT do
 
-1. **Did not annotate each of the 68 Pareto plan sub-tasks individually.** The
+1.~~**Did not annotate each of the 68 Pareto plan sub-tasks individually.** The~~ done — decided — banner approach (Q1 option a) applied
    banner approach is sufficient — marking each row would add visual noise
    without additional information value.
-2. **Did not add new behavioral tests (items 6-22 from the 05-04 report).**
+2.~~**Did not add new behavioral tests (items 6-22 from the 05-04 report).**~~ done — routed — see the 05:04 F-list annotations
    These are genuinely open work but a different category (test deepening, not
    documentation repair). They should be tracked in TODO_LIST.
-3. **Did not add a CI meta-test for man page/module option parity.** This is
+3.~~**Did not add a CI meta-test for man page/module option parity.** This is~~ done — moved to ROADMAP Theme 6
    a good idea (item 39 from the 05-04 report) but requires writing a Nix
    check derivation — more involved than a documentation fix.
 

@@ -56,9 +56,9 @@
 
 | Item              | Status  | What's done                                                                | What's missing                                                                                                                                                        |
 | ----------------- | ------- | -------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| PMA `requireDeps` | Partial | Module option added + PMA migrated + eval-verified with `--override-input` | **Flake.lock points to remote go-nix-helpers which doesn't have `requireDeps` yet** — PMA won't eval without `--override-input` until go-nix-helpers master is pushed |
-| Migration guide   | Partial | 7 common patterns added                                                    | No examples for `srcFileset`, `goExperiment`, `cgoEnabled` options (don't exist yet)                                                                                  |
-| index adopter     | Partial | Verified already clean (no dead inputs)                                    | Fleet audit noted it needs `enableCheck=true` review and deps/publicDeps expansion — not done                                                                         |
+| ~~PMA `requireDeps`~~ | ~~Partial~~ | ~~Module option added + PMA migrated + eval-verified with `--override-input`~~ | ~~**Flake.lock points to remote go-nix-helpers which doesn't have `requireDeps` yet** — PMA won't eval without `--override-input` until go-nix-helpers master is pushed~~ |
+| ~~Migration guide~~ | ~~Partial~~ | ~~7 common patterns added~~ | ~~No examples for `srcFileset`, `goExperiment`, `cgoEnabled` options (don't exist yet)~~ |
+| ~~index adopter~~ | ~~Partial~~ | ~~Verified already clean (no dead inputs)~~ | ~~Fleet audit noted it needs `enableCheck=true` review and deps/publicDeps expansion — not done~~ |
 
 ---
 
@@ -66,14 +66,14 @@
 
 | Item                                     | Impact   | Notes                                                                                                                                                                          |
 | ---------------------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Build-verify all 10 migrated repos**   | Critical | All migrations are eval-verified only (`--no-build`). No `nix build` attempted. SSH access blocked. `proxyVendor` changes (true→false) will likely require vendorHash updates. |
-| **Push go-nix-helpers master**           | Critical | PMA's `requireDeps` option won't resolve from remote until pushed.                                                                                                             |
-| **Tier B migrations** (6 repos)          | High     | KeyCountdown, StopTube, branching-flow, bank-sync, overview, BuildFlow                                                                                                         |
-| **Tier C migrations** (2 repos)          | Medium   | Standup-Killer, crush-daily (off deprecated mkGoFlake)                                                                                                                         |
-| **New module options**                   | Medium   | `goExperiment` (string), `cgoEnabled` (bool), `completionStyle` (enum: cobra/urfave), `srcFileset` (fileset convenience)                                                       |
-| **`enableCompletions` cobra fix**        | Medium   | Module calls `binary --completion bash` (urfave/cli style). Cobra uses `binary completion bash`. Every cobra consumer needs a workaround.                                      |
-| **Test assertion for `requireDeps`**     | Low      | Module has 114 assertions. `requireDeps` option added but no test assertion written for it.                                                                                    |
-| **erraudit `proxyVendor` documentation** | Low      | erraudit lost `proxyVendor=true` (module forces false when deps set). Not documented in migration guide as a specific callout for that repo.                                   |
+| ~~**Build-verify all 10 migrated repos**~~ | ~~Critical~~ | ~~All migrations are eval-verified only (`--no-build`). No `nix build` attempted. SSH access blocked. `proxyVendor` changes (true→false) will likely require vendorHash updates.~~ |
+| ~~**Push go-nix-helpers master**~~ | ~~Critical~~ | ~~PMA's `requireDeps` option won't resolve from remote until pushed.~~ |
+| ~~**Tier B migrations** (6 repos)~~ | ~~High~~ | ~~KeyCountdown, StopTube, branching-flow, bank-sync, overview, BuildFlow~~ |
+| ~~**Tier C migrations** (2 repos)~~ | ~~Medium~~ | ~~Standup-Killer, crush-daily (off deprecated mkGoFlake)~~ |
+| ~~**New module options**~~ | ~~Medium~~ | ~~`goExperiment` (string), `cgoEnabled` (bool), `completionStyle` (enum: cobra/urfave), `srcFileset` (fileset convenience)~~ |
+| ~~**`enableCompletions` cobra fix**~~ | ~~Medium~~ | ~~Module calls `binary --completion bash` (urfave/cli style). Cobra uses `binary completion bash`. Every cobra consumer needs a workaround.~~ |
+| ~~**Test assertion for `requireDeps`**~~ | ~~Low~~ | ~~Module has 114 assertions. `requireDeps` option added but no test assertion written for it.~~ |
+| ~~**erraudit `proxyVendor` documentation**~~ | ~~Low~~ | ~~erraudit lost `proxyVendor=true` (module forces false when deps set). Not documented in migration guide as a specific callout for that repo.~~ |
 
 ---
 
