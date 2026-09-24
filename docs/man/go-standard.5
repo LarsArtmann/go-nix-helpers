@@ -76,6 +76,20 @@ goPkgOverride = pkg: pkg.overrideAttrs (finalAttrs: _prev: {
 });
 .fi
 .TP
+.BR goTarballVersion " (str or null, default: null)"
+Exact Go version to build from
+https://go.dev/dl/go<version>.src.tar.gz (e.g. "1.26.6"). Use when the
+go.mod floor is newer than the newest nixpkgs go_1_XX branch and
+buildGoModule's GOTOOLCHAIN=local forbids toolchain auto-downloads.
+Requires goTarballHash.
+.TP
+.BR goTarballHash " (str or null, default: null)"
+SRI hash of the go.dev source tarball pinned by
+.BR goTarballVersion .
+Compute with: nix-prefetch-url --unpack
+https://go.dev/dl/go<version>.src.tar.gz (convert to SRI with
+.BR "nix hash convert" ).
+.TP
 .BR lintAsCheck " (bool, default: false)"
 Also expose golangci-lint as a
 .BR checks.lint
