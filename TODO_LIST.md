@@ -52,6 +52,13 @@
 | T23 | Generalize `nix-lint.sh` `go_1_26-outline` message pattern to `go_1_XX-outline`                                  | TODO   | 10min  | `docs/status/2026-09-24_*` f.15                       |
 | T24 | Old-nixpkgs pinned CI matrix job for moduleTest (proves auto-default + fallback degrade gracefully)              | TODO   | 1h     | `docs/status/2026-09-24_*` e.4, f.11                  |
 | T25 | Derive `dashboard.sh` `GO_LATEST` from nixpkgs instead of a manual-bump default (this exact default rotted twice before; the 2026-09-24 fix only made the default auto-derivable) | TODO | 30min | `docs/status/2026-09-24_*` f.16; `scripts/dashboard.sh` |
+| T26 | Normalize `1.~~` → `1. ~~` list-marker spacing across all annotated reports (markdown ordered-list rendering is broken on struck items) | TODO | 15min | `docs/status/2026-09-24_18-06_*` b.2 — inherited from the skill tooling format |
+| T27 | Render-verify the 5 largest struck tables (16-50, 22-45, 02-51, 21-31, 23-04) in a markdown preview | TODO | 20min | `docs/status/2026-09-24_18-06_*` b.1 — markers-inside-cells never visually checked |
+| T28 | Groff-validate both man pages (`MANWIDTH=80 man --local-file`) after the goTarball additions | TODO | 5min | `docs/status/2026-09-24_18-06_*` b.3 — `.BR` entries added without running man |
+| T29 | Add in-file exemption notes to archived 07-38 §B and 06-51 "What went well" (why items stay bare) | TODO | 10min | `docs/status/2026-09-24_18-06_*` c.3 — future gates will re-flag them |
+| T30 | Wire `check-rows.py` + archived grep-gate into a flake check (vendor the scripts into `scripts/`) so annotation uniformity is CI-enforced | TODO | 1h | `docs/status/2026-09-24_18-06_*` f.5 — would have caught the case-bug at pass one |
+| T31 | Write the correction note for `0817f80`'s wrong mechanism story (docs/, never rewrite others' commits) | TODO | 15min | `docs/status/2026-09-07_*` b.6 |
+| T32 | Write the lock-bump postmortem (lock bump → eval break → consumer-visible failure; "input bumps are eval changes") | TODO | 30min | `docs/status/2026-09-07_*` f.50 |
 
 ## Decided against / rejected
 
@@ -67,3 +74,4 @@
 | Real private-repo integration test in CI      | BLOCKED | High   | 2h     | CI job scaffolded (`if: false`); needs SSH key secret (`DEPLOY_SSH_KEY`) |
 | Fix empty commit message in `df9a5ff`         | BLOCKED | Low    | 15min  | Requires interactive rebase + force-push; user approval needed  |
 | Cut first tagged release (v0.1.0)             | BLOCKED | Medium | 30min  | Owner decision — unlocks the `mkGoFlake` removal contract and consumer version pinning |
+| Decide the Won't-implement policy (age threshold / cap / owner sign-off for "dormant — dropped") | BLOCKED | Low | 15min | Owner decision — ~120 unilateral verdicts were stamped during the 2026-09-24 annotation pass |
