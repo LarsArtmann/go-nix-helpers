@@ -8,7 +8,7 @@
 }:
 let
   pure = import ./pure-functions.nix { inherit lib; };
-  inherit (pure) stripVersionSuffix repoName;
+  inherit (pure) stripVersionSuffix repoName newestGoAttrName;
 
   assertEq =
     name: actual: expected:

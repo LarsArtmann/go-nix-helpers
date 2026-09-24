@@ -64,10 +64,10 @@
   # Build configuration
   doCheck ? true,
   ldflags ? null,
-  goPkgAttr ? "go_1_26",
+  goPkgAttr ? null,
   # Go from the go.dev SOURCE tarball — set when the go.mod floor is newer
-  # than nixpkgs' go (buildGoModule pins GOTOOLCHAIN=local, so the sandbox
-  # cannot auto-download a toolchain). Drop once nixpkgs catches up.
+  # than every nixpkgs go_1_XX branch (buildGoModule pins GOTOOLCHAIN=local,
+  # so the sandbox cannot auto-download a toolchain). Drop once nixpkgs catches up.
   goTarballVersion ? null,
   goTarballHash ? null,
   buildGoModuleOverrides ? { },
@@ -94,12 +94,24 @@
       ...
     }:
     let
+      # null = newest packaged go_1_XX branch in the consumer's nixpkgs.
+      goBase =
+        if goPkgAttr != null then
+          pkgs.${goPkgAttr}
+        else
+          let
+            newest = (import ./pure-functions.nix { inherit lib; }).newestGoAttrName (
+              builtins.attrNames pkgs
+            );
+          in
+          if newest == null then pkgs.go else pkgs.${newest};
+
       goPkg =
         if goTarballVersion != null then
           if goTarballHash == null then
             throw "mkGoFlake: goTarballHash is required when goTarballVersion is set"
           else
-            pkgs.${goPkgAttr}.overrideAttrs (
+            goBase.overrideAttrs (
               finalAttrs: _prev: {
                 version = goTarballVersion;
                 src = pkgs.fetchurl {
@@ -109,7 +121,7 @@
               }
             )
         else
-          pkgs.${goPkgAttr};
+          goBase;
 
       mkPreparedSource = import (inputs.go-nix-helpers + "/mkPreparedSource.nix") {
         inherit pkgs lib goPkg;

@@ -84,9 +84,15 @@ in
     };
 
     goPkgAttr = lib.mkOption {
-      type = lib.types.str;
-      default = "go_1_26";
-      description = "Go package attribute in nixpkgs";
+      type = lib.types.nullOr lib.types.str;
+      default = null;
+      example = "go_1_27";
+      description = ''
+        Go package attribute in nixpkgs (e.g. "go_1_27"). null (default)
+        auto-selects the newest packaged go_1_XX branch from your nixpkgs,
+        so a go.mod floor newer than the pinned default never breaks the
+        build. Set goTarballVersion when even the newest branch is too old.
+      '';
     };
 
     goPkgOverride = lib.mkOption {
@@ -110,19 +116,19 @@ in
     };
 
     # Build Go from the go.dev SOURCE tarball instead of nixpkgs — set when
-    # the repo's go.mod floor is newer than nixpkgs' toolchain. Unlike
+    # the repo's go.mod floor is newer than every nixpkgs branch. Unlike
     # goPkgOverride this needs no `pkgs` in scope, so consumers can set it at
     # flake level. Takes precedence over goPkgOverride. Drop the setting once
-    # nixpkgs' go_1_26 satisfies the go.mod floor again.
+    # the newest nixpkgs go_1_XX branch satisfies the go.mod floor again.
     goTarballVersion = lib.mkOption {
       type = lib.types.nullOr lib.types.str;
       default = null;
       example = "1.26.6";
       description = ''
         Exact Go version to build from https://go.dev/dl/go<version>.src.tar.gz
-        (e.g. "1.26.6"). Use when the go.mod floor is newer than nixpkgs'
-        go_1_26 and buildGoModule's GOTOOLCHAIN=local forbids toolchain
-        auto-downloads. Requires goTarballHash.
+        (e.g. "1.26.6"). Use when the go.mod floor is newer than the newest
+        nixpkgs go_1_XX branch and buildGoModule's GOTOOLCHAIN=local forbids
+        toolchain auto-downloads. Requires goTarballHash.
       '';
     };
 
@@ -466,6 +472,20 @@ in
       let
         inherit (cfg) version;
 
+        # Resolve goPkgAttr to a concrete package. null (default) picks the
+        # newest packaged go_1_XX branch so the default can never lag a fresh
+        # go.mod floor; falls back to pkgs.go if no branch attr exists.
+        goBase =
+          if cfg.goPkgAttr != null then
+            pkgs.${cfg.goPkgAttr}
+          else
+            let
+              newest = (import ./pure-functions.nix { inherit lib; }).newestGoAttrName (
+                builtins.attrNames pkgs
+              );
+            in
+            if newest == null then pkgs.go else pkgs.${newest};
+
         # go.dev source tarball wins over goPkgOverride when set: it is the
         # declarative, pkgs-scope-free way to outrun a lagging nixpkgs go.
         goPkg =
@@ -473,7 +493,7 @@ in
             if cfg.goTarballHash == null then
               throw "go-standard.goTarballHash is required when goTarballVersion is set"
             else
-              pkgs.${cfg.goPkgAttr}.overrideAttrs (
+              goBase.overrideAttrs (
                 finalAttrs: _prev: {
                   version = cfg.goTarballVersion;
                   src = pkgs.fetchurl {
@@ -481,7 +501,7 @@ in
                     hash = cfg.goTarballHash;
                   };
                   # The tarball's source tree is goTarballVersion's, but
-                  # pkgs.${goPkgAttr} is the nixpkgs default (e.g. 1.26) —
+                  # goBase is the nixpkgs default (e.g. 1.27) —
                   # its version-suffixed patches (go_no_vendor_checks-1.26)
                   # do not apply to a newer tree. Swap for the matching
                   # nixpkgs patch when one exists.
@@ -498,7 +518,7 @@ in
                 }
               )
           else
-            cfg.goPkgOverride pkgs.${cfg.goPkgAttr};
+            cfg.goPkgOverride goBase;
 
         usePreparedSource = cfg.deps != { };
 
