@@ -472,51 +472,15 @@ in
       let
         inherit (cfg) version;
 
-        # Resolve goPkgAttr to a concrete package. null (default) picks the
-        # newest packaged go_1_XX branch so the default can never lag a fresh
-        # go.mod floor; falls back to pkgs.go if no branch attr exists.
-        goBase =
-          if cfg.goPkgAttr != null then
-            pkgs.${cfg.goPkgAttr}
-          else
-            let
-              newest = (import ../pure-functions.nix { inherit lib; }).newestGoAttrName (builtins.attrNames pkgs);
-            in
-            if newest == null then pkgs.go else pkgs.${newest};
+        pure = import ../pure-functions.nix { inherit lib; };
 
-        # go.dev source tarball wins over goPkgOverride when set: it is the
-        # declarative, pkgs-scope-free way to outrun a lagging nixpkgs go.
-        goPkg =
-          if cfg.goTarballVersion != null then
-            if cfg.goTarballHash == null then
-              throw "go-standard.goTarballHash is required when goTarballVersion is set"
-            else
-              goBase.overrideAttrs (
-                finalAttrs: _prev: {
-                  version = cfg.goTarballVersion;
-                  src = pkgs.fetchurl {
-                    url = "https://go.dev/dl/go${finalAttrs.version}.src.tar.gz";
-                    hash = cfg.goTarballHash;
-                  };
-                  # The tarball's source tree is goTarballVersion's, but
-                  # goBase is the nixpkgs default (e.g. 1.27) —
-                  # its version-suffixed patches (go_no_vendor_checks-1.26)
-                  # do not apply to a newer tree. Swap for the matching
-                  # nixpkgs patch when one exists.
-                  patches =
-                    let
-                      vendorChecks = p: builtins.match "go_no_vendor_checks-.*[.]patch" (baseNameOf p) != null;
-                      majorMinor = builtins.concatStringsSep "." (
-                        lib.lists.sublist 0 2 (lib.splitVersion cfg.goTarballVersion)
-                      );
-                      matching = pkgs.path + "/pkgs/development/compilers/go/go_no_vendor_checks-${majorMinor}.patch";
-                    in
-                    builtins.filter (p: !vendorChecks p) _prev.patches
-                    ++ lib.optionals (builtins.pathExists matching) [ matching ];
-                }
-              )
-          else
-            cfg.goPkgOverride goBase;
+        # Single declaration site for toolchain resolution — attr pin, auto
+        # newest branch, go.dev source tarball, override hook — lives in
+        # pure-functions.goBaseFrom (shared with mkGoFlake).
+        goPkg = pure.goBaseFrom {
+          inherit pkgs;
+          inherit (cfg) goPkgAttr goPkgOverride goTarballVersion goTarballHash;
+        };
 
         usePreparedSource = cfg.deps != { };
 

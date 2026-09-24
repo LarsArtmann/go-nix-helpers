@@ -94,32 +94,14 @@
       ...
     }:
     let
-      # null = newest packaged go_1_XX branch in the consumer's nixpkgs.
-      goBase =
-        if goPkgAttr != null then
-          pkgs.${goPkgAttr}
-        else
-          let
-            newest = (import ./pure-functions.nix { inherit lib; }).newestGoAttrName (builtins.attrNames pkgs);
-          in
-          if newest == null then pkgs.go else pkgs.${newest};
+      pure = import ./pure-functions.nix { inherit lib; };
 
-      goPkg =
-        if goTarballVersion != null then
-          if goTarballHash == null then
-            throw "mkGoFlake: goTarballHash is required when goTarballVersion is set"
-          else
-            goBase.overrideAttrs (
-              finalAttrs: _prev: {
-                version = goTarballVersion;
-                src = pkgs.fetchurl {
-                  url = "https://go.dev/dl/go${finalAttrs.version}.src.tar.gz";
-                  hash = goTarballHash;
-                };
-              }
-            )
-        else
-          goBase;
+      # Single declaration site for toolchain resolution — attr pin, auto
+      # newest branch, go.dev source tarball — lives in
+      # pure-functions.goBaseFrom (shared with the go-standard module).
+      goPkg = pure.goBaseFrom {
+        inherit pkgs goPkgAttr goTarballVersion goTarballHash;
+      };
 
       mkPreparedSource = import (inputs.go-nix-helpers + "/mkPreparedSource.nix") {
         inherit pkgs lib goPkg;
