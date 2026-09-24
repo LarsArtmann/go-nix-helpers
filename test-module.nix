@@ -178,10 +178,18 @@ let
     ) "LarsArtmann regex")
     (assertCheck "publicDeps default is empty" (cfg.publicDeps == [ ]) "[]")
     (assertCheck "proxyVendor default is true" (cfg.proxyVendor == true) "true")
-    (assertCheck "systems default is 4-element list" (builtins.length cfg.systems == 4) "4 systems")
+    (assertCheck "systems default is 3-element list (x86_64-darwin dropped)" (
+      builtins.length cfg.systems == 3
+    ) "3 systems")
     (assertCheck "systems includes x86_64-linux" (builtins.elem "x86_64-linux" cfg.systems)
       "x86_64-linux in list"
     )
+    (assertCheck "systems includes aarch64-darwin" (builtins.elem "aarch64-darwin" cfg.systems)
+      "aarch64-darwin in list"
+    )
+    (assertCheck "systems excludes dropped x86_64-darwin" (
+      !builtins.elem "x86_64-darwin" cfg.systems
+    ) "no x86_64-darwin")
     (assertCheck "ldflags default is null" (cfg.ldflags == null) "null")
     (assertCheck "extraMeta default is empty" (cfg.extraMeta == { }) "{}")
     (assertCheck "extraBuildAttrs default is empty" (cfg.extraBuildAttrs == { }) "{}")

@@ -85,7 +85,7 @@ for target in "${TARGETS[@]}"; do
   # We check for config.treefmt outside of perSystem context
 
   # Pattern 3: goPkg = goPkg self-reference
-  check_fix 'let\s+goPkg\s*=\s*goPkg\s*;' "goPkg = goPkg self-reference (should be pkgs.go_1_26)"
+  check_fix 'let\s+goPkg\s*=\s*goPkg\s*;' "goPkg = goPkg self-reference (should be pkgs.go_1_XX, e.g. pkgs.go_1_27)"
 
   # Pattern 4: Duplicate checks attributes
   # NOTE: `grep -c` exits 1 when count is 0; piping through `|| echo 0` appends a

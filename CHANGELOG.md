@@ -296,6 +296,20 @@ This project has not made a tagged release yet; all changes below are in
 
 ### Changed
 
+- `goPkgAttr` default changed from `"go_1_26"` to `null` (both in the
+  go-standard module and deprecated `mkGoFlake`). null auto-selects the
+  newest packaged `go_1_XX` branch from the consumer's nixpkgs (numeric
+  compare via new `pure-functions.nix` `newestGoAttrName`; falls back to
+  `pkgs.go` when no branch attr exists). A hardcoded branch default lagged
+  every Go release and silently broke builds for repos whose go.mod floor
+  moved past it (buildGoModule pins `GOTOOLCHAIN=local`, so the sandbox
+  cannot auto-download a toolchain). Consumers that pinned `goPkgAttr`
+  explicitly are unaffected; unpinned consumers may see the build toolchain
+  jump a branch on the next nixpkgs update (verify `vendorHash` still
+  matches — `buildflow -s nix-hash-fix --fix` if not).
+- Default `systems` is now the `nix-systems/default` set minus `x86_64-darwin`
+  (nixpkgs 26.11 dropped x86_64-darwin, so evaluating that system fails
+  outright). `defaultText` and the module description now state this.
 - `templates/go-standard/flake.nix`: Added monorepo, `goPkgOverride`, and
   `lintAsCheck` examples (in addition to the existing private deps example).
 - `templates/go-standard/flake.nix`: Fixed output-fn destructuring bug —

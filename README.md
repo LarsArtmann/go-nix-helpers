@@ -156,7 +156,7 @@ See the full option table below, or copy one of the [templates](#templates).
 | `src`                   | `self.outPath`               | Source path (use `lib.fileset` to filter)                                        |
 | `description`           | `"A LarsArtmann Go project"` | Short description for package meta                                               |
 | `version`               | `self.rev or "dev"`          | Version string (defaults to git revision)                                        |
-| `systems`               | `[x86_64-linux, ...]`        | Systems to build for (matches `nix-systems/default`)                             |
+| `systems`               | `[x86_64-linux, ...]`        | Systems to build for (`nix-systems/default` minus `x86_64-darwin`, which nixpkgs 26.11 dropped) |
 | `subPackages`           | `[ "." ]`                    | Subpackages to build                                                             |
 | `goPkgAttr`             | `null` (auto)               | Go package attribute in nixpkgs; `null` = newest packaged `go_1_XX` branch       |
 | `goPkgOverride`         | identity                     | Function applied to the Go package (custom toolchains, e.g. newer patch version) |

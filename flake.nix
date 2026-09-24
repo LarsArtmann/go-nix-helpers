@@ -31,9 +31,9 @@
         # Public library API — system-independent pure functions.
         # Consumers can use either:
         #   (a) raw import (works with flake = false):
-        #       mkPreparedSource = import (go-nix-helpers + "/mkPreparedSource.nix") { inherit pkgs lib; goPkg = pkgs.go_1_26; };
+        #       mkPreparedSource = import (go-nix-helpers + "/mkPreparedSource.nix") { inherit pkgs lib; goPkg = pkgs.go_1_27; };
         #   (b) flake lib (works when imported as a real flake):
-        #       mkPreparedSource = go-nix-helpers.lib.mkPreparedSource { inherit pkgs lib; goPkg = pkgs.go_1_26; };
+        #       mkPreparedSource = go-nix-helpers.lib.mkPreparedSource { inherit pkgs lib; goPkg = pkgs.go_1_27; };
         lib.mkPreparedSource = import ./mkPreparedSource.nix;
         lib.mkGoFlake =
           args:

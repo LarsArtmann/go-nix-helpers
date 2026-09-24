@@ -177,13 +177,13 @@ in
         [
           "x86_64-linux"
           "aarch64-linux"
-          "x86_64-darwin"
           "aarch64-darwin"
         ]
       '';
       description = ''
         Systems to build for. Defaults to the standard set from
-        github:nix-systems/default. Override to restrict or extend.
+        github:nix-systems/default minus x86_64-darwin (nixpkgs 26.11+
+        dropped x86_64-darwin support). Override to restrict or extend.
         Alternatively, use a `systems` flake input and set
         `go-standard.systems = import inputs.systems;`.
       '';

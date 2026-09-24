@@ -27,7 +27,7 @@
 # Usage:
 #   mkPreparedSource = import (go-nix-helpers + "/mkPreparedSource.nix") {
 #     inherit pkgs lib;
-#     goPkg = pkgs.go_1_26;
+#     goPkg = pkgs.go_1_27;
 #   };
 #   preparedSrc = mkPreparedSource {
 #     name = "my-app";
