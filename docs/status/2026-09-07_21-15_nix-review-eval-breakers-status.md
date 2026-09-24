@@ -25,7 +25,7 @@ Evidence chain (bisect): eval green at `0817f80` → broken at `528488a` (lock b
 
 1. **Push + consumer lock update** — everything is local; HEAD is NOT pushed, so CV's `flake.lock` still pins the eval-broken rev and CV's `nix flake check`/full go-change-gate stay red until: push here → `nix flake lock update go-nix-helpers` in CV → full gate re-run. Not mine to push without the owner's word.
 2. **CV `vendorHash` validity claim** — argued from byte-identical fixes (identical vendored output ⇒ identical FOD output hash) but NOT re-proven by building CV's FOD against this repo's HEAD; cheap to verify once the lock consumes HEAD.
-3. **templ-committed test hardness** — the negative-case assertion (`tryEval … !result.success`) passed for the WRONG reason before my fix (it caught the realization *error* just as happily as the intended `throw`). It now exercises the intended path, but the test still cannot DISTINGUISH intended-throw from accidental-eval-error — it should assert the throw message ("without a committed *_templ.go"). Not done.
+3. **templ-committed test hardness** — the negative-case assertion (`tryEval … !result.success`) passed for the WRONG reason before my fix (it caught the realization _error_ just as happily as the intended `throw`). It now exercises the intended path, but the test still cannot DISTINGUISH intended-throw from accidental-eval-error — it should assert the throw message ("without a committed *_templ.go"). Not done.
 4. **`test-module.nix` read coverage** — 945 lines; I read the mock/templ/overlay/assert sections by targeted views (~85%), not a full sequential pass. The skill says read everything; the un-read remainder is option-default assertions, but honest reporting: partial.
 5. **Flake-lock drift governance** — `528488a`'s lock bump broke eval for 40+ minutes unbeknownst to CI (local-only). No gate here forces "lock bump must pass `nix flake check` before landing" beyond the daemon's blind auto-commit. Not addressed this session.
 6. **`0817f80` commit-message accuracy** — the parallel session's message describes a "single-quoted shell fragment" and "regex mismatch" mechanism; the real mechanism is Nix indented-string interpolation → eval error. The CODE is correct; the recorded RATIONALE is wrong and will mislead future debugging. Not corrected (rewriting others' commits is off-limits); a docs correction is a next-step.
@@ -64,6 +64,7 @@ Evidence chain (bisect): eval green at `0817f80` → broken at `528488a` (lock b
 ## f) Up to 50 things to get done next (impact-ordered brainstorm → HARVEST decides)
 
 **Unblock / urgent**
+
 1. Push this repo's HEAD (`8188ad2` + in-flight parallel work) — unblocks the entire CV fleet.
 2. CV: `nix flake lock update go-nix-helpers` → `nix flake check` → full `bash scripts/go-change-gate.sh`.
 3. Verify CV's `vendorHash` re-pin end-to-end (build the FOD against the consumed rev, not by reasoning).
@@ -125,4 +126,4 @@ Evidence chain (bisect): eval green at `0817f80` → broken at `528488a` (lock b
 
 ---
 
-*Point-in-time snapshot; claims re-verify at session start. Format note: user requested `.md`; the status-report skill's canonical HTML output was overridden by explicit instruction (flagged, not propagated back into the skill).*
+_Point-in-time snapshot; claims re-verify at session start. Format note: user requested `.md`; the status-report skill's canonical HTML output was overridden by explicit instruction (flagged, not propagated back into the skill)._
