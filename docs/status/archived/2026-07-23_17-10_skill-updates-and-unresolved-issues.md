@@ -65,13 +65,13 @@ Since the first status report, the session focused on updating three Nix skills 
 
 ### Process Failures This Session
 
-1. **I didn't act on my own report.** Report #1 listed 5 critical issues. I addressed exactly zero of them before moving to skill updates. I should have fixed the `defaultSystems` issue (2-line change) before doing anything else.
+1.~~**I didn't act on my own report.** Report #1 listed 5 critical issues. I addressed exactly zero of them before moving to skill updates. I should have fixed the `defaultSystems` issue (2-line change) before doing anything else.~~ **Won't implement — process lesson — all five criticals shipped since (systems option, moduleTest, migrations).**
 
-2. **I didn't investigate the auto-commit mystery.** This is the most alarming thing in the entire session — commits are appearing that I didn't create — and I ignored it across two rounds of work.
+2.~~**I didn't investigate the auto-commit mystery.** This is the most alarming thing in the entire session — commits are appearing that I didn't create — and I ignored it across two rounds of work.~~ done — identified — buildflow watcher (2026-07-24)
 
-3. **Skills are incomplete.** I added "use go-standard" recommendations but didn't give the skills enough information to be self-contained. A skill that says "use go-standard" but doesn't list the options forces the agent to go read the repo.
+3.~~**Skills are incomplete.** I added "use go-standard" recommendations but didn't give the skills enough information to be self-contained. A skill that says "use go-standard" but doesn't list the options forces the agent to go read the repo.~~ **Won't implement — SKILLS-repo scope — addressed in the 2026-08-12 audits.**
 
-4. **Two templates now contradict each other.** `templates/go-standard/` shows 3 inputs, `templates/go-flake-parts/` shows 5 inputs. Neither is marked as preferred or deprecated.
+4.~~**Two templates now contradict each other.** `templates/go-standard/` shows 3 inputs, `templates/go-flake-parts/` shows 5 inputs. Neither is marked as preferred or deprecated.~~ done — resolved — go-flake-parts deprecated with banner
 
 ### Architectural
 
@@ -79,7 +79,7 @@ Since the first status report, the session focused on updating three Nix skills 
 
 6.~~**Skill copies synchronization** — Three copies of skills exist: `/home/lars/projects/SKILLS/`, `/home/lars/.agents/skills/`, `/home/lars/.config/crush/skills/`. Changes to the source may not propagate. Need to understand the sync mechanism.~~ **Won't implement — SKILLS-repo scope.**
 
-7. **No integration test for the module** — The most valuable test would be a minimal Go project in `tests/consumer/` that imports `flakeModules.go-standard` and verifies all outputs resolve.
+7.~~**No integration test for the module** — The most valuable test would be a minimal Go project in `tests/consumer/` that imports `flakeModules.go-standard` and verifies all outputs resolve.~~ done — moduleTest (121 assertions) + templateEval + 10 real consumers
 
 ---
 
@@ -163,7 +163,7 @@ Since the first status report, the session focused on updating three Nix skills 
 
 **Is this a tool you installed? Should I be concerned? Should I work around it?**
 
-### 2. How do skill copies synchronize?
+### ~~2. How do skill copies synchronize?~~ **Won't implement — SKILLS-repo scope — symlink conversion tracked in the SKILLS repo.**
 
 Three locations contain copies of the same skills:
 

@@ -51,6 +51,7 @@
 | T22 | Silence or properly set `__intentionallyOverridingVersion` in the goPkgOverride test (warning noise per check log) | TODO   | 10min  | `docs/status/2026-09-24_*` f.14                       |
 | T23 | Generalize `nix-lint.sh` `go_1_26-outline` message pattern to `go_1_XX-outline`                                  | TODO   | 10min  | `docs/status/2026-09-24_*` f.15                       |
 | T24 | Old-nixpkgs pinned CI matrix job for moduleTest (proves auto-default + fallback degrade gracefully)              | TODO   | 1h     | `docs/status/2026-09-24_*` e.4, f.11                  |
+| T25 | Derive `dashboard.sh` `GO_LATEST` from nixpkgs instead of a manual-bump default (this exact default rotted twice before; the 2026-09-24 fix only made the default auto-derivable) | TODO | 30min | `docs/status/2026-09-24_*` f.16; `scripts/dashboard.sh` |
 
 ## Decided against / rejected
 

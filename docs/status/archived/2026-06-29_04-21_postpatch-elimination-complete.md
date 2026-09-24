@@ -123,7 +123,7 @@ These are documented but intentionally NOT migrated:
 | #  | Priority | Task                                                                              | Impact                                   | Effort |
 | -- | -------- | --------------------------------------------------------------------------------- | ---------------------------------------- | ------ |
 | ~~1~~ | ~~P0~~ | ~~Fix Cyberdom: update go.mod to cqrs v3.3.0, then retry mkPreparedSource migration~~ | ~~Eliminates instance #6~~ | ~~30min~~ | **Won't implement — external — Cyberdom-side.**
-| 2  | P0       | Verify file-and-image-renamer `sync.go` deletion was intentional                  | Correctness                              | 10min  |
+| ~~2~~ | ~~P0~~ | ~~Verify file-and-image-renamer `sync.go` deletion was intentional~~ | ~~Correctness~~ | ~~10min~~ |
 | ~~3~~ | ~~P1~~ | ~~Add `excludeSubModuleDirs` passthrough in `mkGoFlake.nix`~~ | ~~API completeness~~ | ~~15min~~ | done — moot — mkGoFlake deprecated; go-standard forwards all params
 | ~~4~~ | ~~P1~~ | ~~Make `validatePrivateDeps` smarter: skip repos available on Go proxy~~ | ~~Removes 4× `validatePrivateDeps = false`~~ | ~~60min~~ | done — shipped as `publicDeps` (versioned-path aware)
 | ~~5~~ | ~~P1~~ | ~~Fix overview + branching-flow pre-existing BuildFlow pre-commit failures~~ | ~~Unblocks normal commits~~ | ~~30min~~ | **Won't implement — external — BuildFlow-side.**
@@ -131,7 +131,7 @@ These are documented but intentionally NOT migrated:
 | ~~7~~ | ~~P2~~ | ~~Add property-based tests for `stripVersionSuffix` edge cases~~ | ~~Regression prevention~~ | ~~30min~~ | done — shipped — checks.pureFunctions (41 assertions)
 | ~~8~~ | ~~P2~~ | ~~Add property-based tests for recursive `discoverSubModules`~~ | ~~Regression prevention~~ | ~~30min~~ | done — shipped — 9 integration scenarios in test.nix
 | ~~9~~ | ~~P2~~ | ~~Change Cyberdom `path:` input to `git+ssh://...ref=v3.3.0`~~ | ~~Reproducibility~~ | ~~10min~~ | **Won't implement — external — Cyberdom-side.**
-| 2  | P3       | Audit remaining ~80 flakes that DON'T use mkPreparedSource                        | Adoption                                 | 4h     |
+| ~~2~~ | ~~P3~~ | ~~Audit remaining ~80 flakes that DON'T use mkPreparedSource~~ | ~~Adoption~~ | ~~4h~~ |
 | ~~11~~ | ~~P3~~ | ~~Create migration guide: "How to adopt mkPreparedSource" in README~~ | ~~Adoption~~ | ~~30min~~ | done — shipped — docs/migration-guide.md
 | ~~12~~ | ~~P3~~ | ~~Add `nix flake check` to go-nix-helpers CI~~ | ~~CI quality~~ | ~~15min~~ | done — shipped — CI workflow since 2026-07-24
 | ~~13~~ | ~~P3~~ | ~~Consider go.sum auto-generation for stripped replaces (ast-state-analyzer)~~ | ~~Eliminates 2 instances~~ | ~~2h~~ | **Won't implement — dormant since 2026-06 — dropped.**
@@ -159,9 +159,9 @@ Currently, `validatePrivateDeps` treats ALL modules matching `github\.com/[Ll]ar
 The question is: **is there a reliable way to know which LarsArtmann repos are public vs private at Nix evaluation time?** Options I considered:
 
 1.~~**Hardcode a public-repo allowlist** — Brittle, requires manual maintenance~~ done — answered — `publicDeps` exclusion list shipped (option 3 of the report's own list)
-2. **Try to fetch from the proxy during eval** — Not possible (no network in Nix eval)
-3. **Add a `publicDeps` parameter** — Shifts the burden to the user but is explicit
-4. **Make `privateDepPattern` more specific** — User would need to list only truly private repos
+2.~~**Try to fetch from the proxy during eval** — Not possible (no network in Nix eval)~~ **Won't implement — rejected — not possible at eval time (no network).**
+3.~~**Add a `publicDeps` parameter** — Shifts the burden to the user but is explicit~~ done — shipped — `publicDeps` exclusion list
+4.~~**Make `privateDepPattern` more specific** — User would need to list only truly private repos~~ **Won't implement — rejected — `privateDepPattern` override already exists.**
 
 I don't know which repos are actually private vs public in the LarsArtmann org, and this affects whether option 1 or 3 is the right approach. **What's the org's policy? Are all repos public, or are some private?**
 

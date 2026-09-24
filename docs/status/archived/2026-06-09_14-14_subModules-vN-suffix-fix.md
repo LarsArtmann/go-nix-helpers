@@ -66,11 +66,11 @@
 
 ## b) PARTIALLY DONE 🔶
 
-### 1. `subModuleVersionNormalize` with versioned sub-paths — Works but untested end-to-end
+### ~~1. `subModuleVersionNormalize` with versioned sub-paths — Works but untested end-to-end~~ done — covered — pseudoVersionNormalizeTest scenario in test.nix
 
 The sed command `s|${depPath}/${sub} v0\.0\.0-[^ ]*|${depPath}/${sub} ${subModuleVersion}|g` now receives `sub = "codec/v2"`, making the full pattern `go-cqrs-lite/codec/v2`. This is correct — it matches the full Go module path in `go.mod`. But no downstream consumer has tested this with versioned subModules yet.
 
-### 2. Downstream consumers — Need migration to new subModules feature
+### ~~2. Downstream consumers — Need migration to new subModules feature~~ done — done — crush-daily/overview/DiscordSync postPatchExtra removed (`649e8a9` et al.)
 
 Projects currently listing `go-cqrs-lite` sub-modules as individual deps can now consolidate:
 
@@ -79,7 +79,7 @@ Projects currently listing `go-cqrs-lite` sub-modules as individual deps can now
 | crush-daily    | 14 individual deps `"go-cqrs-lite/codec/v2" = "${go-cqrs-lite}/codec"` | `subModules = { ".../go-cqrs-lite" = [ "catalog/v2" "codec/v2" ... ]; }` + single dep entry |
 | Standup-Killer | `subModules = { ".../go-cqrs-lite" = [ "core" "memory" ]; }`           | `subModules = { ".../go-cqrs-lite" = [ "core" "memory/v2" ]; }`                             |
 
-### 3. Downstream consumers — Need `vendorHash` updates
+### ~~3. Downstream consumers — Need `vendorHash` updates~~ done — consumer-side — long since rebuilt
 
 Projects using versioned deps via mkPreparedSource need `vendorHash` recalculated:
 
@@ -92,7 +92,7 @@ Projects using versioned deps via mkPreparedSource need `vendorHash` recalculate
 
 ## c) NOT STARTED ⬜
 
-### 1. No `flake.nix` for go-nix-helpers itself
+### ~~1. No `flake.nix` for go-nix-helpers itself~~ done — shipped `3c22ce4`
 
 The project has no `flake.nix` — it's imported as `flake = false` by consumers. This means:
 
@@ -101,27 +101,27 @@ The project has no `flake.nix` — it's imported as `flake = false` by consumers
 - No `nix flake check` for the project
 - Can't run `treefmt-nix` on the `.nix` files
 
-### 2. No automated tests
+### ~~2. No automated tests~~ done — shipped — full checks suite
 
 No test suite exists. Verification is manual via `nix eval` and downstream consumer builds. The `repoName` and `stripVersionSuffix` helpers are pure functions that could easily be unit-tested with Nix checks.
 
-### 3. No `CHANGELOG.md`
+### ~~3. No `CHANGELOG.md`~~ done — shipped
 
 No formal change log — only git history.
 
-### 4. No `AGENTS.md`
+### ~~4. No `AGENTS.md`~~ done — shipped `3c22ce4`
 
 No project-level AI context file for session continuity.
 
-### 5. No `FEATURES.md`
+### ~~5. No `FEATURES.md`~~ done — shipped — FEATURES.md
 
 No feature inventory.
 
-### 6. No `TODO_LIST.md`
+### ~~6. No `TODO_LIST.md`~~ done — shipped — TODO_LIST.md
 
 No short/mid-term task tracking.
 
-### 7. `report/` directory is empty
+### ~~7. `report/` directory is empty~~ done — moot — directory gone
 
 An empty `report/` directory exists — purpose unclear, likely a leftover placeholder.
 
@@ -144,31 +144,31 @@ All known bugs have been fixed. The `/vN` suffix bug in `subModules` was identif
 
 ## e) WHAT WE SHOULD IMPROVE 📈
 
-### 1. Test infrastructure is the #1 gap
+### ~~1. Test infrastructure is the #1 gap~~ done — shipped — full checks suite
 
 `repoName`, `stripVersionSuffix`, `copyDeps`, `replaceLines`, `subModuleReplace` are all pure Nix expressions. They could be verified with `nix eval` assertions in a `flake.nix` checks block. This would have caught both `/vN` bugs at introduction.
 
-### 2. `dashboard.sh` hardcodes `go_1_25` check
+### ~~2. `dashboard.sh` hardcodes `go_1_25` check~~ done — fixed 2026-09-24 — GO_LATEST default is auto-derivable; TODO_LIST T25 tracks full derivation
 
 Line 47 checks for `go_1_25` but the standard is now `go_1_26`. Should check for outdated Go versions generically.
 
-### 3. `generate-flake.sh` uses fragile sed for templ support
+### ~~3. `generate-flake.sh` uses fragile sed for templ support~~ done — fixed — D4 fix (2026-07-24 23:04 session)
 
 The `sed` commands for adding `templ` support (lines 53-57) are line-number-dependent and will break if the template changes. Should use a proper template engine or markers.
 
-### 4. `subModuleVersionNormalize` sed is fragile
+### ~~4. `subModuleVersionNormalize` sed is fragile~~ done — hardened — `[.]` style after the 2026-09-07 escape-semantics probe
 
 The sed pattern assumes a specific pseudo-version format. If Go changes the format, it breaks silently.
 
-### 5. No validation of `subModules` entries
+### ~~5. No validation of `subModules` entries~~ **Won't implement — dormant — dropped.**
 
 If a user lists `subModules = { ".../go-cqrs-lite" = [ "nonexistent" ]; }`, the build will fail with a confusing error about a missing directory. Should validate that `${deps.${depPath}}/${sub}` exists.
 
-### 6. `repoName` collision risk for same-name different-owner deps
+### ~~6. `repoName` collision risk for same-name different-owner deps~~ **Won't implement — no incidents — dropped.**
 
 If two deps share the same repo name (e.g., `larsartmann/go-output` and `otheruser/go-output`), `repoName` produces the same basename, causing a collision in `_local_deps/`. Not currently a problem but architecturally unsound.
 
-### 7. Template drift risk
+### ~~7. Template drift risk~~ done — guarded — checks.templateEval
 
 The `templates/go-flake-parts/flake.nix` is manually maintained. When `mkPreparedSource` changes, the template comments may drift. Consider generating from source.
 
@@ -178,31 +178,31 @@ The `templates/go-flake-parts/flake.nix` is manually maintained. When `mkPrepare
 
 | #  | Priority | Task                                                                                              | Impact                             |
 | -- | -------- | ------------------------------------------------------------------------------------------------- | ---------------------------------- |
-| 1  | P0       | Commit the subModules `/vN` fix                                                                   | Unblocks go-cqrs-lite consumers    |
-| 2  | P0       | Migrate `crush-daily` from 14 individual deps to `subModules` with versioned paths                | Eliminates 14 lines of boilerplate |
-| 3  | P0       | Migrate `Standup-Killer` to use `memory/v2` in subModules                                         | Correctness — memory module IS v2  |
-| 4  | P0       | Recalculate `vendorHash` in `projects-management-automation`                                      | Unblocks downstream                |
-| 5  | P0       | Recalculate `vendorHash` in `go-structure-linter`                                                 | Unblocks downstream                |
-| 6  | P1       | Add `flake.nix` with `nix fmt` (treefmt-nix) for the repo itself                                  | Code quality                       |
-| 7  | P1       | Add Nix-based tests for `repoName` and `stripVersionSuffix` via `nix eval` checks                 | Prevents regressions               |
-| 8  | P1       | Add Nix-based tests for full `mkPreparedSource` output (copyDeps, replaceLines, subModuleReplace) | Prevents regressions               |
-| 9  | P1       | Create `AGENTS.md` with project context for AI sessions                                           | Session continuity                 |
-| 10 | P1       | Fix `dashboard.sh` to check for outdated Go versions generically (not hardcoded `go_1_25`)        | Correctness                        |
-| 11 | P1       | Audit all go-cqrs-lite consumers (crush-daily, browser-history) for migration to subModules       | Cleanup                            |
-| 12 | P2       | Add `CHANGELOG.md`                                                                                | Release tracking                   |
-| 13 | P2       | Add `FEATURES.md` for feature inventory                                                           | Documentation                      |
-| 14 | P2       | Add `TODO_LIST.md` for short/mid-term tasks                                                       | Planning                           |
-| 15 | P2       | Remove empty `report/` directory or document its purpose                                          | Cleanup                            |
-| 16 | P2       | Move `cmdguard` manual workaround in PMA into `deps` map                                          | Reduces duplication                |
-| 17 | P2       | Audit all 7 consumers for manual `_local_deps/` workarounds                                       | Cleanup                            |
-| 18 | P2       | Add validation that `subModules` entries exist in the source derivation                           | Better error messages              |
-| 19 | P3       | Add CI pipeline (GitHub Actions) that runs `nix eval` tests                                       | Automation                         |
-| 20 | P3       | Support `go.sum` patching (currently only `go.mod` is patched)                                    | Completeness                       |
-| 21 | P3       | Add `--dry-run` option to mkPreparedSource                                                        | Debugging                          |
-| 22 | P3       | Consider publishing as a proper flake (not `flake = false`) for better caching                    | Performance                        |
-| 23 | P4       | Add `lib` overlay so consumers can `inherit (go-nix-helpers.lib) mkPreparedSource;`               | Ergonomics                         |
-| 24 | P4       | Add integration test: build a real Go project with mkPreparedSource in CI                         | Confidence                         |
-| 25 | P4       | Explore `go.work` support for workspace-based projects                                            | Future-proofing                    |
+| ~~1~~ | ~~P0~~ | ~~Commit the subModules `/vN` fix~~ | ~~Unblocks go-cqrs-lite consumers~~ |
+| ~~2~~ | ~~P0~~ | ~~Migrate `crush-daily` from 14 individual deps to `subModules` with versioned paths~~ | ~~Eliminates 14 lines of boilerplate~~ |
+| ~~3~~ | ~~P0~~ | ~~Migrate `Standup-Killer` to use `memory/v2` in subModules~~ | ~~Correctness — memory module IS v2~~ |
+| ~~4~~ | ~~P0~~ | ~~Recalculate `vendorHash` in `projects-management-automation`~~ | ~~Unblocks downstream~~ |
+| ~~5~~ | ~~P0~~ | ~~Recalculate `vendorHash` in `go-structure-linter`~~ | ~~Unblocks downstream~~ |
+| ~~6~~ | ~~P1~~ | ~~Add `flake.nix` with `nix fmt` (treefmt-nix) for the repo itself~~ | ~~Code quality~~ |
+| ~~7~~ | ~~P1~~ | ~~Add Nix-based tests for `repoName` and `stripVersionSuffix` via `nix eval` checks~~ | ~~Prevents regressions~~ |
+| ~~8~~ | ~~P1~~ | ~~Add Nix-based tests for full `mkPreparedSource` output (copyDeps, replaceLines, subModuleReplace)~~ | ~~Prevents regressions~~ |
+| ~~9~~ | ~~P1~~ | ~~Create `AGENTS.md` with project context for AI sessions~~ | ~~Session continuity~~ |
+| ~~10~~ | ~~P1~~ | ~~Fix `dashboard.sh` to check for outdated Go versions generically (not hardcoded `go_1_25`)~~ | ~~Correctness~~ |
+| ~~11~~ | ~~P1~~ | ~~Audit all go-cqrs-lite consumers (crush-daily, browser-history) for migration to subModules~~ | ~~Cleanup~~ |
+| ~~12~~ | ~~P2~~ | ~~Add `CHANGELOG.md`~~ | ~~Release tracking~~ |
+| ~~13~~ | ~~P2~~ | ~~Add `FEATURES.md` for feature inventory~~ | ~~Documentation~~ |
+| ~~14~~ | ~~P2~~ | ~~Add `TODO_LIST.md` for short/mid-term tasks~~ | ~~Planning~~ |
+| ~~15~~ | ~~P2~~ | ~~Remove empty `report/` directory or document its purpose~~ | ~~Cleanup~~ |
+| ~~16~~ | ~~P2~~ | ~~Move `cmdguard` manual workaround in PMA into `deps` map~~ | ~~Reduces duplication~~ |
+| ~~17~~ | ~~P2~~ | ~~Audit all 7 consumers for manual `_local_deps/` workarounds~~ | ~~Cleanup~~ |
+| ~~18~~ | ~~P2~~ | ~~Add validation that `subModules` entries exist in the source derivation~~ | ~~Better error messages~~ |
+| ~~19~~ | ~~P3~~ | ~~Add CI pipeline (GitHub Actions) that runs `nix eval` tests~~ | ~~Automation~~ |
+| ~~20~~ | ~~P3~~ | ~~Support `go.sum` patching (currently only `go.mod` is patched)~~ | ~~Completeness~~ |
+| ~~21~~ | ~~P3~~ | ~~Add `--dry-run` option to mkPreparedSource~~ | ~~Debugging~~ |
+| ~~22~~ | ~~P3~~ | ~~Consider publishing as a proper flake (not `flake = false`) for better caching~~ | ~~Performance~~ |
+| ~~23~~ | ~~P4~~ | ~~Add `lib` overlay so consumers can `inherit (go-nix-helpers.lib) mkPreparedSource;`~~ | ~~Ergonomics~~ |
+| ~~24~~ | ~~P4~~ | ~~Add integration test: build a real Go project with mkPreparedSource in CI~~ | ~~Confidence~~ |
+| ~~25~~ | ~~P4~~ | ~~Explore `go.work` support for workspace-based projects~~ | ~~Future-proofing~~ |
 
 ---
 

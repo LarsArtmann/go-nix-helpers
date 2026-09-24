@@ -61,7 +61,7 @@ The second commit also picked up adjacent documentation grooming (`AGENTS.md`, `
 
 ## b) PARTIALLY DONE
 
-1. **README superb-ness**
+1.~~**README superb-ness**~~ done — all sub-items shipped — dynamic badge, LICENSE, architecture diagram, FAQ (see Resolution appendix); demo video moved to ROADMAP Theme 4
    - Strong first pass, but could still use:
      - Dynamic badges (currently static shields.io).
      - A license badge/file.
@@ -69,39 +69,39 @@ The second commit also picked up adjacent documentation grooming (`AGENTS.md`, `
      - A troubleshooting/FAQ section.
      - A recorded demo or animated GIF.
 
-2. **GitHub presence**
+2.~~**GitHub presence**~~ **Won't implement — social preview dropped; docs site moved to ROADMAP Theme 4.**
    - Description and topics are live, but:
      - No social preview image / Open Graph image.
      - No homepage URL (intentionally left blank; could point to future docs site).
      - No repository website / GitHub Pages.
 
-3. **Community/contributor affordances**
+3.~~**Community/contributor affordances**~~ done — shipped — CONTRIBUTING, issue/PR templates, CODEOWNERS (Resolution appendix)
    - README mentions templates, but there is no `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, issue templates, or PR template.
 
 ---
 
 ## c) NOT STARTED
 
-1. Add an open-source `LICENSE` file and license badge.
-2. Set up GitHub Actions (or Hercules CI) to make the "nix flake check" badge dynamic.
-3. Create a custom social preview / Open Graph image for the repo.
-4. Publish a documentation website (GitHub Pages / Astro / Starlight).
-5. Add `CONTRIBUTING.md`.
-6. Add issue templates and PR template.
-7. Add `SECURITY.md` and vulnerability reporting policy.
-8. Write a migration guide from `mkGoFlake.nix` to `flakeModules.go-standard`.
-9. Add an FAQ / troubleshooting section.
-10. Create video or GIF walkthrough.
-11. Add release tags and release notes.
-12. Submit the package to nixpkgs.
-13. Add property-based or fuzz tests.
-14. Add real private-repo integration tests.
-15. Add cross-compilation helpers.
-16. Add `goreleaser`-style release automation.
-17. Set up Dependabot / flake.lock auto-update workflow.
-18. Add shell completions for generated apps.
-19. Add man pages.
-20. Create a public Discord/Matrix community.
+1.~~Add an open-source `LICENSE` file and license badge.~~ done — done — MIT LICENSE + badge (`ce35aa5`)
+2.~~Set up GitHub Actions (or Hercules CI) to make the "nix flake check" badge dynamic.~~ done — done — GitHub Actions CI (`7415763`)
+3.~~Create a custom social preview / Open Graph image for the repo.~~ **Won't implement — dropped — social preview.**
+4.~~Publish a documentation website (GitHub Pages / Astro / Starlight).~~ done — moved to ROADMAP Theme 4
+5.~~Add `CONTRIBUTING.md`.~~ done — done — CONTRIBUTING.md (`7415763`)
+6.~~Add issue templates and PR template.~~ done — done — issue/PR templates + CODEOWNERS (`7415763`)
+7.~~Add `SECURITY.md` and vulnerability reporting policy.~~ **Won't implement — dormant — dropped.**
+8.~~Write a migration guide from `mkGoFlake.nix` to `flakeModules.go-standard`.~~ done — done — docs/migration-guide.md (`7415763`)
+9.~~Add an FAQ / troubleshooting section.~~ done — done — README Troubleshooting/FAQ (`7415763`)
+10.~~Create video or GIF walkthrough.~~ done — moved to ROADMAP Theme 4
+11.~~Add release tags and release notes.~~ done — moved to TODO_LIST Blocked (v0.1.0)
+12.~~Submit the package to nixpkgs.~~ done — moved to ROADMAP Theme 4
+13.~~Add property-based or fuzz tests.~~ done — shipped — checks.pureFunctions (41 assertions)
+14.~~Add real private-repo integration tests.~~ done — moved to TODO_LIST Blocked (SSH secret)
+15.~~Add cross-compilation helpers.~~ **Won't implement — dormant — dropped.**
+16.~~Add `goreleaser`-style release automation.~~ **Won't implement — dormant — dropped.**
+17.~~Set up Dependabot / flake.lock auto-update workflow.~~ done — done — dependabot.yml added 2026-09
+18.~~Add shell completions for generated apps.~~ done — done — enableCompletions option
+19.~~Add man pages.~~ done — done — man pages (`d8574df`)
+20.~~Create a public Discord/Matrix community.~~ **Won't implement — dormant — dropped.**
 
 ---
 
@@ -115,35 +115,35 @@ If forced to name the biggest lingering smell: **the "nix flake check" badge in 
 
 ## e) WHAT WE SHOULD IMPROVE!
 
-1. **Make badges honest**
+1.~~**Make badges honest**~~ done — done — dynamic CI badge
    - A static badge that says "passing" is worse than no badge if it can become false.
    - Add GitHub Actions or another CI source so the badge reflects real CI state.
 
-2. **License the project**
+2.~~**License the project**~~ done — done — MIT `ce35aa5`
    - Without a `LICENSE` file, reuse rights are ambiguous.
    - Add a clear license (likely MIT, given it's a library/helper) and a badge.
 
-3. **Complete the GitHub presence**
+3.~~**Complete the GitHub presence**~~ **Won't implement — templates shipped; social preview dropped.**
    - Social preview image.
    - `.github/` directory with issue templates, PR template, and workflows.
    - A homepage URL that points somewhere useful (docs site or this repo).
 
-4. **Add a migration guide**
+4.~~**Add a migration guide**~~ done — done — docs/migration-guide.md
    - `mkGoFlake.nix` is deprecated but existing consumers need a clear path.
 
-5. **Automate routine maintenance**
+5.~~**Automate routine maintenance**~~ done — done — dependabot.yml
    - `flake.lock` should update on a schedule (weekly/monthly) with a PR, not manually.
 
-6. **Expand test coverage**
+6.~~**Expand test coverage**~~ done — done — 121 module assertions + templateEval check
    - `go-standard` module is lightly tested compared to `mkPreparedSource`.
    - Templates are not exercised in CI.
 
-7. **Sharpen the README further**
+7.~~**Sharpen the README further**~~ done — done — architecture diagram + FAQ shipped
    - Add a "Who this is for" / "Who this is not for" section.
    - Add a short architecture diagram (D2 or Mermaid).
    - Add a troubleshooting section for common private-dep failures.
 
-8. **Standardize status-report hygiene**
+8.~~**Standardize status-report hygiene**~~ done — decided — Markdown reports; the convention has held since
    - This report is being written as a Markdown file per the user's explicit instruction, while the skill specifies HTML. Decide on one format and stick to it, or support both with clear rules.
 
 ---
@@ -160,60 +160,60 @@ Sorted by a rough Pareto mix of impact, effort, and urgency.
 | 4  | Add `.github/ISSUE_TEMPLATE/bug.yml` and `feature.yml`             | Community    | Medium | 30 min  |
 | 5  | Add `.github/pull_request_template.md`                             | Community    | Medium | 15 min  |
 | 6  | Write `CONTRIBUTING.md`                                            | Community    | Medium | 30 min  |
-| 7  | Create a repo social preview image (Open Graph)                    | Presence     | Medium | 1 h     |
-| 8  | Add `SECURITY.md`                                                  | Governance   | Medium | 20 min  |
+| ~~7~~ | ~~Create a repo social preview image (Open Graph)~~ | ~~Presence~~ | ~~Medium~~ | ~~1 h~~ |
+| ~~8~~ | ~~Add `SECURITY.md`~~ | ~~Governance~~ | ~~Medium~~ | ~~20 min~~ |
 | 9  | Write a migration guide from `mkGoFlake.nix` to `go-standard`      | Docs         | High   | 1 h     |
 | 10 | Add a troubleshooting/FAQ section to README                        | Docs         | High   | 45 min  |
 | 11 | Add architecture diagram to README                                 | Clarity      | Medium | 45 min  |
 | 12 | Add unit/integration tests for the `go-standard` module            | Quality      | High   | 2 h     |
-| 13 | Add CI test for `templates/go-standard/flake.nix`                  | Quality      | High   | 1 h     |
-| 14 | Add CI test for `templates/go-flake-parts/flake.nix`               | Quality      | High   | 1 h     |
-| 15 | Set up automated `flake.lock` updates (Dependabot or workflow)     | Maintenance  | High   | 1 h     |
-| 16 | Publish a documentation site (GitHub Pages / Astro / Starlight)    | Presence     | High   | 4 h     |
+| ~~13~~ | ~~Add CI test for `templates/go-standard/flake.nix`~~ | ~~Quality~~ | ~~High~~ | ~~1 h~~ |
+| ~~14~~ | ~~Add CI test for `templates/go-flake-parts/flake.nix`~~ | ~~Quality~~ | ~~High~~ | ~~1 h~~ |
+| ~~15~~ | ~~Set up automated `flake.lock` updates (Dependabot or workflow)~~ | ~~Maintenance~~ | ~~High~~ | ~~1 h~~ |
+| ~~16~~ | ~~Publish a documentation site (GitHub Pages / Astro / Starlight)~~ | ~~Presence~~ | ~~High~~ | ~~4 h~~ |
 | 17 | Add release tags and `CHANGELOG.md`                                | Process      | Medium | 1 h     |
-| 18 | Add release automation (tag + notes)                               | Process      | Medium | 1 h     |
-| 19 | Add property-based tests for `mkPreparedSource`                    | Quality      | Medium | 2 h     |
-| 20 | Add real private-repo integration test in CI                       | Quality      | High   | 2 h     |
-| 21 | Add `nix run .#docs` app to preview docs locally                   | DX           | Medium | 30 min  |
+| ~~18~~ | ~~Add release automation (tag + notes)~~ | ~~Process~~ | ~~Medium~~ | ~~1 h~~ |
+| ~~19~~ | ~~Add property-based tests for `mkPreparedSource`~~ | ~~Quality~~ | ~~Medium~~ | ~~2 h~~ |
+| ~~20~~ | ~~Add real private-repo integration test in CI~~ | ~~Quality~~ | ~~High~~ | ~~2 h~~ |
+| ~~21~~ | ~~Add `nix run .#docs` app to preview docs locally~~ | ~~DX~~ | ~~Medium~~ | ~~30 min~~ |
 | 22 | Add man pages for `mkPreparedSource` and `go-standard` options     | Docs         | Low    | 2 h     |
 | 23 | Add shell completions for generated apps                           | DX           | Low    | 1 h     |
-| 24 | Add cross-compilation example to README/docs                       | Capability   | Medium | 1 h     |
-| 25 | Add a "Recipes" page to docs (templ, govulncheck, gopls toggles)   | Docs         | Medium | 1 h     |
-| 26 | Audit all `docs/status/` reports for drift and annotate or archive | Maintenance  | Medium | 1 h     |
-| 27 | Rename `mkGoFlake.nix` usage in old downstream repos               | Migration    | Medium | ongoing |
-| 28 | Add support for Go workspace projects (`go.work`)                  | Capability   | Medium | 2 h     |
-| 29 | Add option for custom Go toolchain per package                     | Capability   | Low    | 1 h     |
+| ~~24~~ | ~~Add cross-compilation example to README/docs~~ | ~~Capability~~ | ~~Medium~~ | ~~1 h~~ |
+| ~~25~~ | ~~Add a "Recipes" page to docs (templ, govulncheck, gopls toggles)~~ | ~~Docs~~ | ~~Medium~~ | ~~1 h~~ |
+| ~~26~~ | ~~Audit all `docs/status/` reports for drift and annotate or archive~~ | ~~Maintenance~~ | ~~Medium~~ | ~~1 h~~ |
+| ~~27~~ | ~~Rename `mkGoFlake.nix` usage in old downstream repos~~ | ~~Migration~~ | ~~Medium~~ | ~~ongoing~~ |
+| ~~28~~ | ~~Add support for Go workspace projects (`go.work`)~~ | ~~Capability~~ | ~~Medium~~ | ~~2 h~~ |
+| ~~29~~ | ~~Add option for custom Go toolchain per package~~ | ~~Capability~~ | ~~Low~~ | ~~1 h~~ |
 | 30 | Add `enableGolangciLint` toggle (currently always on)              | Config       | Low    | 30 min  |
 | 31 | Add `enableGofumpt` / `enableGoimports` toggles in treefmt         | Config       | Low    | 30 min  |
 | 32 | Add built-in `nix run .#fmt` alias app                             | DX           | Low    | 15 min  |
-| 33 | Add `meta.longDescription` and `meta.maintainers` fix              | Quality      | Low    | 30 min  |
-| 34 | Run a full code review of `modules/go-standard.nix`                | Quality      | Medium | 1 h     |
-| 35 | Run a naming review across the public API                          | Quality      | Medium | 1 h     |
-| 36 | Run a duplication review after recent unification work             | Quality      | Medium | 1 h     |
-| 37 | Add telemetry-free usage stats via GitHub traffic only             | Insights     | Low    | 0 min   |
-| 38 | Register `maintainers.larsartmann` in nixpkgs                      | Correctness  | Low    | 30 min  |
-| 39 | Write a blog post announcing go-standard                           | Marketing    | Medium | 2 h     |
-| 40 | Create a 60-second demo video/GIF                                  | Marketing    | Medium | 2 h     |
-| 41 | Add repo to nixpkgs or nix-community                               | Distribution | High   | 2 h     |
-| 42 | Add `nix run .#ci` app that runs the same checks as CI             | DX           | Low    | 15 min  |
-| 43 | Add pre-commit hook example in docs                                | DX           | Low    | 30 min  |
-| 44 | Document how to override `treefmt` programs per consumer           | Docs         | Low    | 30 min  |
-| 45 | Document how to pin `goPkg` to a different Go version              | Docs         | Low    | 20 min  |
-| 46 | Add a "Comparison with other Go+Nix tools" section                 | Docs         | Medium | 1 h     |
+| ~~33~~ | ~~Add `meta.longDescription` and `meta.maintainers` fix~~ | ~~Quality~~ | ~~Low~~ | ~~30 min~~ |
+| ~~34~~ | ~~Run a full code review of `modules/go-standard.nix`~~ | ~~Quality~~ | ~~Medium~~ | ~~1 h~~ |
+| ~~35~~ | ~~Run a naming review across the public API~~ | ~~Quality~~ | ~~Medium~~ | ~~1 h~~ |
+| ~~36~~ | ~~Run a duplication review after recent unification work~~ | ~~Quality~~ | ~~Medium~~ | ~~1 h~~ |
+| ~~37~~ | ~~Add telemetry-free usage stats via GitHub traffic only~~ | ~~Insights~~ | ~~Low~~ | ~~0 min~~ |
+| ~~38~~ | ~~Register `maintainers.larsartmann` in nixpkgs~~ | ~~Correctness~~ | ~~Low~~ | ~~30 min~~ |
+| ~~39~~ | ~~Write a blog post announcing go-standard~~ | ~~Marketing~~ | ~~Medium~~ | ~~2 h~~ |
+| ~~40~~ | ~~Create a 60-second demo video/GIF~~ | ~~Marketing~~ | ~~Medium~~ | ~~2 h~~ |
+| ~~41~~ | ~~Add repo to nixpkgs or nix-community~~ | ~~Distribution~~ | ~~High~~ | ~~2 h~~ |
+| ~~42~~ | ~~Add `nix run .#ci` app that runs the same checks as CI~~ | ~~DX~~ | ~~Low~~ | ~~15 min~~ |
+| ~~43~~ | ~~Add pre-commit hook example in docs~~ | ~~DX~~ | ~~Low~~ | ~~30 min~~ |
+| ~~44~~ | ~~Document how to override `treefmt` programs per consumer~~ | ~~Docs~~ | ~~Low~~ | ~~30 min~~ |
+| ~~45~~ | ~~Document how to pin `goPkg` to a different Go version~~ | ~~Docs~~ | ~~Low~~ | ~~20 min~~ |
+| ~~46~~ | ~~Add a "Comparison with other Go+Nix tools" section~~ | ~~Docs~~ | ~~Medium~~ | ~~1 h~~ |
 | 47 | Add a public roadmap file (`ROADMAP.md`)                           | Planning     | Low    | 30 min  |
-| 48 | Add issue labels and milestones in GitHub                          | Process      | Low    | 20 min  |
-| 49 | Set up a Discord/Matrix channel for support                        | Community    | Low    | 30 min  |
-| 50 | Record a longer tutorial video or livestream                       | Marketing    | Low    | 4 h     |
+| ~~48~~ | ~~Add issue labels and milestones in GitHub~~ | ~~Process~~ | ~~Low~~ | ~~20 min~~ |
+| ~~49~~ | ~~Set up a Discord/Matrix channel for support~~ | ~~Community~~ | ~~Low~~ | ~~30 min~~ |
+| ~~50~~ | ~~Record a longer tutorial video or livestream~~ | ~~Marketing~~ | ~~Low~~ | ~~4 h~~ |
 
 ---
 
 ## g) Questions I Cannot Figure Out Myself
 
-1. **License:** What open-source license should this project use? Without a decision, I cannot add a `LICENSE` file or a license badge.
+1.~~**License:** What open-source license should this project use? Without a decision, I cannot add a `LICENSE` file or a license badge.~~ done — decided — MIT (`ce35aa5`)
 
-2. **CI platform:** Do you want GitHub Actions, Hercules CI, or another CI service backing the dynamic badges and automated checks? This determines badge URLs and workflow files.
+2.~~**CI platform:** Do you want GitHub Actions, Hercules CI, or another CI service backing the dynamic badges and automated checks? This determines badge URLs and workflow files.~~ done — decided — GitHub Actions
 
-3. **Homepage / docs site:** Should the GitHub homepage URL stay empty, point to a future `go-nix-helpers.lars.software` docs site, or point to this repo's rendered README? This affects whether I should set up a public website next.
+3.~~**Homepage / docs site:** Should the GitHub homepage URL stay empty, point to a future `go-nix-helpers.lars.software` docs site, or point to this repo's rendered README? This affects whether I should set up a public website next.~~ done — homepage left empty; a docs site remains a ROADMAP Theme 4 idea
 
 ---
 

@@ -108,7 +108,7 @@ gold-standard template:
 
 ## b) PARTIALLY DONE 🔶
 
-### 1. `goPkg` parameter is dead weight — needs decision
+### ~~1. `goPkg` parameter is dead weight — needs decision~~ done — decided — kept for API compat; drop planned at the first tagged release (TODO_LIST Blocked)
 
 `goPkg` is a required parameter and added to `nativeBuildInputs`, but the derivation
 has `dontBuild = true` and the builder only runs `sed/cp/mkdir/echo/awk/grep` —
@@ -116,7 +116,7 @@ never `go`. The Go toolchain is pulled into the sandbox for nothing, inflating t
 closure and signalling to consumers that pinning the Go version here matters. It
 does not. Documented in AGENTS.md gotchas. Needs a deprecation/drop decision.
 
-### 2. `subModuleVersionNormalize` may be cargo-culted — needs verification
+### ~~2. `subModuleVersionNormalize` may be cargo-culted — needs verification~~ done — verified load-bearing — `[.]` style, covered by pseudoVersionNormalizeTest
 
 The sed rewrites `v0.0.0-20260101000000-abc123` → `v0.0.0` so replace directives
 "match". But Go ignores the require version for path-replaced modules, so the sed
@@ -124,13 +124,13 @@ may be unnecessary. The sed also assumes a specific pseudo-version format and br
 silently if Go changes it. Needs a controlled test: remove it and see if a real
 build still resolves.
 
-### 3. Downstream consumers — Need migration to unified subModules
+### ~~3. Downstream consumers — Need migration to unified subModules~~ done — done — Tier A migrated 2026-08-10; rest in TODO_LIST T4/T5
 
 The split-brain unification (round 2) is backwards-compatible in output but
 consumers haven't been audited to confirm they benefit from the dedup. No consumer
 breakage expected (output is identical), but worth verifying.
 
-### 4. `generate-flake.sh` still has rough edges
+### ~~4. `generate-flake.sh` still has rough edges~~ done — fixed — full rewrite with flags
 
 - Hardcoded `/home/lars/projects` path (not configurable, unlike `dashboard.sh`)
 - The `--templ` sed injections are line-number-dependent and fragile
@@ -141,51 +141,51 @@ breakage expected (output is identical), but worth verifying.
 
 ## c) NOT STARTED ⬜
 
-### 1. No CI pipeline for go-nix-helpers itself
+### ~~1. No CI pipeline for go-nix-helpers itself~~ done — shipped — ci.yml
 
 The `docs/ci-workflow.yml` is a template for consumers. The repo itself has no
 GitHub Actions workflow running `nix flake check` on push/PR. Now that `flake.nix`
 exists, this is a 5-minute job.
 
-### 2. No `CHANGELOG.md`
+### ~~2. No `CHANGELOG.md`~~ done — shipped
 
 No formal change log — only git history and point-in-time status reports.
 
-### 3. No `FEATURES.md`
+### ~~3. No `FEATURES.md`~~ done — shipped
 
 No feature inventory by status.
 
-### 4. No `TODO_LIST.md`
+### ~~4. No `TODO_LIST.md`~~ done — shipped
 
 No short/mid-term task tracking.
 
-### 5. `repoName` collision risk unaddressed
+### ~~5. `repoName` collision risk unaddressed~~ **Won't implement — no incidents — dropped.**
 
 If two deps share the same repo name (e.g., `larsartmann/go-output` and
 `otheruser/go-output`), `repoName` produces the same basename, causing a silent
 overwrite in `_local_deps/`. Not triggered today but architecturally unsound.
 
-### 6. `requireDeps` can emit duplicate require lines
+### ~~6. `requireDeps` can emit duplicate require lines~~ done — shipped — requireDeps dedup
 
 `requireDeps` appends a fresh `require (...)` block without checking whether a
 module is already required. A duplicate `require` makes `go mod tidy` complain.
 
-### 7. `postPatchExtra` ordering is undocumented
+### ~~7. `postPatchExtra` ordering is undocumented~~ done — documented — AGENTS.md gotcha + README
 
 `postPatchExtra` runs BEFORE the `replace (...)` block is appended. A consumer
 whose `postPatchExtra` needs to read the generated replaces will silently see a
 stale `go.mod`. Documented in AGENTS.md but not in README.
 
-### 8. No `go.sum` patching
+### ~~8. No `go.sum` patching~~ **Won't implement — moot — the FOD runs go mod tidy + vendor.**
 
 Currently only `go.mod` is patched. If a dep requires `go.sum` manipulation, it's
 not handled.
 
-### 9. No `--dry-run` option
+### ~~9. No `--dry-run` option~~ done — moved to ROADMAP Theme 3
 
 No way to inspect the generated postPatch script without building.
 
-### 10. No nested sub-module support
+### ~~10. No nested sub-module support~~ done — shipped — recursive discovery `7fdb95c`
 
 `subModules = { "foo/bar" = [ "baz" ]; }` → `foo/bar/baz` is not tested.
 
@@ -220,39 +220,39 @@ addressed every objective defect found, each verified empirically before fixing:
 
 ## e) WHAT WE SHOULD IMPROVE! 📈
 
-### 1. Deprecate or drop `goPkg`
+### ~~1. Deprecate or drop `goPkg`~~ done — gated on the first tagged release (TODO_LIST Blocked)
 
 It's dead weight. The cleanest fix is to make it default to `pkgs.go` and stop
 adding it to `nativeBuildInputs`. Breaking API change for consumers, so needs
 coordination.
 
-### 2. Verify whether `subModuleVersionNormalize` is needed
+### ~~2. Verify whether `subModuleVersionNormalize` is needed~~ done — verified load-bearing
 
 If Go ignores the require version for path-replaced modules (which it does), the
 sed is cargo-culted. Remove it and test with a real consumer. If it works, delete
 ~15 lines of fragile code.
 
-### 3. Namespace `repoName` by owner
+### ~~3. Namespace `repoName` by owner~~ **Won't implement — no incidents — dropped.**
 
 Change `_local_deps/<repoName>` to `_local_deps/<owner>-<repoName>` to eliminate
 the same-name collision risk. Breaking change for consumers' `postPatchExtra`
 that hardcodes `_local_deps/<name>` — but no consumer does this today.
 
-### 4. Add CI pipeline for the repo itself
+### ~~4. Add CI pipeline for the repo itself~~ done — shipped — ci.yml
 
 Now that `flake.nix` exists with `nix flake check` passing, a GitHub Actions
 workflow is trivial. Use the `docs/ci-workflow.yml` template on the repo itself.
 
-### 5. Make `generate-flake.sh` robust
+### ~~5. Make `generate-flake.sh` robust~~ done — shipped — full rewrite
 
 Configurable target dir, proper template engine (or markers instead of sed),
 non-destructive defaults (don't push by default).
 
-### 6. Dedup `requireDeps` against existing requires
+### ~~6. Dedup `requireDeps` against existing requires~~ done — shipped
 
 Before appending a `require (...)` block, check if the module is already required.
 
-### 7. Consider publishing as a proper flake
+### ~~7. Consider publishing as a proper flake~~ done — shipped — real flake since `3c22ce4`
 
 Now that `flake.nix` exists with `lib.mkPreparedSource`, consumers can use
 `go-nix-helpers.lib.mkPreparedSource` instead of raw import. Better caching, better
@@ -264,31 +264,31 @@ discoverability. The raw import path still works for backwards compatibility.
 
 | #  | Priority | Task                                                                           | Impact                        |
 | -- | -------- | ------------------------------------------------------------------------------ | ----------------------------- |
-| 1  | P0       | Commit the staged round 2 changes (flake.nix + unification + AGENTS.md)        | Unblocks everything below     |
-| 2  | P0       | Add GitHub Actions CI workflow for the repo itself (`nix flake check` on push) | Automated quality gate        |
-| 3  | P1       | Deprecate/drop `goPkg` parameter (dead weight — derivation never invokes `go`) | Cleaner API, smaller closures |
-| 4  | P1       | Verify `subModuleVersionNormalize` is needed; remove if cargo-culted           | -15 lines fragile sed         |
-| 5  | P1       | Namespace `repoName` by owner to prevent same-name collisions                  | Correctness                   |
-| 6  | P1       | Add `CHANGELOG.md` for release tracking                                        | Release discipline            |
-| 7  | P2       | Add `FEATURES.md` for feature inventory                                        | Documentation                 |
-| 8  | P2       | Add `TODO_LIST.md` for short/mid-term task tracking                            | Planning                      |
-| 9  | P2       | Dedup `requireDeps` against existing requires                                  | Correctness                   |
-| 10 | P2       | Document `postPatchExtra` ordering in README                                   | Clarity                       |
-| 11 | P2       | Make `generate-flake.sh` configurable (target dir, no push default)            | Portability                   |
-| 12 | P2       | Fix `generate-flake.sh` templ sed fragility (use markers not line numbers)     | Robustness                    |
-| 13 | P2       | Migrate `crush-daily` from 14 individual deps to `subModules`                  | Eliminates boilerplate        |
-| 14 | P2       | Audit all consumers for manual `_local_deps/` workarounds                      | Cleanup                       |
-| 15 | P3       | Add `--dry-run` option to mkPreparedSource                                     | Debugging DX                  |
-| 16 | P3       | Support `go.sum` patching                                                      | Completeness                  |
-| 17 | P3       | Add integration test: build a real Go project with mkPreparedSource in CI      | Confidence                    |
-| 18 | P3       | Support nested sub-modules (`foo/bar/baz`)                                     | Edge case                     |
-| 19 | P3       | Add property-based tests for `repoName`/`stripVersionSuffix`                   | Regression prevention         |
-| 20 | P3       | Migrate consumers to `go-nix-helpers.lib.mkPreparedSource` (flake lib)         | Better caching                |
-| 21 | P4       | Explore `go.work` support for workspace-based projects                         | Future-proofing               |
-| 22 | P4       | Add `vendorHash` auto-calculation helper                                       | DX improvement                |
-| 23 | P4       | Add `overlays.default` for consumers to `pkgs.<name>`                          | Ergonomics                    |
-| 24 | P4       | Generate template from source comments (prevent template drift)                | Maintainability               |
-| 25 | P4       | Consider a `mkPreparedSource` NixOS check option                               | Discoverability               |
+| ~~1~~ | ~~P0~~ | ~~Commit the staged round 2 changes (flake.nix + unification + AGENTS.md)~~ | ~~Unblocks everything below~~ |
+| ~~2~~ | ~~P0~~ | ~~Add GitHub Actions CI workflow for the repo itself (`nix flake check` on push)~~ | ~~Automated quality gate~~ |
+| ~~3~~ | ~~P1~~ | ~~Deprecate/drop `goPkg` parameter (dead weight — derivation never invokes `go`)~~ | ~~Cleaner API, smaller closures~~ |
+| ~~4~~ | ~~P1~~ | ~~Verify `subModuleVersionNormalize` is needed; remove if cargo-culted~~ | ~~-15 lines fragile sed~~ |
+| ~~5~~ | ~~P1~~ | ~~Namespace `repoName` by owner to prevent same-name collisions~~ | ~~Correctness~~ |
+| ~~6~~ | ~~P1~~ | ~~Add `CHANGELOG.md` for release tracking~~ | ~~Release discipline~~ |
+| ~~7~~ | ~~P2~~ | ~~Add `FEATURES.md` for feature inventory~~ | ~~Documentation~~ |
+| ~~8~~ | ~~P2~~ | ~~Add `TODO_LIST.md` for short/mid-term task tracking~~ | ~~Planning~~ |
+| ~~9~~ | ~~P2~~ | ~~Dedup `requireDeps` against existing requires~~ | ~~Correctness~~ |
+| ~~10~~ | ~~P2~~ | ~~Document `postPatchExtra` ordering in README~~ | ~~Clarity~~ |
+| ~~11~~ | ~~P2~~ | ~~Make `generate-flake.sh` configurable (target dir, no push default)~~ | ~~Portability~~ |
+| ~~12~~ | ~~P2~~ | ~~Fix `generate-flake.sh` templ sed fragility (use markers not line numbers)~~ | ~~Robustness~~ |
+| ~~13~~ | ~~P2~~ | ~~Migrate `crush-daily` from 14 individual deps to `subModules`~~ | ~~Eliminates boilerplate~~ |
+| ~~14~~ | ~~P2~~ | ~~Audit all consumers for manual `_local_deps/` workarounds~~ | ~~Cleanup~~ |
+| ~~15~~ | ~~P3~~ | ~~Add `--dry-run` option to mkPreparedSource~~ | ~~Debugging DX~~ |
+| ~~16~~ | ~~P3~~ | ~~Support `go.sum` patching~~ | ~~Completeness~~ |
+| ~~17~~ | ~~P3~~ | ~~Add integration test: build a real Go project with mkPreparedSource in CI~~ | ~~Confidence~~ |
+| ~~18~~ | ~~P3~~ | ~~Support nested sub-modules (`foo/bar/baz`)~~ | ~~Edge case~~ |
+| ~~19~~ | ~~P3~~ | ~~Add property-based tests for `repoName`/`stripVersionSuffix`~~ | ~~Regression prevention~~ |
+| ~~20~~ | ~~P3~~ | ~~Migrate consumers to `go-nix-helpers.lib.mkPreparedSource` (flake lib)~~ | ~~Better caching~~ |
+| ~~21~~ | ~~P4~~ | ~~Explore `go.work` support for workspace-based projects~~ | ~~Future-proofing~~ |
+| ~~22~~ | ~~P4~~ | ~~Add `vendorHash` auto-calculation helper~~ | ~~DX improvement~~ |
+| ~~23~~ | ~~P4~~ | ~~Add `overlays.default` for consumers to `pkgs.<name>`~~ | ~~Ergonomics~~ |
+| ~~24~~ | ~~P4~~ | ~~Generate template from source comments (prevent template drift)~~ | ~~Maintainability~~ |
+| ~~25~~ | ~~P4~~ | ~~Consider a `mkPreparedSource` NixOS check option~~ | ~~Discoverability~~ |
 
 ---
 
@@ -303,11 +303,11 @@ pure dead weight that inflates every consumer's build closure for no reason.
 
 The problem: **all 7 downstream consumers pass `goPkg = pkgs.go_1_26;`**. Three options:
 
-1. **Default it** — make `goPkg ? pkgs.go` and stop adding it to `nativeBuildInputs`.
+1.~~**Default it** — make `goPkg ? pkgs.go` and stop adding it to `nativeBuildInputs`.~~ done — decided — kept for API compat; removal planned at the first tagged release
    Backwards-compatible (consumers keep passing it, it's just ignored). Lowest risk.
-2. **Deprecate then drop** — add a deprecation warning now, drop in a future version.
+2.~~**Deprecate then drop** — add a deprecation warning now, drop in a future version.~~ done — superseded by option 1 — default kept, no warning needed
    Clean but requires consumer coordination.
-3. **Drop it now** — breaking API change. Cleanest but forces all 7 consumers to update.
+3.~~**Drop it now** — breaking API change. Cleanest but forces all 7 consumers to update.~~ done — rejected — kept for API compat; removal planned at the first tagged release
 
 I cannot determine which approach aligns with your preferred breaking-change policy
 and consumer-migration cadence. This is a one-person ecosystem decision.

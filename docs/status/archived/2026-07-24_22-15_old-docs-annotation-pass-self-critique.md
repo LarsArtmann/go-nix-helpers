@@ -69,17 +69,17 @@ The session produced two kinds of artefact:
 
 ## b) PARTIALLY DONE 🔶
 
-1. **Idempotency was checked, but reactively.** I grepped for existing
+1.~~**Idempotency was checked, but reactively.** I grepped for existing~~ **Won't implement — process note — robust idempotence is now built into the annotate tooling.**
    `## Resolution` sections early (returned empty — good), but only re-verified
    no-duplicates AFTER the auto-commit surprised me. If the watcher had
    committed mid-pass and I'd re-run the same edits, I could have double-stamped.
    I got lucky; the process was not robust.
-2. **"So what?" test — passed for all 7, but inconsistently cited.** Some
+2.~~**"So what?" test — passed for all 7, but inconsistently cited.** Some~~ done — done — this pass cites item text, not bare filenames
    appendices cite the specific `TODO_LIST.md` item text
    ("Fix `defaultSystems` hardcoding in `go-standard`"); others cite only the
    filename generically. The skill demands item-text/section citations, not
    bare filename pointers. Inconsistent rigour.
-3. **HTML annotation verified structurally** — the resolution `<section>` sits
+3.~~**HTML annotation verified structurally** — the resolution `<section>` sits~~ **Won't implement — structural check accepted; browser render verification skipped.**
    after the "Open findings" and before "Core helper deep-dive", uses existing
    `callout callout-solution` classes, no inline `style=`/`on*=`. CSP
    preserved. But I did not open the rendered HTML in a browser to confirm
@@ -89,7 +89,7 @@ The session produced two kinds of artefact:
 
 ## c) NOT STARTED ⬜
 
-1. **The `update-old-docs` "actionable-list" pattern was NOT applied.** The
+1.~~**The `update-old-docs` "actionable-list" pattern was NOT applied.** The~~ done — done — inline markers applied to all lists (docs-health pass 2026-09-24)
    skill has a dedicated section for old reports containing "Top 25 Things to
    Get Done Next" lists: strike through completed items inline with
    `~~item~~ DONE: <hash>;`. At least three reports (`2026-06-08`, `2026-06-09`,
@@ -98,13 +98,13 @@ The session produced two kinds of artefact:
    appendix summaries instead. Defensible for 25-item lists, but it is NOT the
    skill's preferred inline pattern — a reader scanning the list does not see
    per-item status without context-switching to my appendix.
-2. **AGENTS.md not updated with the auto-commit discovery.** The buildflow
+2.~~**AGENTS.md not updated with the auto-commit discovery.** The buildflow~~ done — done — AGENTS.md Git Workflow documents the auto-commit daemon
    watcher is enduring project-environment context that two prior sessions were
    confused by and a third (this one) finally explained. Per the global AGENTS.md
    "Aggressive Update Protocol," this belongs in the project `AGENTS.md`
    Gotchas. I discovered it and did not record it. (Held back only because the
    user scoped this session to "report based on this run.")
-3. **No browser-render verification of the HTML dashboard.**
+3.~~**No browser-render verification of the HTML dashboard.**~~ **Won't implement — structural check accepted.**
 
 ---
 
@@ -164,41 +164,41 @@ comparisons) before landing on it. Correct outcome, inefficient path.
 
 ### On the annotation pass itself
 
-1. **Apply the inline `DONE:` list pattern.** Revisit the three reports with
+1.~~**Apply the inline `DONE:` list pattern.** Revisit the three reports with~~ done — done — this pass struck every list inline
    "Top 25" lists and strike through completed items inline
    (`~~item~~ DONE: <hash>;`) rather than relying on appendix summaries. This
    is the skill's stated preference for actionable-item lists.
-2. **Make every TODO_LIST citation item-specific.** Replace generic "tracked in
+2.~~**Make every TODO_LIST citation item-specific.** Replace generic "tracked in~~ done — done — item-text citations used
    `TODO_LIST.md`" with the actual item text, e.g.
    `TODO_LIST.md item "Fix defaultSystems hardcoding in go-standard"`. The skill
    forbids generic pointers that fail the "so what?" test.
-3. **Reconsider the `2026-06-29` postpatch-completion report.** It has a 25-item
+3.~~**Reconsider the `2026-06-29` postpatch-completion report.** It has a 25-item~~ done — done — the 2026-06-29 report is annotated and archived (docs-health pass 2026-09-24)
    "next" list with go-nix-helpers-specific items (e.g. "excludeSubModuleDirs
    passthrough in mkGoFlake", "validatePrivateDeps smarter") that are now stale
    (mkGoFlake is deprecated). Currently LEAVE-ALONE; arguably an ANNOTATE miss.
 
 ### On process / environment
 
-4. **Record the buildflow auto-commit fact in `AGENTS.md` Gotchas.** Future
+4.~~**Record the buildflow auto-commit fact in `AGENTS.md` Gotchas.** Future~~ done — done — AGENTS.md Git Workflow section
    sessions must know: edits to this repo may be auto-committed by an external
    buildflow watcher (see `.gitignore` `buildflow-managed` markers). This
    explains every "mystery commit" in the 2026-07-23 reports and changes how a
    session should treat `git status` mid-work.
-5. **Treat scope-clarification as a hard gate, not a nicety.** The skill's
+5.~~**Treat scope-clarification as a hard gate, not a nicety.** The skill's~~ **Won't implement — process convention absorbed — the skill keeps the scope gate.**
    "ask before touching" rule exists because the failure mode (blanket edits the
    user cannot review) is catastrophic at scale. I should ask even when the set
    feels obviously small.
-6. **Pre-flight environment check.** Before a multi-file annotation pass, run a
+6.~~**Pre-flight environment check.** Before a multi-file annotation pass, run a~~ **Won't implement — process convention absorbed.**
    one-liner that detects auto-commit watchers (e.g. check for
    `buildflow-managed` markers in `.gitignore`, running `buildflow`/file-watcher
    processes). The cost is seconds; the benefit is not being surprised mid-pass.
 
 ### On verification
 
-7. **Render-verify HTML.** For HTML dashboards, open in a browser (or at least
+7.~~**Render-verify HTML.** For HTML dashboards, open in a browser (or at least~~ **Won't implement — structural check accepted.**
    confirm the new section appears in the right visual position via a structural
    check) before declaring done.
-8. **Idempotency check BEFORE each edit, not after.** Re-run the
+8.~~**Idempotency check BEFORE each edit, not after.** Re-run the~~ done — adopted — idempotence checks are standard in this pass's tooling
    `grep "## Resolution (date)"` immediately before appending, in case a
    watcher committed a partial pass.
 
@@ -211,74 +211,74 @@ comparisons) before landing on it. Correct outcome, inefficient path.
 1. Apply inline `~~item~~ DONE: <hash>;` marking to the `2026-06-08` Top-25 list
 2. Apply inline `~~item~~ DONE: <hash>;` marking to the `2026-06-09` Top-25 list
 3. Apply inline `~~item~~ DONE: <hash>;` marking to the `2026-07-23_16-15` up-to-50 list
-4. Replace all generic `TODO_LIST.md` citations with specific item text
-5. Reconsider `2026-06-29` postpatch-completion report for annotation (stale next-list)
-6. Browser-verify the `2026-06-19` HTML dashboard renders the new section correctly
+4.~~Replace all generic `TODO_LIST.md` citations with specific item text~~ done — done — item-text citations used
+5.~~Reconsider `2026-06-29` postpatch-completion report for annotation (stale next-list)~~ done — done — annotated and archived 2026-09-24
+6.~~Browser-verify the `2026-06-19` HTML dashboard renders the new section correctly~~ **Won't implement — structural check accepted.**
 
 ### Record discoveries from this session
 
-7. Add a `buildflow` auto-commit Gotcha entry to project `AGENTS.md`
-8. Add a one-line note to the two `2026-07-23` reports' auto-commit questions
+7.~~Add a `buildflow` auto-commit Gotcha entry to project `AGENTS.md`~~ done — done — AGENTS.md Git Workflow documents the daemon
+8.~~Add a one-line note to the two `2026-07-23` reports' auto-commit questions~~ done — done — both 2026-07-23 g.1 questions now carry the buildflow answer inline
    pointing to the buildflow finding (so a future reader's "what created these?"
    question is answered in-place)
 
 ### Process hardening
 
-9. Add a pre-flight "detect auto-commit watcher" step to the update-old-docs
+9.~~Add a pre-flight "detect auto-commit watcher" step to the update-old-docs~~ **Won't implement — absorbed into the workflow conventions.**
    workflow note (check `.gitignore` for `buildflow-managed`, check running
    daemons)
-10. Make scope-confirmation a non-optional first tool call for any "update all
+10.~~Make scope-confirmation a non-optional first tool call for any "update all~~ **Won't implement — absorbed into the workflow conventions.**
     the old X" request
 
 ### Open work carried from the annotated reports (still open, tracked in TODO_LIST.md)
 
-11. Fix `defaultSystems` hardcoding in `go-standard` → use `import inputs.systems`
-12. Create a real downstream consumer end-to-end test for `go-standard`
-13. Delete or formally deprecate `mkGoFlake.nix` (remove `flake.lib.mkGoFlake`)
-14. Mark `templates/go-flake-parts/` as legacy or delete it
-15. Add `LICENSE` file (MIT) and license badge
-16. Set up GitHub Actions CI for `nix flake check` on push/PR
-17. Replace static "nix flake check" README badge with a dynamic CI badge
-18. Add `CONTRIBUTING.md`
-19. Add `.github` issue templates, PR template, and workflows
-20. Add unit/integration tests for `go-standard` module outputs
-21. Write migration guide from `mkGoFlake.nix` to `go-standard`
-22. Make `scripts/generate-flake.sh` configurable and non-interactive
-23. Add `enableCheck` option to `go-standard`
-24. Add `enableOverlay` option to `go-standard`
-25. Add `version` option to override git-derived version
-26. Support multiple packages in `go-standard` (monorepo binaries)
-27. Audit all downstream consumers for manual `_local_deps/` workarounds
-28. Add architecture diagram to README
-29. Add troubleshooting/FAQ section to README
-30. Add real private-repo integration test in CI
-31. Add `buildFlags` option to `go-standard` for build tags
-32. Add `enableGolangciLint` toggle to `go-standard`
-33. Add `enableGofumpt` / `enableGoimports` toggles in treefmt
-34. Add `nix run .#fmt` alias app
-35. Register `maintainers.larsartmann` in nixpkgs
-36. Add shell completions for generated apps
-37. Add man pages for `mkPreparedSource` and `go-standard` options
-38. Resolve `repoName` same-name different-owner collision risk
-39. Dedup `requireDeps` against existing requires
-40. Verify whether `subModuleVersionNormalize` sed is cargo-culted (remove if so)
-41. Investigate `goPkg` dead-weight parameter (deprecate/default/drop decision)
-42. Document `postPatchExtra` ordering in README (currently only in AGENTS.md)
-43. Add `--dry-run` option to `mkPreparedSource`
-44. Support `go.sum` patching in `mkPreparedSource`
-45. Add property-based tests for `repoName`, `stripVersionSuffix`, `discoverSubModules`
-46. Add CI matrix testing `go-standard` with common consumer configurations
-47. Publish to nixpkgs or nix-community
-48. Semver-tagged releases with release notes
-49. Public documentation site (Astro/Starlight)
-50. Standardize status-report format (Markdown vs HTML — the skill says HTML,
+11.~~Fix `defaultSystems` hardcoding in `go-standard` → use `import inputs.systems`~~ done — shipped — configurable systems option
+12.~~Create a real downstream consumer end-to-end test for `go-standard`~~ done — 10 real consumers + templateEval; build E2E in TODO_LIST T3
+13.~~Delete or formally deprecate `mkGoFlake.nix` (remove `flake.lib.mkGoFlake`)~~ done — trace shipped; deletion gated on v0.1.0 (TODO_LIST Blocked)
+14.~~Mark `templates/go-flake-parts/` as legacy or delete it~~ done — deprecated with banner
+15.~~Add `LICENSE` file (MIT) and license badge~~ done — shipped `ce35aa5`
+16.~~Set up GitHub Actions CI for `nix flake check` on push/PR~~ done — shipped
+17.~~Replace static "nix flake check" README badge with a dynamic CI badge~~ done — shipped
+18.~~Add `CONTRIBUTING.md`~~ done — shipped
+19.~~Add `.github` issue templates, PR template, and workflows~~ done — shipped
+20.~~Add unit/integration tests for `go-standard` module outputs~~ done — shipped — test-module.nix (121 assertions)
+21.~~Write migration guide from `mkGoFlake.nix` to `go-standard`~~ done — shipped — docs/migration-guide.md
+22.~~Make `scripts/generate-flake.sh` configurable and non-interactive~~ done — shipped — full rewrite
+23.~~Add `enableCheck` option to `go-standard`~~ done — shipped
+24.~~Add `enableOverlay` option to `go-standard`~~ done — shipped
+25.~~Add `version` option to override git-derived version~~ done — shipped
+26.~~Support multiple packages in `go-standard` (monorepo binaries)~~ done — shipped — packages option + G2
+27.~~Audit all downstream consumers for manual `_local_deps/` workarounds~~ done — done — 2026-06-29 + 2026-08-10 audits
+28.~~Add architecture diagram to README~~ done — shipped
+29.~~Add troubleshooting/FAQ section to README~~ done — shipped
+30.~~Add real private-repo integration test in CI~~ done — moved to TODO_LIST Blocked
+31.~~Add `buildFlags` option to `go-standard` for build tags~~ done — shipped
+32.~~Add `enableGolangciLint` toggle to `go-standard`~~ done — shipped
+33.~~Add `enableGofumpt` / `enableGoimports` toggles in treefmt~~ done — shipped
+34.~~Add `nix run .#fmt` alias app~~ done — shipped
+35.~~Register `maintainers.larsartmann` in nixpkgs~~ done — moved to TODO_LIST Blocked
+36.~~Add shell completions for generated apps~~ done — shipped — enableCompletions
+37.~~Add man pages for `mkPreparedSource` and `go-standard` options~~ done — shipped
+38.~~Resolve `repoName` same-name different-owner collision risk~~ **Won't implement — no incidents — dropped.**
+39.~~Dedup `requireDeps` against existing requires~~ done — shipped
+40.~~Verify whether `subModuleVersionNormalize` sed is cargo-culted (remove if so)~~ done — verified load-bearing — `[.]` style
+41.~~Investigate `goPkg` dead-weight parameter (deprecate/default/drop decision)~~ done — decided — kept for API compat; drop planned at the first tagged release
+42.~~Document `postPatchExtra` ordering in README (currently only in AGENTS.md)~~ done — documented — AGENTS.md gotcha + README
+43.~~Add `--dry-run` option to `mkPreparedSource`~~ done — moved to ROADMAP Theme 3
+44.~~Support `go.sum` patching in `mkPreparedSource`~~ **Won't implement — moot — the FOD runs go mod tidy + vendor.**
+45.~~Add property-based tests for `repoName`, `stripVersionSuffix`, `discoverSubModules`~~ done — shipped — checks.pureFunctions
+46.~~Add CI matrix testing `go-standard` with common consumer configurations~~ done — moduleTest covers consumer configs
+47.~~Publish to nixpkgs or nix-community~~ done — moved to ROADMAP Theme 4
+48.~~Semver-tagged releases with release notes~~ done — moved to TODO_LIST Blocked (v0.1.0)
+49.~~Public documentation site (Astro/Starlight)~~ done — moved to ROADMAP Theme 4
+50.~~Standardize status-report format (Markdown vs HTML — the skill says HTML,~~ done — decided — Markdown; the convention has held since
     this repo uses Markdown; decide one)
 
 ---
 
 ## g) Questions I CANNOT Figure Out Myself 🤔
 
-### 1. Is the `buildflow` auto-commit watcher intentional, and should sessions work around it?
+### ~~1. Is the `buildflow` auto-commit watcher intentional, and should sessions work around it?~~ done — expected per AGENTS.md Git Workflow — sessions keep working; the daemon sweeps
 
 I identified (via `.gitignore`'s `buildflow-managed` markers and commit
 `7418028`'s timing) that an external buildflow watcher auto-committed 5 of my
@@ -290,7 +290,7 @@ expected and just keep working, or should I pause/disable it before multi-file
 editing passes so you can review the diff before it commits?** This changes
 whether `git status` mid-session is meaningful at all.
 
-### 2. Should I now apply the skill's inline `DONE:` list-strike pattern to the three "Top 25" lists?
+### ~~2. Should I now apply the skill's inline `DONE:` list-strike pattern to the three "Top 25" lists?~~ done — done — this pass (2026-09-24) struck every list inline
 
 I chose appendix summaries over the skill's preferred per-item
 `~~item~~ DONE: <hash>;` inline marking for the three reports with long
@@ -298,7 +298,7 @@ actionable lists. **Do you want me to go back and strike through completed list
 items inline (the skill's preferred form), or are the appendix summaries
 sufficient given the lists are 25-50 items each?**
 
-### 3. Did you want the scope to include the living docs (README/FEATURES/TODO/ROADMAP/CHANGELOG) too?
+### 3.~~Did you want the scope to include the living docs (README/FEATURES/TODO/ROADMAP/CHANGELOG) too?~~ done — decided: living docs are docs-health territory; this pass (2026-09-24) covered them
 
 I excluded them because the `update-old-docs` skill explicitly says living docs
 are `docs-health` territory (rewrite in place, not annotate). But the original
