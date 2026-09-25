@@ -44,6 +44,9 @@ This project has not made a tagged release yet; all changes below are in
 
 ### Added
 
+- `passthru.go` on module packages — the resolved Go toolchain is exposed
+  explicitly (`nix eval .#default.go.version`) instead of relying on the
+  implicit derivation attr; consumer passthru keys are preserved.
 - Old-nixpkgs CI matrix job (`old-nixpkgs-module-test`) — builds moduleTest
   against a pinned 2026-06 nixpkgs (go_1_26 era, no go_1_27), proving the
   goPkgAttr auto-default degrades gracefully and the floor check throws
