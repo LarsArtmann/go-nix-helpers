@@ -441,6 +441,14 @@ let
       builtins.attrNames pkgs
     )
   );
+  # mockSelf's go.mod floor (see the fixture); when the second-newest
+  # branch falls below it (older nixpkgs: newest go_1_26, second go_1_25),
+  # the stale-pin config must THROW via the floor check — correct
+  # behavior, not a warning-path regression.
+  mockFloor = "1.26";
+  olderMeetsFloor =
+    olderGoAttr == null
+    || lib.versionAtLeast (pkgs.${olderGoAttr}.version) mockFloor;
 
   # --- lintAsCheck test ------------------------------------------------------
   lintAsCheckCfg = mkPerSystemConfig { lintAsCheck = true; };
@@ -1076,9 +1084,9 @@ let
       && lib.hasInfix "toolchain is 1.24.9" msg
     ) "message content")
     # --- Behavioral: stale goPkgAttr pin warning ---
-    (assertCheck "stale goPkgAttr pin warns without breaking evaluation" (
-      olderGoAttr == null || stalePinEval.success
-    ) "eval success (warning on stderr only)")
+    (assertCheck "stale pin: eval survives warning above floor; floor-check throws below it" (
+      if olderMeetsFloor then stalePinEval.success else !stalePinEval.success
+    ) "outcome matches floor interaction")
     # --- G2: per-package extraBuildAttrs ----------------------------------
     (assertCheck "packages.<name>.extraBuildAttrs option default is {}" (
       let

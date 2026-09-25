@@ -53,6 +53,30 @@ jobs:
           nix build .#checks.$SYSTEM.pureFunctions
           nix build .#checks.$SYSTEM.structural
 
+  old-nixpkgs-module-test:
+    # Auto-default degradation: against an older nixpkgs (2026-06-22 rev —
+    # go_1_26 era, no go_1_27), the moduleTest must stay green: the
+    # goPkgAttr auto-default resolves the newest available branch, and a
+    # stale pin below the consumer's go.mod floor throws via the floor
+    # check (asserted as the correct outcome). Catches hardcoded-version
+    # regressions that only today's nixpkgs would hide.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v418de8f4afa59f8f81d # v4
+
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@e50d5f73bfe71c2dd0aa4218de8f4afa59f8f81d # v16
+
+      - name: Cache Nix Store
+        uses: DeterminateSystems/magic-nix-cache-action@6221693898146dc97e38ad0e013488a16477a4c4 # v9
+
+      - name: Module test against the pinned old nixpkgs
+        run: |
+          SYSTEM=$(nix eval --raw --impure --expr 'builtins.currentSystem')
+          nix build \
+            --override-input nixpkgs github:NixOS/nixpkgs/567a49d1913ce81ac6e9582e3553dd90a955875f \
+            .#checks.$SYSTEM.moduleTest
+
   smoke-test:
     runs-on: ubuntu-latest
     steps:
