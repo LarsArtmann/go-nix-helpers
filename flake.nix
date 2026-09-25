@@ -24,7 +24,14 @@
       ...
     }:
     flake-parts.lib.mkFlake { inherit inputs; } {
-      systems = import inputs.systems;
+      # Match go-standard's default system set (nix-systems/default minus
+      # x86_64-darwin, which nixpkgs 26.11 dropped) — importing the full
+      # default set generated outputs for a system nothing can build.
+      systems = [
+        "x86_64-linux"
+        "aarch64-linux"
+        "aarch64-darwin"
+      ];
       imports = [ inputs.treefmt-nix.flakeModule ];
 
       flake = {
@@ -52,12 +59,20 @@
         # go-standard is a composite module that bundles treefmt-nix internally,
         # so consumers do NOT need to declare treefmt-nix or systems as inputs.
         # Consumer needs only: nixpkgs, flake-parts, go-nix-helpers.
-        flakeModules.go-standard = {
-          imports = [
-            inputs.treefmt-nix.flakeModule
-            ./modules/go-standard.nix
-          ];
-        };
+        flakeModules.go-standard =
+          { config, ... }:
+          {
+            imports = [
+              inputs.treefmt-nix.flakeModule
+              ./modules/go-standard.nix
+            ];
+            # go-standard.systems is the single systems knob: map it onto
+            # flake-parts' systems so outputs generate exactly for the
+            # configured set. (Previously the option was documented but never
+            # wired — flake-parts' own default silently won, and consumers
+            # with x86_64-darwin inherited a nixpkgs-dropped system.)
+            config.systems = config.go-standard.systems;
+          };
       };
 
       perSystem =
