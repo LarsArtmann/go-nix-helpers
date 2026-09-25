@@ -5,11 +5,14 @@
 Root claim backing: every "done" below is backed by tool output from this
 session; every caveat is named, not buried.
 
-**Session end state:** tree clean at `499187f`, master ahead 31, **NOT pushed**.
-Last FULL `nix flake check` (all builds): PASSED — but it ran BEFORE the final
-`passthru.go` and script-quoting commits; those were verified individually
-(moduleTest build, docsAnnotations build, gates, shellcheck). A closing full
-sweep is queued as next-work #1.
+**Session end state:** tree clean at `89b0405`. Master through `bb56b78` was
+pushed DURING this report's preparation (not by this session — external
+push observed at ~09:47), so CI is now validating the whole D/E/F suite;
+the two remaining local commits (`499187f` script-quote fix, `89b0405` this
+report) are unpushed. Last FULL `nix flake check` (all builds): PASSED —
+but it ran BEFORE the final `passthru.go` and script-quoting commits; those
+were verified individually (moduleTest build, docsAnnotations build, gates,
+shellcheck). A closing full sweep is queued as next-work #1.
 
 ## a) FULLY DONE (verified this session)
 
@@ -119,7 +122,7 @@ sweep is queued as next-work #1.
 
 ## g) Up to 3 questions I CANNOT answer myself
 
-1. **Push master now?** 31 commits sit unpushed (the D-tier suite + tonight's work, all locally build-verified). Pushing makes GitHub Actions the independent oracle and unblocks the T34 option sweep — but you've said don't push unless asked, so: may I?
+1. **Push:** master through `bb56b78` is now on origin (external push, ~09:47) — CI should be validating the suite right now. The two remaining commits (script fix + this report) are unpushed: push them as-is, or hold until CI's verdict on the batch?
 2. **T15 (templ generate inside module builds):** confirm closing as won't-implement? (Consumers commit `*_templ.go`; build-time generation is dead weight and a templ-version reproducibility risk; the motivating override is already gone from sbts.)
 3. **The binfmt fix happened but nix.conf auto-GC did not** (min-free=5G / max-free=30G still armed). The canary will keep warning and the mid-check source-copy deletion risk remains. Will you raise/disable auto-GC + restart the daemon (root), or should the workflow keep working around it (worktrees, commit-before-check)?
 
