@@ -120,11 +120,12 @@ failure and session end.
      (trusted-users = root only), `sandbox = false` does not bypass it.
      **Fix (root): `systemctl restart systemd-binfmt.service`** (or restore the
      `boot.binfmt.emulatedSystems` mount), then daemon picks it up.
-   - **Nixpkgs pin closure loss**: the flake's old nixpkgs rev (4975466)
-     lost substitutable bootstrap paths (`l622p70...-source` "don't know how
-     to build"). Fixed by `nix flake lock --update-input nixpkgs` (low risk:
-     test mocks use vendorHash=null; `expectedAutoGoAttr` auto-adapts).
-     **Uncommitted lock bump is in the tree.**
+   - **`stdenv.sh` closure loss detour:** one failure phase implicated the
+     old nixpkgs pin's `stdenv.sh` ("don't know how to build"). A
+     `nix flake update nixpkgs` was attempted — it was a NO-OP (4975466 IS
+     the current nixos-unstable tip; no lock change landed, none is pending).
+     In hindsight this path was collateral of the same GC/dirty-tree races,
+     not a distinct closure problem.
    - **Intermittent `path ... -source is not valid` during flake check.**
      ROOT CAUSE FOUND (initial hypothesis in this bullet was WRONG — it is
      NOT a pathExists-context bug in the floor check): nix 2.34's handling of
@@ -221,10 +222,8 @@ failure and session end.
    systemd-binfmt.service` as root? Everything local-build-shaped is blocked
    on it; without it I can only eval-verify (CI would cover the rest after a
    push you haven't requested).
-2. **nixpkgs bump:** I bumped the nixpkgs input to restore substitutability
-   after the daemon restart invalidated the old pin's closure. Keep (commit
-   with rationale), or pin back to a specific rev once the host is stable?
-   Keeping it changes what CI tests (newer Go attrs may appear — see f.46).
+2. **Nixpkgs bump question withdrawn** — the attempted bump was a no-op
+   (4975466 is the current nixos-unstable tip). No lock change is pending.
 3. **D10 redesign confirmation:** I chose NOT to add `templ generate` to
    module build phases (sbts commits generated files; regenerating in builds
    risks templ-version-dependent output) and will instead delete the vestigial
