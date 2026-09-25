@@ -562,14 +562,11 @@ in
             if floorStr == null then
               null
             else if cmp (toNums floorStr) (toNums goPkg.version) == 1 then
-              throw ''
-                go-standard: go.mod requires go ${floorStr} but the resolved toolchain is ${goPkg.version} (${if cfg.goPkgAttr != null then cfg.goPkgAttr else "auto"}).
-                GOTOOLCHAIN=local forbids toolchain downloads, so every build and devShell `go` invocation would fail.
-                Fix one of:
-                  1. Pin the newest nixpkgs branch: goPkgAttr = "go_1_XX" (or leave null for auto)
-                  2. Build the exact version from source: goTarballVersion = "${floorStr}" + goTarballHash
-                  3. Update the nixpkgs input so a newer go_1_XX branch is packaged
-              ''
+              throw (pure.goModFloorMessage {
+                inherit floorStr;
+                toolchainVersion = goPkg.version;
+                inherit (cfg) goPkgAttr;
+              })
             else
               null;
 

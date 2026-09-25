@@ -326,6 +326,46 @@ let
     )
   ];
 
+  # --- goModFloorMessage tests (pure message builder for the floor check) ---
+  floorMsg = pure.goModFloorMessage;
+
+  floorMsgBasic = [
+    (assertEq "floorMsg: names the requirement"
+      (builtins.match ".*requires go 1\.28.*" (
+        floorMsg { floorStr = "1.28"; toolchainVersion = "1.26.4"; }
+      ) != null)
+      true
+    )
+    (assertEq "floorMsg: names the resolved toolchain"
+      (builtins.match ".*toolchain is 1\.26\.4.*" (
+        floorMsg { floorStr = "1.28"; toolchainVersion = "1.26.4"; }
+      ) != null)
+      true
+    )
+    (assertEq "floorMsg: auto label when goPkgAttr is null"
+      (builtins.match ".*\\(auto\\).*" (
+        floorMsg { floorStr = "1.28"; toolchainVersion = "1.26.4"; }
+      ) != null)
+      true
+    )
+    (assertEq "floorMsg: pinned attr label when goPkgAttr is set"
+      (builtins.match ".*\\(go_1_26\\).*" (
+        floorMsg {
+          floorStr = "1.28";
+          toolchainVersion = "1.26.4";
+          goPkgAttr = "go_1_26";
+        }
+      ) != null)
+      true
+    )
+    (assertEq "floorMsg: offers the tarball fix with the floor version"
+      (builtins.match ".*goTarballVersion = \"1\.28\".*" (
+        floorMsg { floorStr = "1.28"; toolchainVersion = "1.26.4"; }
+      ) != null)
+      true
+    )
+  ];
+
   allChecks =
     stripBasic
     ++ stripIdempotence
@@ -335,6 +375,7 @@ let
     ++ repoNoSlash
     ++ newestGoBasic
     ++ staleGoBasic
+    ++ floorMsgBasic
     ++ goBaseBasic;
 in
 pkgs.runCommand "test-pure-functions" { } ''
