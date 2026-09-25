@@ -166,6 +166,9 @@ let
     (assertCheck "enableGopls default is true" (cfg.enableGopls == true) "true")
     (assertCheck "deps default is empty" (cfg.deps == { }) "{}")
     (assertCheck "requireDeps default is empty" (cfg.requireDeps == { }) "{}")
+    (assertCheck "goExperiment default is null" (cfg.goExperiment == null) "null")
+    (assertCheck "cgoEnabled default is null" (cfg.cgoEnabled == null) "null")
+    (assertCheck "completionStyle default is flag" (cfg.completionStyle == "flag") "flag")
     (assertCheck "enableCheck default is true" (cfg.enableCheck == true) "true")
     (assertCheck "enableOverlay default is true" (cfg.enableOverlay == true) "true")
     (assertCheck "buildFlags default is empty" (cfg.buildFlags == [ ]) "[]")
@@ -357,6 +360,18 @@ let
     requireDeps = {
       "github.com/larsartmann/mock-require-dep" = "v0.0.0";
     };
+  };
+
+  # --- goExperiment / cgoEnabled propagation test ---------------------------
+  goEnvCfg = mkPerSystemConfig {
+    goExperiment = "jsonv2";
+    cgoEnabled = false;
+  };
+
+  # --- completionStyle test (cobra-style subcommand) -------------------------
+  cobraCompletionsCfg = mkPerSystemConfig {
+    enableCompletions = true;
+    completionStyle = "subcommand";
   };
 
   # --- GOPRIVATE with custom privateGlobPattern + deps --------------------
@@ -842,6 +857,39 @@ let
     (assertCheck "requireDeps entries reach mkPreparedSource postPatch"
       (lib.hasInfix "github.com/larsartmann/mock-require-dep" requireDepsCfg.packages.default.src.postPatch)
       "require line in postPatch"
+    )
+    # --- Behavioral: goExperiment/cgoEnabled reach build env + devShell ---
+    (assertCheck "goExperiment reaches package build env"
+      (goEnvCfg.packages.default.env.GOEXPERIMENT or null == "jsonv2")
+      "GOEXPERIMENT=jsonv2 in env"
+    )
+    (assertCheck "cgoEnabled=false reaches package build env"
+      (goEnvCfg.packages.default.env.CGO_ENABLED or null == "false")
+      "CGO_ENABLED=false in env"
+    )
+    (assertCheck "goExperiment reaches devShell"
+      (goEnvCfg.devShells.default.GOEXPERIMENT or null == "jsonv2")
+      "GOEXPERIMENT in devShell"
+    )
+    (assertCheck "cgoEnabled reaches devShell"
+      (goEnvCfg.devShells.default.CGO_ENABLED or null == "false")
+      "CGO_ENABLED in devShell"
+    )
+    (assertCheck "go env vars absent when options are null"
+      (!(psCfg.devShells.default ? GOEXPERIMENT) && !(psCfg.devShells.default ? CGO_ENABLED))
+      "no env vars by default"
+    )
+    # --- Behavioral: completionStyle switches the invocation ---
+    (assertCheck "default completionStyle uses --completion flag"
+      (lib.hasInfix "--completion bash" completionsCfg.packages.default.postInstall)
+      "--completion in postInstall"
+    )
+    (assertCheck "subcommand completionStyle uses cobra-style command"
+      (
+        lib.hasInfix "completion bash" cobraCompletionsCfg.packages.default.postInstall
+        && !(lib.hasInfix "--completion" cobraCompletionsCfg.packages.default.postInstall)
+      )
+      "completion subcommand in postInstall"
     )
     # --- Behavioral: goPkgAttr null auto-resolves to the newest branch ---
     (assertCheck "goPkgAttr null resolves to newest go_1_XX branch" (

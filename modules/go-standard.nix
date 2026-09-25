@@ -266,6 +266,40 @@ in
         Requires the binary to support `--completion <shell>` subcommand
         (e.g. cobra, urfave/cli). Emits a build-time warning if the binary
         doesn't support completions instead of silently doing nothing.
+        See `completionStyle` for cobra-style `completion <shell>` commands.
+      '';
+    };
+
+    completionStyle = lib.mkOption {
+      type = lib.types.enum [
+        "flag"
+        "subcommand"
+      ];
+      default = "flag";
+      description = ''
+        How the binary exposes shell completions (only used when
+        enableCompletions is true): "flag" invokes
+        `<binary> --completion <shell>` (urfave/cli style, the default);
+        "subcommand" invokes `<binary> completion <shell>` (cobra style).
+      '';
+    };
+
+    goExperiment = lib.mkOption {
+      type = lib.types.nullOr lib.types.str;
+      default = null;
+      description = ''
+        GOEXPERIMENT setting for the package build AND devShells
+        (e.g. "jsonv2"). null leaves the variable unset so the Go
+        toolchain's default experiment set applies.
+      '';
+    };
+
+    cgoEnabled = lib.mkOption {
+      type = lib.types.nullOr lib.types.bool;
+      default = null;
+      description = ''
+        CGO_ENABLED setting for the package build AND devShells.
+        null leaves the platform/toolchain default in place.
       '';
     };
 
@@ -595,6 +629,16 @@ in
             a
           else
             a + "\n" + b;
+
+        # The completion command word: urfave/cli style `--completion <shell>`
+        # (flag, default) or cobra style `completion <shell>` (subcommand).
+        completionWord = if cfg.completionStyle == "subcommand" then "completion" else "--completion";
+
+        # Go env vars from typed options; empty when both are unset (null).
+        optionEnv =
+          (lib.optionalAttrs (cfg.goExperiment != null) { GOEXPERIMENT = cfg.goExperiment; })
+          // (lib.optionalAttrs (cfg.cgoEnabled != null) { CGO_ENABLED = toString cfg.cgoEnabled; });
+
         mkGoPackage =
           pkgName: subPkgs: pkgDesc: pkgExtraBuildAttrs:
           let
@@ -615,20 +659,21 @@ in
               # Falls back to a clear warning instead of silently installing
               # empty completion files.
               # timeout prevents a hanging binary from blocking the build.
-              if ! timeout 10 $out/bin/${pkgName} --completion bash >/dev/null 2>&1; then
+              if ! timeout 10 $out/bin/${pkgName} ${completionWord} bash >/dev/null 2>&1; then
                 echo "" >&2
                 echo "=======================================================" >&2
                 echo "go-standard: enableCompletions is enabled but ${pkgName}" >&2
-                echo "does not support the --completion subcommand." >&2
+                echo "does not support ${cfg.completionStyle}-style completions." >&2
                 echo "Shell completions were NOT installed." >&2
-                echo "Either set enableCompletions = false or ensure the binary" >&2
-                echo "uses a framework that supports --completion (cobra, urfave/cli)." >&2
+                echo "Either set enableCompletions = false, pick the right" >&2
+                echo "completionStyle, or ensure the binary uses a framework" >&2
+                echo "that supports them (cobra, urfave/cli)." >&2
                 echo "=======================================================" >&2
               else
                 installShellCompletion --cmd ${pkgName} \
-                  --bash <(timeout 10 $out/bin/${pkgName} --completion bash 2>/dev/null || true) \
-                  --zsh <(timeout 10 $out/bin/${pkgName} --completion zsh 2>/dev/null || true) \
-                  --fish <(timeout 10 $out/bin/${pkgName} --completion fish 2>/dev/null || true)
+                  --bash <(timeout 10 $out/bin/${pkgName} ${completionWord} bash 2>/dev/null || true) \
+                  --zsh <(timeout 10 $out/bin/${pkgName} ${completionWord} zsh 2>/dev/null || true) \
+                  --fish <(timeout 10 $out/bin/${pkgName} ${completionWord} fish 2>/dev/null || true)
               fi
             '';
             mergedPostInstall = completionPostInstall + combinedConcat.postInstall;
@@ -668,6 +713,11 @@ in
             }
             // autoDepFodAttrs
             // combinedOther
+            // (lib.optionalAttrs (optionEnv != { }) {
+              # Typed options win inside env, but a consumer's own
+              # extraBuildAttrs.env keys are preserved.
+              env = (combinedOther.env or { }) // optionEnv;
+            })
           );
 
         # Build the default package (always present)
@@ -695,7 +745,7 @@ in
         autoGoPrivateEnv =
           if cfg.deps != { } && cfg.autoGoPrivate then { GOPRIVATE = cfg.privateGlobPattern; } else { };
 
-        finalShellExtraEnv = autoGoPrivateEnv // cfg.shellExtraEnv;
+        finalShellExtraEnv = autoGoPrivateEnv // optionEnv // cfg.shellExtraEnv;
       in
       {
         packages = {
