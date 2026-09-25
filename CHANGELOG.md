@@ -10,15 +10,48 @@ This project has not made a tagged release yet; all changes below are in
 
 ## [Unreleased]
 
+### Fixed
+
+- `cgoEnabled = false` was a silent no-op: the option used Nix's `toString`
+  on booleans, and `toString false` is `""` — which Go treats as unset,
+  leaving cgo enabled. CGO_ENABLED now uses Go's canonical `0`/`1` values.
+- Completions `postInstall` comment hardcoded `--completion` regardless of
+  `completionStyle` (misleading in build logs and tripping style tests);
+  now interpolates the configured completion word.
+- 8 moduleTest assertions shipped never-green while the build host was down
+  (written against imagined behavior): wrong warning-text expectations,
+  assertions on `env` after `mkDerivation` consumes it, and message-content
+  checks via `toString` of tryEval-captured errors — which is always `""`
+  on Nix 2.34. Rewritten against real observables (flattened derivation
+  attrs, the pure floor-message builder, throw-site source text). Suites
+  now honestly green: moduleTest 139 assertions, pureFunctions 61 checks.
+
 ### Added
 
+- `checks.docsAnnotations` — docs-health annotate discipline enforced by
+  `nix flake check`: gate 1 requires every archived status report to carry
+  at least one strikethrough resolution; gate 2 (vendored `check-rows.py`
+  with upstream attribution) fails on tables mixing struck and unstruck
+  rows. Guard-the-guard verified red on planted defects; two informational
+  sections carry explicit "intentionally bare" exemption notes.
+- Stale `goPkgAttr` pin warning — pinning a real but non-newest go_1_XX
+  branch traces an informational warning naming the newest branch. Decision
+  logic lives in `pure-functions.staleGoAttrName` (6 property tests).
+- `lib.newestGoAttr` — newest go_1_XX branch of this flake's nixpkgs pin;
+  `dashboard.sh` derives GO_LATEST from it (last manual-bump site removed).
+- `scripts/nix-health.sh` — pre-flight canary for local verification
+  batches: binfmt-mount presence vs nix.conf references, daemon reachability
+  and age, auto-GC threshold exposure, store headroom. Born from the
+  2026-09-25 host incident where a daemon restart silently broke every
+  local build for hours.
 - Eval-time go.mod floor check — the module reads the consumer's root go.mod
   and throws when its `go` directive exceeds the resolved toolchain
   (GOTOOLCHAIN=local makes that a guaranteed build failure). The message
-  names both versions and three fixes (goPkgAttr pin, goTarball pair,
-  nixpkgs update). Comparison is numeric per component with
-  longer-list-wins prefix semantics, matching Go ("1.27" < "1.27.1");
-  version suffixes from custom overrides ("1.26.4-custom") are tolerated.
+  (pure, test-assertable `goModFloorMessage`) names both versions and three
+  fixes (goPkgAttr pin, goTarball pair, nixpkgs update). Comparison is
+  numeric per component with longer-list-wins prefix semantics, matching Go
+  ("1.27" < "1.27.1"); version suffixes from custom overrides
+  ("1.26.4-custom") are tolerated.
 - `goExperiment` (nullOr str), `cgoEnabled` (nullOr bool), and
   `completionStyle` (enum flag/subcommand) options. `goExperiment`/`cgoEnabled`
   set GOEXPERIMENT/CGO_ENABLED in both the package build env and devShells

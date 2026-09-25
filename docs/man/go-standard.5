@@ -149,8 +149,9 @@ null leaves the variable unset so the Go toolchain's default experiment set
 applies.
 .TP
 .BR cgoEnabled " (nullOr bool, default: null)"
-CGO_ENABLED setting for the package build AND devShells. null leaves the
-platform/toolchain default in place.
+CGO_ENABLED setting for the package build AND devShells, using Go's
+canonical \fB0\fR/\fB1\fR values. null leaves the platform/toolchain
+default in place.
 .TP
 .BR buildFlags " (list str, default: [])"
 Extra build flags passed to go build (e.g. build tags).
@@ -224,6 +225,12 @@ matching Go's own semantics.
 .BR templ-committed
 Throws at eval when any \fB.templ\fR file lacks its committed
 \fB*_templ.go\fR sibling.
+.TP
+.BR stale-pin\ warning
+Traces a warning when \fBgoPkgAttr\fR pins a real but non-newest go_1_XX
+branch of the consumer's nixpkgs — usually a stale pin, since the auto
+default (null) resolves newest. Informational only; deliberate old pins
+may ignore it.
 .SH OUTPUTS
 .TP
 .BR packages.default
