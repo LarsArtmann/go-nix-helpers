@@ -557,6 +557,15 @@ in
           else
             null;
 
+        # deps (mkPreparedSource) force proxyVendor = false: vendoring must
+        # resolve through the injected _local_deps replaces, not the Go proxy.
+        # Say so instead of silently flipping the consumer's explicit true.
+        proxyVendorWarning =
+          if usePreparedSource && cfg.proxyVendor then
+            builtins.trace "warning: go-standard.proxyVendor = true is ignored when deps are set — prepared-source builds vendor via the injected _local_deps replaces, never the Go proxy." null
+          else
+            null;
+
         finalLdflags =
           if cfg.ldflags != null then
             cfg.ldflags
@@ -721,10 +730,12 @@ in
           );
 
         # Build the default package (always present)
-        # vendorHashWarning is referenced here to force evaluation of the
-        # placeholder-detection trace at build time.
-        package = builtins.seq vendorHashWarning (
-          mkGoPackage cfg.pname cfg.subPackages cfg.description { }
+        # vendorHashWarning/proxyVendorWarning are referenced here to force
+        # evaluation of their detection traces when packages are evaluated.
+        package = builtins.seq proxyVendorWarning (
+          builtins.seq vendorHashWarning (
+            mkGoPackage cfg.pname cfg.subPackages cfg.description { }
+          )
         );
 
         # Build extra packages when monorepo config is set

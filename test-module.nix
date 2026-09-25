@@ -491,6 +491,60 @@ let
     in
     perSysEval.config.checks;
 
+  # --- mkPreparedSource rejects glob metachars in excludeSubModuleDirs -----
+  # Entries are spliced into a shell case PATTERN; a metachar would silently
+  # change matching. Eval-time throw with a named contract beats a broken
+  # discovery sweep at build time.
+  mkPreparedSourceLib = import ./mkPreparedSource.nix {
+    inherit pkgs lib;
+    goPkg = pkgs.go;
+  };
+  badExcludeEval =
+    builtins.tryEval
+      ((mkPreparedSourceLib {
+        name = "bad-exclude";
+        version = "test";
+        src = mockSrc;
+        excludeSubModuleDirs = [ "test*dir" ];
+      }).outPath);
+
+  # --- mkGoFlake (deprecated) eval smoke ------------------------------------
+  # Two consumers still ship the deprecated path; a minimal config must keep
+  # evaluating (module + perSystem outputs) until it is deleted post-v0.1.0.
+  # The auto-default logic inside is shared with go-standard via
+  # pure-functions.goBaseFrom, so this also guards that wiring.
+  mkGoFlakeModule = import ./mkGoFlake.nix {
+    inputs = gnhInputs // { systems = ./test-assets/systems.nix; };
+    self = mockSelf;
+    pname = "smoke";
+    version = "0.0.0";
+    vendorHash = null;
+    description = "smoke";
+    src = mockSelf;
+  };
+  mkGoFlakeEval = lib.evalModules {
+    modules = [
+      flakePartsStub
+      mkGoFlakeModule
+    ];
+  };
+  mkGoFlakePerSystemEval = lib.evalModules {
+    modules = [
+      perSystemStubOptions
+      (
+        let
+          fn = mkGoFlakeEval.config.perSystem;
+        in
+        if builtins.isFunction fn then fn else _: fn
+      )
+    ];
+    specialArgs = {
+      inherit pkgs lib;
+      config = mkGoFlakePerSystemEval.config or { };
+    };
+  };
+  mkGoFlakeSmoke = builtins.tryEval (mkGoFlakePerSystemEval.config.packages ? default);
+
   # --- nativeBuildInputs merge test (user inputs appended, not overridden) ---
   nativeBuildInputsMergeCfg = mkPerSystemConfig {
     enableTempl = true;
@@ -957,6 +1011,10 @@ let
       !result.success
       && lib.hasInfix "without a committed *_templ.go sibling" (toString result.value)
     ) "throw message content")
+    (assertCheck "excludeSubModuleDirs rejects glob metacharacters at eval" (
+      !badExcludeEval.success
+      && lib.hasInfix "literal directory names" (toString badExcludeEval.value)
+    ) "eval throw naming the contract")
     # --- G2: per-package extraBuildAttrs ----------------------------------
     (assertCheck "packages.<name>.extraBuildAttrs option default is {}" (
       let

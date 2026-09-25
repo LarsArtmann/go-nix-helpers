@@ -211,13 +211,26 @@ let
   # are appended. Moving discovery from eval-time to build-time avoids
   # builtins.readDir/readFile on derivation outputs, which would force those
   # derivations to be built during evaluation (breaking `nix flake check --no-build`).
-  autoDiscoverScript = lib.optionalString autoSubModules ''
-    rm -f go.mod.discovered
-    find _local_deps/ -mindepth 3 -name go.mod | sort | while IFS= read -r gomod; do
-      case "$gomod" in
-        ${lib.concatStringsSep "|" (map (d: "*/${d}/*") excludeSubModuleDirs)}) continue ;;
-      esac
-      dir=$(dirname "$gomod")
+  #
+  # excludeSubModuleDirs entries are spliced into a shell `case` PATTERN, so
+  # they must be literal directory names: a glob metacharacter would silently
+  # change matching semantics. Reject anything outside [A-Za-z0-9._-] at EVAL
+  # time with a named error instead.
+  badExcludeDirs = builtins.filter (d: builtins.match "[A-Za-z0-9._-]+" d == null) excludeSubModuleDirs;
+  autoDiscoverScript = lib.optionalString autoSubModules (
+    if badExcludeDirs != [ ] then
+      throw ''
+        mkPreparedSource: excludeSubModuleDirs entries are spliced into a shell case
+        pattern and must be literal directory names (letters, digits, . _ -).
+        Offending entries: ${toString badExcludeDirs}''
+    else
+      ''
+        rm -f go.mod.discovered
+        find _local_deps/ -mindepth 3 -name go.mod | sort | while IFS= read -r gomod; do
+          case "$gomod" in
+            ${lib.concatStringsSep "|" (map (d: "*/${d}/*") excludeSubModuleDirs)}) continue ;;
+          esac
+          dir=$(dirname "$gomod")
       rel=''${dir#_local_deps/}
       basename=$(printf '%s' "$rel" | cut -d/ -f1)
       subdir=$(printf '%s' "$rel" | cut -d/ -f2-)
@@ -234,8 +247,9 @@ let
       if [ -n "$major" ]; then normVer="v$major.0.0"; else normVer="${subModuleVersion}"; fi
       sed -E -i "s#$modulePath v[0-9]+[.][0-9]+[.][0-9]+(-0[.][0-9]+-[0-9a-f]+|-[0-9]+-[0-9a-f]+)#$modulePath $normVer#g" go.mod
       printf '  %s => ./_local_deps/%s/%s\n' "$modulePath" "$basename" "$subdir" >> go.mod.discovered
-    done
-  '';
+        done
+      ''
+  );
 
   # Strip replace directives that point OUTSIDE the prepared source tree,
   # where the path cannot exist inside the Nix sandbox:
@@ -260,9 +274,13 @@ let
   # Versioned-path aware: listing "github.com/foo/bar" also matches
   # "github.com/foo/bar/v2", "github.com/foo/bar/v3", etc. Consumers no longer
   # need to enumerate every /vN variant separately.
+  # ERE metacharacters in the path (the domain dots) are escaped before the
+  # grep -vE: an unescaped dot would make "go.sse" also exclude a required
+  # module literally named "goXsse", silently skipping validation for it.
   publicDepsFilter = lib.optionalString (publicDeps != [ ]) ''
     for pub in ${lib.concatMapStringsSep " " lib.escapeShellArg publicDeps}; do
-      REQUIRED=$(printf '%s\n' "$REQUIRED" | grep -vE "^''${pub}(/v[0-9]+)?\$" || true)
+      pub_re=$(printf '%s' "$pub" | sed 's/[.[\*^$()+?{|]/\\&/g')
+      REQUIRED=$(printf '%s\n' "$REQUIRED" | grep -vE "^''${pub_re}(/v[0-9]+)?\$" || true)
     done
   '';
 
