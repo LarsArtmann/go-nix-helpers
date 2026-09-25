@@ -970,7 +970,9 @@ let
       "GOEXPERIMENT in devShell"
     )
     (assertCheck "cgoEnabled reaches devShell"
-      (goEnvCfg.devShells.default.CGO_ENABLED or null == "false")
+      (builtins.trace "DEBUG-CGO-VALUE: ${builtins.toJSON (goEnvCfg.devShells.default.CGO_ENABLED or "ABSENT")}; GOEXP: ${builtins.toJSON (goEnvCfg.devShells.default.GOEXPERIMENT or "ABSENT")}" (
+        goEnvCfg.devShells.default.CGO_ENABLED or null == "false"
+      ))
       "CGO_ENABLED in devShell"
     )
     (assertCheck "go env vars absent when options are null"
