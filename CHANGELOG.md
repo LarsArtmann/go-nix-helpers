@@ -12,6 +12,14 @@ This project has not made a tagged release yet; all changes below are in
 
 ### Added
 
+- `goExperiment` (nullOr str), `cgoEnabled` (nullOr bool), and
+  `completionStyle` (enum flag/subcommand) options. `goExperiment`/`cgoEnabled`
+  set GOEXPERIMENT/CGO_ENABLED in both the package build env and devShells
+  (null = unset; consumer `extraBuildAttrs.env` keys are preserved,
+  `shellExtraEnv` still wins in shells). `completionStyle` switches
+  enableCompletions between urfave/cli `--completion <shell>` (default) and
+  cobra `completion <shell>`. Module options now 44; covered by defaults +
+  propagation tests (build env, devShell, postInstall invocation).
 - `checks.templFixtureGuard` — fails `nix flake check` when generated
   `*_templ.go` files become tracked under `test-assets/mock-templ-missing-generated/`
   (the auto-commit daemon re-added them once and turned `moduleTest` red; the

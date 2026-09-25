@@ -138,6 +138,20 @@ Enable shfmt (shell script formatter) in treefmt programs.
 .BR enableCompletions " (bool, default: false)"
 Install shell completions for the default binary.
 .TP
+.BR completionStyle " (enum flag|subcommand, default: flag)"
+How the binary exposes completions (used with enableCompletions): "flag"
+invokes \fB<binary> --completion <shell>\fR (urfave/cli style); "subcommand"
+invokes \fB<binary> completion <shell>\fR (cobra style).
+.TP
+.BR goExperiment " (nullOr str, default: null)"
+GOEXPERIMENT setting for the package build AND devShells (e.g. "jsonv2").
+null leaves the variable unset so the Go toolchain's default experiment set
+applies.
+.TP
+.BR cgoEnabled " (nullOr bool, default: null)"
+CGO_ENABLED setting for the package build AND devShells. null leaves the
+platform/toolchain default in place.
+.TP
 .BR buildFlags " (list str, default: [])"
 Extra build flags passed to go build (e.g. build tags).
 .TP

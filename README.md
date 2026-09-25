@@ -175,6 +175,9 @@ See the full option table below, or copy one of the [templates](#templates).
 | `enableNixfmt`          | `true`                       | Enable `nixfmt` in treefmt programs                                                             |
 | `enableShfmt`           | `false`                      | Enable `shfmt` in treefmt programs                                                              |
 | `enableCompletions`     | `false`                      | Install shell completions (requires cobra/urfave/cli; warns if unsupported)                     |
+| `completionStyle`       | `"flag"`                     | Completion invocation: `"flag"` = `--completion <shell>` (urfave/cli); `"subcommand"` = `completion <shell>` (cobra) |
+| `goExperiment`          | `null`                       | `GOEXPERIMENT` for the package build AND devShells (e.g. `"jsonv2"`); `null` = unset              |
+| `cgoEnabled`            | `null`                       | `CGO_ENABLED` for the package build AND devShells; `null` = platform default                    |
 | `buildFlags`            | `[]`                         | Extra build flags for `go build` (e.g. build tags)                                              |
 | `packages`              | `{}`                         | Additional packages for monorepo support                                                        |
 | `deps`                  | `{}`                         | Private Go deps for `mkPreparedSource`                                                          |

@@ -950,6 +950,13 @@ let
       in
       !result.success
     ) "eval throw")
+    (assertCheck "templ-committed throw message names the committed-generated contract" (
+      let
+        result = builtins.tryEval (mkTemplChecks true false).templ-committed;
+      in
+      !result.success
+      && lib.hasInfix "without a committed *_templ.go sibling" (toString result.value)
+    ) "throw message content")
     # --- G2: per-package extraBuildAttrs ----------------------------------
     (assertCheck "packages.<name>.extraBuildAttrs option default is {}" (
       let

@@ -624,10 +624,10 @@ in
     text = ''
       set +e
       log=$(nix-store -r ${builtins.unsafeDiscardStringContext validationTest.drvPath} 2>&1)
-      if echo "$log" | grep -q "modules without local replace"; then
-        echo "PASS: validation caught missing dep with clear error"
+      if echo "$log" | grep -q "modules without local replace" && echo "$log" | grep -qF "github.com/larsartmann/nonexistent-dep"; then
+        echo "PASS: validation caught missing dep with a clear error that names the module"
       else
-        echo "FAIL: validation did not emit the expected error"
+        echo "FAIL: validation error missing the expected header or module name"
         echo "$log" | tail -8
         exit 1
       fi
