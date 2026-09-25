@@ -707,9 +707,14 @@ in
         completionWord = if cfg.completionStyle == "subcommand" then "completion" else "--completion";
 
         # Go env vars from typed options; empty when both are unset (null).
+        # CGO_ENABLED uses Go's canonical 0/1 — NOT toString (Nix's
+        # toString false is "", which Go treats as unset, silently
+        # re-enabling cgo).
         optionEnv =
           (lib.optionalAttrs (cfg.goExperiment != null) { GOEXPERIMENT = cfg.goExperiment; })
-          // (lib.optionalAttrs (cfg.cgoEnabled != null) { CGO_ENABLED = toString cfg.cgoEnabled; });
+          // (lib.optionalAttrs (cfg.cgoEnabled != null) {
+            CGO_ENABLED = if cfg.cgoEnabled then "1" else "0";
+          });
 
         mkGoPackage =
           pkgName: subPkgs: pkgDesc: pkgExtraBuildAttrs:
