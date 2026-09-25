@@ -1038,6 +1038,14 @@ let
     (assertCheck "mkGoFlake (deprecated) still evaluates a minimal config" (
       mkGoFlakeSmoke.success && mkGoFlakeSmoke.value
     ) "packages.default evaluates")
+    # --- Behavioral: eval-time go.mod floor check ---
+    (assertCheck "go.mod floor above toolchain throws at eval" (
+      !lowFloorEval.success
+    ) "eval throw")
+    (assertCheck "floor-check message names the requirement and both versions" (
+      !lowFloorEval.success
+      && lib.hasInfix "requires go 1.26" (toString lowFloorEval.value)
+    ) "message content")
     # --- G2: per-package extraBuildAttrs ----------------------------------
     (assertCheck "packages.<name>.extraBuildAttrs option default is {}" (
       let

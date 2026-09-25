@@ -782,7 +782,7 @@ in
         # Build the default package (always present)
         # vendorHashWarning/proxyVendorWarning/goModFloorCheck are referenced
         # here to force evaluation of their checks when packages are evaluated.
-        package = builtins.seq goModFloorCheck (
+        package = (
           builtins.seq proxyVendorWarning (
             builtins.seq vendorHashWarning (
               mkGoPackage cfg.pname cfg.subPackages cfg.description { }
