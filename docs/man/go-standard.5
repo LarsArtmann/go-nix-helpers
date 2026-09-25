@@ -209,6 +209,21 @@ Function receiving pkgs, returns extra devShell packages.
 .TP
 .BR shellExtraEnv " (attrs, default: {})"
 Extra environment variables for devShells.
+.SH EVAL-TIME CHECKS
+.TP
+.BR go.mod\ floor\ check
+The module reads the consumer's root go.mod at evaluation time and throws
+when its \fBgo\fR directive exceeds the resolved toolchain version: with
+GOTOOLCHAIN=local (all devShells, and the build sandbox) a floor above the
+toolchain is a guaranteed build failure, so it is surfaced at eval with a
+message naming both versions and three fixes (pin goPkgAttr, set
+goTarballVersion/goTarballHash, or update nixpkgs). Comparison is numeric
+per component and longer lists win on equal prefixes ("1.27" < "1.27.1"),
+matching Go's own semantics.
+.TP
+.BR templ-committed
+Throws at eval when any \fB.templ\fR file lacks its committed
+\fB*_templ.go\fR sibling.
 .SH OUTPUTS
 .TP
 .BR packages.default

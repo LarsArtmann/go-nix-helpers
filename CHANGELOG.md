@@ -12,6 +12,13 @@ This project has not made a tagged release yet; all changes below are in
 
 ### Added
 
+- Eval-time go.mod floor check — the module reads the consumer's root go.mod
+  and throws when its `go` directive exceeds the resolved toolchain
+  (GOTOOLCHAIN=local makes that a guaranteed build failure). The message
+  names both versions and three fixes (goPkgAttr pin, goTarball pair,
+  nixpkgs update). Comparison is numeric per component with
+  longer-list-wins prefix semantics, matching Go ("1.27" < "1.27.1");
+  version suffixes from custom overrides ("1.26.4-custom") are tolerated.
 - `goExperiment` (nullOr str), `cgoEnabled` (nullOr bool), and
   `completionStyle` (enum flag/subcommand) options. `goExperiment`/`cgoEnabled`
   set GOEXPERIMENT/CGO_ENABLED in both the package build env and devShells

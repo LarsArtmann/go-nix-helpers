@@ -283,6 +283,17 @@ handles private-dependency injection automatically.
 
 ## Troubleshooting / FAQ
 
+### "go-standard: go.mod requires go 1.X but the resolved toolchain is ..."
+
+The module checks your root `go.mod` `go` directive against the resolved
+toolchain at evaluation time. `GOTOOLCHAIN=local` forbids toolchain
+downloads, so a floor above the toolchain would fail every build with a
+cryptic error — instead you get this actionable one. Fix by any of:
+
+1. `goPkgAttr = "go_1_XX"` — pin the newest branch your nixpkgs ships
+2. `goTarballVersion` + `goTarballHash` — build the exact version from go.dev
+3. Update the `nixpkgs` input so a newer `go_1_XX` branch is packaged
+
 ### "go: module github.com/larsartmann/...: reading ... 410 Gone" or SSH errors
 
 The Nix sandbox has no network access. You need to add private deps as flake

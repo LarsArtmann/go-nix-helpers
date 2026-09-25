@@ -73,14 +73,14 @@ failure and session end.
 
 ## b) PARTIALLY DONE
 
-- **D13 (go.mod floor check):** Implemented in `modules/go-standard.nix`
+- **D13–D14 (P16, go.mod floor check):** Implemented in `modules/go-standard.nix`
   (eval-time read of consumer root go.mod, numeric per-component compare with
-  longer-list-wins semantics matching Go, actionable 3-fix throw message,
-  forced via `builtins.seq` in the package chain) + 2 test assertions +
-  `toNums` hardening for suffixed versions ("1.26.4-custom"). **BLOCKED at
-  verification:** `nix flake check --no-build` fails deterministically —
-  see §d.1. The implementation is complete but UNVERIFIED; D14 message-content
-  assertion and D15 docs (man/README FAQ/CHANGELOG) are NOT done.
+  longer-list-wins semantics matching Go, suffix-tolerant version parsing,
+  actionable 3-fix throw message, forced via `builtins.seq` in the package
+  chain) + 2 test assertions (throw + message content). **VERIFIED GREEN via
+  clean-worktree check** (see §d.1c for why the main tree's checks were
+  flaky). D15 docs: man page EVAL-TIME CHECKS section, README FAQ entry,
+  CHANGELOG entry — done.
 - **D10 (templ generate in module builds):** Investigated, deliberately
   REDESIGNED: standard-bug-tracking-schema commits its `*_templ.go` (verified),
   so build-time `templ generate` would be dead weight + reproducibility risk
@@ -125,18 +125,18 @@ failure and session end.
      to build"). Fixed by `nix flake lock --update-input nixpkgs` (low risk:
      test mocks use vendorHash=null; `expectedAutoGoAttr` auto-adapts).
      **Uncommitted lock bump is in the tree.**
-   - **Intermittent `path ... -source is not valid` during flake check**,
-     deterministic variants decoded as: (a) daemon-commit races against nix's
-     dirty-tree copy (transient; retry on clean tree), (b) REAL treefmt-nix
-     module eval pulling its own locked inputs (fixed via stub in D12),
-     (c) the CURRENT deterministic failure on moduleTest — **suspected: my
-     D13 floor check does `self.outPath + "/go.mod"` → context-carrying string
-     → `builtins.pathExists` realises the source-copy derivation → not valid
-     under --no-build** — the EXACT trap the module's own walkTempl comment
-     documents ("path arithmetic ONLY: coercing to string first... fatal under
-     nix flake check --no-build"). I wrote the comment's forbidden pattern
-     60 lines below it. Fix on resume: mirror walkTempl's approach (the check
-     must keep path arithmetic or read through a path-typed binding).
+   - **Intermittent `path ... -source is not valid` during flake check.**
+     ROOT CAUSE FOUND (initial hypothesis in this bullet was WRONG — it is
+     NOT a pathExists-context bug in the floor check): nix 2.34's handling of
+     DIRTY git trees plus the auto-commit daemon committing DURING a running
+     `nix flake check` invalidates the dirty-tree source copy mid-check.
+     Proof: `git worktree add /tmp/gnh-clean HEAD && cd /tmp/gnh-clean &&
+     nix flake check --no-build` → **all checks passed** with the full D-tier
+     work including the floor check. RECIPE (now f.41): verify from a clean
+     worktree whenever the main tree is dirty or the daemon is active.
+     (b) the treefmt-nix module-pull variant was real and is fixed via the
+     D12 stub; (c) one misleading detour blamed the floor check — bisect
+     disproved it.
 2. **Commit races:** the auto-commit daemon swept my staged B-tier commit
    twice (my heredoc commit silently no-op'd on an empty index after daemon
    commits; "git log -1" then printed the daemon's hash, briefly making me
