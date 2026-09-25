@@ -505,6 +505,7 @@ let
         name = "bad-exclude";
         version = "test";
         src = mockSrc;
+        deps = { };
         excludeSubModuleDirs = [ "test*dir" ];
       }).outPath);
 
@@ -1015,6 +1016,9 @@ let
       !badExcludeEval.success
       && lib.hasInfix "literal directory names" (toString badExcludeEval.value)
     ) "eval throw naming the contract")
+    (assertCheck "mkGoFlake (deprecated) still evaluates a minimal config" (
+      mkGoFlakeSmoke.success && mkGoFlakeSmoke.value
+    ) "packages.default evaluates")
     # --- G2: per-package extraBuildAttrs ----------------------------------
     (assertCheck "packages.<name>.extraBuildAttrs option default is {}" (
       let
