@@ -446,9 +446,7 @@ let
   # the stale-pin config must THROW via the floor check — correct
   # behavior, not a warning-path regression.
   mockFloor = "1.26";
-  olderMeetsFloor =
-    olderGoAttr == null
-    || lib.versionAtLeast (pkgs.${olderGoAttr}.version) mockFloor;
+  olderMeetsFloor = olderGoAttr == null || lib.versionAtLeast (pkgs.${olderGoAttr}.version) mockFloor;
 
   # --- lintAsCheck test ------------------------------------------------------
   lintAsCheckCfg = mkPerSystemConfig { lintAsCheck = true; };

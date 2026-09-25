@@ -12,9 +12,25 @@ This project has not made a tagged release yet; all changes below are in
 
 ### Fixed
 
+- `go-standard.systems` was documented but never wired — flake-parts' own
+  default system list silently won, so consumers with `x86_64-darwin`
+  inherited a system nixpkgs 26.11 dropped (surfacing as "incompatible
+  system" warnings on every `nix flake check`). The composite module now
+  maps `go-standard.systems` onto flake-parts' `systems`; verified with a
+  consumer probe (outputs generated exactly for the configured set). This
+  repo's own flake also drops `x86_64-darwin` from its system list.
 - `cgoEnabled = false` was a silent no-op: the option used Nix's `toString`
   on booleans, and `toString false` is `""` — which Go treats as unset,
   leaving cgo enabled. CGO_ENABLED now uses Go's canonical `0`/`1` values.
+- Tier A fleet build-verification completed 10/10 (go-localsync,
+  project-meta, oxlint-auto-configure, project-dependency-graph,
+  golangci-lint-auto-configure, go-humanize-linter, standard-bug-tracking-schema
+  this pass; erraudit, PMA, go-auto-upgrade earlier): all eval+build green
+  with vendorHash intact under the goPkgAttr auto-default. The sbts build
+  additionally shed its hand-rolled modBuildPhase (templ generate + tidy +
+  vendor), gained publicDeps entries for go-etag's sub-modules, and bumped
+  go-nix-helpers to a437284 — its go.mod floor (1.27.1) had outgrown the
+  previously locked rev's go_1_26 resolution.
 - Completions `postInstall` comment hardcoded `--completion` regardless of
   `completionStyle` (misleading in build logs and tripping style tests);
   now interpolates the configured completion word.
@@ -28,6 +44,11 @@ This project has not made a tagged release yet; all changes below are in
 
 ### Added
 
+- Old-nixpkgs CI matrix job (`old-nixpkgs-module-test`) — builds moduleTest
+  against a pinned 2026-06 nixpkgs (go_1_26 era, no go_1_27), proving the
+  goPkgAttr auto-default degrades gracefully and the floor check throws
+  for stale pins below the consumer's go.mod floor. Verified locally on
+  both pins before wiring.
 - `checks.docsAnnotations` — docs-health annotate discipline enforced by
   `nix flake check`: gate 1 requires every archived status report to carry
   at least one strikethrough resolution; gate 2 (vendored `check-rows.py`

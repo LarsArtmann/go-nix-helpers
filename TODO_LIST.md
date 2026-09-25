@@ -17,7 +17,6 @@
 
 | #  | Task                                                                                                      | Status | Effort | Evidence                                                                                                                                                     |
 | -- | --------------------------------------------------------------------------------------------------------- | ------ | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| T3 | Build-verify the 10 eval-only Tier A migrations (`nix build`, update vendorHash where the proxyVendor flip bites) | TODO   | 3h     | `docs/status/2026-08-10_16-50_*` C ("It evaluates" ≠ "it builds"); 3/10 done 2026-09-24 (erraudit, PMA, go-auto-upgrade — eval+build green, vendorHash intact) |
 | T4 | Migrate Tier B consumers to go-standard (KeyCountdown, StopTube, branching-flow, bank-sync, overview, BuildFlow) — G2 unblocks all | TODO   | 4h     | `docs/status/2026-08-10_11-02_*` Tier B table; G2 shipped `2f3b6b2`                                                                                          |
 | T5 | Migrate Tier C consumers off deprecated `mkGoFlake` (Standup-Killer, crush-daily)                          | TODO   | 2h     | `mkGoFlake.nix` deprecation trace; only 2 repos remain on the deprecated path                                                                                 |
 
@@ -25,16 +24,9 @@
 
 | #  | Task                                                                                                       | Status | Effort | Evidence                                                                                                        |
 | -- | ---------------------------------------------------------------------------------------------------------- | ------ | ------ | ---------------------------------------------------------------------------------------------------------------- |
-| T24 | Old-nixpkgs pinned CI matrix job for moduleTest (proves auto-default + fallback degrade gracefully)              | TODO   | 1h     | `docs/status/2026-09-24_*` e.4, f.11                  |
-| T27 | Render-verify the 5 largest struck tables (16-50, 22-45, 02-51, 21-31, 23-04) in a markdown preview | TODO | 20min | `docs/status/2026-09-24_18-06_*` b.1 — markers-inside-cells never visually checked |
 | T33 | Wire `go-standard.systems` mapping verification into `test-module.nix` (the composite mapping is verified by CI + the 2026-09-25 consumer probe, but not by a module test) | TODO | 30min | commit `105c981`+ — probe was manual; regression coverage missing |
-| T34 | Sweep consumers: GOEXPERIMENT boilerplate → `goExperiment` option; cobra repos → `completionStyle = "subcommand"` (7/10 Tier A repeat it) | TODO | 2h | `docs/status/2026-08-10_16-50_*` E.9–E.11; options shipped 2026-09-24 |
+| T34 | Sweep consumers: GOEXPERIMENT boilerplate → `goExperiment` option; cobra repos → `completionStyle = "subcommand"` (7/10 Tier A repeat it; sbts's extraBuildAttrs GOEXPERIMENT included — its modBuildPhase override is already gone) | TODO | 2h | `docs/status/2026-08-10_16-50_*` E.9–E.11; options shipped 2026-09-24; requires go-nix-helpers master push |
 
-## Low impact / Polish
-
-| #  | Task                                                                                                              | Status | Effort | Evidence                                              |
-| -- | ------------------------------------------------------------------------------------------------------------------ | ------ | ------ | ----------------------------------------------------- |
-| T34b | Remove sbts's vestigial templ/GOEXPERIMENT extraBuildAttrs override (`standard-bug-tracking-schema/flake.nix` ~90-106) — `goExperiment` option replaces it | TODO | 15min | `docs/status/2026-09-25_04-39_*` f.8; D10 redesign |
 ## Decided against / rejected
 
 | Task                                            | Reason                                                                                                                                                             |
