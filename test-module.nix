@@ -573,7 +573,7 @@ let
   lowFloorToolchainCfg = mkPerSystemConfig {
     goPkgOverride =
       pkg:
-n      pkg.overrideAttrs (_: {
+      pkg.overrideAttrs (_: {
         version = "1.24.9";
         # Silence nixpkgs' overridden-version warning — the version change
         # IS the point of this test.
@@ -1070,6 +1070,10 @@ n      pkg.overrideAttrs (_: {
       !lowFloorEval.success
       && lib.hasInfix "requires go 1.26" (toString lowFloorEval.value)
     ) "message content")
+    # --- Behavioral: stale goPkgAttr pin warning ---
+    (assertCheck "stale goPkgAttr pin warns without breaking evaluation" (
+      olderGoAttr == null || stalePinEval.success
+    ) "eval success (warning on stderr only)")
     # --- G2: per-package extraBuildAttrs ----------------------------------
     (assertCheck "packages.<name>.extraBuildAttrs option default is {}" (
       let

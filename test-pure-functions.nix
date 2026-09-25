@@ -281,6 +281,51 @@ let
     )
   ];
 
+  # --- staleGoAttrName tests (warning decision for go-standard) ---
+  staleGo = pure.staleGoAttrName;
+
+  staleGoBasic = [
+    (assertEq "staleGo: null pin (auto default) never warns"
+      (staleGo { pkgs = stubPkgs; goPkgAttr = null; })
+      null
+    )
+    (assertEq "staleGo: pinning the newest branch does not warn"
+      (staleGo {
+        pkgs = stubPkgs;
+        goPkgAttr = "go_1_27";
+      })
+      null
+    )
+    (assertEq "staleGo: older existing pin returns the newest attr"
+      (staleGo {
+        pkgs = stubPkgs;
+        goPkgAttr = "go_1_26";
+      })
+      "go_1_27"
+    )
+    (assertEq "staleGo: much older pin also returns the newest attr"
+      (staleGo {
+        pkgs = stubPkgs;
+        goPkgAttr = "go_1_24";
+      })
+      "go_1_27"
+    )
+    (assertEq "staleGo: missing attr returns null (not our error)"
+      (staleGo {
+        pkgs = stubPkgs;
+        goPkgAttr = "go_1_99";
+      })
+      null
+    )
+    (assertEq "staleGo: no branch attrs in pkgs returns null"
+      (staleGo {
+        pkgs = stubPkgsNoBranch;
+        goPkgAttr = "go_1_26";
+      })
+      null
+    )
+  ];
+
   allChecks =
     stripBasic
     ++ stripIdempotence
@@ -289,6 +334,7 @@ let
     ++ repoDeterminism
     ++ repoNoSlash
     ++ newestGoBasic
+    ++ staleGoBasic
     ++ goBaseBasic;
 in
 pkgs.runCommand "test-pure-functions" { } ''
