@@ -543,7 +543,9 @@ in
               floorStr = if goLines == [ ] then null else lib.removePrefix "go " (builtins.head goLines);
               # Numeric components only: custom overrides can carry suffixes
               # ("1.26.4-custom") that would crash fromJSON.
-              toNums = v: map builtins.fromJSON (builtins.filter (c: builtins.match "[0-9]+" c != null) (lib.splitVersion v));
+              toNums =
+                v:
+                map builtins.fromJSON (builtins.filter (c: builtins.match "[0-9]+" c != null) (lib.splitVersion v));
               # -1 | 0 | 1, numeric per component; longer list wins on equal
               # prefix ("1.27" < "1.27.1"), matching Go's own comparison.
               cmp =
@@ -562,11 +564,13 @@ in
             if floorStr == null then
               null
             else if cmp (toNums floorStr) (toNums goPkg.version) == 1 then
-              throw (pure.goModFloorMessage {
-                inherit floorStr;
-                toolchainVersion = goPkg.version;
-                inherit (cfg) goPkgAttr;
-              })
+              throw (
+                pure.goModFloorMessage {
+                  inherit floorStr;
+                  toolchainVersion = goPkg.version;
+                  inherit (cfg) goPkgAttr;
+                }
+              )
             else
               null;
 
@@ -619,7 +623,10 @@ in
         # ignore it.
         stalePinWarning =
           let
-            newest = pure.staleGoAttrName { inherit pkgs; goPkgAttr = cfg.goPkgAttr; };
+            newest = pure.staleGoAttrName {
+              inherit pkgs;
+              goPkgAttr = cfg.goPkgAttr;
+            };
           in
           if newest != null then
             builtins.trace "warning: go-standard.goPkgAttr = \"${cfg.goPkgAttr}\" is not the newest Go in your nixpkgs (\"${newest}\") — bump the pin or drop it to use the auto default." null

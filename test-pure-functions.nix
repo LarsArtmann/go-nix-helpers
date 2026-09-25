@@ -285,85 +285,67 @@ let
   staleGo = pure.staleGoAttrName;
 
   staleGoBasic = [
-    (assertEq "staleGo: null pin (auto default) never warns"
-      (staleGo { pkgs = stubPkgs; goPkgAttr = null; })
-      null
-    )
-    (assertEq "staleGo: pinning the newest branch does not warn"
-      (staleGo {
-        pkgs = stubPkgs;
-        goPkgAttr = "go_1_27";
-      })
-      null
-    )
-    (assertEq "staleGo: older existing pin returns the newest attr"
-      (staleGo {
-        pkgs = stubPkgs;
-        goPkgAttr = "go_1_26";
-      })
-      "go_1_27"
-    )
-    (assertEq "staleGo: much older pin also returns the newest attr"
-      (staleGo {
-        pkgs = stubPkgs;
-        goPkgAttr = "go_1_24";
-      })
-      "go_1_27"
-    )
-    (assertEq "staleGo: missing attr returns null (not our error)"
-      (staleGo {
-        pkgs = stubPkgs;
-        goPkgAttr = "go_1_99";
-      })
-      null
-    )
-    (assertEq "staleGo: no branch attrs in pkgs returns null"
-      (staleGo {
-        pkgs = stubPkgsNoBranch;
-        goPkgAttr = "go_1_26";
-      })
-      null
-    )
+    (assertEq "staleGo: null pin (auto default) never warns" (staleGo {
+      pkgs = stubPkgs;
+      goPkgAttr = null;
+    }) null)
+    (assertEq "staleGo: pinning the newest branch does not warn" (staleGo {
+      pkgs = stubPkgs;
+      goPkgAttr = "go_1_27";
+    }) null)
+    (assertEq "staleGo: older existing pin returns the newest attr" (staleGo {
+      pkgs = stubPkgs;
+      goPkgAttr = "go_1_26";
+    }) "go_1_27")
+    (assertEq "staleGo: much older pin also returns the newest attr" (staleGo {
+      pkgs = stubPkgs;
+      goPkgAttr = "go_1_24";
+    }) "go_1_27")
+    (assertEq "staleGo: missing attr returns null (not our error)" (staleGo {
+      pkgs = stubPkgs;
+      goPkgAttr = "go_1_99";
+    }) null)
+    (assertEq "staleGo: no branch attrs in pkgs returns null" (staleGo {
+      pkgs = stubPkgsNoBranch;
+      goPkgAttr = "go_1_26";
+    }) null)
   ];
 
   # --- goModFloorMessage tests (pure message builder for the floor check) ---
   floorMsg = pure.goModFloorMessage;
 
   floorMsgBasic = [
-    (assertEq "floorMsg: names the requirement"
-      (builtins.match ".*requires go 1\.28.*" (
-        floorMsg { floorStr = "1.28"; toolchainVersion = "1.26.4"; }
-      ) != null)
-      true
-    )
-    (assertEq "floorMsg: names the resolved toolchain"
-      (builtins.match ".*toolchain is 1\.26\.4.*" (
-        floorMsg { floorStr = "1.28"; toolchainVersion = "1.26.4"; }
-      ) != null)
-      true
-    )
-    (assertEq "floorMsg: auto label when goPkgAttr is null"
-      (builtins.match ".*\\(auto\\).*" (
-        floorMsg { floorStr = "1.28"; toolchainVersion = "1.26.4"; }
-      ) != null)
-      true
-    )
-    (assertEq "floorMsg: pinned attr label when goPkgAttr is set"
-      (builtins.match ".*\\(go_1_26\\).*" (
-        floorMsg {
-          floorStr = "1.28";
-          toolchainVersion = "1.26.4";
-          goPkgAttr = "go_1_26";
-        }
-      ) != null)
-      true
-    )
-    (assertEq "floorMsg: offers the tarball fix with the floor version"
-      (builtins.match ".*goTarballVersion = \"1\.28\".*" (
-        floorMsg { floorStr = "1.28"; toolchainVersion = "1.26.4"; }
-      ) != null)
-      true
-    )
+    (assertEq "floorMsg: names the requirement" (
+      builtins.match ".*requires go 1\.28.*" (floorMsg {
+        floorStr = "1.28";
+        toolchainVersion = "1.26.4";
+      }) != null
+    ) true)
+    (assertEq "floorMsg: names the resolved toolchain" (
+      builtins.match ".*toolchain is 1\.26\.4.*" (floorMsg {
+        floorStr = "1.28";
+        toolchainVersion = "1.26.4";
+      }) != null
+    ) true)
+    (assertEq "floorMsg: auto label when goPkgAttr is null" (
+      builtins.match ".*\\(auto\\).*" (floorMsg {
+        floorStr = "1.28";
+        toolchainVersion = "1.26.4";
+      }) != null
+    ) true)
+    (assertEq "floorMsg: pinned attr label when goPkgAttr is set" (
+      builtins.match ".*\\(go_1_26\\).*" (floorMsg {
+        floorStr = "1.28";
+        toolchainVersion = "1.26.4";
+        goPkgAttr = "go_1_26";
+      }) != null
+    ) true)
+    (assertEq "floorMsg: offers the tarball fix with the floor version" (
+      builtins.match ".*goTarballVersion = \"1\.28\".*" (floorMsg {
+        floorStr = "1.28";
+        toolchainVersion = "1.26.4";
+      }) != null
+    ) true)
   ];
 
   allChecks =

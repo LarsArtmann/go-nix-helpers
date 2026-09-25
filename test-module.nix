@@ -437,9 +437,9 @@ let
   # Second-newest branch (null when nixpkgs carries a single branch) — the
   # stale-pin test needs a REAL older attr to pin.
   olderGoAttr = pure.newestGoAttrName (
-    builtins.filter (
-      n: builtins.match "go_1_[0-9]+" n != null && n != expectedAutoGoAttr
-    ) (builtins.attrNames pkgs)
+    builtins.filter (n: builtins.match "go_1_[0-9]+" n != null && n != expectedAutoGoAttr) (
+      builtins.attrNames pkgs
+    )
   );
 
   # --- lintAsCheck test ------------------------------------------------------
@@ -509,15 +509,15 @@ let
     inherit pkgs lib;
     goPkg = pkgs.go;
   };
-  badExcludeEval =
-    builtins.tryEval
-      ((mkPreparedSourceLib {
-        name = "bad-exclude";
-        version = "test";
-        src = mockSrc;
-        deps = { };
-        excludeSubModuleDirs = [ "test*dir" ];
-      }).outPath);
+  badExcludeEval = builtins.tryEval (
+    (mkPreparedSourceLib {
+      name = "bad-exclude";
+      version = "test";
+      src = mockSrc;
+      deps = { };
+      excludeSubModuleDirs = [ "test*dir" ];
+    }).outPath
+  );
 
   # --- mkGoFlake (deprecated) eval smoke ------------------------------------
   # Two consumers still ship the deprecated path; a minimal config must keep
@@ -525,17 +525,15 @@ let
   # The auto-default logic inside is shared with go-standard via
   # pure-functions.goBaseFrom, so this also guards that wiring.
   mkGoFlakeModule = import ./mkGoFlake.nix {
-    inputs =
-      gnhInputs
-      // {
-        systems = ./test-assets/systems.nix;
-        # Stub the treefmt flakeModule: evaluating the REAL one pulls
-        # treefmt-nix's own locked inputs into the closure, none of which
-        # are inputs of this flake (store-invalid under --no-build). The
-        # smoke covers mkGoFlake's own wiring (goBaseFrom resolution,
-        # packages/devShells), not treefmt integration.
-        treefmt-nix.flakeModule = { };
-      };
+    inputs = gnhInputs // {
+      systems = ./test-assets/systems.nix;
+      # Stub the treefmt flakeModule: evaluating the REAL one pulls
+      # treefmt-nix's own locked inputs into the closure, none of which
+      # are inputs of this flake (store-invalid under --no-build). The
+      # smoke covers mkGoFlake's own wiring (goBaseFrom resolution,
+      # packages/devShells), not treefmt integration.
+      treefmt-nix.flakeModule = { };
+    };
     self = mockSelf;
     pname = "smoke";
     version = "0.0.0";
@@ -957,45 +955,32 @@ let
       "require line in postPatch"
     )
     # --- Behavioral: goExperiment/cgoEnabled reach build env + devShell ---
-    # mkDerivation consumes the `env` attrset (merged into the derivation
-    # environment, removed from visible attrs), so the honest end-to-end
-    # check reads the derivation's .drv ATerm (tuple-encoded env).
-    (assertCheck "goExperiment reaches package build env"
-      (lib.hasInfix "\"GOEXPERIMENT\",\"jsonv2\""" (
-        builtins.readFile goEnvCfg.packages.default.drvPath
-      ))
-      "GOEXPERIMENT=jsonv2 in derivation env"
-    )
-    (assertCheck "cgoEnabled=false reaches package build env"
-      (lib.hasInfix "\"CGO_ENABLED\",\"0\""" (
-        builtins.readFile goEnvCfg.packages.default.drvPath
-      ))
-      "CGO_ENABLED=0 in derivation env"
-    )
-    (assertCheck "goExperiment reaches devShell"
-      ((goEnvCfg.devShells.default.GOEXPERIMENT or null) == "jsonv2")
-      "GOEXPERIMENT in devShell"
-    )
-    (assertCheck "cgoEnabled reaches devShell"
-      ((goEnvCfg.devShells.default.CGO_ENABLED or null) == "0")
-      "CGO_ENABLED in devShell"
-    )
-    (assertCheck "go env vars absent when options are null"
-      (!(psCfg.devShells.default ? GOEXPERIMENT) && !(psCfg.devShells.default ? CGO_ENABLED))
-      "no env vars by default"
-    )
+    # mkDerivation consumes the `env` attrset but flattens its entries onto
+    # the derivation as attrs, so .GOEXPERIMENT is the honest observable.
+    (assertCheck "goExperiment reaches package build env" (
+      (goEnvCfg.packages.default.GOEXPERIMENT or null) == "jsonv2"
+    ) "GOEXPERIMENT=jsonv2 in derivation env")
+    (assertCheck "cgoEnabled=false reaches package build env" (
+      (goEnvCfg.packages.default.CGO_ENABLED or null) == "0"
+    ) "CGO_ENABLED=0 in derivation env")
+    (assertCheck "goExperiment reaches devShell" (
+      (goEnvCfg.devShells.default.GOEXPERIMENT or null) == "jsonv2"
+    ) "GOEXPERIMENT in devShell")
+    (assertCheck "cgoEnabled reaches devShell" (
+      (goEnvCfg.devShells.default.CGO_ENABLED or null) == "0"
+    ) "CGO_ENABLED in devShell")
+    (assertCheck "go env vars absent when options are null" (
+      !(psCfg.devShells.default ? GOEXPERIMENT) && !(psCfg.devShells.default ? CGO_ENABLED)
+    ) "no env vars by default")
     # --- Behavioral: completionStyle switches the invocation ---
     (assertCheck "default completionStyle uses --completion flag"
       (lib.hasInfix "--completion bash" completionsCfg.packages.default.postInstall)
       "--completion in postInstall"
     )
-    (assertCheck "subcommand completionStyle uses cobra-style command"
-      (
-        lib.hasInfix "completion bash" cobraCompletionsCfg.packages.default.postInstall
-        && !(lib.hasInfix "--completion" cobraCompletionsCfg.packages.default.postInstall)
-      )
-      "completion subcommand in postInstall"
-    )
+    (assertCheck "subcommand completionStyle uses cobra-style command" (
+      lib.hasInfix "completion bash" cobraCompletionsCfg.packages.default.postInstall
+      && !(lib.hasInfix "--completion" cobraCompletionsCfg.packages.default.postInstall)
+    ) "completion subcommand in postInstall")
     # --- Behavioral: goPkgAttr null auto-resolves to the newest branch ---
     (assertCheck "goPkgAttr null resolves to newest go_1_XX branch" (
       expectedAutoGoAttr != null && psCfg.packages.default.go == pkgs.${expectedAutoGoAttr}
@@ -1063,7 +1048,9 @@ let
       # captured error is ""), so assert the static contract sentence at
       # the throw's source.
       !result.success
-      && lib.hasInfix "without a committed *_templ.go sibling" (builtins.readFile ./modules/go-standard.nix)
+      && lib.hasInfix "without a committed *_templ.go sibling" (
+        builtins.readFile ./modules/go-standard.nix
+      )
     ) "throw message content")
     (assertCheck "excludeSubModuleDirs rejects glob metacharacters at eval" (
       !badExcludeEval.success
@@ -1073,9 +1060,7 @@ let
       mkGoFlakeSmoke.success && mkGoFlakeSmoke.value
     ) "packages.default evaluates")
     # --- Behavioral: eval-time go.mod floor check ---
-    (assertCheck "go.mod floor above toolchain throws at eval" (
-      !lowFloorEval.success
-    ) "eval throw")
+    (assertCheck "go.mod floor above toolchain throws at eval" (!lowFloorEval.success) "eval throw")
     (assertCheck "floor-check message names the requirement and both versions" (
       # The thrown message itself is unrecoverable via tryEval (Nix 2.34);
       # assert against the pure message builder the throw delegates to.

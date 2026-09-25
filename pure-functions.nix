@@ -50,9 +50,12 @@ let
     let
       newest = newestGoAttrName (builtins.attrNames pkgs);
     in
-    if goPkgAttr == null || newest == null || goPkgAttr == newest then null
-    else if pkgs ? ${goPkgAttr} then newest
-    else null;
+    if goPkgAttr == null || newest == null || goPkgAttr == newest then
+      null
+    else if pkgs ? ${goPkgAttr} then
+      newest
+    else
+      null;
 
   # Actionable error message for the eval-time go.mod floor check. Kept
   # pure so tests can assert the actual message content (tryEval cannot
@@ -64,7 +67,9 @@ let
       goPkgAttr ? null,
     }:
     ''
-      go-standard: go.mod requires go ${floorStr} but the resolved toolchain is ${toolchainVersion} (${if goPkgAttr != null then goPkgAttr else "auto"}).
+      go-standard: go.mod requires go ${floorStr} but the resolved toolchain is ${toolchainVersion} (${
+        if goPkgAttr != null then goPkgAttr else "auto"
+      }).
       GOTOOLCHAIN=local forbids toolchain downloads, so every build and devShell `go` invocation would fail.
       Fix one of:
         1. Pin the newest nixpkgs branch: goPkgAttr = "go_1_XX" (or leave null for auto)

@@ -216,7 +216,9 @@ let
   # they must be literal directory names: a glob metacharacter would silently
   # change matching semantics. Reject anything outside [A-Za-z0-9._-] at EVAL
   # time with a named error instead.
-  badExcludeDirs = builtins.filter (d: builtins.match "[A-Za-z0-9._-]+" d == null) excludeSubModuleDirs;
+  badExcludeDirs = builtins.filter (
+    d: builtins.match "[A-Za-z0-9._-]+" d == null
+  ) excludeSubModuleDirs;
   autoDiscoverScript = lib.optionalString autoSubModules (
     if badExcludeDirs != [ ] then
       throw ''
@@ -225,29 +227,29 @@ let
         Offending entries: ${toString badExcludeDirs}''
     else
       ''
-        rm -f go.mod.discovered
-        find _local_deps/ -mindepth 3 -name go.mod | sort | while IFS= read -r gomod; do
-          case "$gomod" in
-            ${lib.concatStringsSep "|" (map (d: "*/${d}/*") excludeSubModuleDirs)}) continue ;;
-          esac
-          dir=$(dirname "$gomod")
-      rel=''${dir#_local_deps/}
-      basename=$(printf '%s' "$rel" | cut -d/ -f1)
-      subdir=$(printf '%s' "$rel" | cut -d/ -f2-)
-      modulePath=$(awk '/^module /{print $2; exit}' "$gomod")
-      [ -z "$modulePath" ] && continue
-      # `[.]` not `\.`: this is a Nix DOUBLE-quoted string where `\.` is an
-      # unknown escape and the backslash is DROPPED — the pattern must stay a
-      # literal-dot regex either way (see explicitVersionNormalize NOTE 1/2:
-      # -E + `#` delimiter matches both pseudo-version shapes).
-      # The replacement preserves the module-path major: /vN modules reject
-      # v0.0.0 ("should be vN, not v0"); mid-path /vN (event/v3/eventtest)
-      # extracts the segment, not the suffix.
-      major=$(printf '%s' "$modulePath" | sed -n 's#^.*/v\([0-9][0-9]*\)\(/.*\)\?$#\1#p')
-      if [ -n "$major" ]; then normVer="v$major.0.0"; else normVer="${subModuleVersion}"; fi
-      sed -E -i "s#$modulePath v[0-9]+[.][0-9]+[.][0-9]+(-0[.][0-9]+-[0-9a-f]+|-[0-9]+-[0-9a-f]+)#$modulePath $normVer#g" go.mod
-      printf '  %s => ./_local_deps/%s/%s\n' "$modulePath" "$basename" "$subdir" >> go.mod.discovered
-        done
+          rm -f go.mod.discovered
+          find _local_deps/ -mindepth 3 -name go.mod | sort | while IFS= read -r gomod; do
+            case "$gomod" in
+              ${lib.concatStringsSep "|" (map (d: "*/${d}/*") excludeSubModuleDirs)}) continue ;;
+            esac
+            dir=$(dirname "$gomod")
+        rel=''${dir#_local_deps/}
+        basename=$(printf '%s' "$rel" | cut -d/ -f1)
+        subdir=$(printf '%s' "$rel" | cut -d/ -f2-)
+        modulePath=$(awk '/^module /{print $2; exit}' "$gomod")
+        [ -z "$modulePath" ] && continue
+        # `[.]` not `\.`: this is a Nix DOUBLE-quoted string where `\.` is an
+        # unknown escape and the backslash is DROPPED — the pattern must stay a
+        # literal-dot regex either way (see explicitVersionNormalize NOTE 1/2:
+        # -E + `#` delimiter matches both pseudo-version shapes).
+        # The replacement preserves the module-path major: /vN modules reject
+        # v0.0.0 ("should be vN, not v0"); mid-path /vN (event/v3/eventtest)
+        # extracts the segment, not the suffix.
+        major=$(printf '%s' "$modulePath" | sed -n 's#^.*/v\([0-9][0-9]*\)\(/.*\)\?$#\1#p')
+        if [ -n "$major" ]; then normVer="v$major.0.0"; else normVer="${subModuleVersion}"; fi
+        sed -E -i "s#$modulePath v[0-9]+[.][0-9]+[.][0-9]+(-0[.][0-9]+-[0-9a-f]+|-[0-9]+-[0-9a-f]+)#$modulePath $normVer#g" go.mod
+        printf '  %s => ./_local_deps/%s/%s\n' "$modulePath" "$basename" "$subdir" >> go.mod.discovered
+          done
       ''
   );
 
