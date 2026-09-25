@@ -32,7 +32,7 @@ fail=0
 bare=$(grep -rLn '~~' "$status_dir/archived" || true)
 if [ -n "$bare" ]; then
   echo "FAIL (gate 1: archived completeness) — no strikethrough resolution found in:" >&2
-  printf '  %s\n' $bare >&2
+  printf '  %s\n' "$bare" >&2
   fail=1
 else
   echo "PASS (gate 1: archived completeness)"
