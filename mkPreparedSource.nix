@@ -9,11 +9,13 @@
 #
 # Key features:
 #   - Recursive auto-discovery (build-time): scans _local_deps/ at build time
-#     to find ALL go.mod files at any depth (not just top-level) and generates
-#     replace directives automatically. Excludes example/testdata/vendor
-#     directories. No manual `subModules` list needed (though explicit entries
-#     are merged). Build-time discovery avoids builtins.readDir on derivation
-#     outputs during evaluation, keeping `nix flake check --no-build` working.
+#     to find go.mod files at any depth BELOW each dependency's top level and
+#     generates replace directives automatically. Each dep's own top-level
+#     go.mod is skipped by design — its replace directive comes from the
+#     `deps` key, not discovery. Excludes example/testdata/vendor directories.
+#     No manual `subModules` list needed (though explicit entries are merged).
+#     Build-time discovery avoids builtins.readDir on derivation outputs
+#     during evaluation, keeping `nix flake check --no-build` working.
 #   - Build-time validation: verifies every private module require in go.mod
 #     has a corresponding replace directive, failing with a clear message
 #     instead of a cryptic "could not read Username" SSH error.
@@ -228,6 +230,9 @@ let
     else
       ''
           rm -f go.mod.discovered
+          # find depth: _local_deps/<dep>/go.mod sits at depth 2 — -mindepth 3
+          # skips it by design (that dep's main replace comes from the `deps`
+          # key); sub-module go.mod files live at depth 3+.
           find _local_deps/ -mindepth 3 -name go.mod | sort | while IFS= read -r gomod; do
             case "$gomod" in
               ${lib.concatStringsSep "|" (map (d: "*/${d}/*") excludeSubModuleDirs)}) continue ;;

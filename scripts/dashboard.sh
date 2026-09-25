@@ -26,8 +26,11 @@ NC='\033[0m'
 
 # Projects root is configurable; defaults to ~/projects.
 PROJECTS_DIR="${PROJECTS_DIR:-$HOME/projects}"
-# Go version considered current. Override with GO_LATEST=go_1_28 etc.
-GO_LATEST="${GO_LATEST:-go_1_27}"
+# Go version considered current, derived from this repo's nixpkgs pin via
+# lib.newestGoAttr — no manual bump site. Falls back when eval is impossible
+# (offline, broken daemon); override with GO_LATEST=go_1_28 etc.
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+GO_LATEST="${GO_LATEST:-$(nix eval --raw "$REPO_ROOT#lib.newestGoAttr" 2>/dev/null || echo go_1_27)}"
 
 pass=0
 fail=0

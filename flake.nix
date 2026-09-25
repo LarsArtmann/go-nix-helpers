@@ -35,6 +35,14 @@
         #   (b) flake lib (works when imported as a real flake):
         #       mkPreparedSource = go-nix-helpers.lib.mkPreparedSource { inherit pkgs lib; goPkg = pkgs.go_1_27; };
         lib.mkPreparedSource = import ./mkPreparedSource.nix;
+        # Newest go_1_XX branch in THIS flake's nixpkgs pin — the fleet-wide
+        # "current Go" reference (dashboard.sh derives GO_LATEST from it, so
+        # no script carries a manual bump site).
+        lib.newestGoAttr =
+          let
+            pure = import ./pure-functions.nix { lib = inputs.nixpkgs.lib; };
+          in
+          pure.newestGoAttrName (builtins.attrNames inputs.nixpkgs.legacyPackages.x86_64-linux);
         lib.mkGoFlake =
           args:
           builtins.trace "WARNING: mkGoFlake.nix is deprecated and will be removed in the first tagged release (v1.0.0). Migrate to flakeModules.go-standard — see docs/migration-guide.md" (

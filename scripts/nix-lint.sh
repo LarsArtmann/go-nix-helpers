@@ -108,9 +108,10 @@ for target in "${TARGETS[@]}"; do
   check_fix '\[\s*templ\s*\]' "bare 'templ' in list (needs pkgs.templ)" '|\[\s*templ\s*\]|[ pkgs.templ ]|'
   check_fix '\[\s*gotools\s*\]' "bare 'gotools' in list (needs pkgs.gotools)" '|\[\s*gotools\s*\]|[ pkgs.gotools ]|'
 
-  # Pattern 9: Non-existent package names
-  check 'go_1_26-outline' "go_1_26-outline doesn't exist (use go-outline)"
-  check 'pkgs\.go_1_26-outline' "pkgs.go_1_26-outline doesn't exist (use pkgs.go-outline)"
+  # Pattern 9: Non-existent package names (any go_1_XX branch, not just the
+  # one that was current when this check was written)
+  check 'go_1_[0-9]+-outline' "go_1_XX-outline doesn't exist (use go-outline)"
+  check 'pkgs\.go_1_[0-9]+-outline' "pkgs.go_1_XX-outline doesn't exist (use pkgs.go-outline)"
 
   # Pattern 11: outputs = inputs: missing self
   check '^\s*outputs\s*=\s*inputs\s*:' "outputs = inputs: missing self (use inputs@{ self, ... })"
