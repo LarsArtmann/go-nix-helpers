@@ -523,6 +523,56 @@ in
 
         usePreparedSource = cfg.deps != { };
 
+        # Eval-time go.mod floor check: the `go` directive in the consumer's
+        # ROOT go.mod must not exceed the resolved toolchain. GOTOOLCHAIN=local
+        # (set in all devShells and enforced in the sandbox) forbids toolchain
+        # downloads, so a floor above the toolchain is a guaranteed build
+        # failure — surface it at eval with an actionable message instead of
+        # a cryptic sandbox error at build time.
+        goModFloorCheck =
+          let
+            goModPath = self.outPath + "/go.mod";
+          in
+          if !builtins.pathExists goModPath then
+            null
+          else
+            let
+              goLines = builtins.filter (l: builtins.match "go [0-9].*" l != null) (
+                map lib.strings.trim (lib.splitString "\n" (builtins.readFile goModPath))
+              );
+              floorStr = if goLines == [ ] then null else lib.removePrefix "go " (builtins.head goLines);
+              # Numeric components only: custom overrides can carry suffixes
+              # ("1.26.4-custom") that would crash fromJSON.
+              toNums = v: map builtins.fromJSON (builtins.filter (c: builtins.match "[0-9]+" c != null) (lib.splitVersion v));
+              # -1 | 0 | 1, numeric per component; longer list wins on equal
+              # prefix ("1.27" < "1.27.1"), matching Go's own comparison.
+              cmp =
+                a: b:
+                if a == [ ] then
+                  (if b == [ ] then 0 else -1)
+                else if b == [ ] then
+                  1
+                else if builtins.head a < builtins.head b then
+                  -1
+                else if builtins.head a > builtins.head b then
+                  1
+                else
+                  cmp (builtins.tail a) (builtins.tail b);
+            in
+            if floorStr == null then
+              null
+            else if cmp (toNums floorStr) (toNums goPkg.version) == 1 then
+              throw ''
+                go-standard: go.mod requires go ${floorStr} but the resolved toolchain is ${goPkg.version} (${if cfg.goPkgAttr != null then cfg.goPkgAttr else "auto"}).
+                GOTOOLCHAIN=local forbids toolchain downloads, so every build and devShell `go` invocation would fail.
+                Fix one of:
+                  1. Pin the newest nixpkgs branch: goPkgAttr = "go_1_XX" (or leave null for auto)
+                  2. Build the exact version from source: goTarballVersion = "${floorStr}" + goTarballHash
+                  3. Update the nixpkgs input so a newer go_1_XX branch is packaged
+              ''
+            else
+              null;
+
         preparedSrc =
           if usePreparedSource then
             (import "${inputs.go-nix-helpers}/mkPreparedSource.nix" {
@@ -730,11 +780,13 @@ in
           );
 
         # Build the default package (always present)
-        # vendorHashWarning/proxyVendorWarning are referenced here to force
-        # evaluation of their detection traces when packages are evaluated.
-        package = builtins.seq proxyVendorWarning (
-          builtins.seq vendorHashWarning (
-            mkGoPackage cfg.pname cfg.subPackages cfg.description { }
+        # vendorHashWarning/proxyVendorWarning/goModFloorCheck are referenced
+        # here to force evaluation of their checks when packages are evaluated.
+        package = builtins.seq goModFloorCheck (
+          builtins.seq proxyVendorWarning (
+            builtins.seq vendorHashWarning (
+              mkGoPackage cfg.pname cfg.subPackages cfg.description { }
+            )
           )
         );
 

@@ -556,6 +556,15 @@ let
   };
   mkGoFlakeSmoke = builtins.tryEval (mkGoFlakePerSystemEval.config.packages ? default);
 
+  # --- go.mod floor check test ----------------------------------------------
+  # mockSelf's go.mod declares `go 1.26`; a toolchain overridden BELOW that
+  # floor must throw at eval with an actionable message (GOTOOLCHAIN=local
+  # would fail every build otherwise).
+  lowFloorToolchainCfg = mkPerSystemConfig {
+    goPkgOverride = pkg: pkg.overrideAttrs (_: { version = "1.24.9"; });
+  };
+  lowFloorEval = builtins.tryEval lowFloorToolchainCfg.packages.default.drvPath;
+
   # --- nativeBuildInputs merge test (user inputs appended, not overridden) ---
   nativeBuildInputsMergeCfg = mkPerSystemConfig {
     enableTempl = true;
