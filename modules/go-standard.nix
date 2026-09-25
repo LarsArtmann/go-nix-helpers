@@ -732,7 +732,7 @@ in
             combinedOther =
               (builtins.removeAttrs topLevel concatKeys) // (builtins.removeAttrs perPkg concatKeys);
             completionPostInstall = lib.optionalString cfg.enableCompletions ''
-              # Check if the binary supports --completion before installing.
+              # Check if the binary supports ${completionWord} before installing.
               # Falls back to a clear warning instead of silently installing
               # empty completion files.
               # timeout prevents a hanging binary from blocking the build.

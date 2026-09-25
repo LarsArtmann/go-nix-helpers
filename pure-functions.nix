@@ -54,6 +54,24 @@ let
     else if pkgs ? ${goPkgAttr} then newest
     else null;
 
+  # Actionable error message for the eval-time go.mod floor check. Kept
+  # pure so tests can assert the actual message content (tryEval cannot
+  # recover thrown messages — toString of a captured error is "").
+  goModFloorMessage =
+    {
+      floorStr,
+      toolchainVersion,
+      goPkgAttr ? null,
+    }:
+    ''
+      go-standard: go.mod requires go ${floorStr} but the resolved toolchain is ${toolchainVersion} (${if goPkgAttr != null then goPkgAttr else "auto"}).
+      GOTOOLCHAIN=local forbids toolchain downloads, so every build and devShell `go` invocation would fail.
+      Fix one of:
+        1. Pin the newest nixpkgs branch: goPkgAttr = "go_1_XX" (or leave null for auto)
+        2. Build the exact version from source: goTarballVersion = "${floorStr}" + goTarballHash
+        3. Update the nixpkgs input so a newer go_1_XX branch is packaged
+    '';
+
   # Resolve the Go toolchain package from consumer options — the single
   # declaration site shared by the go-standard module and mkGoFlake.
   #   goPkgAttr:          explicit nixpkgs attr ("go_1_27") wins; null picks
@@ -116,6 +134,7 @@ in
     repoName
     newestGoAttrName
     staleGoAttrName
+    goModFloorMessage
     goBaseFrom
     ;
 }
