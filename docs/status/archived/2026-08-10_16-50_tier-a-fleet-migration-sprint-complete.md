@@ -129,25 +129,25 @@
 
 ### Process improvements
 
-1.~~**ALWAYS run `git diff --cached --stat` before committing** — would have caught the stray docs/status file.~~ **Won't implement — process lesson — recorded.**
-2.~~**ALWAYS run `wc -l` on the final file before citing line counts in commit messages** — avoid embarrassing inaccuracies.~~ **Won't implement — process lesson — recorded.**
-3.~~**Never use `--no-verify` as a blanket strategy** — fix the deadnix issue or configure BuildFlow to skip unavailable tools gracefully. Using `--no-verify` on every commit means zero quality gates.~~ **Won't implement — process lesson — recorded.**
-4.~~**Verify migrations work WITHOUT `--override-input` before committing** — the PMA time bomb could have been caught by running `nix flake check --no-build` on the committed flake.lock.~~ **Won't implement — process lesson — recorded.**
-5.~~**Push module changes BEFORE migrating dependent repos** — or at minimum, note the push dependency in the commit message.~~ **Won't implement — process lesson — recorded.**
-6.~~**Add test assertions for new module options** — `requireDeps` shipped without a single test. The 114 assertions cover existing behavior but not the new option.~~ done — moved to TODO_LIST T6
+1. ~~**ALWAYS run `git diff --cached --stat` before committing** — would have caught the stray docs/status file.~~ **Won't implement — process lesson — recorded.**
+2. ~~**ALWAYS run `wc -l` on the final file before citing line counts in commit messages** — avoid embarrassing inaccuracies.~~ **Won't implement — process lesson — recorded.**
+3. ~~**Never use `--no-verify` as a blanket strategy** — fix the deadnix issue or configure BuildFlow to skip unavailable tools gracefully. Using `--no-verify` on every commit means zero quality gates.~~ **Won't implement — process lesson — recorded.**
+4. ~~**Verify migrations work WITHOUT `--override-input` before committing** — the PMA time bomb could have been caught by running `nix flake check --no-build` on the committed flake.lock.~~ **Won't implement — process lesson — recorded.**
+5. ~~**Push module changes BEFORE migrating dependent repos** — or at minimum, note the push dependency in the commit message.~~ **Won't implement — process lesson — recorded.**
+6. ~~**Add test assertions for new module options** — `requireDeps` shipped without a single test. The 114 assertions cover existing behavior but not the new option.~~ done — moved to TODO_LIST T6
 
 ### Technical improvements
 
-7.~~**`enableCompletions` is fundamentally broken for cobra** — this is the #1 module gap. Every cobra consumer (project-meta, potentially others) needs a workaround. Should add a `completionStyle` option (enum: `urfave-cli` | `cobra`).~~ done — moved to TODO_LIST T13 (completionStyle)
-8.~~**`proxyVendor = false` forced when deps set** — this is correct behavior but surprising. Should emit a `builtins.trace` warning when the consumer's original `proxyVendor` would have been `true`.~~ done — moved to TODO_LIST T14 (proxyVendor warning)
-9.~~**No `goExperiment` convenience option** — every single Tier A repo needs `GOEXPERIMENT=jsonv2`. This is 3 lines of boilerplate repeated 10 times. Should be a one-liner: `goExperiment = "jsonv2"`.~~ done — moved to TODO_LIST T13 (goExperiment)
-10.~~**Module's `modBuildPhase` doesn't support `templ generate`** — standard-bug-tracking-schema needed a manual override. Should add `enableTempl` integration with `modBuildPhase`.~~ done — moved to TODO_LIST T15 (templ in modBuildPhase)
-11.~~**No `cgoEnabled` option** — multiple repos set `CGO_ENABLED=0` via `extraBuildAttrs.env`. Should be a direct option.~~ done — moved to TODO_LIST T13 (cgoEnabled)
+7. ~~**`enableCompletions` is fundamentally broken for cobra** — this is the #1 module gap. Every cobra consumer (project-meta, potentially others) needs a workaround. Should add a `completionStyle` option (enum: `urfave-cli` | `cobra`).~~ done — moved to TODO_LIST T13 (completionStyle)
+8. ~~**`proxyVendor = false` forced when deps set** — this is correct behavior but surprising. Should emit a `builtins.trace` warning when the consumer's original `proxyVendor` would have been `true`.~~ done — moved to TODO_LIST T14 (proxyVendor warning)
+9. ~~**No `goExperiment` convenience option** — every single Tier A repo needs `GOEXPERIMENT=jsonv2`. This is 3 lines of boilerplate repeated 10 times. Should be a one-liner: `goExperiment = "jsonv2"`.~~ done — moved to TODO_LIST T13 (goExperiment)
+10. ~~**Module's `modBuildPhase` doesn't support `templ generate`** — standard-bug-tracking-schema needed a manual override. Should add `enableTempl` integration with `modBuildPhase`.~~ done — moved to TODO_LIST T15 (templ in modBuildPhase)
+11. ~~**No `cgoEnabled` option** — multiple repos set `CGO_ENABLED=0` via `extraBuildAttrs.env`. Should be a direct option.~~ done — moved to TODO_LIST T13 (cgoEnabled)
 
 ### Documentation improvements
 
-12.~~**Migration guide should have a "verification protocol"** — what to check after migrating: eval-check, build-check, test-check, lint-check.~~ done — done — GOEXPERIMENT recipe card (`e6860c5`)
-13.~~**No troubleshooting entry for "conflicting definition values"** — this error appeared in PMA (apps.lint conflict) and standard-bug-tracking-schema (shfmt conflict). Should document the `mkForce` pattern.~~ done — shipped — mkForce recipe card in the migration guide (`e6860c5`)
+12. ~~**Migration guide should have a "verification protocol"** — what to check after migrating: eval-check, build-check, test-check, lint-check.~~ done — done — GOEXPERIMENT recipe card (`e6860c5`)
+13. ~~**No troubleshooting entry for "conflicting definition values"** — this error appeared in PMA (apps.lint conflict) and standard-bug-tracking-schema (shfmt conflict). Should document the `mkForce` pattern.~~ done — shipped — mkForce recipe card in the migration guide (`e6860c5`)
 
 ---
 

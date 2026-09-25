@@ -59,14 +59,14 @@ All three flakes pass `nix flake check --no-build`:
 
 ## b) PARTIALLY DONE 🔧
 
-1.~~**go-nix-helpers flake.lock not updated** — the `go-nix-helpers` input in crush-daily and Standup-Killer still points to the remote `master` (rev `3c22ce4`) which does NOT contain `mkGoFlake.nix`. Until `go-nix-helpers` is pushed, consumers must use `--override-input go-nix-helpers path:...` or the build will fail. This is a **blocking deployment step**.~~ done — pushed — downstream consumers advanced past it (Resolution 2026-07-24)
-2.~~**Template not updated** — `templates/go-flake-parts/flake.nix` in go-nix-helpers still uses the old inline pattern. Should be updated to use `mkGoFlake` as the gold standard.~~ done — superseded — the go-standard template is the gold standard now (`927c924`)
+1. ~~**go-nix-helpers flake.lock not updated** — the `go-nix-helpers` input in crush-daily and Standup-Killer still points to the remote `master` (rev `3c22ce4`) which does NOT contain `mkGoFlake.nix`. Until `go-nix-helpers` is pushed, consumers must use `--override-input go-nix-helpers path:...` or the build will fail. This is a **blocking deployment step**.~~ done — pushed — downstream consumers advanced past it (Resolution 2026-07-24)
+2. ~~**Template not updated** — `templates/go-flake-parts/flake.nix` in go-nix-helpers still uses the old inline pattern. Should be updated to use `mkGoFlake` as the gold standard.~~ done — superseded — the go-standard template is the gold standard now (`927c924`)
 
 ## c) NOT STARTED 📋
 
-1.~~**Other consumers not migrated** — AGENTS.md mentions 7+ downstream consumers (BuildFlow, mr-sync, PMA, go-structure-linter, branching-flow, library-policy). None migrated yet.~~ done — superseded — Tier A fleet migrated to go-standard (2026-08-10); rest in TODO_LIST T4/T5
-2.~~**Template migration** — `templates/go-flake-parts/flake.nix` not updated to use mkGoFlake~~ **Won't implement — superseded — template deprecated with banner (`ee8c5b3`) instead.**
-3.~~**go.sum in Standup-Killer** — has unrelated changes (test deps removed by prior `go mod tidy`). Not committed.~~ done — moot — three months of subsequent commits
+1. ~~**Other consumers not migrated** — AGENTS.md mentions 7+ downstream consumers (BuildFlow, mr-sync, PMA, go-structure-linter, branching-flow, library-policy). None migrated yet.~~ done — superseded — Tier A fleet migrated to go-standard (2026-08-10); rest in TODO_LIST T4/T5
+2. ~~**Template migration** — `templates/go-flake-parts/flake.nix` not updated to use mkGoFlake~~ **Won't implement — superseded — template deprecated with banner (`ee8c5b3`) instead.**
+3. ~~**go.sum in Standup-Killer** — has unrelated changes (test deps removed by prior `go mod tidy`). Not committed.~~ done — moot — three months of subsequent commits
 
 ## d) TOTALLY FUCKED UP ❌
 
@@ -74,53 +74,53 @@ Nothing. All verifications pass. No data loss, no broken builds.
 
 ## e) WHAT WE SHOULD IMPROVE
 
-1.~~**Push go-nix-helpers to remote** — without this, consumers can't build without `--override-input`~~ done — pushed (Resolution 2026-07-24)
-2.~~**Update the template** — `templates/go-flake-parts/flake.nix` should demonstrate mkGoFlake usage~~ **Won't implement — superseded — go-flake-parts template deprecated; go-standard template is canonical.**
-3.~~**Migrate other consumers** — 7+ projects still use the old boilerplate pattern~~ done — Tier A done 2026-08-10; rest tracked in TODO_LIST T4/T5
-4.~~**Add `meta.description` to generated apps** — `nix flake check` warns about missing descriptions on apps~~ done — go-standard-generated apps carry meta.description
-5.~~**Consider `doCheck = false` as default** — many projects have pre-existing test failures and run tests via a separate `checks.test` instead~~ **Won't implement — kept `enableCheck = true` default — the option ships the choice.**
+1. ~~**Push go-nix-helpers to remote** — without this, consumers can't build without `--override-input`~~ done — pushed (Resolution 2026-07-24)
+2. ~~**Update the template** — `templates/go-flake-parts/flake.nix` should demonstrate mkGoFlake usage~~ **Won't implement — superseded — go-flake-parts template deprecated; go-standard template is canonical.**
+3. ~~**Migrate other consumers** — 7+ projects still use the old boilerplate pattern~~ done — Tier A done 2026-08-10; rest tracked in TODO_LIST T4/T5
+4. ~~**Add `meta.description` to generated apps** — `nix flake check` warns about missing descriptions on apps~~ done — go-standard-generated apps carry meta.description
+5. ~~**Consider `doCheck = false` as default** — many projects have pre-existing test failures and run tests via a separate `checks.test` instead~~ **Won't implement — kept `enableCheck = true` default — the option ships the choice.**
 
 ## f) Top 25 Things to Get Done Next
 
 ### Critical (blocks consumers)
 
-1.~~**Commit and push go-nix-helpers** — mkGoFlake.nix, flake.nix, AGENTS.md, README.md~~ done — pushed
-2.~~**Commit crush-daily flake.nix migration**~~ done — committed
-3.~~**Commit Standup-Killer flake.nix migration**~~ done — committed
-4.~~**Update flake.lock in crush-daily** — after go-nix-helpers is pushed~~ done — lock advanced past `3c22ce4`
-5.~~**Update flake.lock in Standup-Killer** — after go-nix-helpers is pushed~~ done — lock advanced past `3c22ce4`
+1. ~~**Commit and push go-nix-helpers** — mkGoFlake.nix, flake.nix, AGENTS.md, README.md~~ done — pushed
+2. ~~**Commit crush-daily flake.nix migration**~~ done — committed
+3. ~~**Commit Standup-Killer flake.nix migration**~~ done — committed
+4. ~~**Update flake.lock in crush-daily** — after go-nix-helpers is pushed~~ done — lock advanced past `3c22ce4`
+5. ~~**Update flake.lock in Standup-Killer** — after go-nix-helpers is pushed~~ done — lock advanced past `3c22ce4`
 
 ### Template & Docs
 
-6.~~**Update `templates/go-flake-parts/flake.nix`** to use mkGoFlake~~ **Won't implement — template deprecated with banner instead.**
-7.~~**Add a "migration guide" section to README.md** — how to convert an existing flake~~ done — shipped — docs/migration-guide.md
-8.~~**Update `docs/flake-patterns.md`** — reference mkGoFlake as the canonical pattern~~ done — shipped — flake-patterns references go-standard
+6. ~~**Update `templates/go-flake-parts/flake.nix`** to use mkGoFlake~~ **Won't implement — template deprecated with banner instead.**
+7. ~~**Add a "migration guide" section to README.md** — how to convert an existing flake~~ done — shipped — docs/migration-guide.md
+8. ~~**Update `docs/flake-patterns.md`** — reference mkGoFlake as the canonical pattern~~ done — shipped — flake-patterns references go-standard
 
 ### Extract More (from the comparison report)
 
-9.~~**Extract HHMM type** — into a shared package (standup-killer `domain.HHMM` vs crush-daily `config.HHMM`)~~ **Won't implement — external repos — out of go-nix-helpers scope.**
-10.~~**Extract event replay helper** — `event.ReplayInto(ctx, store, handler)` into go-cqrs-lite~~ **Won't implement — external repos — out of go-nix-helpers scope.**
+9. ~~**Extract HHMM type** — into a shared package (standup-killer `domain.HHMM` vs crush-daily `config.HHMM`)~~ **Won't implement — external repos — out of go-nix-helpers scope.**
+10. ~~**Extract event replay helper** — `event.ReplayInto(ctx, store, handler)` into go-cqrs-lite~~ **Won't implement — external repos — out of go-nix-helpers scope.**
 
 ### Other Consumer Migrations
 
-11.~~**Migrate BuildFlow flake.nix** to mkGoFlake~~ done — superseded — migrated to go-standard (TODO_LIST T4)
-12.~~**Migrate mr-sync flake.nix** to mkGoFlake~~ done — superseded — tracked in TODO_LIST T4
-13.~~**Migrate PMA flake.nix** to mkGoFlake~~ done — done — PMA migrated to go-standard (`9b47684`)
-14.~~**Migrate go-structure-linter flake.nix** to mkGoFlake~~ done — superseded — tracked in TODO_LIST T4
-15.~~**Migrate branching-flow flake.nix** to mkGoFlake~~ done — superseded — tracked in TODO_LIST T4
-16.~~**Migrate library-policy flake.nix** to mkGoFlake~~ done — superseded — tracked in TODO_LIST T5
+11. ~~**Migrate BuildFlow flake.nix** to mkGoFlake~~ done — superseded — migrated to go-standard (TODO_LIST T4)
+12. ~~**Migrate mr-sync flake.nix** to mkGoFlake~~ done — superseded — tracked in TODO_LIST T4
+13. ~~**Migrate PMA flake.nix** to mkGoFlake~~ done — done — PMA migrated to go-standard (`9b47684`)
+14. ~~**Migrate go-structure-linter flake.nix** to mkGoFlake~~ done — superseded — tracked in TODO_LIST T4
+15. ~~**Migrate branching-flow flake.nix** to mkGoFlake~~ done — superseded — tracked in TODO_LIST T4
+16. ~~**Migrate library-policy flake.nix** to mkGoFlake~~ done — superseded — tracked in TODO_LIST T5
 
 ### Refinements
 
-17.~~**Add `meta.description` to all generated apps** — silence nix flake check warnings~~ done — go-standard apps carry meta.description
-18.~~**Add a test derivation for mkGoFlake** — verify it produces valid outputs for a minimal config~~ done — moved to TODO_LIST T10 (mkGoFlake smoke)
-19.~~**Consider a `subPackages` parameter** — for projects with `cmd/<name>/` entrypoints~~ done — shipped — subPackages option in go-standard
-20.~~**Consider `programs.gofumpt` vs `programs.gofumpt.enable`** — template pattern consistency~~ **Won't implement — cosmetic.**
-21.~~**Add `git-hooks.nix` support** to mkGoFlake (optional pre-commit hooks)~~ **Won't implement — dormant since 2026-06 — dropped (reopen on demand).**
-22.~~**Consider `version ? self.shortRev or "dev"`** — dynamic versioning from git~~ done — shipped — version option defaults to self.rev or self.dirtyRev or "dev"
-23.~~**Add `homepage` to meta** — currently missing~~ **Won't implement — dormant since 2026-06 — dropped.**
-24.~~**Document `buildGoModuleOverrides` shallow-merge caveat** — `//` replaces nested attrs like `meta`~~ done — superseded — extraBuildAttrs merge semantics documented (6 concatenated attrs)
-25.~~**Clean up Standup-Killer go.sum** — unrelated changes should be committed separately or reverted~~ done — moot — three months of subsequent commits
+17. ~~**Add `meta.description` to all generated apps** — silence nix flake check warnings~~ done — go-standard apps carry meta.description
+18. ~~**Add a test derivation for mkGoFlake** — verify it produces valid outputs for a minimal config~~ done — moved to TODO_LIST T10 (mkGoFlake smoke)
+19. ~~**Consider a `subPackages` parameter** — for projects with `cmd/<name>/` entrypoints~~ done — shipped — subPackages option in go-standard
+20. ~~**Consider `programs.gofumpt` vs `programs.gofumpt.enable`** — template pattern consistency~~ **Won't implement — cosmetic.**
+21. ~~**Add `git-hooks.nix` support** to mkGoFlake (optional pre-commit hooks)~~ **Won't implement — dormant since 2026-06 — dropped (reopen on demand).**
+22. ~~**Consider `version ? self.shortRev or "dev"`** — dynamic versioning from git~~ done — shipped — version option defaults to self.rev or self.dirtyRev or "dev"
+23. ~~**Add `homepage` to meta** — currently missing~~ **Won't implement — dormant since 2026-06 — dropped.**
+24. ~~**Document `buildGoModuleOverrides` shallow-merge caveat** — `//` replaces nested attrs like `meta`~~ done — superseded — extraBuildAttrs merge semantics documented (6 concatenated attrs)
+25. ~~**Clean up Standup-Killer go.sum** — unrelated changes should be committed separately or reverted~~ done — moot — three months of subsequent commits
 
 ## g) Top #1 Question
 

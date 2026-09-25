@@ -211,40 +211,40 @@ and run it directly. Minor, but worth noting.
 
 ## E) WHAT WE SHOULD IMPROVE
 
-1.~~**TODO_LIST lifecycle must be maintained during execution.** I completed~~ **Won't implement — process lesson — TODO_LIST lifecycle maintained since.**
+1. ~~**TODO_LIST lifecycle must be maintained during execution.** I completed~~ **Won't implement — process lesson — TODO_LIST lifecycle maintained since.**
    25+ items but didn't update TODO_LIST.md as I went. The list went from
    "severely stale" (before the docs-health audit) to "severely stale" again
    (after this session). The delete-done protocol must be applied after each
    work package, not deferred to a separate session.
 
-2.~~**CHANGELOG must be written incrementally.** 16 commits with no CHANGELOG~~ **Won't implement — process lesson — CHANGELOG written incrementally since.**
+2. ~~**CHANGELOG must be written incrementally.** 16 commits with no CHANGELOG~~ **Won't implement — process lesson — CHANGELOG written incrementally since.**
    entries means there's no structured record of what shipped. Each package
    (P1-P11) should have added a CHANGELOG entry.
 
-3.~~**CI YAML needs commit discipline.** The auto-git daemon and manual edits~~ **Won't implement — process lesson — daemon commits are expected (AGENTS.md).**
+3. ~~**CI YAML needs commit discipline.** The auto-git daemon and manual edits~~ **Won't implement — process lesson — daemon commits are expected (AGENTS.md).**
    are fighting over `ci.yml`. The working tree has the correct version but
    it's uncommitted. Should have committed immediately after verifying.
 
-4.~~**P12 risk assessment was correct but should be documented.** The decision~~ done — done — P12 rationale recorded in the plan banner + TODO_LIST 'Decided against'
+4. ~~**P12 risk assessment was correct but should be documented.** The decision~~ done — done — P12 rationale recorded in the plan banner + TODO_LIST 'Decided against'
    to skip P12 should be recorded in the plan document itself (strikethrough
    with rationale), not just in this status report.
 
-5.~~**Pure function extraction created a new public surface.** `pure-functions.nix`~~ done — decided — kept internal
+5. ~~**Pure function extraction created a new public surface.** `pure-functions.nix`~~ done — decided — kept internal
    is a new file that consumers could theoretically import, but it's not
    documented in AGENTS.md, README.md, or exported via `flake.lib`. Should
    decide: is it internal (test-only) or public API?
 
-6.~~**The `vendorHashWarning` uses `builtins.trace`** which prints to stderr~~ **Won't implement — kept builtins.trace — Nix-version independent.**
+6. ~~**The `vendorHashWarning` uses `builtins.trace`** which prints to stderr~~ **Won't implement — kept builtins.trace — Nix-version independent.**
    during evaluation. This is the Nix idiom for warnings, but it's noisy in
    CI logs. Consider using `lib.warn` (Nix 2.21+) for a more structured
    warning if the Nix version supports it.
 
-7.~~**Test count inflation.** Module tests went from 74 to 92 assertions, but~~ **Won't implement — process lesson — behavioral tests preferred since.**
+7. ~~**Test count inflation.** Module tests went from 74 to 92 assertions, but~~ **Won't implement — process lesson — behavioral tests preferred since.**
    many new tests are eval-level (`packages ? default`) rather than true
    behavioral tests. The behavioral tests (extracting `drvAttrs`) are more
    valuable and should be the preferred pattern.
 
-8.~~**Integration test count in docs is now wrong.** AGENTS.md says "6~~ done — done — counts re-derived (docs-health 2026-09-24: 41 options, 9 scenarios, 121 assertions)
+8. ~~**Integration test count in docs is now wrong.** AGENTS.md says "6~~ done — done — counts re-derived (docs-health 2026-09-24: 41 options, 9 scenarios, 121 assertions)
    scenarios" — it's now 7. FEATURES.md was updated to "6" in the previous
    session but is now also wrong.
 
@@ -254,71 +254,71 @@ and run it directly. Minor, but worth noting.
 
 ### Immediate (fix damage from this session)
 
-1.~~Update TODO_LIST.md — mark all completed items as done (delete them)~~ done — done — 05:04 docs session
-2.~~Write CHANGELOG entries for all 16 commits~~ done — done — 05:04 docs session
-3.~~Commit the uncommitted `ci.yml` change~~ done — committed
-4.~~Update AGENTS.md test counts (74→92 module assertions, 6→7 integration scenarios, 32→37 options)~~ done — done — 05:04 docs session
-5.~~Update FEATURES.md integration test count (6→7)~~ done — done
-6.~~Document `pure-functions.nix` in AGENTS.md key files table~~ done — done
-7.~~Annotate the Pareto plan: mark P1-P11 as shipped, P12 as skipped with rationale~~ done — done — plan banner marks P1–P11 shipped, P12 skipped
+1. ~~Update TODO_LIST.md — mark all completed items as done (delete them)~~ done — done — 05:04 docs session
+2. ~~Write CHANGELOG entries for all 16 commits~~ done — done — 05:04 docs session
+3. ~~Commit the uncommitted `ci.yml` change~~ done — committed
+4. ~~Update AGENTS.md test counts (74→92 module assertions, 6→7 integration scenarios, 32→37 options)~~ done — done — 05:04 docs session
+5. ~~Update FEATURES.md integration test count (6→7)~~ done — done
+6. ~~Document `pure-functions.nix` in AGENTS.md key files table~~ done — done
+7. ~~Annotate the Pareto plan: mark P1-P11 as shipped, P12 as skipped with rationale~~ done — done — plan banner marks P1–P11 shipped, P12 skipped
 
 ### Short-term (fill remaining gaps)
 
-8.~~Add `--dry-run` and `--verbose` to CI smoke-test job~~ done — shipped — P9 smoke steps
-9.~~Add `enableShfmt` to the man page (`docs/man/go-standard.5`)~~ done — done — 05:04
-10.~~Add `enableShfmt` to the README options table~~ done — done — 05:04
-11.~~Add `pure-functions.nix` to `flake.lib` export (or explicitly mark as internal)~~ done — decided — kept internal
-12.~~Consider `lib.warn` instead of `builtins.trace` for vendorHash placeholder~~ **Won't implement — kept builtins.trace.**
-13.~~Add behavioral test for `enableShfmt` toggle in treefmt (currently only eval-level)~~ **Won't implement — dormant — dropped.**
-14.~~Add behavioral test for `enableShfmt = true` producing `shfmt.enable = true` in treefmt (done, but could be deeper)~~ **Won't implement — dormant — dropped.**
+8. ~~Add `--dry-run` and `--verbose` to CI smoke-test job~~ done — shipped — P9 smoke steps
+9. ~~Add `enableShfmt` to the man page (`docs/man/go-standard.5`)~~ done — done — 05:04
+10. ~~Add `enableShfmt` to the README options table~~ done — done — 05:04
+11. ~~Add `pure-functions.nix` to `flake.lib` export (or explicitly mark as internal)~~ done — decided — kept internal
+12. ~~Consider `lib.warn` instead of `builtins.trace` for vendorHash placeholder~~ **Won't implement — kept builtins.trace.**
+13. ~~Add behavioral test for `enableShfmt` toggle in treefmt (currently only eval-level)~~ **Won't implement — dormant — dropped.**
+14. ~~Add behavioral test for `enableShfmt = true` producing `shfmt.enable = true` in treefmt (done, but could be deeper)~~ **Won't implement — dormant — dropped.**
 
 ### CI hardening
 
-15.~~Replace `ludeeus/action-shellcheck` with Nix-installed shellcheck~~ done — done — Nix-based shellcheck CI job
-16.~~Add `nix flake check --no-build` step to the smoke-test job~~ **Won't implement — dormant — dropped.**
-17.~~Add CI step for `nix build .#checks.x86_64-linux.structural`~~ done — done — CI integration-tests job
-18.~~Add CI step for `nix build .#checks.x86_64-linux.pureFunctions`~~ done — done — CI wiring (05:04 CI-2)
-19.~~Add CI step for pure function tests on macOS~~ **Won't implement — macOS matrix covers pureFunctions.**
-20.~~Add `--all-systems` to the macOS check job (can evaluate all systems on macOS)~~ **Won't implement — infeasible from Linux — documented.**
-21.~~Add Nix flake check to the macOS integration-tests job~~ done — done — macOS matrix
-22.~~Add CI badge for shellcheck job~~ **Won't implement — dropped.**
-23.~~Add CI step that verifies `nix fmt -- --ci` passes on macOS too~~ **Won't implement — dropped.**
+15. ~~Replace `ludeeus/action-shellcheck` with Nix-installed shellcheck~~ done — done — Nix-based shellcheck CI job
+16. ~~Add `nix flake check --no-build` step to the smoke-test job~~ **Won't implement — dormant — dropped.**
+17. ~~Add CI step for `nix build .#checks.x86_64-linux.structural`~~ done — done — CI integration-tests job
+18. ~~Add CI step for `nix build .#checks.x86_64-linux.pureFunctions`~~ done — done — CI wiring (05:04 CI-2)
+19. ~~Add CI step for pure function tests on macOS~~ **Won't implement — macOS matrix covers pureFunctions.**
+20. ~~Add `--all-systems` to the macOS check job (can evaluate all systems on macOS)~~ **Won't implement — infeasible from Linux — documented.**
+21. ~~Add Nix flake check to the macOS integration-tests job~~ done — done — macOS matrix
+22. ~~Add CI badge for shellcheck job~~ **Won't implement — dropped.**
+23. ~~Add CI step that verifies `nix fmt -- --ci` passes on macOS too~~ **Won't implement — dropped.**
 
 ### Test deepening
 
-24.~~Add property test: `repoName` output never contains `/vN`~~ done — shipped — checks.pureFunctions
-25.~~Add property test: `stripVersionSuffix` preserves non-version path segments~~ done — shipped — checks.pureFunctions
-26.~~Add test: `extraBuildAttrs` with ALL list attrs simultaneously~~ **Won't implement — dormant — dropped.**
-27.~~Add test: `enableCompletions` with a mock binary that DOES support `--completion`~~ **Won't implement — dormant — dropped.**
-28.~~Add test: monorepo `packages` option with `enableCompletions`~~ **Won't implement — dormant — dropped.**
-29.~~Add test: `ldflags = []` (empty list, not null)~~ **Won't implement — dormant — dropped.**
-30.~~Add test: `proxyVendor = false` with deps (should be forced to false)~~ **Won't implement — dormant — dropped.**
-31.~~Add test: `buildFlags` with special characters (spaces, quotes)~~ **Won't implement — dormant — dropped.**
-32.~~Add test: `deps` with a deeply nested module path (5+ levels)~~ **Won't implement — dormant — dropped.**
-33.~~Add test: `postPatchExtra` actually runs (behavioral, not eval)~~ **Won't implement — dormant — dropped.**
-34.~~Add test: `shellExtraEnv.GOPRIVATE` overrides `autoGoPrivate`~~ **Won't implement — dormant — dropped.**
-35.~~Add test: `autoGoPrivate = false` suppresses GOPRIVATE even with deps~~ **Won't implement — dormant — dropped.**
-36.~~Add test: `enableGopls = false` removes gopls from devShell~~ done — done — 09:23 session
-37.~~Add test: `enableGovulncheck = false` removes govulncheck from devShell~~ done — done — 09:23 session
-38.~~Add integration test: `requireDeps` with `/v2` path dedup~~ done — done — requireDeps dedup scenario
-39.~~Add integration test: deeply nested sub-module at 4+ levels~~ done — done — depth-2 nested tests
-40.~~Add test: `stripLocalReplaces` with no existing replaces (no-op)~~ **Won't implement — dormant — dropped.**
+24. ~~Add property test: `repoName` output never contains `/vN`~~ done — shipped — checks.pureFunctions
+25. ~~Add property test: `stripVersionSuffix` preserves non-version path segments~~ done — shipped — checks.pureFunctions
+26. ~~Add test: `extraBuildAttrs` with ALL list attrs simultaneously~~ **Won't implement — dormant — dropped.**
+27. ~~Add test: `enableCompletions` with a mock binary that DOES support `--completion`~~ **Won't implement — dormant — dropped.**
+28. ~~Add test: monorepo `packages` option with `enableCompletions`~~ **Won't implement — dormant — dropped.**
+29. ~~Add test: `ldflags = []` (empty list, not null)~~ **Won't implement — dormant — dropped.**
+30. ~~Add test: `proxyVendor = false` with deps (should be forced to false)~~ **Won't implement — dormant — dropped.**
+31. ~~Add test: `buildFlags` with special characters (spaces, quotes)~~ **Won't implement — dormant — dropped.**
+32. ~~Add test: `deps` with a deeply nested module path (5+ levels)~~ **Won't implement — dormant — dropped.**
+33. ~~Add test: `postPatchExtra` actually runs (behavioral, not eval)~~ **Won't implement — dormant — dropped.**
+34. ~~Add test: `shellExtraEnv.GOPRIVATE` overrides `autoGoPrivate`~~ **Won't implement — dormant — dropped.**
+35. ~~Add test: `autoGoPrivate = false` suppresses GOPRIVATE even with deps~~ **Won't implement — dormant — dropped.**
+36. ~~Add test: `enableGopls = false` removes gopls from devShell~~ done — done — 09:23 session
+37. ~~Add test: `enableGovulncheck = false` removes govulncheck from devShell~~ done — done — 09:23 session
+38. ~~Add integration test: `requireDeps` with `/v2` path dedup~~ done — done — requireDeps dedup scenario
+39. ~~Add integration test: deeply nested sub-module at 4+ levels~~ done — done — depth-2 nested tests
+40. ~~Add test: `stripLocalReplaces` with no existing replaces (no-op)~~ **Won't implement — dormant — dropped.**
 
 ### Documentation
 
-41.~~Update `docs/migration-guide.md` to mention `enableShfmt`~~ done — done — 06:51 Task 1
-42.~~Update `docs/flake-patterns.md` with the new `extraBuildAttrs` merge pattern~~ done — done — 06:51 Task 2
-43.~~Add `docs/man/go-standard.5` entry for `enableShfmt`~~ done — done — 06:51 Task 3
-44.~~Add `docs/man/go-standard.5` entry for `vendorHash` placeholder warning~~ **Won't implement — covered by the vendorHash placeholder trace.**
-45.~~Add architecture diagram note about pure-functions.nix~~ done — done — 06:51 Task 7
-46.~~Write a CONTRIBUTING.md for downstream consumers~~ **Won't implement — dormant — dropped.**
+41. ~~Update `docs/migration-guide.md` to mention `enableShfmt`~~ done — done — 06:51 Task 1
+42. ~~Update `docs/flake-patterns.md` with the new `extraBuildAttrs` merge pattern~~ done — done — 06:51 Task 2
+43. ~~Add `docs/man/go-standard.5` entry for `enableShfmt`~~ done — done — 06:51 Task 3
+44. ~~Add `docs/man/go-standard.5` entry for `vendorHash` placeholder warning~~ **Won't implement — covered by the vendorHash placeholder trace.**
+45. ~~Add architecture diagram note about pure-functions.nix~~ done — done — 06:51 Task 7
+46. ~~Write a CONTRIBUTING.md for downstream consumers~~ **Won't implement — dormant — dropped.**
 
 ### Polish
 
-47.~~Add `--force` flag to `generate-flake.sh` to overwrite existing files~~ **Won't implement — dormant — dropped.**
-48.~~Add `--vendor-hash` flag to `generate-flake.sh` for post-build hash injection~~ **Won't implement — dormant — dropped.**
-49.~~Consider adding `golangci-lint` config template to `generate-flake.sh`~~ **Won't implement — dormant — dropped.**
-50.~~Add `nix run .#lint` smoke test to CI~~ **Won't implement — dormant — dropped.**
+47. ~~Add `--force` flag to `generate-flake.sh` to overwrite existing files~~ **Won't implement — dormant — dropped.**
+48. ~~Add `--vendor-hash` flag to `generate-flake.sh` for post-build hash injection~~ **Won't implement — dormant — dropped.**
+49. ~~Consider adding `golangci-lint` config template to `generate-flake.sh`~~ **Won't implement — dormant — dropped.**
+50. ~~Add `nix run .#lint` smoke test to CI~~ **Won't implement — dormant — dropped.**
 
 ---
 

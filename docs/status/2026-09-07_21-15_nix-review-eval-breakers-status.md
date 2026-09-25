@@ -23,21 +23,21 @@ Evidence chain (bisect): eval green at `0817f80` → broken at `528488a` (lock b
 
 ## b) PARTIALLY DONE
 
-1.~~**Push + consumer lock update** — everything is local; HEAD is NOT pushed, so CV's `flake.lock` still pins the eval-broken rev and CV's `nix flake check`/full go-change-gate stay red until: push here → `nix flake lock update go-nix-helpers` in CV → full gate re-run. Not mine to push without the owner's word.~~ done — master pushed and in sync (verified 2026-09-24)
+1. ~~**Push + consumer lock update** — everything is local; HEAD is NOT pushed, so CV's `flake.lock` still pins the eval-broken rev and CV's `nix flake check`/full go-change-gate stay red until: push here → `nix flake lock update go-nix-helpers` in CV → full gate re-run. Not mine to push without the owner's word.~~ done — master pushed and in sync (verified 2026-09-24)
 2. **CV `vendorHash` validity claim** — argued from byte-identical fixes (identical vendored output ⇒ identical FOD output hash) but NOT re-proven by building CV's FOD against this repo's HEAD; cheap to verify once the lock consumes HEAD.
-3.~~**templ-committed test hardness** — the negative-case assertion (`tryEval … !result.success`) passed for the WRONG reason before my fix (it caught the realization _error_ just as happily as the intended `throw`). It now exercises the intended path, but the test still cannot DISTINGUISH intended-throw from accidental-eval-error — it should assert the throw message ("without a committed *_templ.go"). Not done.~~ done — moved to TODO_LIST T11
-4.~~**`test-module.nix` read coverage** — 945 lines; I read the mock/templ/overlay/assert sections by targeted views (~85%), not a full sequential pass. The skill says read everything; the un-read remainder is option-default assertions, but honest reporting: partial.~~ done — superseded — the 2026-09-24 session re-verified the full moduleTest suite
+3. ~~**templ-committed test hardness** — the negative-case assertion (`tryEval … !result.success`) passed for the WRONG reason before my fix (it caught the realization _error_ just as happily as the intended `throw`). It now exercises the intended path, but the test still cannot DISTINGUISH intended-throw from accidental-eval-error — it should assert the throw message ("without a committed *_templ.go"). Not done.~~ done — moved to TODO_LIST T11
+4. ~~**`test-module.nix` read coverage** — 945 lines; I read the mock/templ/overlay/assert sections by targeted views (~85%), not a full sequential pass. The skill says read everything; the un-read remainder is option-default assertions, but honest reporting: partial.~~ done — superseded — the 2026-09-24 session re-verified the full moduleTest suite
 5. **Flake-lock drift governance** — `528488a`'s lock bump broke eval for 40+ minutes unbeknownst to CI (local-only). No gate here forces "lock bump must pass `nix flake check` before landing" beyond the daemon's blind auto-commit. Not addressed this session.
 6. **`0817f80` commit-message accuracy** — the parallel session's message describes a "single-quoted shell fragment" and "regex mismatch" mechanism; the real mechanism is Nix indented-string interpolation → eval error. The CODE is correct; the recorded RATIONALE is wrong and will mislead future debugging. Not corrected (rewriting others' commits is off-limits); a docs correction is a next-step.
 
 ## c) NOT STARTED (observed, deliberately untouched)
 
-1.~~`mkGoFlake.nix` (deprecated) polish — missing `GOTOOLCHAIN=local` in its devshells, `meta = with lib;`, `program = "${writeShellApplication …}/bin/${name}"` instead of `lib.getExe`. Dies at v1.0.0 per its own trace; not worth polishing.~~ **Won't implement — dies at the first tagged release — not worth polishing.**
-2.~~`test.nix:6` `<nixpkgs>` fallback — deliberate convenience for standalone `nix-build test.nix`; flake path passes `pkgs` explicitly. Left as-is.~~ **Won't implement — deliberate standalone convenience — left as-is.**
-3.~~`go-standard` meta `license` hardcoded MIT — overridable via `extraMeta`; fleet-typical, left.~~ **Won't implement — fleet-typical and overridable via extraMeta — left deliberately.**
-4.~~`publicDeps` entries go into an ERE unescaped (`grep -vE "^${pub}…"` via `escapeShellArg` only) — dots are wildcards; harmless over-match today.~~ done — moved to TODO_LIST T12
-5.~~`excludeSubModuleDirs` custom values are spliced into a `case` glob unquoted — metachar-containing custom excludes would break; defaults safe.~~ done — moved to TODO_LIST T20
-6.~~`autoDiscoverScript` header comment says "ALL go.mod at any depth" but `find -mindepth 3` skips each dep's TOP-LEVEL go.mod (by design — main replace comes from the deps key). Comment nit only.~~ done — moved to TODO_LIST T19
+1. ~~`mkGoFlake.nix` (deprecated) polish — missing `GOTOOLCHAIN=local` in its devshells, `meta = with lib;`, `program = "${writeShellApplication …}/bin/${name}"` instead of `lib.getExe`. Dies at v1.0.0 per its own trace; not worth polishing.~~ **Won't implement — dies at the first tagged release — not worth polishing.**
+2. ~~`test.nix:6` `<nixpkgs>` fallback — deliberate convenience for standalone `nix-build test.nix`; flake path passes `pkgs` explicitly. Left as-is.~~ **Won't implement — deliberate standalone convenience — left as-is.**
+3. ~~`go-standard` meta `license` hardcoded MIT — overridable via `extraMeta`; fleet-typical, left.~~ **Won't implement — fleet-typical and overridable via extraMeta — left deliberately.**
+4. ~~`publicDeps` entries go into an ERE unescaped (`grep -vE "^${pub}…"` via `escapeShellArg` only) — dots are wildcards; harmless over-match today.~~ done — moved to TODO_LIST T12
+5. ~~`excludeSubModuleDirs` custom values are spliced into a `case` glob unquoted — metachar-containing custom excludes would break; defaults safe.~~ done — moved to TODO_LIST T20
+6. ~~`autoDiscoverScript` header comment says "ALL go.mod at any depth" but `find -mindepth 3` skips each dep's TOP-LEVEL go.mod (by design — main replace comes from the deps key). Comment nit only.~~ done — moved to TODO_LIST T19
 7. `nativeBuildInputs = [ goPkg ]` in `mkPreparedSource` — no script invokes `go`; possibly vestigial (needs verification before removal).
 8. `scripts/dashboard.sh` / `scripts/nix-lint.sh` — referenced by apps, not reviewed (shell, not `.nix`; flagged for a follow-up).
 9. `nix flake check --all-systems` — darwin/aarch64 legs omitted locally (no builders); CI question only.
@@ -58,29 +58,29 @@ Evidence chain (bisect): eval green at `0817f80` → broken at `528488a` (lock b
 4. **Stop using backslash literals in tool-driven scripted edits entirely** — `chr(92)` construction or sed with `[.]`-style alternates. This is the third session with the same failure shape; the rule belongs in AGENTS.md (still not written — carried foul).
 5. **Lock-bump gate**: a flake.lock change should require a green `nix flake check --no-build` in the same commit window (pre-commit or CI), because input bumps change EVAL semantics, not just build inputs — today's 40-minute red window proves the gap.
 6. **Commit-message accuracy matters downstream**: `0817f80`'s wrong mechanism story ("regex mismatch") vs the real eval-interpolation failure is exactly the "false premise in the record" class the verify-external-claims skill exists for. Correct the record in docs, never rewrite others' commits.
-7.~~**Tests must discriminate the FAILURE MODE, not just failure**: the templ test's `tryEval` should assert the throw MESSAGE so a regression to context-realization errors can't hide behind a green check.~~ done — moved to TODO_LIST T11
+7. ~~**Tests must discriminate the FAILURE MODE, not just failure**: the templ test's `tryEval` should assert the throw MESSAGE so a regression to context-realization errors can't hide behind a green check.~~ done — moved to TODO_LIST T11
 8. **Parallel-session hygiene worked — keep it**: my fix set landed intact via the daemon + their commit; no stomp, no revert, and the bisect protocol kept authorship questions factual.
 
 ## f) Up to 50 things to get done next (impact-ordered brainstorm → HARVEST decides)
 
 **Unblock / urgent**
 
-1.~~Push this repo's HEAD (`8188ad2` + in-flight parallel work) — unblocks the entire CV fleet.~~ done — master pushed and in sync (verified 2026-09-24)
+1. ~~Push this repo's HEAD (`8188ad2` + in-flight parallel work) — unblocks the entire CV fleet.~~ done — master pushed and in sync (verified 2026-09-24)
 2. CV: `nix flake lock update go-nix-helpers` → `nix flake check` → full `bash scripts/go-change-gate.sh`.
 3. Verify CV's `vendorHash` re-pin end-to-end (build the FOD against the consumed rev, not by reasoning).
 4. Check this repo's CI ran/will run green on the pushed HEAD (the lock bump was never CI-proven).
 5. Re-deploy chain: SystemNix cv flake.lock bump AFTER CV's lock lands (ordering matters — stale pins 410).
-6.~~Land or discard the parallel session's in-flight fixture edits (`require github.com/a-h/templ …` lines) consciously — they change fixture content mid-verify.~~ done — fixture edits landed — test-assets committed and moduleTest green
+6. ~~Land or discard the parallel session's in-flight fixture edits (`require github.com/a-h/templ …` lines) consciously — they change fixture content mid-verify.~~ done — fixture edits landed — test-assets committed and moduleTest green
 
 **Correctness / test hardness**
-7.~~Harden the templ-committed negative test to assert the throw MESSAGE (intended-throw vs accidental-eval-error discrimination).~~ done — moved to TODO_LIST T11
+7. ~~Harden the templ-committed negative test to assert the throw MESSAGE (intended-throw vs accidental-eval-error discrimination).~~ done — moved to TODO_LIST T11
 8. Add an eval-regression test for the shell-var-in-nix-string class: eval-smoke each generated shell snippet (or a greppable lint app like `nix run .#lint` extended with an unescaped-`${` detector for indented strings).
 9. Property test: `repoName` mid-path `/vN` cases beyond the current set; `stripVersionSuffix` idempotence already covered.
 10. Verify `nativeBuildInputs = [ goPkg ]` in mkPreparedSource is load-bearing; remove or document.
 11. Guard `cat go.mod` when go.mod is absent in postPatch (stderr noise on no-go.mod sources).
-12.~~Escape ERE metachars in `publicDeps` entries before the `grep -vE` filter.~~ done — moved to TODO_LIST T12
-13.~~Quote/validate `excludeSubModuleDirs` entries spliced into the `case` glob.~~ done — moved to TODO_LIST T20
-14.~~Fix the "any depth" doc/comment vs `find -mindepth 3` mismatch in autoDiscoverScript.~~ done — moved to TODO_LIST T19
+12. ~~Escape ERE metachars in `publicDeps` entries before the `grep -vE` filter.~~ done — moved to TODO_LIST T12
+13. ~~Quote/validate `excludeSubModuleDirs` entries spliced into the `case` glob.~~ done — moved to TODO_LIST T20
+14. ~~Fix the "any depth" doc/comment vs `find -mindepth 3` mismatch in autoDiscoverScript.~~ done — moved to TODO_LIST T19
 15. Decide `goTarballVersion`+`goTarballHash` vs `goPkgOverride` — two knobs, one job; keep precedence documented AND mark one preferred in option docs.
 16. Make the templ-committed exclusion list an option (`templCheckExcludePaths`, default `[".git", "test-assets"]`) instead of a hardcoded name consumers might collide with.
 17. Consider gating the templ-committed walk behind `enableTempl` (consumers without templ skip the eval walk entirely).
@@ -91,22 +91,22 @@ Evidence chain (bisect): eval green at `0817f80` → broken at `528488a` (lock b
 22. `nix flake check --all-systems` leg: document the darwin/aarch64 skip or add a remote-builder CI job.
 23. Confirm minimum-supported Nix version in README — context-realization-on-pathExists semantics changed underfoot today; consumers on older/newer Nix may see different failures.
 24. Add the two `test-assets` fixture layouts to contributor docs (how to extend the templ-committed tests).
-25.~~Template build-smoke: `templateEval` checks eval only; copy `templates/go-standard` into a scratch project and `nix build` it in CI.~~ done — moved to ROADMAP Theme 3
+25. ~~Template build-smoke: `templateEval` checks eval only; copy `templates/go-standard` into a scratch project and `nix build` it in CI.~~ done — moved to ROADMAP Theme 3
 26. `set -euo pipefail` audit across `scripts/*.sh`.
 27. Single-package overlay eval test (only the monorepo overlay has one today).
 28. go-standard: document WHY `devShells.default` is `mkShell` (CC needed for cgo) at the definition.
 29. go-standard: `checks.format`/`build` interplay with consumer-added checks — document merge expectations.
 30. Consider `follows` for a `systems` input in this repo's flake.nix (consistency with the checklist).
-31.~~mkGoFlake: add the actual removal tracking (v1.0.0 milestone issue) the deprecation warning promises.~~ done — gated on the v0.1.0 tag (TODO_LIST Blocked)
+31. ~~mkGoFlake: add the actual removal tracking (v1.0.0 milestone issue) the deprecation warning promises.~~ done — gated on the v0.1.0 tag (TODO_LIST Blocked)
 32. go-standard: make `meta.license` an option (default MIT) instead of extraMeta override.
 33. Write the correction note for `0817f80`'s mechanism story (docs/, not history rewrite).
-34.~~CHANGELOG entry for today's eval fixes (repo has CHANGELOG.md; nothing added yet).~~ done — CHANGELOG entries added
-35.~~FEATURES.md/TODO_LIST.md sync with the new test-assets fixture layout + walkTempl contract (docs-health pass on this repo).~~ done (docs-health pass 2026-09-24)
+34. ~~CHANGELOG entry for today's eval fixes (repo has CHANGELOG.md; nothing added yet).~~ done — CHANGELOG entries added
+35. ~~FEATURES.md/TODO_LIST.md sync with the new test-assets fixture layout + walkTempl contract (docs-health pass on this repo).~~ done (docs-health pass 2026-09-24)
 36. Weekly lock-drift report (mirror CV's flake-lock-drift workflow) so input staleness/breakage is scheduled, not discovered.
-37.~~`manPages` derivation: verify the two man pages still match current options (goTarball*/templCheck additions).~~ done — goTarball entries added to the man page
+37. ~~`manPages` derivation: verify the two man pages still match current options (goTarball*/templCheck additions).~~ done — goTarball entries added to the man page
 38. Auto-discovery: per-dep `excludeSubModuleDirs` override (current list is global).
 39. Consider surfacing the discovered-module list as a build log line ("auto-discovered N sub-modules") for debuggability.
-40.~~`verifyValidation` app: also assert the ERROR TEXT names the missing module (currently matches the generic message only).~~ done — moved to TODO_LIST T21
+40. ~~`verifyValidation` app: also assert the ERROR TEXT names the missing module (currently matches the generic message only).~~ done — moved to TODO_LIST T21
 41. Add a flake-level `checks.templ-fixtures` that walks `test-assets/` deliberately (so fixture breakage fails HERE, not silently in consumers).
 42. README: document that `self.outPath` must be a real path (mock guidance for consumers' own module tests).
 43. Review `pure-functions.nix` `repoName` for paths with <3 segments + `/vN` middle segments (partially covered; edge audit).
@@ -115,13 +115,13 @@ Evidence chain (bisect): eval green at `0817f80` → broken at `528488a` (lock b
 46. NixOS module hardening review: `modules/` has none today — if go-standard ever grows an nixosModule, systemd checklist applies (note only).
 47. `flake-parts` bump follow-up: 31729ca changed evaluation forcing — audit other flakes in the fleet for the same mock-outPath pattern (SystemNix, cqrs-htmx, go-appkit consumers).
 48. Keep `nix fmt` in the pre-commit path for this repo (verify hooks actually wired — untested claim).
-49.~~Tag discipline: once the lock settles fleet-wide, cut the v1.0.0-rc the deprecation warning references.~~ done — moved to TODO_LIST Blocked (v0.1.0)
+49. ~~Tag discipline: once the lock settles fleet-wide, cut the v1.0.0-rc the deprecation warning references.~~ done — moved to TODO_LIST Blocked (v0.1.0)
 50. Publish today's incident (lock bump → eval break → consumer-visible failure) as a SHORT postmortem doc — it is the perfect case study for "input bumps are eval changes".
 
 ## g) Questions I cannot figure out myself
 
-1.~~**Push authority & ordering**: shall I push this repo's HEAD now (it is the unblock for CV's red `nix flake check` and full gate), and should CV's `nix flake lock update go-nix-helpers` + full gate + SystemNix bump follow immediately in that order — or do you want to drive the push yourself given the parallel session is still landing commits?~~ done — master was pushed — origin in sync (verified 2026-09-24)
-2.~~**Fixture ownership**: the parallel session is mid-edit on MY fixture dirs (adding `require github.com/a-h/templ` to `mock-templ-committed/go.mod`, simplifying the `generated` path expr, extending `.gitignore`). Should I stand down from this repo entirely until that session lands, or is concurrent work here expected and I should continue on non-overlapping items (7–16)?~~ done — fixture edits landed with the daemon commits — no stomp occurred
+1. ~~**Push authority & ordering**: shall I push this repo's HEAD now (it is the unblock for CV's red `nix flake check` and full gate), and should CV's `nix flake lock update go-nix-helpers` + full gate + SystemNix bump follow immediately in that order — or do you want to drive the push yourself given the parallel session is still landing commits?~~ done — master was pushed — origin in sync (verified 2026-09-24)
+2. ~~**Fixture ownership**: the parallel session is mid-edit on MY fixture dirs (adding `require github.com/a-h/templ` to `mock-templ-committed/go.mod`, simplifying the `generated` path expr, extending `.gitignore`). Should I stand down from this repo entirely until that session lands, or is concurrent work here expected and I should continue on non-overlapping items (7–16)?~~ done — fixture edits landed with the daemon commits — no stomp occurred
 3. **Templ check semantics**: is `walkTempl`/templ-committed intended to run for ALL consumers (current behavior), or gated behind `enableTempl`? And should the exclusion list (`test-assets`) become a public option (`templCheckExcludePaths`) — this decides items 16/17 and whether CV-class repos without templ pay the eval walk today.
 
 ---

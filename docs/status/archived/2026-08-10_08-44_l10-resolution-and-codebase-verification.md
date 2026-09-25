@@ -28,14 +28,14 @@
 
 ## B) PARTIALLY DONE ◑
 
-1.~~**L10 skip rationale** — the rationale (8 Nix-generated variables make `.sh`~~ done — prototyped and rejected in the 09:23 session (empirical evidence)
+1. ~~**L10 skip rationale** — the rationale (8 Nix-generated variables make `.sh`~~ done — prototyped and rejected in the 09:23 session (empirical evidence)
    extraction a Verschlimmbesserung) is documented in the planning doc and now
    surfaced in TODO_LIST. However, I rubber-stamped the prior session's
    decision rather than independently prototyping the extraction to prove it
    would be worse. The reasoning is sound on inspection, but "I read it and it
    seems right" is weaker than "I tried it and reverted."
 
-2.~~**Documentation consistency** — the living docs (TODO_LIST, CHANGELOG,~~ done — man pages + diagram verified in the 09:23 session
+2. ~~**Documentation consistency** — the living docs (TODO_LIST, CHANGELOG,~~ done — man pages + diagram verified in the 09:23 session
    planning) are consistent. But I did NOT verify the reference docs (man
    pages, architecture diagram, migration guide) against actual code state in
    this session. Prior status reports claim they were synced, but
@@ -45,7 +45,7 @@
 
 ## C) NOT STARTED ⬜
 
-1.~~**The 5 Blocked items** — unchanged, all require external access:~~ done — routed — see TODO_LIST Blocked (maintainers, SSH secret, E2E, df9a5ff)
+1. ~~**The 5 Blocked items** — unchanged, all require external access:~~ done — routed — see TODO_LIST Blocked (maintainers, SSH secret, E2E, df9a5ff)
    - `maintainers.larsartmann` nixpkgs registration (external PR)
    - Real private-repo CI test (needs SSH key secret)
    - Downstream consumer audit (needs access to 7+ repos)
@@ -71,22 +71,22 @@ intellectual shortcut of trusting the prior session's analysis.
 
 ### Process improvements
 
-1.~~**Stop trusting prior-session rationale blindly.** The skip reason for L10~~ done — done — prototyped and rejected (09:23 session)
+1. ~~**Stop trusting prior-session rationale blindly.** The skip reason for L10~~ done — done — prototyped and rejected (09:23 session)
    is convincing on paper, but no session has actually prototyped the `.sh`
    extraction to empirically prove it increases complexity. "Seems right" is
    how subtle bugs hide. Either prototype it and document the failed attempt,
    or explicitly mark it as "evaluated theoretically, not empirically."
 
-2.~~**The `vendorHash` placeholder warning fires during `nix flake check`.**~~ **Won't implement — expected noise — documented in module tests.**
+2. ~~**The `vendorHash` placeholder warning fires during `nix flake check`.**~~ **Won't implement — expected noise — documented in module tests.**
    This is expected (the module test uses a placeholder hash by design), but
    it's noise in CI output. Consider suppressing it in test contexts or
    documenting that it's expected so it doesn't alarm reviewers.
 
-3.~~**`--all-systems` remains infeasible from Linux.** The P11 plan wanted it;~~ done — done — CI comment added in the 09:23 session
+3. ~~**`--all-systems` remains infeasible from Linux.** The P11 plan wanted it;~~ done — done — CI comment added in the 09:23 session
    the matrix approach is the workaround. This limitation should be documented
    in the CI workflow as a comment so future contributors don't re-attempt it.
 
-4.~~**No empirical verification of downstream consumers.** 7+ consumers exist~~ done — done — 34-repo fleet audit (11:02)
+4. ~~**No empirical verification of downstream consumers.** 7+ consumers exist~~ done — done — 34-repo fleet audit (11:02)
    (BuildFlow, mr-sync, PMA, go-structure-linter, branching-flow,
    Standup-Killer, library-policy). Zero have been tested against current
    go-standard in an automated way. A breaking change to go-standard would
@@ -94,31 +94,31 @@ intellectual shortcut of trusting the prior session's analysis.
 
 ### Code improvements (noticed but not in scope this session)
 
-5.~~**`mkGoFlake.nix` is dead code walking.** It emits a deprecation warning,~~ done — moved to TODO_LIST Blocked (v0.1.0)
+5. ~~**`mkGoFlake.nix` is dead code walking.** It emits a deprecation warning,~~ done — moved to TODO_LIST Blocked (v0.1.0)
    has a documented removal target (v1.0.0), and the migration guide covers
    the path. It should be deleted in the next major bump. Until then it's
    maintenance overhead — any change to go-standard requires parallel updates
    to mkGoFlake to stay consistent.
 
-6.~~**`templates/go-flake-parts/` is deprecated but still shipped.** Same issue~~ done — moved to TODO_LIST Blocked (v0.1.0)
+6. ~~**`templates/go-flake-parts/` is deprecated but still shipped.** Same issue~~ done — moved to TODO_LIST Blocked (v0.1.0)
    — it's maintenance burden for a path no new consumer should take.
 
-7.~~**`goPkg` parameter in `mkPreparedSource` is dead weight** (documented~~ done — done — README publicDeps description updated (09:23 session)
+7. ~~**`goPkg` parameter in `mkPreparedSource` is dead weight** (documented~~ done — done — README publicDeps description updated (09:23 session)
    gotcha). The derivation has `dontBuild = true` and never invokes `go`. Kept
    for API compat, but it's misleading — consumers pass `pkgs.go_1_26`
    thinking it matters.
 
-8.~~**`privateDepPattern` default is LarsArtmann-specific.** Any non-~~ done — done — override documented in the README FAQ
+8. ~~**`privateDepPattern` default is LarsArtmann-specific.** Any non-~~ done — done — override documented in the README FAQ
    LarsArtmann consumer MUST override this or validation silently does nothing
    for their private deps. The default optimizes for one org at the expense
    of general correctness.
 
-9.~~**`publicDeps` uses exact-match (`grep -vFx`).** Versioned paths~~ done — fixed — versioned-path aware (09:23 session, `a199f6b`)
+9. ~~**`publicDeps` uses exact-match (`grep -vFx`).** Versioned paths~~ done — fixed — versioned-path aware (09:23 session, `a199f6b`)
    (`github.com/foo/bar/v2`) won't match an entry `github.com/foo/bar`. This
    is documented as a known limitation (Test 7 covers it) but not fixed. A
    prefix-match or glob option would be more robust.
 
-10.~~**No `go mod tidy` validation.** The prepared source injects replace~~ done — done — `go mod tidy` runs in the FOD when deps are set
+10. ~~**No `go mod tidy` validation.** The prepared source injects replace~~ done — done — `go mod tidy` runs in the FOD when deps are set
     directives but never runs `go mod tidy` to verify the resulting go.mod is
     internally consistent. A malformed replace (wrong path, missing dir) only
     surfaces at `buildGoModule` time with a cryptic vendor error.
@@ -196,19 +196,19 @@ intellectual shortcut of trusting the prior session's analysis.
 
 ## G) QUESTIONS I CANNOT FIGURE OUT MYSELF ❓
 
-1.~~**Should I empirically prototype the L10 extraction (extract to `.sh`,~~ **Won't implement — dormant — dropped (reopen on demand).**
+1. ~~**Should I empirically prototype the L10 extraction (extract to `.sh`,~~ **Won't implement — dormant — dropped (reopen on demand).**
    run all tests, document the result, then revert) to convert the theoretical
    skip rationale into hard evidence?** I closed it based on prior-session
    reasoning, but I did not actually try it. If you want rigor over velocity,
    say the word and I'll do the experiment.
 
-2.~~**Should I make a first tagged release (e.g. `v0.1.0`) now that P1-P11 are~~ **Won't implement — dormant — dropped (reopen on demand).**
+2. ~~**Should I make a first tagged release (e.g. `v0.1.0`) now that P1-P11 are~~ **Won't implement — dormant — dropped (reopen on demand).**
    shipped and the project is stable?** The entire CHANGELOG is
    `[Unreleased]`. Downstream consumers pin `ref=master` (rolling). A tag
    would let them pin a stable point — but it also implies a support/maintenance
    commitment I can't assess without knowing your release strategy.
 
-3.~~**Do you want me to delete `mkGoFlake.nix` and~~ **Won't implement — dormant — dropped (reopen on demand).**
+3. ~~**Do you want me to delete `mkGoFlake.nix` and~~ **Won't implement — dormant — dropped (reopen on demand).**
    `templates/go-flake-parts/` now, or wait for v1.0.0 as the deprecation
    warning states?** They're maintenance burden (any go-standard change
    requires parallel updates), but removing them is a breaking change that

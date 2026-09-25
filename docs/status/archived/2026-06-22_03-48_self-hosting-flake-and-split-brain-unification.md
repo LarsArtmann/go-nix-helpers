@@ -303,11 +303,11 @@ pure dead weight that inflates every consumer's build closure for no reason.
 
 The problem: **all 7 downstream consumers pass `goPkg = pkgs.go_1_26;`**. Three options:
 
-1.~~**Default it** — make `goPkg ? pkgs.go` and stop adding it to `nativeBuildInputs`.~~ done — decided — kept for API compat; removal planned at the first tagged release
+1. ~~**Default it** — make `goPkg ? pkgs.go` and stop adding it to `nativeBuildInputs`.~~ done — decided — kept for API compat; removal planned at the first tagged release
    Backwards-compatible (consumers keep passing it, it's just ignored). Lowest risk.
-2.~~**Deprecate then drop** — add a deprecation warning now, drop in a future version.~~ done — superseded by option 1 — default kept, no warning needed
+2. ~~**Deprecate then drop** — add a deprecation warning now, drop in a future version.~~ done — superseded by option 1 — default kept, no warning needed
    Clean but requires consumer coordination.
-3.~~**Drop it now** — breaking API change. Cleanest but forces all 7 consumers to update.~~ done — rejected — kept for API compat; removal planned at the first tagged release
+3. ~~**Drop it now** — breaking API change. Cleanest but forces all 7 consumers to update.~~ done — rejected — kept for API compat; removal planned at the first tagged release
 
 I cannot determine which approach aligns with your preferred breaking-change policy
 and consumer-migration cadence. This is a one-person ecosystem decision.

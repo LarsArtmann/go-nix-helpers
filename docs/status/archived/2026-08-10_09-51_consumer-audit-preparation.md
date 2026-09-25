@@ -60,18 +60,18 @@
 
 ## B) PARTIALLY DONE ◑
 
-1.~~**The consumer audit checklist is written but UNTESTED.** I created a~~ done — fixed in the 14:39 session (POSIX grep + awk)
+1. ~~**The consumer audit checklist is written but UNTESTED.** I created a~~ done — fixed in the 14:39 session (POSIX grep + awk)
    systematic checklist with a triage script, but I never ran the triage
    script against a real consumer repo (or even against this repo's own
    flake.nix). The script may contain bugs — see "TOTALLY FUCKED UP" below.
 
-2.~~**The template was updated but not evaluation-tested.** `nix flake check`~~ done — real bug found and fixed `26b7620`; `templateEval` check shipped (`2f3b6b2`)
+2. ~~**The template was updated but not evaluation-tested.** `nix flake check`~~ done — real bug found and fixed `26b7620`; `templateEval` check shipped (`2f3b6b2`)
    on the main project does NOT evaluate `templates/go-standard/flake.nix`.
    I verified the template parses visually and the Nix syntax is correct,
    but I did not create a throwaway project from the template and run
    `nix build` to confirm it produces a working derivation.
 
-3.~~**The checklist references are complete but not cross-linked.** I added~~ done — cross-linked in the 14:39 session (AGENTS key files + migration guide)
+3. ~~**The checklist references are complete but not cross-linked.** I added~~ done — cross-linked in the 14:39 session (AGENTS key files + migration guide)
    the checklist doc but did not add it to:
    - `AGENTS.md` key files table
    - `README.md` (no pointer for consumers to find it)
@@ -81,24 +81,24 @@
 
 ## C) NOT STARTED ⬜
 
-1.~~**No downstream repos checked out or inspected.** The user's stated goal~~ done — done — 34 repos audited (11:02 report)
+1. ~~**No downstream repos checked out or inspected.** The user's stated goal~~ done — done — 34 repos audited (11:02 report)
    is to audit ALL go repos. I did not check whether any consumer repos are
    available locally under `/home/lars/projects/` or elsewhere. The
    preparation work is done but zero consumers have been audited.
 
-2.~~**No breaking changes initiated** (goPkg removal, mkGoFlake deletion,~~ done — deferred — mkGoFlake removal gated on v0.1.0 (TODO_LIST Blocked)
+2. ~~**No breaking changes initiated** (goPkg removal, mkGoFlake deletion,~~ done — deferred — mkGoFlake removal gated on v0.1.0 (TODO_LIST Blocked)
    old template deletion). These were intentionally deferred to the audit
    phase — they should be done if and when consumers are found still using
    the old paths.
 
-3.~~**No CI improvements** (E2E consumer test mock, dependabot, action~~ done — dependabot.yml added 2026-09; E2E moved to TODO_LIST Blocked
+3. ~~**No CI improvements** (E2E consumer test mock, dependabot, action~~ done — dependabot.yml added 2026-09; E2E moved to TODO_LIST Blocked
    pinning). Out of scope for this session's preparation focus.
 
 ---
 
 ## D) TOTALLY FUCKED UP 💥
 
-1.~~**The triage script in the checklist has a portability bug.** The~~ done — fixed in the 14:39 session
+1. ~~**The triage script in the checklist has a portability bug.** The~~ done — fixed in the 14:39 session
    redundant-override detection loop uses:
    ```bash
    grep -q "^\s*${opt} = true" flake.nix
@@ -110,13 +110,13 @@
    for consumers to run and never tested it.** This is the exact
    "intellectual shortcut" the prior session was criticized for.
 
-2.~~**The awk commands in the triage script are untested.** The~~ done — fixed in the 14:39 session
+2. ~~**The awk commands in the triage script are untested.** The~~ done — fixed in the 14:39 session
    `flake = false` detection uses two separate awk passes with stateful
    `found` variables. This is fragile — if the `go-nix-helpers` input block
    spans more complex formatting (e.g., comments inline), the awk could
    misfire. I wrote this without running it against a single real flake.nix.
 
-3.~~**I perpetuated a pre-existing CHANGELOG structural issue.** There are~~ done — fixed in the 14:39 session (duplicate Added sections merged)
+3. ~~**I perpetuated a pre-existing CHANGELOG structural issue.** There are~~ done — fixed in the 14:39 session (duplicate Added sections merged)
    two `### Added` sections in `[Unreleased]` (one at line 13, one at line
    167). This is confusing — the second one should be `### Changed` or
    merged into the first. I added my new entry to the first `### Added`
@@ -128,39 +128,39 @@
 
 ### Process improvements (this session)
 
-1.~~**Test the scripts you write for others.** I created a triage script~~ done — fixed and tested in the 14:39 session
+1. ~~**Test the scripts you write for others.** I created a triage script~~ done — fixed and tested in the 14:39 session
    that consumers will run, but I never ran it myself. The `\s` grep bug
    and the untested awk would have been caught by a single execution
    against any flake.nix. "Write and ship without running" is exactly the
    anti-pattern the prior session's self-critique called out — and I
    repeated it in the same session.
 
-2.~~**Check what's available locally before declaring "blocked."** The~~ done — done — 34 repos found locally and audited
+2. ~~**Check what's available locally before declaring "blocked."** The~~ done — done — 34 repos found locally and audited
    prior report listed "Audit all downstream consumers" as BLOCKED
    (requires access to 7+ repos). But I never checked whether those repos
    exist under `/home/lars/projects/` or in the user's workspace. They
    might be right there. I took the prior report's "BLOCKED" at face value
    instead of verifying.
 
-3.~~**Cross-link new docs.** Creating `docs/consumer-audit-checklist.md`~~ done — done in the 14:39 session
+3. ~~**Cross-link new docs.** Creating `docs/consumer-audit-checklist.md`~~ done — done in the 14:39 session
    without adding it to AGENTS.md key files, README, or the migration guide
    means consumers will never find it organically. A doc that can't be
    discovered doesn't exist.
 
 ### Code/design improvements (noticed this session)
 
-4.~~**The template still doesn't show monorepo usage.** The `packages`~~ done — monorepo example added to the template `26b7620`
+4. ~~**The template still doesn't show monorepo usage.** The `packages`~~ done — monorepo example added to the template `26b7620`
    option is a key feature, but the template only shows single-package
    usage. A commented-out monorepo example would help consumers discover
    the capability.
 
-5.~~**`shellExtraEnv` example could be more useful.** I replaced the~~ **Won't implement — example replaced — GOPRIVATE comment fixed.**
+5. ~~**`shellExtraEnv` example could be more useful.** I replaced the~~ **Won't implement — example replaced — GOPRIVATE comment fixed.**
    GOPRIVATE example with `GOTOOLCHAIN = "local"` — but `GOTOOLCHAIN` is
    already set by default in all devShells (per AGENTS.md gotchas). A
    better example would be something consumers actually need to set, like
    `GOFLAGS = "-mod=mod"` or `GOPRIVATE` for a non-LarsArtmann org override.
 
-6.~~**The checklist's Section 5 (redundant overrides) lists 11 defaults**~~ **Won't implement — wording acceptable.**
+6. ~~**The checklist's Section 5 (redundant overrides) lists 11 defaults**~~ **Won't implement — wording acceptable.**
    but misses `goPkgAttr = "go_1_26"` being redundant if the consumer
    doesn't need a different Go version — it IS listed, but the wording
    could clarify that `goPkgAttr` should only be set when pinning a
@@ -259,19 +259,19 @@
 
 ## G) QUESTIONS I CANNOT FIGURE OUT MYSELF ❓
 
-1.~~**Where are your Go repos located?** I assumed they might be under~~ done — found — 34 repos under /home/lars/projects; audit done (11:02)
+1. ~~**Where are your Go repos located?** I assumed they might be under~~ done — found — 34 repos under /home/lars/projects; audit done (11:02)
    `/home/lars/projects/` but I did not check (and you told me not to
    research unrelated things this time). If they're all local, the
    "BLOCKED" consumer audit is actually unblocked and we can start
    immediately. If they need cloning, I need to know the list of repos
    and their paths/URLs.
 
-2.~~**Should I fix the triage script bugs (`\s` grep, untested awk) now,~~ done — fixed in the 14:39 session before the audit used the script
+2. ~~**Should I fix the triage script bugs (`\s` grep, untested awk) now,~~ done — fixed in the 14:39 session before the audit used the script
    or wait and fix them during the first real consumer audit?** I can
    fix them in 5 minutes right now, but you may prefer to validate them
    empirically against a real repo during the audit and fix as-needed.
 
-3.~~**When we start the consumer audit, do you want me to fix issues~~ done — answered — in-place migration executed (14:39–16:50 sprints)
+3. ~~**When we start the consumer audit, do you want me to fix issues~~ done — answered — in-place migration executed (14:39–16:50 sprints)
    in-place as I find them (commit per repo), or produce a report first
    for you to review before I touch any consumer repo?** This determines
    whether the audit is "scan and fix" or "scan and report."

@@ -124,27 +124,27 @@ The AGENTS.md says "An auto-git commit daemon runs continuously and commits chan
 
 ### Architecture / Process
 
-1.~~**The auto-commit daemon creates race conditions for multi-file doc passes.** Any docs-health or update-old-docs pass touches 5-15 files. The daemon commits after each file, meaning intermediate commits have inconsistent states (e.g., TODO_LIST says "54 assertions" but FEATURES still says "40+"). Mitigation: batch all writes, then let the daemon commit once.~~ **Won't implement — daemon commits are expected per AGENTS.md Git Workflow.**
+1. ~~**The auto-commit daemon creates race conditions for multi-file doc passes.** Any docs-health or update-old-docs pass touches 5-15 files. The daemon commits after each file, meaning intermediate commits have inconsistent states (e.g., TODO_LIST says "54 assertions" but FEATURES still says "40+"). Mitigation: batch all writes, then let the daemon commit once.~~ **Won't implement — daemon commits are expected per AGENTS.md Git Workflow.**
 
-2.~~**The docs-health + update-old-docs skill boundary is correct but needs a pre-flight check.** I should have detected the concurrent session's report BEFORE starting my edit pass, not during final verification. A pre-flight `git status` + `ls docs/status/` would have caught it.~~ **Won't implement — process convention absorbed.**
+2. ~~**The docs-health + update-old-docs skill boundary is correct but needs a pre-flight check.** I should have detected the concurrent session's report BEFORE starting my edit pass, not during final verification. A pre-flight `git status` + `ls docs/status/` would have caught it.~~ **Won't implement — process convention absorbed.**
 
-3.~~**Evidence columns in TODO_LIST should cite section names or function names, not line numbers.** `modules/go-standard.nix:473-476` rots. `go-standard.nix:autoGoPrivateEnv` survives refactoring.~~ done — done — TODO_LIST evidence cites reports + code
+3. ~~**Evidence columns in TODO_LIST should cite section names or function names, not line numbers.** `modules/go-standard.nix:473-476` rots. `go-standard.nix:autoGoPrivateEnv` survives refactoring.~~ done — done — TODO_LIST evidence cites reports + code
 
 ### Documentation
 
-4.~~**README.md is the biggest remaining doc gap.** The troubleshooting section references old error text, the options table doesn't mention cobra requirement for completions, and there's no mention of `publicDeps`. These are all in TODO_LIST now.~~ done — done — README troubleshooting refreshed (2026-07-24 + later)
+4. ~~**README.md is the biggest remaining doc gap.** The troubleshooting section references old error text, the options table doesn't mention cobra requirement for completions, and there's no mention of `publicDeps`. These are all in TODO_LIST now.~~ done — done — README troubleshooting refreshed (2026-07-24 + later)
 
-5.~~**The `docs/flake-patterns.md` file is stale** — no mention of `publicDeps`, no monorepo patterns, no monorepo vendorHash sharing. It was last touched 2026-06-19.~~ done — done — flake-patterns updated
+5. ~~**The `docs/flake-patterns.md` file is stale** — no mention of `publicDeps`, no monorepo patterns, no monorepo vendorHash sharing. It was last touched 2026-06-19.~~ done — done — flake-patterns updated
 
-6.~~**The `docs/migration-guide.md` doesn't cover `publicDeps` or `privateDepPattern`** — consumers migrating from mkGoFlake won't know these options exist.~~ done — done — migration guide covers both
+6. ~~**The `docs/migration-guide.md` doesn't cover `publicDeps` or `privateDepPattern`** — consumers migrating from mkGoFlake won't know these options exist.~~ done — done — migration guide covers both
 
 ### Testing
 
-7.~~**Module tests are eval-only (57 assertions checking evaluation succeeds).** Zero behavioral tests verify that option values actually reach `buildGoModule`. This is the #1 testing gap, carried forward from the 23:04 report.~~ done — done — behavioral suite (121 assertions)
+7. ~~**Module tests are eval-only (57 assertions checking evaluation succeeds).** Zero behavioral tests verify that option values actually reach `buildGoModule`. This is the #1 testing gap, carried forward from the 23:04 report.~~ done — done — behavioral suite (121 assertions)
 
-8.~~**No test for `privateDepPattern` override** — only the default value is verified. A non-LarsArtmann org using this can't be confident it works.~~ done — done — override documented in the README FAQ
+8. ~~**No test for `privateDepPattern` override** — only the default value is verified. A non-LarsArtmann org using this can't be confident it works.~~ done — done — override documented in the README FAQ
 
-9.~~**No test for `publicDeps` with versioned module paths** (`/v2` suffix). The exact-match `grep -vFx` won't match versioned paths.~~ done — done — Test 7 versioned paths (`a199f6b`)
+9. ~~**No test for `publicDeps` with versioned module paths** (`/v2` suffix). The exact-match `grep -vFx` won't match versioned paths.~~ done — done — Test 7 versioned paths (`a199f6b`)
 
 ---
 

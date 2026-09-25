@@ -104,17 +104,17 @@ These are documented but intentionally NOT migrated:
 
 ## e) WHAT WE SHOULD IMPROVE 🔧
 
-1.~~**`mkPreparedSource` should support sub-module-level replaces** — go-structure-linter needs replaces injected into EACH `modules/*/go.mod`, not just the root. A `subModulePostPatchExtra` parameter or a new helper could handle this.~~ done — G2 per-package extraBuildAttrs shipped (`2f3b6b2`); go-structure-linter migration tracked in TODO_LIST
+1. ~~**`mkPreparedSource` should support sub-module-level replaces** — go-structure-linter needs replaces injected into EACH `modules/*/go.mod`, not just the root. A `subModulePostPatchExtra` parameter or a new helper could handle this.~~ done — G2 per-package extraBuildAttrs shipped (`2f3b6b2`); go-structure-linter migration tracked in TODO_LIST
 
-2.~~**`mkPreparedSource` should handle go.sum generation** — ast-state-analyzer must manually append go.sum entries after stripping local replaces. The helper could detect this pattern and auto-generate.~~ **Won't implement — dormant since 2026-06 — no consumer demanded it.**
+2. ~~**`mkPreparedSource` should handle go.sum generation** — ast-state-analyzer must manually append go.sum entries after stripping local replaces. The helper could detect this pattern and auto-generate.~~ **Won't implement — dormant since 2026-06 — no consumer demanded it.**
 
-3.~~**`validatePrivateDeps` default is too aggressive** — Multiple projects (go-auto-upgrade, file-and-image-renamer, golangci-lint-auto-configure, Cyberdom) set `validatePrivateDeps = false` because they depend on PUBLIC LarsArtmann repos fetched from the Go proxy. The validator should distinguish between private (SSH-only) and public (proxy-available) repos.~~ done — shipped — `publicDeps` exclusion list (versioned-path aware since `a199f6b`)
+3. ~~**`validatePrivateDeps` default is too aggressive** — Multiple projects (go-auto-upgrade, file-and-image-renamer, golangci-lint-auto-configure, Cyberdom) set `validatePrivateDeps = false` because they depend on PUBLIC LarsArtmann repos fetched from the Go proxy. The validator should distinguish between private (SSH-only) and public (proxy-available) repos.~~ done — shipped — `publicDeps` exclusion list (versioned-path aware since `a199f6b`)
 
-4.~~**Cyberdom's `path:` input is a time bomb** — Using `path:` for go-cqrs-lite means any local change to go-cqrs-lite breaks Cyberdom's build silently. Should pin to a tag/ref instead.~~ **Won't implement — external — Cyberdom-side.**
+4. ~~**Cyberdom's `path:` input is a time bomb** — Using `path:` for go-cqrs-lite means any local change to go-cqrs-lite breaks Cyberdom's build silently. Should pin to a tag/ref instead.~~ **Won't implement — external — Cyberdom-side.**
 
-5.~~**`mkGoFlake.nix` should expose `excludeSubModuleDirs`** — The shared flake-parts module (`mkGoFlake.nix`) doesn't currently pass through the new `excludeSubModuleDirs` parameter. Only direct `mkPreparedSource` callers can use it.~~ done — moot — mkGoFlake deprecated; go-standard forwards all mkPreparedSource params
+5. ~~**`mkGoFlake.nix` should expose `excludeSubModuleDirs`** — The shared flake-parts module (`mkGoFlake.nix`) doesn't currently pass through the new `excludeSubModuleDirs` parameter. Only direct `mkPreparedSource` callers can use it.~~ done — moot — mkGoFlake deprecated; go-standard forwards all mkPreparedSource params
 
-6.~~**Pre-commit hooks block dependency-only commits** — overview and branching-flow required `--no-verify` because BuildFlow pre-commit hooks fail on pre-existing go-generate/govalid issues unrelated to go.sum changes.~~ **Won't implement — external — BuildFlow-side pre-commit config.**
+6. ~~**Pre-commit hooks block dependency-only commits** — overview and branching-flow required `--no-verify` because BuildFlow pre-commit hooks fail on pre-existing go-generate/govalid issues unrelated to go.sum changes.~~ **Won't implement — external — BuildFlow-side pre-commit config.**
 
 ---
 
@@ -158,10 +158,10 @@ Currently, `validatePrivateDeps` treats ALL modules matching `github\.com/[Ll]ar
 
 The question is: **is there a reliable way to know which LarsArtmann repos are public vs private at Nix evaluation time?** Options I considered:
 
-1.~~**Hardcode a public-repo allowlist** — Brittle, requires manual maintenance~~ done — answered — `publicDeps` exclusion list shipped (option 3 of the report's own list)
-2.~~**Try to fetch from the proxy during eval** — Not possible (no network in Nix eval)~~ **Won't implement — rejected — not possible at eval time (no network).**
-3.~~**Add a `publicDeps` parameter** — Shifts the burden to the user but is explicit~~ done — shipped — `publicDeps` exclusion list
-4.~~**Make `privateDepPattern` more specific** — User would need to list only truly private repos~~ **Won't implement — rejected — `privateDepPattern` override already exists.**
+1. ~~**Hardcode a public-repo allowlist** — Brittle, requires manual maintenance~~ done — answered — `publicDeps` exclusion list shipped (option 3 of the report's own list)
+2. ~~**Try to fetch from the proxy during eval** — Not possible (no network in Nix eval)~~ **Won't implement — rejected — not possible at eval time (no network).**
+3. ~~**Add a `publicDeps` parameter** — Shifts the burden to the user but is explicit~~ done — shipped — `publicDeps` exclusion list
+4. ~~**Make `privateDepPattern` more specific** — User would need to list only truly private repos~~ **Won't implement — rejected — `privateDepPattern` override already exists.**
 
 I don't know which repos are actually private vs public in the LarsArtmann org, and this affects whether option 1 or 3 is the right approach. **What's the org's policy? Are all repos public, or are some private?**
 

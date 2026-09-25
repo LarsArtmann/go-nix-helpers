@@ -144,41 +144,41 @@ Still open → tracked in TODO_LIST (Blocked — needs interactive rebase + forc
 
 ### Architecture / Design
 
-1.~~**`autoGoPrivateEnv` needs a smarter strategy** — When publicDeps is set, the current approach loses coverage for non-deps private repos. Consider: keep the glob for GOPRIVATE and instead use `GONOSUMCHECK` or `GONOSUMDB` for the public ones, or document the tradeoff explicitly.~~ done — done — publicDeps-aware GOPRIVATE strategy shipped
+1. ~~**`autoGoPrivateEnv` needs a smarter strategy** — When publicDeps is set, the current approach loses coverage for non-deps private repos. Consider: keep the glob for GOPRIVATE and instead use `GONOSUMCHECK` or `GONOSUMDB` for the public ones, or document the tradeoff explicitly.~~ done — done — publicDeps-aware GOPRIVATE strategy shipped
 
-2.~~**`mkGoFlake.nix` should be removed, not just deprecated** — It has been deprecated for a while. The `builtins.trace` warning is noisy. Pick a removal date and delete it.~~ done — gated on the first tagged release (TODO_LIST Blocked)
+2. ~~**`mkGoFlake.nix` should be removed, not just deprecated** — It has been deprecated for a while. The `builtins.trace` warning is noisy. Pick a removal date and delete it.~~ done — gated on the first tagged release (TODO_LIST Blocked)
 
-3.~~**`goPkgAttr` is a string, not a path** — `pkgs.${cfg.goPkgAttr}` is fragile. A better design would be `goPkg = lib.mkOption { type = lib.types.package; }` but this is a breaking API change.~~ done — done — goPkgAttr auto default + goPkgOverride shipped
+3. ~~**`goPkgAttr` is a string, not a path** — `pkgs.${cfg.goPkgAttr}` is fragile. A better design would be `goPkg = lib.mkOption { type = lib.types.package; }` but this is a breaking API change.~~ done — done — goPkgAttr auto default + goPkgOverride shipped
 
-4.~~**The `postPatch` script in mkPreparedSource is getting unwieldy** — 30+ lines of embedded shell in a Nix string. Consider extracting to a separate script file or using `writeShellScript`.~~ **Won't implement — empirically rejected — L10; inline postPatch is idiomatic.**
+4. ~~**The `postPatch` script in mkPreparedSource is getting unwieldy** — 30+ lines of embedded shell in a Nix string. Consider extracting to a separate script file or using `writeShellScript`.~~ **Won't implement — empirically rejected — L10; inline postPatch is idiomatic.**
 
-5.~~**No versioning or changelog for breaking changes** — The `repoName` change is breaking. There's no CHANGELOG.md entry. Semantic versioning would help downstream consumers.~~ done — done — CHANGELOG exists; v0.1.0 in TODO_LIST Blocked
+5. ~~**No versioning or changelog for breaking changes** — The `repoName` change is breaking. There's no CHANGELOG.md entry. Semantic versioning would help downstream consumers.~~ done — done — CHANGELOG exists; v0.1.0 in TODO_LIST Blocked
 
-6.~~**Test infrastructure is eval-only** — The module tests prove options exist and evaluate, but don't prove the package actually builds correctly with those options. A real e2e test (blocked) would catch more.~~ done — done — behavioral suite (121 assertions)
+6. ~~**Test infrastructure is eval-only** — The module tests prove options exist and evaluate, but don't prove the package actually builds correctly with those options. A real e2e test (blocked) would catch more.~~ done — done — behavioral suite (121 assertions)
 
 ### Code Quality
 
-7.~~**`userExtraBuildAttrs` only special-cases 3 attrs** — `nativeBuildInputs`, `preBuild`, `postInstall`. What about `buildInputs`, `checkInputs`, `configureFlags`? These would also be overridden. Consider a recursive merge strategy.~~ done — done — P1 extended to 6 attrs
+7. ~~**`userExtraBuildAttrs` only special-cases 3 attrs** — `nativeBuildInputs`, `preBuild`, `postInstall`. What about `buildInputs`, `checkInputs`, `configureFlags`? These would also be overridden. Consider a recursive merge strategy.~~ done — done — P1 extended to 6 attrs
 
-8.~~**The completion check runs the binary during installPhase** — `$out/bin/${pkgName} --completion bash` could hang or crash for binaries that do heavy init. A timeout would be safer.~~ done — done — timeout 10 shipped
+8. ~~**The completion check runs the binary during installPhase** — `$out/bin/${pkgName} --completion bash` could hang or crash for binaries that do heavy init. A timeout would be safer.~~ done — done — timeout 10 shipped
 
-9.~~**`stripVersionSuffix` matches `v[0-9]+` too broadly** — A directory literally named `v1` or `v2` (not a version suffix) would be stripped. Unlikely but possible.~~ done — covered — v1/v100 edge cases in checks.pureFunctions
+9. ~~**`stripVersionSuffix` matches `v[0-9]+` too broadly** — A directory literally named `v1` or `v2` (not a version suffix) would be stripped. Unlikely but possible.~~ done — covered — v1/v100 edge cases in checks.pureFunctions
 
-10.~~**CI freshness check modifies files in CI** — `nix flake update` writes to `flake.lock` during CI. If the runner's nix registry differs, it could produce false positives. Consider `nix flake lock --no-update` or comparing input revisions directly.~~ **Won't implement — superseded — the freshness job design changed.**
+10. ~~**CI freshness check modifies files in CI** — `nix flake update` writes to `flake.lock` during CI. If the runner's nix registry differs, it could produce false positives. Consider `nix flake lock --no-update` or comparing input revisions directly.~~ **Won't implement — superseded — the freshness job design changed.**
 
 ### Testing
 
-11.~~**No negative tests for new features** — The enableCompletions warning, the requireDeps dedup, the nativeBuildInputs merge — none have tests proving the _absence_ of the old behavior.~~ done — done — negative tests shipped (P8, verifyValidation)
+11. ~~**No negative tests for new features** — The enableCompletions warning, the requireDeps dedup, the nativeBuildInputs merge — none have tests proving the _absence_ of the old behavior.~~ done — done — negative tests shipped (P8, verifyValidation)
 
-12.~~**No property-based testing** — All tests are example-based. Property tests for `stripVersionSuffix`, `repoName`, etc. would catch edge cases.~~ done — done — checks.pureFunctions
+12. ~~**No property-based testing** — All tests are example-based. Property tests for `stripVersionSuffix`, `repoName`, etc. would catch edge cases.~~ done — done — checks.pureFunctions
 
-13.~~**Integration tests don't cover monorepo** — `test.nix` tests single-package scenarios only. The monorepo path through mkPreparedSource is untested at the integration level.~~ done — done — multiDepsTest
+13. ~~**Integration tests don't cover monorepo** — `test.nix` tests single-package scenarios only. The monorepo path through mkPreparedSource is untested at the integration level.~~ done — done — multiDepsTest
 
 ### Documentation
 
-14.~~**No CHANGELOG.md exists** — Breaking changes have nowhere to be announced. AGENTS.md explicitly says "Use CHANGELOG.md for change history" but the file doesn't exist.~~ done — done — CHANGELOG exists
+14. ~~**No CHANGELOG.md exists** — Breaking changes have nowhere to be announced. AGENTS.md explicitly says "Use CHANGELOG.md for change history" but the file doesn't exist.~~ done — done — CHANGELOG exists
 
-15.~~**README FAQ doesn't mention `enableNixfmt`** — Users who want to disable nixfmt formatting won't find it in the FAQ.~~ done — done — enableNixfmt FAQ
+15. ~~**README FAQ doesn't mention `enableNixfmt`** — Users who want to disable nixfmt formatting won't find it in the FAQ.~~ done — done — enableNixfmt FAQ
 
 ---
 
@@ -194,11 +194,11 @@ Still open → tracked in TODO_LIST (Blocked — needs interactive rebase + forc
 
 ### High impact
 
-6.~~**Add real e2e consumer test** ← BLOCKED → tracked in TODO_LIST~~ done — moved to TODO_LIST Blocked (E2E)
-7.~~**Deepen behavioral tests** ← still open → TODO_LIST M7~~ done — shipped — P4
-8.~~**Add negative test for enableCompletions warning** ← still open → TODO_LIST M8~~ done — shipped — P8
-9.~~**Audit all downstream consumers** ← BLOCKED → tracked in TODO_LIST~~ done — done — 34-repo fleet audit
-10.~~**Register `maintainers.larsartmann` in nixpkgs** ← BLOCKED → tracked in TODO_LIST~~ done — moved to TODO_LIST Blocked
+6. ~~**Add real e2e consumer test** ← BLOCKED → tracked in TODO_LIST~~ done — moved to TODO_LIST Blocked (E2E)
+7. ~~**Deepen behavioral tests** ← still open → TODO_LIST M7~~ done — shipped — P4
+8. ~~**Add negative test for enableCompletions warning** ← still open → TODO_LIST M8~~ done — shipped — P8
+9. ~~**Audit all downstream consumers** ← BLOCKED → tracked in TODO_LIST~~ done — done — 34-repo fleet audit
+10. ~~**Register `maintainers.larsartmann` in nixpkgs** ← BLOCKED → tracked in TODO_LIST~~ done — moved to TODO_LIST Blocked
 
 ### Medium impact
 
@@ -206,44 +206,44 @@ Still open → tracked in TODO_LIST (Blocked — needs interactive rebase + forc
 12. ~~**Add `enableNixfmt` to README FAQ** — "How do I disable nixfmt?"~~ done at `9b376b3`
 13. ~~**Rename `checkRequireLines`** to `collectMissingRequires`~~ done at `96336e0`
 14. ~~**Simplify requireDeps dedup escaping**~~ done at `96336e0` — temp file approach
-15.~~**Extend merge protection** to `buildInputs`, `checkInputs`, `configureFlags` ← still open → TODO_LIST H3~~ done — shipped — P1
+15. ~~**Extend merge protection** to `buildInputs`, `checkInputs`, `configureFlags` ← still open → TODO_LIST H3~~ done — shipped — P1
 16. ~~**Add timeout to completion check**~~ done at `c510d7c` — `timeout 10`
 17. ~~**Remove `mkGoFlake.nix`** — set a removal date~~ done — removal target set to v1.0.0 at `9b376b3`
-18.~~**Extract postPatch script** ← still open → TODO_LIST L10~~ **Won't implement — empirically rejected — L10.**
+18. ~~**Extract postPatch script** ← still open → TODO_LIST L10~~ **Won't implement — empirically rejected — L10.**
 19. ~~**Add monorepo integration test** to test.nix~~ done at `12f2350` — Test 6 (multi-deps)
 20. ~~**Document `GONOSUMCHECK`/`GONOSUMDB`**~~ → ROADMAP (Theme 5)
 21. ~~**Add `nix flake check` to generate-flake.sh smoke test**~~ partially — CI smoke-test job validates parse only
-22.~~**Run integration tests on macOS too** ← still open → TODO_LIST L9~~ done — done — macOS matrix
-23.~~**Add property tests** for stripVersionSuffix and repoName ← still open → TODO_LIST M1-M2~~ done — shipped — P5
-24.~~**Add FAQ entry for `deps` with mixed owners** ← still open → TODO_LIST L4~~ done — shipped — L4 FAQ
+22. ~~**Run integration tests on macOS too** ← still open → TODO_LIST L9~~ done — done — macOS matrix
+23. ~~**Add property tests** for stripVersionSuffix and repoName ← still open → TODO_LIST M1-M2~~ done — shipped — P5
+24. ~~**Add FAQ entry for `deps` with mixed owners** ← still open → TODO_LIST L4~~ done — shipped — L4 FAQ
 25. ~~**Document the `owner-repo` naming convention`**~~ NOT-NEEDED — owner prefix reverted at`2cbb37b`
 26. ~~**Consider `goPkg` as `lib.types.package`**~~ → ROADMAP (Theme 1)
 27. ~~**Add `enableNixfmt` to migration guide** parameter mapping table~~ done at `b10399f`
-28.~~**Test the CI freshness check** ← still open → TODO_LIST (Low)~~ **Won't implement — dormant — dropped.**
+28. ~~**Test the CI freshness check** ← still open → TODO_LIST (Low)~~ **Won't implement — dormant — dropped.**
 29. ~~**Test the macOS CI job**~~ partially — CI runs `--no-build` on macOS
 30. ~~**Add `privateDepPattern` override documentation**~~ done at `274cb35`
 31. ~~**Consider GOPRIVATE wildcard with GONOPROXY exclusions**~~ → ROADMAP (Theme 5)
-32.~~**Add `--dry-run` flag to generate-flake.sh** ← still open → TODO_LIST M6~~ done — shipped — P9
-33.~~**Add `generate-flake.sh` integration test** ← partially — CI smoke-test validates parse~~ done — done — CI smoke job
+32. ~~**Add `--dry-run` flag to generate-flake.sh** ← still open → TODO_LIST M6~~ done — shipped — P9
+33. ~~**Add `generate-flake.sh` integration test** ← partially — CI smoke-test validates parse~~ done — done — CI smoke job
 34. ~~**Document the completion warning behavior** in README~~ done — option description updated
-35.~~**Add `treefmt.config` inspection test** ← still open → TODO_LIST M10~~ done — shipped — P10
+35. ~~**Add `treefmt.config` inspection test** ← still open → TODO_LIST M10~~ done — shipped — P10
 
 ### Low impact / Polish
 
-36.~~**Fix commit df9a5ff empty message** ← BLOCKED → tracked in TODO_LIST (needs user approval for force push)~~ done — moved to TODO_LIST Blocked (df9a5ff)
-37.~~**Add `shellcheck` to CI** ← still open → TODO_LIST H4~~ done — shipped — P2
-38.~~**Add `shfmt` to treefmt** ← still open → TODO_LIST H5~~ done — shipped — P2
+36. ~~**Fix commit df9a5ff empty message** ← BLOCKED → tracked in TODO_LIST (needs user approval for force push)~~ done — moved to TODO_LIST Blocked (df9a5ff)
+37. ~~**Add `shellcheck` to CI** ← still open → TODO_LIST H4~~ done — shipped — P2
+38. ~~**Add `shfmt` to treefmt** ← still open → TODO_LIST H5~~ done — shipped — P2
 39. ~~**Consider `lib.types.package` for goPkg`**~~ → ROADMAP (Theme 1)
-40.~~**Add `vendorHash` placeholder detection** ← still open → TODO_LIST M3~~ done — shipped — P6
-41.~~**Add `nix flake show` test** ← still open → TODO_LIST M4~~ done — shipped — structural check
-42.~~**Add `--template` listing** to generate-flake.sh help text ← still open → TODO_LIST L3~~ done — shipped — P9
-43.~~**Cache nix-store in smoke-test job** ← still open → TODO_LIST L8~~ done — shipped — L8
-44.~~**Add badges for macOS CI** to README ← still open → TODO_LIST L2~~ done — covered by the CI matrix badge
+40. ~~**Add `vendorHash` placeholder detection** ← still open → TODO_LIST M3~~ done — shipped — P6
+41. ~~**Add `nix flake show` test** ← still open → TODO_LIST M4~~ done — shipped — structural check
+42. ~~**Add `--template` listing** to generate-flake.sh help text ← still open → TODO_LIST L3~~ done — shipped — P9
+43. ~~**Cache nix-store in smoke-test job** ← still open → TODO_LIST L8~~ done — shipped — L8
+44. ~~**Add badges for macOS CI** to README ← still open → TODO_LIST L2~~ done — covered by the CI matrix badge
 45. ~~**Add `CONTRIBUTING.md`** referenced by README~~ already exists
-46.~~**Update `docs/architecture.d2`** ← still open → TODO_LIST M5~~ done — shipped — P8
-47.~~**Add `docs/flake-patterns.md`** entry for enableNixfmt toggle ← still open~~ **Won't implement — covered by migration guide + flake-patterns.**
+46. ~~**Update `docs/architecture.d2`** ← still open → TODO_LIST M5~~ done — shipped — P8
+47. ~~**Add `docs/flake-patterns.md`** entry for enableNixfmt toggle ← still open~~ **Won't implement — covered by migration guide + flake-patterns.**
 48. ~~**Consider `lib.mkForce` support**~~ → ROADMAP (Theme 1)
-49.~~**Add `--verbose` flag to generate-flake.sh** ← still open → TODO_LIST L1~~ done — shipped — P9
+49. ~~**Add `--verbose` flag to generate-flake.sh** ← still open → TODO_LIST L1~~ done — shipped — P9
 50. ~~**Review all `_local_deps` references in downstream repos**~~ NOT-NEEDED — repoName change reverted at `2cbb37b`
 
 ---

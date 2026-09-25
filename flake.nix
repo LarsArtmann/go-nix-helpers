@@ -111,6 +111,17 @@
               echo "PASS: templ fixture clean (no tracked *_templ.go)"
               mkdir $out
             '';
+            # Docs-annotation gates (docs-health annotate discipline):
+            # gate 1 — every archived status report carries at least one
+            # strikethrough resolution; gate 2 — no table in docs/status/
+            # mixes struck and unstruck rows. Wrapper + vendored checker
+            # live in scripts/ with upstream attribution.
+            docsAnnotations = pkgs.runCommand "docs-annotations" {
+              nativeBuildInputs = [ pkgs.python3 ];
+            } ''
+              bash ${self}/scripts/check-docs-annotations.sh ${self}
+              touch $out
+            '';
             # Structural test: verify all expected flake outputs exist
             structural = pkgs.runCommand "structural-test" { } ''
               ${lib.concatStringsSep "\n" (

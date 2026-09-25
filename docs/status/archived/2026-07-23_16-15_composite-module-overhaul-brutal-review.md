@@ -70,37 +70,37 @@ The session achieved its primary goal: consumer flake.nix dropped from **5 requi
 
 ### Architectural
 
-1.~~**Use `inputs.systems` from go-nix-helpers's own inputs instead of hardcoding** — The composite module can reference `import inputs.systems` (go-nix-helpers already declares this input). This preserves the `nix-systems/default` override pattern while eliminating the consumer's need for the input. One line change in `flake.nix`.~~ done — shipped — systems option supersedes the inputs.systems import
+1. ~~**Use `inputs.systems` from go-nix-helpers's own inputs instead of hardcoding** — The composite module can reference `import inputs.systems` (go-nix-helpers already declares this input). This preserves the `nix-systems/default` override pattern while eliminating the consumer's need for the input. One line change in `flake.nix`.~~ done — shipped — systems option supersedes the inputs.systems import
 
-2.~~**Consider bundling `git-hooks.nix` too** — Would make the composite module even more powerful: pre-commit hooks for free, no extra consumer input.~~ **Won't implement — dormant since 2026-07 — dropped.**
+2. ~~**Consider bundling `git-hooks.nix` too** — Would make the composite module even more powerful: pre-commit hooks for free, no extra consumer input.~~ **Won't implement — dormant since 2026-07 — dropped.**
 
-3.~~**Add `enableCheck` option** — Currently the module always runs `doCheck = true` in buildGoModule. Some projects may want to disable test execution during `nix build` (run tests only via `nix run .#test`). Add `enableCheck = true` option.~~ done — shipped — enableCheck option
+3. ~~**Add `enableCheck` option** — Currently the module always runs `doCheck = true` in buildGoModule. Some projects may want to disable test execution during `nix build` (run tests only via `nix run .#test`). Add `enableCheck = true` option.~~ done — shipped — enableCheck option
 
-4.~~**Add `enableOverlay` option** — Not every project needs `flake.overlays.default`. Make it optional to reduce evaluation overhead.~~ done — shipped — enableOverlay option
+4. ~~**Add `enableOverlay` option** — Not every project needs `flake.overlays.default`. Make it optional to reduce evaluation overhead.~~ done — shipped — enableOverlay option
 
-5.~~**Support multiple packages** — Currently the module only generates one `buildGoModule`. Monorepo projects (like go-cqrs-lite) have multiple binaries. Consider `go-standard.packages = { server = { subPackages = ["cmd/server"]; }; cli = { ... }; };`.~~ done — shipped — packages monorepo option + G2 per-package attrs
+5. ~~**Support multiple packages** — Currently the module only generates one `buildGoModule`. Monorepo projects (like go-cqrs-lite) have multiple binaries. Consider `go-standard.packages = { server = { subPackages = ["cmd/server"]; }; cli = { ... }; };`.~~ done — shipped — packages monorepo option + G2 per-package attrs
 
-6.~~**Version option** — Currently derived from `self.rev or self.dirtyRev or "dev"`. Some projects want `version = "1.2.3"` from a VERSION file or git tag. Add `version` option.~~ done — shipped — version option
+6. ~~**Version option** — Currently derived from `self.rev or self.dirtyRev or "dev"`. Some projects want `version = "1.2.3"` from a VERSION file or git tag. Add `version` option.~~ done — shipped — version option
 
 ### Testing
 
-7.~~**Create a test consumer flake** — A minimal Go project in `test-consumer/` that imports `flakeModules.go-standard` and verifies `nix build`, `nix flake check`, `nix develop` all work. This is THE most important missing test.~~ done — moduleTest + templateEval + real consumers
+7. ~~**Create a test consumer flake** — A minimal Go project in `test-consumer/` that imports `flakeModules.go-standard` and verifies `nix build`, `nix flake check`, `nix develop` all work. This is THE most important missing test.~~ done — moduleTest + templateEval + real consumers
 
-8.~~**Add a check that validates the composite module** — `nix eval .#flakeModules.go-standard --apply 'm: assert m ? imports; assert builtins.length m.imports == 2; true'` as a flake check.~~ done — shipped — structural check + moduleTest
+8. ~~**Add a check that validates the composite module** — `nix eval .#flakeModules.go-standard --apply 'm: assert m ? imports; assert builtins.length m.imports == 2; true'` as a flake check.~~ done — shipped — structural check + moduleTest
 
 ### Cleanup
 
-9.~~**Delete or formally deprecate mkGoFlake.nix** — It's marked deprecated in comments but still exported as `flake.lib.mkGoFlake`. Either delete it or add a deprecation warning that triggers on evaluation.~~ done — trace warning shipped; deletion gated on v0.1.0
+9. ~~**Delete or formally deprecate mkGoFlake.nix** — It's marked deprecated in comments but still exported as `flake.lib.mkGoFlake`. Either delete it or add a deprecation warning that triggers on evaluation.~~ done — trace warning shipped; deletion gated on v0.1.0
 
-10.~~**Remove `test-result` symlink from git** — Use `trash` to unstage, add to `.gitignore`.~~ done — resolved 2026-07-24
+10. ~~**Remove `test-result` symlink from git** — Use `trash` to unstage, add to `.gitignore`.~~ done — resolved 2026-07-24
 
-11.~~**The `go-flake-parts` template is now misleading** — It shows 5 inputs and manual perSystem config. It should either be deleted (in favor of go-standard template) or marked as "legacy manual approach."~~ done — deprecated with banner
+11. ~~**The `go-flake-parts` template is now misleading** — It shows 5 inputs and manual perSystem config. It should either be deleted (in favor of go-standard template) or marked as "legacy manual approach."~~ done — deprecated with banner
 
 ### Documentation
 
-12.~~**Add a migration guide** — Step-by-step: "How to convert your existing 5-input flake.nix to the 3-input pattern." Include before/after.~~ done — shipped — docs/migration-guide.md
+12. ~~**Add a migration guide** — Step-by-step: "How to convert your existing 5-input flake.nix to the 3-input pattern." Include before/after.~~ done — shipped — docs/migration-guide.md
 
-13.~~**Document the `inputs.go-nix-helpers` requirement** — The module uses `import "${inputs.go-nix-helpers}/mkPreparedSource.nix"` when deps are set. This means go-nix-helpers MUST be a real flake input (not `flake = false`). This is mentioned in some places but not in the module's own error messages.~~ done — documented in AGENTS.md, README, and the migration guide
+13. ~~**Document the `inputs.go-nix-helpers` requirement** — The module uses `import "${inputs.go-nix-helpers}/mkPreparedSource.nix"` when deps are set. This means go-nix-helpers MUST be a real flake input (not `flake = false`). This is mentioned in some places but not in the module's own error messages.~~ done — documented in AGENTS.md, README, and the migration guide
 
 ---
 
@@ -108,65 +108,65 @@ The session achieved its primary goal: consumer flake.nix dropped from **5 requi
 
 ### Critical (do first)
 
-1.~~Create a minimal test consumer project to verify the composite module works end-to-end~~ done — 10 real consumers + templateEval; build E2E in TODO_LIST T3
-2.~~Fix `defaultSystems` to use `import inputs.systems` from go-nix-helpers's own inputs~~ done — shipped — systems option
-3.~~Investigate and understand the auto-commit mechanism (4 commits appeared without explicit `git commit`)~~ done — identified — buildflow watcher (2026-07-24)
-4.~~Remove `test-result` symlink from git tracking, add to `.gitignore`~~ done — resolved 2026-07-24
-5.~~Test double-import scenario (consumer has treefmt-nix AND composite module)~~ done — moot — adopters declare no treefmt-nix input
+1. ~~Create a minimal test consumer project to verify the composite module works end-to-end~~ done — 10 real consumers + templateEval; build E2E in TODO_LIST T3
+2. ~~Fix `defaultSystems` to use `import inputs.systems` from go-nix-helpers's own inputs~~ done — shipped — systems option
+3. ~~Investigate and understand the auto-commit mechanism (4 commits appeared without explicit `git commit`)~~ done — identified — buildflow watcher (2026-07-24)
+4. ~~Remove `test-result` symlink from git tracking, add to `.gitignore`~~ done — resolved 2026-07-24
+5. ~~Test double-import scenario (consumer has treefmt-nix AND composite module)~~ done — moot — adopters declare no treefmt-nix input
 
 ### High Priority
 
-6.~~Migrate at least one real consumer (e.g., mr-sync or library-policy) to the 3-input pattern as proof~~ done — 10 consumers migrated (Tier A, 2026-08-10)
-7.~~Write migration guide doc (`docs/migrating-to-go-standard.md`)~~ done — shipped — docs/migration-guide.md
-8.~~Add `enableCheck` option to go-standard (default true)~~ done — shipped
-9.~~Delete `mkGoFlake.nix` or add runtime deprecation warning~~ done — trace shipped; deletion gated v0.1.0
-10.~~Update `go-flake-parts` template to either be deleted or clearly marked as legacy~~ done — deprecated with banner
-11.~~Add `enableOverlay` option (default true)~~ done — shipped
-12.~~Bundle `git-hooks.nix` into composite module (research feasibility first)~~ **Won't implement — dormant since 2026-07 — dropped.**
-13.~~Add automated check for composite module structure in `test.nix`~~ done — shipped — structural + moduleTest
+6. ~~Migrate at least one real consumer (e.g., mr-sync or library-policy) to the 3-input pattern as proof~~ done — 10 consumers migrated (Tier A, 2026-08-10)
+7. ~~Write migration guide doc (`docs/migrating-to-go-standard.md`)~~ done — shipped — docs/migration-guide.md
+8. ~~Add `enableCheck` option to go-standard (default true)~~ done — shipped
+9. ~~Delete `mkGoFlake.nix` or add runtime deprecation warning~~ done — trace shipped; deletion gated v0.1.0
+10. ~~Update `go-flake-parts` template to either be deleted or clearly marked as legacy~~ done — deprecated with banner
+11. ~~Add `enableOverlay` option (default true)~~ done — shipped
+12. ~~Bundle `git-hooks.nix` into composite module (research feasibility first)~~ **Won't implement — dormant since 2026-07 — dropped.**
+13. ~~Add automated check for composite module structure in `test.nix`~~ done — shipped — structural + moduleTest
 
 ### Medium Priority
 
-14.~~Add `version` option (override git-derived version)~~ done — shipped
-15.~~Support multiple packages in go-standard module~~ done — shipped + G2
-16.~~Add `enableApps` option (some projects don't need test/lint apps)~~ **Won't implement — dormant — dropped.**
-17.~~Add `enableDevShells` option (some projects have their own devShell logic)~~ **Won't implement — dormant — dropped.**
-18.~~Add `extraChecks` option (function of perSystem args)~~ **Won't implement — dormant — dropped.**
-19.~~Add `extraApps` option (function of perSystem args)~~ **Won't implement — dormant — dropped.**
-20.~~Add `nixosModules` output option (for Go projects that also provide NixOS modules)~~ **Won't implement — dormant — consumers add nixosModules via flake-parts directly.**
-21.~~Add `darwinModules` output option~~ **Won't implement — dormant — dropped.**
-22.~~Document the `follows` chain requirement clearly~~ done — documented
-23.~~Add `enableCgo` option (use mkShell instead of mkShellNoCC for CGO projects)~~ done — folded into TODO_LIST T13 (cgoEnabled)
-24.~~Add `buildFlags` option for build tags~~ done — shipped
-25.~~Add `env` option for buildGoModule env vars~~ done — extraBuildAttrs.env covers it (documented)
+14. ~~Add `version` option (override git-derived version)~~ done — shipped
+15. ~~Support multiple packages in go-standard module~~ done — shipped + G2
+16. ~~Add `enableApps` option (some projects don't need test/lint apps)~~ **Won't implement — dormant — dropped.**
+17. ~~Add `enableDevShells` option (some projects have their own devShell logic)~~ **Won't implement — dormant — dropped.**
+18. ~~Add `extraChecks` option (function of perSystem args)~~ **Won't implement — dormant — dropped.**
+19. ~~Add `extraApps` option (function of perSystem args)~~ **Won't implement — dormant — dropped.**
+20. ~~Add `nixosModules` output option (for Go projects that also provide NixOS modules)~~ **Won't implement — dormant — consumers add nixosModules via flake-parts directly.**
+21. ~~Add `darwinModules` output option~~ **Won't implement — dormant — dropped.**
+22. ~~Document the `follows` chain requirement clearly~~ done — documented
+23. ~~Add `enableCgo` option (use mkShell instead of mkShellNoCC for CGO projects)~~ done — folded into TODO_LIST T13 (cgoEnabled)
+24. ~~Add `buildFlags` option for build tags~~ done — shipped
+25. ~~Add `env` option for buildGoModule env vars~~ done — extraBuildAttrs.env covers it (documented)
 
 ### Low Priority
 
-26.~~Consider auto-detecting `enableTempl` by checking for `.templ` files in src~~ done — moved to ROADMAP Theme 1
-27.~~Consider auto-detecting `vendorHash` on first build (document the workflow)~~ done — moved to ROADMAP Theme 1
-28.~~Add `homepage` to meta by default (derive from pname + GitHub org)~~ **Won't implement — dormant — dropped.**
-29.~~Add `longDescription` option for meta~~ **Won't implement — dormant — dropped.**
-30.~~Consider `enableProfiling` option (delve, pprof)~~ **Won't implement — dormant — dropped.**
-31.~~Add `crossCompileTargets` option for cross-compilation~~ **Won't implement — dormant — dropped.**
-32.~~Consider adding `nixci` support for multi-system CI~~ **Won't implement — dormant — dropped.**
-33.~~Document common consumer error patterns in README troubleshooting section~~ done — shipped — README Troubleshooting/FAQ
-34.~~Add CI workflow that tests the module against a matrix of consumer configs~~ done — moduleTest covers 20+ configs; macOS matrix in CI
-35.~~Consider extracting module tests into a separate `tests/module-test.nix`~~ done — shipped — test-module.nix
-36.~~Add JSON schema for go-standard options (for IDE autocomplete)~~ **Won't implement — dormant — dropped.**
-37.~~Add `enableGoReleaser` option for release automation~~ **Won't implement — dormant — dropped.**
-38.~~Consider `enableGore` option (Go REPL)~~ **Won't implement — dormant — dropped.**
-39.~~Add `extraOverlays` option for projects that provide multiple packages~~ **Won't implement — dormant — dropped.**
-40.~~Consider `flake.templates` output (so `nix init` works)~~ done — moved to ROADMAP Theme 1
-41.~~Add `enableBench` option (benchmark app)~~ **Won't implement — dormant — dropped.**
-42.~~Consider `enableFuzzing` option (Go fuzzing support)~~ **Won't implement — dormant — dropped.**
-43.~~Document interaction with `direnv` / `nix-direnv`~~ **Won't implement — dormant — dropped.**
-44.~~Consider adding `treefmt.settings` global config~~ **Won't implement — dormant — dropped.**
-45.~~Add `enableDependabot` or `enableNixUpdate` automation~~ done — dependabot.yml shipped for this repo 2026-09; per-consumer option dropped
-46.~~Document `nix profile install` workflow for consumers~~ **Won't implement — dormant — dropped.**
-47.~~Consider `enableStaticBuild` option (CGO_ENABLED=0)~~ done — folded into TODO_LIST T13 (cgoEnabled)
-48.~~Add `license` option (default mit, allow override)~~ done — moved to ROADMAP Theme 1 (extraMeta covers it today)
-49.~~Consider `enableSops` integration for secret management~~ **Won't implement — dormant — dropped.**
-50.~~Create a `CHANGELOG.md` for tracking these changes over time~~ done — shipped — CHANGELOG.md exists
+26. ~~Consider auto-detecting `enableTempl` by checking for `.templ` files in src~~ done — moved to ROADMAP Theme 1
+27. ~~Consider auto-detecting `vendorHash` on first build (document the workflow)~~ done — moved to ROADMAP Theme 1
+28. ~~Add `homepage` to meta by default (derive from pname + GitHub org)~~ **Won't implement — dormant — dropped.**
+29. ~~Add `longDescription` option for meta~~ **Won't implement — dormant — dropped.**
+30. ~~Consider `enableProfiling` option (delve, pprof)~~ **Won't implement — dormant — dropped.**
+31. ~~Add `crossCompileTargets` option for cross-compilation~~ **Won't implement — dormant — dropped.**
+32. ~~Consider adding `nixci` support for multi-system CI~~ **Won't implement — dormant — dropped.**
+33. ~~Document common consumer error patterns in README troubleshooting section~~ done — shipped — README Troubleshooting/FAQ
+34. ~~Add CI workflow that tests the module against a matrix of consumer configs~~ done — moduleTest covers 20+ configs; macOS matrix in CI
+35. ~~Consider extracting module tests into a separate `tests/module-test.nix`~~ done — shipped — test-module.nix
+36. ~~Add JSON schema for go-standard options (for IDE autocomplete)~~ **Won't implement — dormant — dropped.**
+37. ~~Add `enableGoReleaser` option for release automation~~ **Won't implement — dormant — dropped.**
+38. ~~Consider `enableGore` option (Go REPL)~~ **Won't implement — dormant — dropped.**
+39. ~~Add `extraOverlays` option for projects that provide multiple packages~~ **Won't implement — dormant — dropped.**
+40. ~~Consider `flake.templates` output (so `nix init` works)~~ done — moved to ROADMAP Theme 1
+41. ~~Add `enableBench` option (benchmark app)~~ **Won't implement — dormant — dropped.**
+42. ~~Consider `enableFuzzing` option (Go fuzzing support)~~ **Won't implement — dormant — dropped.**
+43. ~~Document interaction with `direnv` / `nix-direnv`~~ **Won't implement — dormant — dropped.**
+44. ~~Consider adding `treefmt.settings` global config~~ **Won't implement — dormant — dropped.**
+45. ~~Add `enableDependabot` or `enableNixUpdate` automation~~ done — dependabot.yml shipped for this repo 2026-09; per-consumer option dropped
+46. ~~Document `nix profile install` workflow for consumers~~ **Won't implement — dormant — dropped.**
+47. ~~Consider `enableStaticBuild` option (CGO_ENABLED=0)~~ done — folded into TODO_LIST T13 (cgoEnabled)
+48. ~~Add `license` option (default mit, allow override)~~ done — moved to ROADMAP Theme 1 (extraMeta covers it today)
+49. ~~Consider `enableSops` integration for secret management~~ **Won't implement — dormant — dropped.**
+50. ~~Create a `CHANGELOG.md` for tracking these changes over time~~ done — shipped — CHANGELOG.md exists
 
 ---
 

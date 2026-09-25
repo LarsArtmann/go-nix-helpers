@@ -616,6 +616,19 @@ in
           else
             null;
 
+        # A pinned goPkgAttr older than the newest packaged branch is
+        # usually a stale pin — the auto default would resolve newer.
+        # Informational only: deliberate old pins (reproducibility) may
+        # ignore it.
+        stalePinWarning =
+          let
+            newest = pure.staleGoAttrName { inherit pkgs; goPkgAttr = cfg.goPkgAttr; };
+          in
+          if newest != null then
+            builtins.trace "warning: go-standard.goPkgAttr = \"${cfg.goPkgAttr}\" is not the newest Go in your nixpkgs (\"${newest}\") — bump the pin or drop it to use the auto default." null
+          else
+            null;
+
         finalLdflags =
           if cfg.ldflags != null then
             cfg.ldflags
@@ -780,12 +793,13 @@ in
           );
 
         # Build the default package (always present)
-        # vendorHashWarning/proxyVendorWarning/goModFloorCheck are referenced
-        # here to force evaluation of their checks when packages are evaluated.
+        # vendorHashWarning/proxyVendorWarning/goModFloorCheck/stalePinWarning
+        # are referenced here to force evaluation of their checks when
+        # packages are evaluated.
         package = builtins.seq goModFloorCheck (
           builtins.seq proxyVendorWarning (
             builtins.seq vendorHashWarning (
-              mkGoPackage cfg.pname cfg.subPackages cfg.description { }
+              builtins.seq stalePinWarning (mkGoPackage cfg.pname cfg.subPackages cfg.description { })
             )
           )
         );

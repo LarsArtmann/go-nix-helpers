@@ -37,6 +37,23 @@ let
     in
     if branchAttrs == [ ] then null else lib.last (lib.sort (a: b: minor a < minor b) branchAttrs);
 
+  # Stale-pin decision for the go-standard warning: when goPkgAttr pins a
+  # REAL but non-newest go_1_XX branch, return the newest branch name (the
+  # warning payload). null when the pin is null, already newest, absent
+  # from pkgs (a different error), or no branch attrs exist at all. Kept
+  # pure so tests assert the decision without capturing stderr.
+  staleGoAttrName =
+    {
+      pkgs,
+      goPkgAttr,
+    }:
+    let
+      newest = newestGoAttrName (builtins.attrNames pkgs);
+    in
+    if goPkgAttr == null || newest == null || goPkgAttr == newest then null
+    else if pkgs ? ${goPkgAttr} then newest
+    else null;
+
   # Resolve the Go toolchain package from consumer options — the single
   # declaration site shared by the go-standard module and mkGoFlake.
   #   goPkgAttr:          explicit nixpkgs attr ("go_1_27") wins; null picks
@@ -98,6 +115,7 @@ in
     stripVersionSuffix
     repoName
     newestGoAttrName
+    staleGoAttrName
     goBaseFrom
     ;
 }

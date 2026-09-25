@@ -202,34 +202,34 @@ is simply absent).
 
 ## E) WHAT WE SHOULD IMPROVE
 
-1.~~**Execute trivial TODOs immediately, don't defer them.** I created~~ **Won't implement — process lesson — recorded.**
+1. ~~**Execute trivial TODOs immediately, don't defer them.** I created~~ **Won't implement — process lesson — recorded.**
    D1 and D2 as TODO items, then didn't do them. The time spent writing
    the TODO entries exceeded the time to execute them. If a task is
    under 15 minutes and you're already in the file, DO IT.
 
-2.~~**Annotate ALL sections of a planning document, not just the summary.**~~ done — done — banner approach applied (06:51 Task 5)
+2. ~~**Annotate ALL sections of a planning document, not just the summary.**~~ done — done — banner approach applied (06:51 Task 5)
    The Pareto plan has 12 detailed breakdown sections that are now stale.
    Future readers will see "P1: Merge protection fix — 4 tasks" with no
    indication that all 4 tasks shipped. Either annotate each section or
    add a single "All tasks in sections P1–P11 are shipped; P12 skipped"
    banner at the top of the detailed breakdown.
 
-3.~~**Cross-reference claims against actual CI YAML.** The previous~~ **Won't implement — process lesson — recorded.**
+3. ~~**Cross-reference claims against actual CI YAML.** The previous~~ **Won't implement — process lesson — recorded.**
    report's shellcheck claim was never verified against the actual
    `ci.yml`. When a status report says "X is in CI," verify by reading
    the CI file, not by trusting the report.
 
-4.~~**Audit documentation completeness when adding entries.** When I~~ **Won't implement — process lesson — recorded.**
+4. ~~**Audit documentation completeness when adding entries.** When I~~ **Won't implement — process lesson — recorded.**
    added `enableShfmt` to the man page, I should have diffed the man
    page's option list against the module's option list to find other
    gaps. `postPatchExtra` would have been caught.
 
-5.~~**The AGENTS.md "35 options" claim lists only 18 by name.** The~~ done — done — AGENTS.md names all options now
+5. ~~**The AGENTS.md "35 options" claim lists only 18 by name.** The~~ done — done — AGENTS.md names all options now
    remaining 17 are implied. This is a minor clarity issue but could
    confuse a reader trying to understand what the module configures.
    Consider listing all 35 or removing the count.
 
-6.~~**CHANGELOG entry categorization could be cleaner.** Some behavioral~~ **Won't implement — process lesson — recorded.**
+6. ~~**CHANGELOG entry categorization could be cleaner.** Some behavioral~~ **Won't implement — process lesson — recorded.**
    test additions went under "Changed" (module test suite deepened) when
    they could arguably be "Added" (new test coverage). Not wrong, just
    inconsistent with how test-only additions were categorized elsewhere.
@@ -240,63 +240,63 @@ is simply absent).
 
 ### Immediate (fix gaps from this session)
 
-1.~~Add `enableShfmt` to `docs/migration-guide.md` options table (D1)~~ done — done 06:51 Task 1
-2.~~Add `extraBuildAttrs` 6-attr merge pattern to `docs/flake-patterns.md` (D2)~~ done — done 06:51 Task 2
-3.~~Add `postPatchExtra` to `docs/man/go-standard.5` (pre-existing gap)~~ done — done 06:51 Task 3
-4.~~Annotate Pareto plan detailed breakdown sections P1–P12 with shipped status~~ done — done 06:51 Task 5 (banner)
-5.~~Add note about `pure-functions.nix` to `docs/architecture.d2`~~ done — done 06:51 Task 7
+1. ~~Add `enableShfmt` to `docs/migration-guide.md` options table (D1)~~ done — done 06:51 Task 1
+2. ~~Add `extraBuildAttrs` 6-attr merge pattern to `docs/flake-patterns.md` (D2)~~ done — done 06:51 Task 2
+3. ~~Add `postPatchExtra` to `docs/man/go-standard.5` (pre-existing gap)~~ done — done 06:51 Task 3
+4. ~~Annotate Pareto plan detailed breakdown sections P1–P12 with shipped status~~ done — done 06:51 Task 5 (banner)
+5. ~~Add note about `pure-functions.nix` to `docs/architecture.d2`~~ done — done 06:51 Task 7
 
 ### Short-term (test deepening from previous report, not yet done)
 
-6.~~Add property test: `repoName` output never contains `/vN` (item 24)~~ done — shipped — checks.pureFunctions (41 assertions)
-7.~~Add property test: `stripVersionSuffix` preserves non-version segments (item 25)~~ done — shipped — same suite
-8.~~Add test: `extraBuildAttrs` with ALL list attrs simultaneously (item 26)~~ **Won't implement — dormant backlog item from 2026-08 — dropped (suite has since grown to 121 assertions).**
-9.~~Add test: `enableCompletions` with a mock binary that DOES support `--completion` (item 27)~~ **Won't implement — dormant — dropped.**
-10.~~Add test: monorepo `packages` option with `enableCompletions` (item 28)~~ **Won't implement — dormant — dropped.**
-11.~~Add test: `ldflags = []` (empty list, not null) (item 29)~~ **Won't implement — dormant — dropped.**
-12.~~Add test: `proxyVendor = false` with deps (should be forced to false) (item 30)~~ **Won't implement — dormant — dropped.**
-13.~~Add test: `buildFlags` with special characters (spaces, quotes) (item 31)~~ **Won't implement — dormant — dropped.**
-14.~~Add test: `deps` with a deeply nested module path (5+ levels) (item 32)~~ **Won't implement — dormant — dropped.**
-15.~~Add test: `postPatchExtra` actually runs (behavioral, not eval) (item 33)~~ **Won't implement — dormant — dropped.**
-16.~~Add test: `shellExtraEnv.GOPRIVATE` overrides `autoGoPrivate` (item 34)~~ **Won't implement — dormant — dropped.**
-17.~~Add test: `autoGoPrivate = false` suppresses GOPRIVATE even with deps (item 35)~~ **Won't implement — dormant — dropped.**
-18.~~Add test: `enableGopls = false` removes gopls from devShell (item 36)~~ done — done — 09:23 session
-19.~~Add test: `enableGovulncheck = false` removes govulncheck from devShell (item 37)~~ done — done — 09:23 session
-20.~~Add integration test: `requireDeps` with `/v2` path dedup (item 38)~~ done — covered — requireDeps dedup integration scenario
-21.~~Add integration test: deeply nested sub-module at 4+ levels (item 39)~~ done — covered — depth-2 nested module tests exist
-22.~~Add test: `stripLocalReplaces` with no existing replaces (no-op) (item 40)~~ **Won't implement — dormant — dropped.**
+6. ~~Add property test: `repoName` output never contains `/vN` (item 24)~~ done — shipped — checks.pureFunctions (41 assertions)
+7. ~~Add property test: `stripVersionSuffix` preserves non-version segments (item 25)~~ done — shipped — same suite
+8. ~~Add test: `extraBuildAttrs` with ALL list attrs simultaneously (item 26)~~ **Won't implement — dormant backlog item from 2026-08 — dropped (suite has since grown to 121 assertions).**
+9. ~~Add test: `enableCompletions` with a mock binary that DOES support `--completion` (item 27)~~ **Won't implement — dormant — dropped.**
+10. ~~Add test: monorepo `packages` option with `enableCompletions` (item 28)~~ **Won't implement — dormant — dropped.**
+11. ~~Add test: `ldflags = []` (empty list, not null) (item 29)~~ **Won't implement — dormant — dropped.**
+12. ~~Add test: `proxyVendor = false` with deps (should be forced to false) (item 30)~~ **Won't implement — dormant — dropped.**
+13. ~~Add test: `buildFlags` with special characters (spaces, quotes) (item 31)~~ **Won't implement — dormant — dropped.**
+14. ~~Add test: `deps` with a deeply nested module path (5+ levels) (item 32)~~ **Won't implement — dormant — dropped.**
+15. ~~Add test: `postPatchExtra` actually runs (behavioral, not eval) (item 33)~~ **Won't implement — dormant — dropped.**
+16. ~~Add test: `shellExtraEnv.GOPRIVATE` overrides `autoGoPrivate` (item 34)~~ **Won't implement — dormant — dropped.**
+17. ~~Add test: `autoGoPrivate = false` suppresses GOPRIVATE even with deps (item 35)~~ **Won't implement — dormant — dropped.**
+18. ~~Add test: `enableGopls = false` removes gopls from devShell (item 36)~~ done — done — 09:23 session
+19. ~~Add test: `enableGovulncheck = false` removes govulncheck from devShell (item 37)~~ done — done — 09:23 session
+20. ~~Add integration test: `requireDeps` with `/v2` path dedup (item 38)~~ done — covered — requireDeps dedup integration scenario
+21. ~~Add integration test: deeply nested sub-module at 4+ levels (item 39)~~ done — covered — depth-2 nested module tests exist
+22. ~~Add test: `stripLocalReplaces` with no existing replaces (no-op) (item 40)~~ **Won't implement — dormant — dropped.**
 
 ### CI hardening (remaining from previous report)
 
-23.~~Add CI step for pure function tests on macOS (item 19)~~ done — done — pureFunctions wired into the matrixed integration-tests job (CI-2)
-24.~~Add `--all-systems` to the macOS check job (item 20)~~ **Won't implement — infeasible from Linux — documented in CI comments.**
-25.~~Add CI step that verifies `nix fmt -- --ci` passes on macOS too (item 23)~~ **Won't implement — dormant — dropped.**
-26.~~Add CI badge for shellcheck job (item 22)~~ **Won't implement — shellcheck job exists; badge dropped.**
+23. ~~Add CI step for pure function tests on macOS (item 19)~~ done — done — pureFunctions wired into the matrixed integration-tests job (CI-2)
+24. ~~Add `--all-systems` to the macOS check job (item 20)~~ **Won't implement — infeasible from Linux — documented in CI comments.**
+25. ~~Add CI step that verifies `nix fmt -- --ci` passes on macOS too (item 23)~~ **Won't implement — dormant — dropped.**
+26. ~~Add CI badge for shellcheck job (item 22)~~ **Won't implement — shellcheck job exists; badge dropped.**
 
 ### Documentation
 
-27.~~Update `docs/flake-patterns.md` with the new `enableShfmt` option~~ **Won't implement — covered by the migration guide + man page instead.**
-28.~~Add architecture diagram note about pure-functions.nix (item 45)~~ done — done — 06:51 Task 7 (diagram node)
-29.~~Write CONTRIBUTING.md updates for downstream consumers (item 46)~~ **Won't implement — dormant — dropped.**
-30.~~List ALL 35 module options in AGENTS.md or link to a complete reference~~ done — done — AGENTS.md names all options + links the man page
+27. ~~Update `docs/flake-patterns.md` with the new `enableShfmt` option~~ **Won't implement — covered by the migration guide + man page instead.**
+28. ~~Add architecture diagram note about pure-functions.nix (item 45)~~ done — done — 06:51 Task 7 (diagram node)
+29. ~~Write CONTRIBUTING.md updates for downstream consumers (item 46)~~ **Won't implement — dormant — dropped.**
+30. ~~List ALL 35 module options in AGENTS.md or link to a complete reference~~ done — done — AGENTS.md names all options + links the man page
 
 ### Polish
 
-31.~~Add `--force` flag to `generate-flake.sh` to overwrite existing files (item 47)~~ **Won't implement — dormant — dropped.**
-32.~~Add `--vendor-hash` flag to `generate-flake.sh` for post-build hash injection (item 48)~~ **Won't implement — dormant — dropped.**
-33.~~Consider adding `golangci-lint` config template to `generate-flake.sh` (item 49)~~ **Won't implement — dormant — dropped.**
-34.~~Add `nix run .#lint` smoke test to CI (item 50)~~ **Won't implement — dormant — dropped.**
+31. ~~Add `--force` flag to `generate-flake.sh` to overwrite existing files (item 47)~~ **Won't implement — dormant — dropped.**
+32. ~~Add `--vendor-hash` flag to `generate-flake.sh` for post-build hash injection (item 48)~~ **Won't implement — dormant — dropped.**
+33. ~~Consider adding `golangci-lint` config template to `generate-flake.sh` (item 49)~~ **Won't implement — dormant — dropped.**
+34. ~~Add `nix run .#lint` smoke test to CI (item 50)~~ **Won't implement — dormant — dropped.**
 
 ### Design decisions
 
-35.~~Decide: export `pure-functions.nix` via `flake.lib` or keep internal~~ done — decided — kept internal
-36.~~Decide: vendorHash placeholder warning → hard error? (breaking for 7+ consumers)~~ done — decided — kept as a non-breaking trace warning
-37.~~Consider `lib.warn` instead of `builtins.trace` for vendorHash warning (Nix 2.21+)~~ **Won't implement — Nix-version dependency — dropped.**
+35. ~~Decide: export `pure-functions.nix` via `flake.lib` or keep internal~~ done — decided — kept internal
+36. ~~Decide: vendorHash placeholder warning → hard error? (breaking for 7+ consumers)~~ done — decided — kept as a non-breaking trace warning
+37. ~~Consider `lib.warn` instead of `builtins.trace` for vendorHash warning (Nix 2.21+)~~ **Won't implement — Nix-version dependency — dropped.**
 
 ### Structural
 
-38.~~Consolidate option-count references — AGENTS.md says 35, README lists all in a table, man page has 51 .BR entries. These should be cross-verifiable.~~ done — done — counts re-derived and cross-checked (41 options, docs-health pass 2026-09-24)
-39.~~Consider a CI step that verifies man page option list matches module option list (meta-test)~~ done — moved to ROADMAP Theme 6
+38. ~~Consolidate option-count references — AGENTS.md says 35, README lists all in a table, man page has 51 .BR entries. These should be cross-verifiable.~~ done — done — counts re-derived and cross-checked (41 options, docs-health pass 2026-09-24)
+39. ~~Consider a CI step that verifies man page option list matches module option list (meta-test)~~ done — moved to ROADMAP Theme 6
 
 ---
 

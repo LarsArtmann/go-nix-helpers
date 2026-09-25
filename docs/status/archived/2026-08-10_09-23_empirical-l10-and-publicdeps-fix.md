@@ -68,7 +68,7 @@
 
 ## B) PARTIALLY DONE ◑
 
-1.~~**Test coverage expansion** — added 7 of the ~19 untested-option tests~~ done — suite since deepened 99 → 121 assertions; remaining niche tests dropped as diminishing returns
+1. ~~**Test coverage expansion** — added 7 of the ~19 untested-option tests~~ done — suite since deepened 99 → 121 assertions; remaining niche tests dropped as diminishing returns
    identified in the prior status report (Tasks 22-40). The 7 I chose were
    the highest-value: disabled-state toggles that could silently break
    devShells, and monorepo + version propagation. The remaining 12 tests
@@ -77,7 +77,7 @@
    behavioral, `completionsPackage` in monorepo, `buildFlags` with
    multiple flags, etc.). These are valuable but diminishing returns.
 
-2.~~**`publicDeps` fix documentation** — the code, test, man page, README,~~ done — ROADMAP Theme 5 updated
+2. ~~**`publicDeps` fix documentation** — the code, test, man page, README,~~ done — ROADMAP Theme 5 updated
    and module option description are all updated. But the ROADMAP.md
    "Theme 5" entry (which tracks prefix-matching as a future improvement)
    was NOT updated to reflect that this is now shipped. This is a stale
@@ -87,7 +87,7 @@
 
 ## C) NOT STARTED ⬜
 
-1.~~**The 5 Blocked items** — unchanged from prior report, all require~~ done — routed — see TODO_LIST Blocked (maintainers, SSH secret, df9a5ff)
+1. ~~**The 5 Blocked items** — unchanged from prior report, all require~~ done — routed — see TODO_LIST Blocked (maintainers, SSH secret, df9a5ff)
    external access:
    - `maintainers.larsartmann` nixpkgs registration (external PR)
    - Real private-repo CI test (needs `DEPLOY_SSH_KEY` secret)
@@ -95,15 +95,15 @@
    - E2E consumer test (needs mock Go project + full build)
    - Empty commit `df9a5ff` fix (needs interactive rebase + force-push)
 
-2.~~**`go mod tidy` validation** (status report Task 4) — adding a~~ **Won't implement — subsumed — the module's FOD already runs `go mod tidy` when deps are set (verified by the 09:51 session).**
+2. ~~**`go mod tidy` validation** (status report Task 4) — adding a~~ **Won't implement — subsumed — the module's FOD already runs `go mod tidy` when deps are set (verified by the 09:51 session).**
    `go mod tidy` check to mkPreparedSource's postPatch to catch malformed
    replaces at preparation time. Not started; estimated 30min.
 
-3.~~**ROADMAP.md Theme 5 update** — the `publicDeps` versioned-path-aware~~ done — done — ROADMAP Theme 5 updated
+3. ~~**ROADMAP.md Theme 5 update** — the `publicDeps` versioned-path-aware~~ done — done — ROADMAP Theme 5 updated
    matching was listed as a ROADMAP item. Now that it's shipped, the
    ROADMAP entry should be marked done or removed.
 
-4.~~**First tagged release (`v0.1.0`)** — all P1-P12 work is shipped or~~ done — moved to TODO_LIST Blocked (v0.1.0)
+4. ~~**First tagged release (`v0.1.0`)** — all P1-P12 work is shipped or~~ done — moved to TODO_LIST Blocked (v0.1.0)
    empirically rejected. The CHANGELOG is all `[Unreleased]`. A tag would
    let consumers pin a stable point.
 
@@ -117,13 +117,13 @@ reverted. All changes are additive or surgical.
 
 ### Honest self-critique
 
-1.~~**I didn't update ROADMAP.md.** The `publicDeps` versioned-path~~ done — ROADMAP Theme 5 updated
+1. ~~**I didn't update ROADMAP.md.** The `publicDeps` versioned-path~~ done — ROADMAP Theme 5 updated
    matching was explicitly listed as a ROADMAP "Theme 5" future
    improvement. I shipped the feature but didn't mark the ROADMAP entry
    as done. This is a documentation split-brain: the CHANGELOG says
    "shipped" but the ROADMAP still says "planned."
 
-2.~~**I didn't verify the `grep -vE` regex against edge cases beyond~~ done — moved to TODO_LIST T12 (publicDeps ERE escaping)
+2. ~~**I didn't verify the `grep -vE` regex against edge cases beyond~~ done — moved to TODO_LIST T12 (publicDeps ERE escaping)
    Test 7.** The regex `^${pub}(/v[0-9]+)?$` correctly handles
    `foo/bar` matching `foo/bar/v2`, but I didn't test adversarial inputs:
    what if `$pub` contains regex metacharacters? The `lib.escapeShellArg`
@@ -135,12 +135,12 @@ reverted. All changes are additive or surgical.
    and `_`), and `.` matching any char is harmless (it would just
    over-match slightly). But it's not rigorously correct.
 
-3.~~**I only ran `nix flake check` on x86_64-linux.** The CI matrix~~ **Won't implement — accepted — CI matrix covers macOS.**
+3. ~~**I only ran `nix flake check` on x86_64-linux.** The CI matrix~~ **Won't implement — accepted — CI matrix covers macOS.**
    includes macOS, but I can't verify that locally. The prior session
    noted `--all-systems` is infeasible from Linux. Any darwin-specific
    evaluation issue would only surface in CI.
 
-4.~~**The test count went from 92 to 99 but I said "7 new assertions."**~~ done — status reports are swept by the auto-commit daemon routinely
+4. ~~**The test count went from 92 to 99 but I said "7 new assertions."**~~ done — status reports are swept by the auto-commit daemon routinely
    92 + 7 = 99. Math checks out. But I should note that the count
    breakdown is: 35 optionChecks + 13 perSystemChecks + 48
    additionalChecks + 3 standalone checks (overlayCheck,
@@ -156,35 +156,35 @@ reverted. All changes are additive or surgical.
 
 ### Process improvements
 
-1.~~**Update ROADMAP when shipping ROADMAP items.** I shipped the~~ done — done — ROADMAP Theme 5 updated
+1. ~~**Update ROADMAP when shipping ROADMAP items.** I shipped the~~ done — done — ROADMAP Theme 5 updated
    `publicDeps` versioned-path-aware matching (ROADMAP Theme 5) without
    touching ROADMAP.md. This creates a split-brain where the ROADMAP
    claims something is "planned" that is actually "shipped." The
    docs-health skill exists for exactly this — I should have used it or
    at least checked ROADMAP before declaring done.
 
-2.~~**Test the regex, not just the happy path.** The `grep -vE` pattern~~ done — moved to TODO_LIST T12
+2. ~~**Test the regex, not just the happy path.** The `grep -vE` pattern~~ done — moved to TODO_LIST T12
    works for the Test 7 scenario, but I didn't write adversarial tests
    for edge cases (regex metacharacters in module paths, empty
    publicDeps list, `/v0` and `/v100` variants). The pure-functions
    test suite has this rigor (22 assertions for 2 functions); the
    publicDeps filter has 1 integration test.
 
-3.~~**The `grep -c '(assertCheck'` != actual check count discrepancy**~~ **Won't implement — accepted — the 3 let-bound checks are structural.**
+3. ~~**The `grep -c '(assertCheck'` != actual check count discrepancy**~~ **Won't implement — accepted — the 3 let-bound checks are structural.**
    is a pre-existing papercut. Three checks use a different structural
    pattern (assigned to `let` bindings, then included in the list by
    name). Anyone trying to count assertions programmatically will
    undercount by 3. This should be normalized so all checks use the
    same `(assertCheck ...)` list-item pattern.
 
-4.~~**Status reports should be committed, not just untracked files.**~~ **Won't implement — dormant — dropped (reopen on demand).**
+4. ~~**Status reports should be committed, not just untracked files.**~~ **Won't implement — dormant — dropped (reopen on demand).**
    The prior session's status report (`2026-08-10_08-44_*.md`) is still
    untracked. This session's report will also be untracked unless
    committed. The auto-git daemon may handle this, but it's worth noting.
 
 ### Code improvements (noticed but not in scope this session)
 
-5.~~**`grep -vE` regex injection surface.** The `publicDeps` entries are~~ done — moved to TODO_LIST T12
+5. ~~**`grep -vE` regex injection surface.** The `publicDeps` entries are~~ done — moved to TODO_LIST T12
    user-supplied strings used directly in a `grep -E` pattern. While Go
    module paths are restricted to safe characters, a defensive
    `grep -vF` (fixed-string) with explicit `/vN` suffix stripping would
@@ -192,25 +192,25 @@ reverted. All changes are additive or surgical.
    sed 's/[.[\*^$()+?{|]/\\&/g')(/v[0-9]+)?$"` would escape
    metacharacters. Overkill for now, but worth noting.
 
-6.~~**`mkGoFlake.nix` and `templates/go-flake-parts/` are still~~ done — moved to TODO_LIST Blocked (v0.1.0 gates removal)
+6. ~~**`mkGoFlake.nix` and `templates/go-flake-parts/` are still~~ done — moved to TODO_LIST Blocked (v0.1.0 gates removal)
    maintenance burden.** Every go-standard change requires parallel
    updates. The deprecation warning says "removed in v1.0.0" but no
    v1.0.0 is scheduled. They should either be deleted now (breaking)
    or the removal target should be concretized.
 
-7.~~**`goPkg` parameter in `mkPreparedSource` is still dead weight.**~~ **Won't implement — dormant — dropped (reopen on demand).**
+7. ~~**`goPkg` parameter in `mkPreparedSource` is still dead weight.**~~ **Won't implement — dormant — dropped (reopen on demand).**
    The derivation has `dontBuild = true` and never invokes `go`.
    Documented gotcha, kept for API compat, but misleading.
 
-8.~~**`privateDepPattern` default is still LarsArtmann-specific.**~~ **Won't implement — LarsArtmann default kept — override documented in the README FAQ.**
+8. ~~**`privateDepPattern` default is still LarsArtmann-specific.**~~ **Won't implement — LarsArtmann default kept — override documented in the README FAQ.**
    Any non-LarsArtmann consumer MUST override this or validation
    silently does nothing for their private deps.
 
-9.~~**No `go mod tidy` validation in mkPreparedSource.** Malformed~~ **Won't implement — dormant — dropped (reopen on demand).**
+9. ~~**No `go mod tidy` validation in mkPreparedSource.** Malformed~~ **Won't implement — dormant — dropped (reopen on demand).**
    replaces only surface at `buildGoModule` time with a cryptic vendor
    error. A `go mod tidy` check in postPatch would catch these early.
 
-10.~~**The module test count discrepancy (96 vs 99).** Three checks~~ **Won't implement — dormant — dropped (reopen on demand).**
+10. ~~**The module test count discrepancy (96 vs 99).** Three checks~~ **Won't implement — dormant — dropped (reopen on demand).**
     use `let` bindings instead of the list-item pattern. Normalizing
     would make programmatic counting reliable.
 
@@ -287,20 +287,20 @@ reverted. All changes are additive or surgical.
 
 ## G) QUESTIONS I CANNOT FIGURE OUT MYSELF ❓
 
-1.~~**Should I tag `v0.1.0` now?** All P1-P12 work is shipped or~~ **Won't implement — dormant — dropped (reopen on demand).**
+1. ~~**Should I tag `v0.1.0` now?** All P1-P12 work is shipped or~~ **Won't implement — dormant — dropped (reopen on demand).**
    empirically rejected. The project is stable. But tagging implies a
    support/maintenance commitment — if a consumer pins `v0.1.0` and I
    ship a breaking change, what's the backport policy? I can't assess
    this without knowing your release strategy.
 
-2.~~**Should I delete `mkGoFlake.nix` and `templates/go-flake-parts/`~~ **Won't implement — dormant — dropped (reopen on demand).**
+2. ~~**Should I delete `mkGoFlake.nix` and `templates/go-flake-parts/`~~ **Won't implement — dormant — dropped (reopen on demand).**
    now, or wait for v1.0.0?** They're maintenance burden (every
    go-standard change requires parallel updates), but removing them is
    a breaking change. The deprecation warning says "removed in v1.0.0"
    but no v1.0.0 is scheduled. I can't audit the 7+ downstream consumers
    to know if any still use the old path — that requires repo access.
 
-3.~~**Should the `publicDeps` filter use fixed-string matching (`grep -vF`)~~ done — kept `grep -vE` — defensive escaping tracked in TODO_LIST T12
+3. ~~**Should the `publicDeps` filter use fixed-string matching (`grep -vF`)~~ done — kept `grep -vE` — defensive escaping tracked in TODO_LIST T12
    with explicit `/vN` suffix variants instead of `grep -vE`?** The
    current `grep -E` approach works but has a theoretical regex injection
    surface (module paths with `.` are slightly over-matched). A

@@ -424,6 +424,9 @@ let
       pkg:
       pkg.overrideAttrs (_: {
         version = "1.26.4-custom";
+        # Silence nixpkgs' overridden-version warning — the version change
+        # IS the point of this test.
+        __intentionallyOverridingVersion = true;
       });
   };
 
@@ -431,6 +434,13 @@ let
   # expected resolution of the default (null) goPkgAttr.
   pure = import ./pure-functions.nix { inherit lib; };
   expectedAutoGoAttr = pure.newestGoAttrName (builtins.attrNames pkgs);
+  # Second-newest branch (null when nixpkgs carries a single branch) — the
+  # stale-pin test needs a REAL older attr to pin.
+  olderGoAttr = pure.newestGoAttrName (
+    builtins.filter (
+      n: builtins.match "go_1_[0-9]+" n != null && n != expectedAutoGoAttr
+    ) (builtins.attrNames pkgs)
+  );
 
   # --- lintAsCheck test ------------------------------------------------------
   lintAsCheckCfg = mkPerSystemConfig { lintAsCheck = true; };
@@ -561,9 +571,23 @@ let
   # floor must throw at eval with an actionable message (GOTOOLCHAIN=local
   # would fail every build otherwise).
   lowFloorToolchainCfg = mkPerSystemConfig {
-    goPkgOverride = pkg: pkg.overrideAttrs (_: { version = "1.24.9"; });
+    goPkgOverride =
+      pkg:
+n      pkg.overrideAttrs (_: {
+        version = "1.24.9";
+        # Silence nixpkgs' overridden-version warning — the version change
+        # IS the point of this test.
+        __intentionallyOverridingVersion = true;
+      });
   };
   lowFloorEval = builtins.tryEval lowFloorToolchainCfg.packages.default.drvPath;
+
+  # --- stale goPkgAttr pin test -----------------------------------------------
+  # Pinning a real-but-older branch emits the stale-pin warning on stderr;
+  # evaluation itself must still succeed (the decision logic is asserted in
+  # test-pure-functions.nix; here we prove the warning path cannot break eval).
+  stalePinCfg = mkPerSystemConfig { goPkgAttr = olderGoAttr; };
+  stalePinEval = builtins.tryEval stalePinCfg.packages.default.drvPath;
 
   # --- nativeBuildInputs merge test (user inputs appended, not overridden) ---
   nativeBuildInputsMergeCfg = mkPerSystemConfig {

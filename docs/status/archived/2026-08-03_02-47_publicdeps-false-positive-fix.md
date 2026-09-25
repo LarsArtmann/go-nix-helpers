@@ -115,14 +115,14 @@ Nothing is broken. All tests pass, the feature works as designed. The gaps are o
 2. ~~Add `publicDeps` as a remediation option in README.md troubleshooting~~ done at `274cb35`
 3. ~~Fix AGENTS.md key files table: "28 options" → "30 options"~~ done — now at 32 options
 4. ~~Make `autoGoPrivateEnv` in go-standard.nix aware of `publicDeps`~~ decided against at `052d92d` — broad glob kept as safer default; `privateGlobPattern` option added instead at `c510d7c`
-5.~~Update nix-private-go-repos SKILL.md with `publicDeps` parameter and new error message ← still open~~ done — done — SKILL.md updated in the 2026-08-12 audits
+5. ~~Update nix-private-go-repos SKILL.md with `publicDeps` parameter and new error message ← still open~~ done — done — SKILL.md updated in the 2026-08-12 audits
 6. ~~Add test for `privateDepPattern` override in test-module.nix~~ partially done — default-value test added; override test still open → TODO_LIST M7
-7.~~Add test for `publicDeps` with `/v2` versioned module paths ← still open → TODO_LIST M9~~ done — done — Test 7 versioned publicDeps (`a199f6b`)
+7. ~~Add test for `publicDeps` with `/v2` versioned module paths ← still open → TODO_LIST M9~~ done — done — Test 7 versioned publicDeps (`a199f6b`)
 
 ### Medium Priority
 
 8. ~~Document the path-exact matching behavior of `publicDeps` more prominently~~ done at `274cb35`
-9.~~Add `publicDeps` usage example to docs/flake-patterns.md ← still open~~ **Won't implement — covered by README + template examples.**
+9. ~~Add `publicDeps` usage example to docs/flake-patterns.md ← still open~~ **Won't implement — covered by README + template examples.**
 10. ~~Consider prefix matching for `publicDeps` instead of exact match~~ → ROADMAP (Theme 5)
 11. ~~Update README.md GOPRIVATE section to mention interaction with publicDeps~~ done — `publicDeps` scope clarified in README options table at `274cb35`
 12. ~~Add integration test that exercises the full go-standard module with `publicDeps` set~~ done at `12f2350` (multi-deps test covers this)

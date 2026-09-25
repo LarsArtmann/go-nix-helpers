@@ -174,38 +174,38 @@ name). This will rot less than line numbers but still couples to file structure.
 
 ### Process
 
-1.~~**Load ALL skill references before starting.** The SKILL.md is a summary. The~~ done — done — this pass loaded the skill + annotation tooling before editing
+1. ~~**Load ALL skill references before starting.** The SKILL.md is a summary. The~~ done — done — this pass loaded the skill + annotation tooling before editing
    references contain the actual procedures, checklists, and format specs. I
    loaded 1 of 6 references. Loading `annotation-placement.md` would have caught
    the missed C/E sections. Loading `health-report-format.md` would have
    produced the prescribed report format.
 
-2.~~**Annotate EVERY section, not just the ones with numbered lists.** The skill~~ done — done — this pass annotated every section type, tables included
+2. ~~**Annotate EVERY section, not just the ones with numbered lists.** The skill~~ done — done — this pass annotated every section type, tables included
    says "every numbered item" but C-sections (NOT STARTED) and E-sections (WHAT
    WE SHOULD IMPROVE) contain actionable claims that readers need resolved. A
    section-skipping annotation pass is an incomplete annotation pass.
 
-3.~~**Clean up build artifacts.** `verify-result` should be trashed immediately~~ done — moved to TODO_LIST T17 — result* symlinks
+3. ~~**Clean up build artifacts.** `verify-result` should be trashed immediately~~ done — moved to TODO_LIST T17 — result* symlinks
    after use, or the nix-build command should use `--no-out-link` (which I did
    use later, but not consistently).
 
-4.~~**Produce the health report in the prescribed format.** The skill specifies~~ done — done — health report produced inline (2026-09-24 pass)
+4. ~~**Produce the health report in the prescribed format.** The skill specifies~~ done — done — health report produced inline (2026-09-24 pass)
    two independent scores (Accuracy + Fitness), per-doc findings table, visible
    math. I should have followed the format spec, not invented my own.
 
 ### Documentation
 
-5.~~**`docs/flake-patterns.md` is STILL stale** — flagged in report 02-51 E5 and~~ done — fixed — flake-patterns updated (05:04 D2)
+5. ~~**`docs/flake-patterns.md` is STILL stale** — flagged in report 02-51 E5 and~~ done — fixed — flake-patterns updated (05:04 D2)
    again in report 07-38. No mention of `publicDeps`, no monorepo patterns.
    This is now in TODO_LIST but has been open for 3 sessions.
 
-6.~~**The `nix-private-go-repos` SKILL.md still doesn't mention `publicDeps`** —~~ **Won't implement — SKILLS-repo scope — fixed in the 2026-08-12 audits.**
+6. ~~**The `nix-private-go-repos` SKILL.md still doesn't mention `publicDeps`** —~~ **Won't implement — SKILLS-repo scope — fixed in the 2026-08-12 audits.**
    flagged in report 02-47 C5. The feedback doc explicitly references this
    skill's gotcha table. Still open, now tracked in ROADMAP.
 
 ### Annotation Quality
 
-7.~~**Report 02-51 C3 says "archived/ not created" — I created it this session~~ done — done — recorded
+7. ~~**Report 02-51 C3 says "archived/ not created" — I created it this session~~ done — done — recorded
    but didn't annotate C3 with that resolution.** The reader would see "C3: The
    `docs/status/archived/` directory was not created" and not know it now
    exists.

@@ -65,21 +65,21 @@ Since the first status report, the session focused on updating three Nix skills 
 
 ### Process Failures This Session
 
-1.~~**I didn't act on my own report.** Report #1 listed 5 critical issues. I addressed exactly zero of them before moving to skill updates. I should have fixed the `defaultSystems` issue (2-line change) before doing anything else.~~ **Won't implement — process lesson — all five criticals shipped since (systems option, moduleTest, migrations).**
+1. ~~**I didn't act on my own report.** Report #1 listed 5 critical issues. I addressed exactly zero of them before moving to skill updates. I should have fixed the `defaultSystems` issue (2-line change) before doing anything else.~~ **Won't implement — process lesson — all five criticals shipped since (systems option, moduleTest, migrations).**
 
-2.~~**I didn't investigate the auto-commit mystery.** This is the most alarming thing in the entire session — commits are appearing that I didn't create — and I ignored it across two rounds of work.~~ done — identified — buildflow watcher (2026-07-24)
+2. ~~**I didn't investigate the auto-commit mystery.** This is the most alarming thing in the entire session — commits are appearing that I didn't create — and I ignored it across two rounds of work.~~ done — identified — buildflow watcher (2026-07-24)
 
-3.~~**Skills are incomplete.** I added "use go-standard" recommendations but didn't give the skills enough information to be self-contained. A skill that says "use go-standard" but doesn't list the options forces the agent to go read the repo.~~ **Won't implement — SKILLS-repo scope — addressed in the 2026-08-12 audits.**
+3. ~~**Skills are incomplete.** I added "use go-standard" recommendations but didn't give the skills enough information to be self-contained. A skill that says "use go-standard" but doesn't list the options forces the agent to go read the repo.~~ **Won't implement — SKILLS-repo scope — addressed in the 2026-08-12 audits.**
 
-4.~~**Two templates now contradict each other.** `templates/go-standard/` shows 3 inputs, `templates/go-flake-parts/` shows 5 inputs. Neither is marked as preferred or deprecated.~~ done — resolved — go-flake-parts deprecated with banner
+4. ~~**Two templates now contradict each other.** `templates/go-standard/` shows 3 inputs, `templates/go-flake-parts/` shows 5 inputs. Neither is marked as preferred or deprecated.~~ done — resolved — go-flake-parts deprecated with banner
 
 ### Architectural
 
-5.~~**The composite module's `inputs.systems` reference** — go-nix-helpers has `systems.url = "github:nix-systems/default"` in its own flake inputs. The composite module should pass `import inputs.systems` to go-standard.nix instead of hardcoding the list. This preserves the override pattern.~~ done — shipped — systems option
+5. ~~**The composite module's `inputs.systems` reference** — go-nix-helpers has `systems.url = "github:nix-systems/default"` in its own flake inputs. The composite module should pass `import inputs.systems` to go-standard.nix instead of hardcoding the list. This preserves the override pattern.~~ done — shipped — systems option
 
-6.~~**Skill copies synchronization** — Three copies of skills exist: `/home/lars/projects/SKILLS/`, `/home/lars/.agents/skills/`, `/home/lars/.config/crush/skills/`. Changes to the source may not propagate. Need to understand the sync mechanism.~~ **Won't implement — SKILLS-repo scope.**
+6. ~~**Skill copies synchronization** — Three copies of skills exist: `/home/lars/projects/SKILLS/`, `/home/lars/.agents/skills/`, `/home/lars/.config/crush/skills/`. Changes to the source may not propagate. Need to understand the sync mechanism.~~ **Won't implement — SKILLS-repo scope.**
 
-7.~~**No integration test for the module** — The most valuable test would be a minimal Go project in `tests/consumer/` that imports `flakeModules.go-standard` and verifies all outputs resolve.~~ done — moduleTest (121 assertions) + templateEval + 10 real consumers
+7. ~~**No integration test for the module** — The most valuable test would be a minimal Go project in `tests/consumer/` that imports `flakeModules.go-standard` and verifies all outputs resolve.~~ done — moduleTest (121 assertions) + templateEval + 10 real consumers
 
 ---
 
@@ -87,71 +87,71 @@ Since the first status report, the session focused on updating three Nix skills 
 
 ### Immediate Fixes (from report #1 — still open)
 
-1.~~Fix `defaultSystems` → `import inputs.systems` (2-line change in go-standard.nix + flake.nix)~~ done — shipped — systems option
-2.~~Remove `test-result` symlink from git, add to `.gitignore`~~ done — resolved 2026-07-24
-3.~~Investigate the auto-commit mechanism — check for git-town, file watchers, daemons, cron jobs~~ done — identified — buildflow watcher
-4.~~Test double-import scenario: consumer with treefmt-nix + composite module~~ done — moot — no treefmt-nix input in adopters
-5.~~Create a minimal test consumer project that verifies the composite module end-to-end~~ done — 10 consumers migrated; templateEval shipped
-6.~~Delete or formally deprecate `mkGoFlake.nix` (remove `flake.lib.mkGoFlake` export)~~ done — trace shipped; deletion gated v0.1.0
-7.~~Mark `templates/go-flake-parts/` as legacy or delete it entirely~~ done — deprecated with banner
+1. ~~Fix `defaultSystems` → `import inputs.systems` (2-line change in go-standard.nix + flake.nix)~~ done — shipped — systems option
+2. ~~Remove `test-result` symlink from git, add to `.gitignore`~~ done — resolved 2026-07-24
+3. ~~Investigate the auto-commit mechanism — check for git-town, file watchers, daemons, cron jobs~~ done — identified — buildflow watcher
+4. ~~Test double-import scenario: consumer with treefmt-nix + composite module~~ done — moot — no treefmt-nix input in adopters
+5. ~~Create a minimal test consumer project that verifies the composite module end-to-end~~ done — 10 consumers migrated; templateEval shipped
+6. ~~Delete or formally deprecate `mkGoFlake.nix` (remove `flake.lib.mkGoFlake` export)~~ done — trace shipped; deletion gated v0.1.0
+7. ~~Mark `templates/go-flake-parts/` as legacy or delete it entirely~~ done — deprecated with banner
 
 ### Skill Improvements
 
-8.~~Add a compact go-standard options table to `nix-flake-migration` skill (pname, vendorHash, deps, enableTempl, ldflags, etc.)~~ **Won't implement — SKILLS-repo scope — 2026-08-12 audits.**
-9.~~Add `validatePrivateDeps` and `privateDepPattern` override examples to `nix-private-go-repos` Option A~~ **Won't implement — SKILLS-repo scope — 2026-08-12 audits.**
-10.~~Add a "migrating from manual to go-standard" section to `nix-flake-migration` skill (before/after diff)~~ **Won't implement — SKILLS-repo scope — 2026-08-12 audits.**
-11.~~Add `enableCheck`, `enableOverlay`, `subPackages` mentions to skill templates~~ **Won't implement — SKILLS-repo scope — 2026-08-12 audits.**
-12.~~Verify skill copies sync to `.agents/skills/` and `.config/crush/skills/`~~ **Won't implement — SKILLS-repo scope — 2026-08-12 audits.**
-13.~~Add the go-standard 3-input pattern to the `nix-review` skill's "Strengths" section as a pattern to praise~~ **Won't implement — SKILLS-repo scope — 2026-08-12 audits.**
-14.~~Add a common-problems entry: "LarsArtmann Go project with manual flake.nix" → recommend go-standard migration~~ **Won't implement — SKILLS-repo scope — 2026-08-12 audits.**
+8. ~~Add a compact go-standard options table to `nix-flake-migration` skill (pname, vendorHash, deps, enableTempl, ldflags, etc.)~~ **Won't implement — SKILLS-repo scope — 2026-08-12 audits.**
+9. ~~Add `validatePrivateDeps` and `privateDepPattern` override examples to `nix-private-go-repos` Option A~~ **Won't implement — SKILLS-repo scope — 2026-08-12 audits.**
+10. ~~Add a "migrating from manual to go-standard" section to `nix-flake-migration` skill (before/after diff)~~ **Won't implement — SKILLS-repo scope — 2026-08-12 audits.**
+11. ~~Add `enableCheck`, `enableOverlay`, `subPackages` mentions to skill templates~~ **Won't implement — SKILLS-repo scope — 2026-08-12 audits.**
+12. ~~Verify skill copies sync to `.agents/skills/` and `.config/crush/skills/`~~ **Won't implement — SKILLS-repo scope — 2026-08-12 audits.**
+13. ~~Add the go-standard 3-input pattern to the `nix-review` skill's "Strengths" section as a pattern to praise~~ **Won't implement — SKILLS-repo scope — 2026-08-12 audits.**
+14. ~~Add a common-problems entry: "LarsArtmann Go project with manual flake.nix" → recommend go-standard migration~~ **Won't implement — SKILLS-repo scope — 2026-08-12 audits.**
 
 ### Consumer Migrations
 
-15.~~Migrate `library-policy` to go-standard (simplest consumer, good pilot)~~ done — still open — Tier A sweep did not cover library-policy; tracked with TODO_LIST T4 backlog
-16.~~Migrate `mr-sync` to go-standard~~ done — still open — tracked with TODO_LIST T4 backlog
-17.~~Migrate `go-structure-linter` to go-standard~~ done — still open — Tier C; tracked with TODO_LIST T4/T5 backlog
-18.~~Migrate `BuildFlow` to go-standard~~ done — moved to TODO_LIST T4
-19.~~Migrate `branching-flow` to go-standard~~ done — moved to TODO_LIST T4
-20.~~Migrate `Standup-Killer` to go-standard~~ done — moved to TODO_LIST T5
-21.~~Migrate `PMA` to go-standard~~ done — done — PMA migrated (`9b47684`)
-22.~~Write a migration guide doc (`docs/migrating-to-go-standard.md`)~~ done — shipped — docs/migration-guide.md
-23.~~Create a migration script that converts 5-input → 3-input automatically~~ done — moved to ROADMAP Theme 2
+15. ~~Migrate `library-policy` to go-standard (simplest consumer, good pilot)~~ done — still open — Tier A sweep did not cover library-policy; tracked with TODO_LIST T4 backlog
+16. ~~Migrate `mr-sync` to go-standard~~ done — still open — tracked with TODO_LIST T4 backlog
+17. ~~Migrate `go-structure-linter` to go-standard~~ done — still open — Tier C; tracked with TODO_LIST T4/T5 backlog
+18. ~~Migrate `BuildFlow` to go-standard~~ done — moved to TODO_LIST T4
+19. ~~Migrate `branching-flow` to go-standard~~ done — moved to TODO_LIST T4
+20. ~~Migrate `Standup-Killer` to go-standard~~ done — moved to TODO_LIST T5
+21. ~~Migrate `PMA` to go-standard~~ done — done — PMA migrated (`9b47684`)
+22. ~~Write a migration guide doc (`docs/migrating-to-go-standard.md`)~~ done — shipped — docs/migration-guide.md
+23. ~~Create a migration script that converts 5-input → 3-input automatically~~ done — moved to ROADMAP Theme 2
 
 ### Testing
 
-24.~~Add a `tests/module-test.nix` that evaluates go-standard and checks all outputs exist~~ done — shipped — test-module.nix (121 assertions)
-25.~~Add a CI matrix that tests go-standard with different consumer configs (with deps, without deps, with templ, etc.)~~ done — moduleTest covers consumer configs
-26.~~Add a check that validates the composite module structure (`assert m.imports != []`)~~ done — shipped — structural check
-27.~~Test go-standard with `vendorHash = null` (committed vendor/ pattern)~~ done — moved to ROADMAP Theme 3 (committed-vendor test)
-28.~~Test go-standard with `enableTempl = true`~~ done — shipped — enableTempl treefmt + devShell assertions
-29.~~Test go-standard with multiple `deps` entries~~ done — shipped — multiDepsTest integration scenario
-30.~~Test go-standard with `subModules` override~~ done — shipped — explicit subModules tests
+24. ~~Add a `tests/module-test.nix` that evaluates go-standard and checks all outputs exist~~ done — shipped — test-module.nix (121 assertions)
+25. ~~Add a CI matrix that tests go-standard with different consumer configs (with deps, without deps, with templ, etc.)~~ done — moduleTest covers consumer configs
+26. ~~Add a check that validates the composite module structure (`assert m.imports != []`)~~ done — shipped — structural check
+27. ~~Test go-standard with `vendorHash = null` (committed vendor/ pattern)~~ done — moved to ROADMAP Theme 3 (committed-vendor test)
+28. ~~Test go-standard with `enableTempl = true`~~ done — shipped — enableTempl treefmt + devShell assertions
+29. ~~Test go-standard with multiple `deps` entries~~ done — shipped — multiDepsTest integration scenario
+30. ~~Test go-standard with `subModules` override~~ done — shipped — explicit subModules tests
 
 ### Module Enhancements
 
-31.~~Add `enableCheck` option (default true)~~ done — shipped
-32.~~Add `enableOverlay` option (default true)~~ done — shipped
-33.~~Add `enableApps` option (for projects that don't need test/lint apps)~~ **Won't implement — dormant — dropped.**
-34.~~Add `version` option (override git-derived version)~~ done — shipped
-35.~~Add `enableCgo` option (use mkShell instead of mkShellNoCC)~~ done — folded into TODO_LIST T13 (cgoEnabled)
-36.~~Add `buildFlags` option for build tags~~ done — shipped
-37.~~Add `env` option for buildGoModule env vars~~ done — extraBuildAttrs.env covers it
-38.~~Support multiple packages (monorepo with multiple binaries)~~ done — shipped — packages monorepo + G2
-39.~~Add `extraChecks` option (function of perSystem args)~~ **Won't implement — dormant — consumers add checks via perSystem directly.**
-40.~~Add `extraApps` option (function of perSystem args)~~ **Won't implement — dormant — consumers add apps via perSystem directly.**
-41.~~Bundle `git-hooks.nix` into composite module~~ **Won't implement — dormant since 2026-07 — dropped.**
-42.~~Add `license` option (default mit)~~ done — moved to ROADMAP Theme 1 (extraMeta covers it today)
-43.~~Add `homepage` to meta (derive from pname + GitHub org)~~ **Won't implement — dormant — dropped.**
-44.~~Add `longDescription` option for meta~~ **Won't implement — dormant — dropped.**
+31. ~~Add `enableCheck` option (default true)~~ done — shipped
+32. ~~Add `enableOverlay` option (default true)~~ done — shipped
+33. ~~Add `enableApps` option (for projects that don't need test/lint apps)~~ **Won't implement — dormant — dropped.**
+34. ~~Add `version` option (override git-derived version)~~ done — shipped
+35. ~~Add `enableCgo` option (use mkShell instead of mkShellNoCC)~~ done — folded into TODO_LIST T13 (cgoEnabled)
+36. ~~Add `buildFlags` option for build tags~~ done — shipped
+37. ~~Add `env` option for buildGoModule env vars~~ done — extraBuildAttrs.env covers it
+38. ~~Support multiple packages (monorepo with multiple binaries)~~ done — shipped — packages monorepo + G2
+39. ~~Add `extraChecks` option (function of perSystem args)~~ **Won't implement — dormant — consumers add checks via perSystem directly.**
+40. ~~Add `extraApps` option (function of perSystem args)~~ **Won't implement — dormant — consumers add apps via perSystem directly.**
+41. ~~Bundle `git-hooks.nix` into composite module~~ **Won't implement — dormant since 2026-07 — dropped.**
+42. ~~Add `license` option (default mit)~~ done — moved to ROADMAP Theme 1 (extraMeta covers it today)
+43. ~~Add `homepage` to meta (derive from pname + GitHub org)~~ **Won't implement — dormant — dropped.**
+44. ~~Add `longDescription` option for meta~~ **Won't implement — dormant — dropped.**
 
 ### Cleanup
 
-45.~~Remove `mkGoFlake.nix` entirely once all consumers migrated~~ done — gated on v0.1.0 (TODO_LIST Blocked)
-46.~~Remove `go-flake-parts` template or mark as legacy~~ done — deprecated with banner
-47.~~Consolidate `docs/flake-standard.md` and `docs/flake-patterns.md` (overlapping content)~~ **Won't implement — overlapping content is intentional (patterns vs standard); dropped.**
-48.~~Create `CHANGELOG.md` for tracking breaking changes~~ done — shipped — CHANGELOG.md exists
-49.~~Register `maintainers.larsartmann` in nixpkgs for full correctness~~ done — moved to TODO_LIST Blocked
-50.~~Add `flake.templates` output so `nix flake init -t go-nix-helpers#go-standard` works~~ done — moved to ROADMAP Theme 1
+45. ~~Remove `mkGoFlake.nix` entirely once all consumers migrated~~ done — gated on v0.1.0 (TODO_LIST Blocked)
+46. ~~Remove `go-flake-parts` template or mark as legacy~~ done — deprecated with banner
+47. ~~Consolidate `docs/flake-standard.md` and `docs/flake-patterns.md` (overlapping content)~~ **Won't implement — overlapping content is intentional (patterns vs standard); dropped.**
+48. ~~Create `CHANGELOG.md` for tracking breaking changes~~ done — shipped — CHANGELOG.md exists
+49. ~~Register `maintainers.larsartmann` in nixpkgs for full correctness~~ done — moved to TODO_LIST Blocked
+50. ~~Add `flake.templates` output so `nix flake init -t go-nix-helpers#go-standard` works~~ done — moved to ROADMAP Theme 1
 
 ---
 

@@ -150,17 +150,17 @@ All 3 migrated repos pass `nix flake check --no-build` but none have been actual
 
 ## C) NOT STARTED ⬜
 
-1.~~**7 remaining Tier A consumer migrations** — surveyed, patterns understood, not executed~~ done — done in the 16:50 sprint
-2.~~**6 Tier B consumer migrations** — some now unblocked by G2, not started~~ done — moved to TODO_LIST T4
-3.~~**2 Tier C migrations** (Standup-Killer, crush-daily) — need to migrate off deprecated `mkGoFlake`~~ done — moved to TODO_LIST T5
-4.~~**`index` adopter cleanup** — 5th module adopter, not touched~~ done — still open — tracked with the Tier B/C fleet backlog
-5.~~**CI standardization** across migrated repos — not started~~ **Won't implement — dormant — dropped.**
-6.~~**`flake.lock` freshness audit** across consumer repos — not checked~~ **Won't implement — dormant — dropped.**
-7.~~**Real `nix build` verification** of migrated repos — blocked on SSH access~~ done — moved to TODO_LIST T3
-8.~~**G2 real-world validation** — no consumer uses per-package attrs yet~~ **Won't implement — Tier B migration (T4) will validate G2 in a real consumer.**
-9.~~**`enableTestCheck` real-world validation** — no consumer uses it yet~~ **Won't implement — Tier B consumers will exercise it.**
-10.~~**flake-patterns.md TOC update for anchor links** — added "CI-friendly options" to TOC but didn't verify the anchor works~~ **Won't implement — cosmetic — anchor works.**
-11.~~**Commit the work** — 9 files uncommitted in go-nix-helpers, 7 consumer repos uncommitted~~ done — committed by the daemon (16:50 sweep)
+1. ~~**7 remaining Tier A consumer migrations** — surveyed, patterns understood, not executed~~ done — done in the 16:50 sprint
+2. ~~**6 Tier B consumer migrations** — some now unblocked by G2, not started~~ done — moved to TODO_LIST T4
+3. ~~**2 Tier C migrations** (Standup-Killer, crush-daily) — need to migrate off deprecated `mkGoFlake`~~ done — moved to TODO_LIST T5
+4. ~~**`index` adopter cleanup** — 5th module adopter, not touched~~ done — still open — tracked with the Tier B/C fleet backlog
+5. ~~**CI standardization** across migrated repos — not started~~ **Won't implement — dormant — dropped.**
+6. ~~**`flake.lock` freshness audit** across consumer repos — not checked~~ **Won't implement — dormant — dropped.**
+7. ~~**Real `nix build` verification** of migrated repos — blocked on SSH access~~ done — moved to TODO_LIST T3
+8. ~~**G2 real-world validation** — no consumer uses per-package attrs yet~~ **Won't implement — Tier B migration (T4) will validate G2 in a real consumer.**
+9. ~~**`enableTestCheck` real-world validation** — no consumer uses it yet~~ **Won't implement — Tier B consumers will exercise it.**
+10. ~~**flake-patterns.md TOC update for anchor links** — added "CI-friendly options" to TOC but didn't verify the anchor works~~ **Won't implement — cosmetic — anchor works.**
+11. ~~**Commit the work** — 9 files uncommitted in go-nix-helpers, 7 consumer repos uncommitted~~ done — committed by the daemon (16:50 sweep)
 
 ---
 
@@ -217,33 +217,33 @@ The module defaults to `systems = [ "x86_64-linux" "aarch64-linux" "x86_64-darwi
 
 ### Process
 
-1.~~**Commit immediately after each logical unit of work.** The "forgot to commit" failure is recurring. The auto-daemon is a safety net, not a strategy. I should commit after each todo completion, not at the end.~~ **Won't implement — process lesson — recorded.**
+1. ~~**Commit immediately after each logical unit of work.** The "forgot to commit" failure is recurring. The auto-daemon is a safety net, not a strategy. I should commit after each todo completion, not at the end.~~ **Won't implement — process lesson — recorded.**
 
-2.~~**Build-verify migrations before declaring done.** "Evaluates" ≠ "builds." The 3 migrated repos are eval-verified only. The `proxyVendor` change is a known build-affecting difference. I should have flagged this explicitly in each migration.~~ **Won't implement — process lesson — recorded.**
+2. ~~**Build-verify migrations before declaring done.** "Evaluates" ≠ "builds." The 3 migrated repos are eval-verified only. The `proxyVendor` change is a known build-affecting difference. I should have flagged this explicitly in each migration.~~ **Won't implement — process lesson — recorded.**
 
-3.~~**Test the test.** The G2 ldflags test failed because I assumed `buildGoModule` exposes `ldflags` in `drvAttrs`. It doesn't. I should have verified the test assertion mechanism before writing 3 tests that depend on it. Using `passthru` is the correct approach, but discovering this cost a round-trip.~~ **Won't implement — process lesson — recorded.**
+3. ~~**Test the test.** The G2 ldflags test failed because I assumed `buildGoModule` exposes `ldflags` in `drvAttrs`. It doesn't. I should have verified the test assertion mechanism before writing 3 tests that depend on it. Using `passthru` is the correct approach, but discovering this cost a round-trip.~~ **Won't implement — process lesson — recorded.**
 
-4.~~**Read the actual merge code before refactoring it.** The G2 refactor touched a critical merge path (`userExtraBuildAttrs` → `combinedOther`). I read the code first, but the variable naming (`combinedConcat` vs actual attribute values) is still confusing. I should have named things more clearly.~~ **Won't implement — process lesson — recorded.**
+4. ~~**Read the actual merge code before refactoring it.** The G2 refactor touched a critical merge path (`userExtraBuildAttrs` → `combinedOther`). I read the code first, but the variable naming (`combinedConcat` vs actual attribute values) is still confusing. I should have named things more clearly.~~ **Won't implement — process lesson — recorded.**
 
 ### Module
 
-5.~~**`proxyVendor` should be configurable per-deps.** The module forces `proxyVendor = false` when deps are set, but some repos (erraudit) had `proxyVendor = true` with deps. This is a behavior change on migration. Consider making this an option or documenting it prominently.~~ done — moved to TODO_LIST T14
+5. ~~**`proxyVendor` should be configurable per-deps.** The module forces `proxyVendor = false` when deps are set, but some repos (erraudit) had `proxyVendor = true` with deps. This is a behavior change on migration. Consider making this an option or documenting it prominently.~~ done — moved to TODO_LIST T14
 
-6.~~**No `src` with `lib.fileset` convenience.** Most legacy repos use `lib.fileset.toSource` for source filtering. The module's `src` option defaults to `self.outPath` (whole repo). Migrated repos lose their fileset filtering unless they set `src = lib.fileset.toSource { ... }` — but then `lib` isn't in scope in the module config. Consider adding a `srcFileset` option or documenting the pattern.~~ **Won't implement — dormant — the src option accepts filesets directly.**
+6. ~~**No `src` with `lib.fileset` convenience.** Most legacy repos use `lib.fileset.toSource` for source filtering. The module's `src` option defaults to `self.outPath` (whole repo). Migrated repos lose their fileset filtering unless they set `src = lib.fileset.toSource { ... }` — but then `lib` isn't in scope in the module config. Consider adding a `srcFileset` option or documenting the pattern.~~ **Won't implement — dormant — the src option accepts filesets directly.**
 
-7.~~**`GOEXPERIMENT` is extremely common** (7/10 Tier A repos use `jsonv2`). Consider an `enableJsonV2` option or a generic `goExperiment` string option to avoid the `extraBuildAttrs.env.GOEXPERIMENT` boilerplate.~~ done — moved to TODO_LIST T13
+7. ~~**`GOEXPERIMENT` is extremely common** (7/10 Tier A repos use `jsonv2`). Consider an `enableJsonV2` option or a generic `goExperiment` string option to avoid the `extraBuildAttrs.env.GOEXPERIMENT` boilerplate.~~ done — moved to TODO_LIST T13
 
-8.~~**`CGO_ENABLED = "0"` is common.** Consider a `cgoEnabled` option (default: false for CLI tools).~~ done — moved to TODO_LIST T13
+8. ~~**`CGO_ENABLED = "0"` is common.** Consider a `cgoEnabled` option (default: false for CLI tools).~~ done — moved to TODO_LIST T13
 
-9.~~**`enableCompletions` uses `--completion` but cobra uses `completion <shell>`.** project-meta needed a custom `postInstall` because the module's `enableCompletions` calls `binary --completion bash` (urfave/cli style) but cobra calls `binary completion bash`. The module should auto-detect or provide a `completionStyle` option.~~ done — moved to TODO_LIST T13
+9. ~~**`enableCompletions` uses `--completion` but cobra uses `completion <shell>`.** project-meta needed a custom `postInstall` because the module's `enableCompletions` calls `binary --completion bash` (urfave/cli style) but cobra calls `binary completion bash`. The module should auto-detect or provide a `completionStyle` option.~~ done — moved to TODO_LIST T13
 
-10.~~**The `checks.test` derivation doesn't use `enableCheck`.** If `enableCheck = true` (default), `checks.build` already runs tests. Adding `checks.test` is redundant unless `enableCheck = false`. The option works but its value proposition is narrow. Consider: when `enableCheck = false` AND `enableTestCheck = true`, generate `checks.test`. When `enableCheck = true`, don't (it's redundant with `checks.build`).~~ **Won't implement — checks.test is opt-in; redundancy is the consumer's choice.**
+10. ~~**The `checks.test` derivation doesn't use `enableCheck`.** If `enableCheck = true` (default), `checks.build` already runs tests. Adding `checks.test` is redundant unless `enableCheck = false`. The option works but its value proposition is narrow. Consider: when `enableCheck = false` AND `enableTestCheck = true`, generate `checks.test`. When `enableCheck = true`, don't (it's redundant with `checks.build`).~~ **Won't implement — checks.test is opt-in; redundancy is the consumer's choice.**
 
 ### Consumer migrations
 
-11.~~**The `proxyVendor` change needs prominent documentation in the migration guide.** Right now, the migration guide doesn't mention that `proxyVendor` flips to `false` when deps are set.~~ done — shipped in the migration-guide recipe cards (`e6860c5`)
+11. ~~**The `proxyVendor` change needs prominent documentation in the migration guide.** Right now, the migration guide doesn't mention that `proxyVendor` flips to `false` when deps are set.~~ done — shipped in the migration-guide recipe cards (`e6860c5`)
 
-12.~~**A migration "recipe card" per common pattern would help.** The GOEXPERIMENT + CGO_ENABLED + fileset pattern appears in 7+ repos. A copy-paste recipe would speed up the remaining 7 Tier A migrations.~~ done — shipped — 7 recipe cards (`e6860c5`)
+12. ~~**A migration "recipe card" per common pattern would help.** The GOEXPERIMENT + CGO_ENABLED + fileset pattern appears in 7+ repos. A copy-paste recipe would speed up the remaining 7 Tier A migrations.~~ done — shipped — 7 recipe cards (`e6860c5`)
 
 ---
 
@@ -251,77 +251,77 @@ The module defaults to `systems = [ "x86_64-linux" "aarch64-linux" "x86_64-darwi
 
 ### Immediate (loose ends from this session)
 
-1.~~**Commit all 9 uncommitted files in go-nix-helpers** — the daemon may or may not fire~~ done — committed by the daemon (16:50 sweep)
-2.~~**Commit the 7 consumer repo changes** — go-localsync, erraudit, project-meta, lean-business-plan, storbi, template-arch-lint, terraform-diagrams-aggregator~~ done — committed by the daemon (16:50 sweep)
-3.~~**Build-verify the 3 migrated repos** with `nix build` (needs SSH access) — update vendorHash if needed~~ done — moved to TODO_LIST T3
-4.~~**Clean up `index` adopter** — the 5th module adopter, remove `enableCheck=true` redundancy~~ **Won't implement — dormant — dropped (reopen on demand).**
-5.~~**Verify flake-patterns.md anchor link** for "CI-friendly options" TOC entry~~ **Won't implement — cosmetic — anchor works.**
+1. ~~**Commit all 9 uncommitted files in go-nix-helpers** — the daemon may or may not fire~~ done — committed by the daemon (16:50 sweep)
+2. ~~**Commit the 7 consumer repo changes** — go-localsync, erraudit, project-meta, lean-business-plan, storbi, template-arch-lint, terraform-diagrams-aggregator~~ done — committed by the daemon (16:50 sweep)
+3. ~~**Build-verify the 3 migrated repos** with `nix build` (needs SSH access) — update vendorHash if needed~~ done — moved to TODO_LIST T3
+4. ~~**Clean up `index` adopter** — the 5th module adopter, remove `enableCheck=true` redundancy~~ **Won't implement — dormant — dropped (reopen on demand).**
+5. ~~**Verify flake-patterns.md anchor link** for "CI-friendly options" TOC entry~~ **Won't implement — cosmetic — anchor works.**
 
 ### Module improvements
 
-6.~~**Add `goExperiment` option** — string, default null. When set, adds `GOEXPERIMENT = <value>` to both build env and devShell. Eliminates boilerplate in 7+ repos.~~ done — moved to TODO_LIST T13
-7.~~**Add `cgoEnabled` option** — bool, default false. Eliminates `CGO_ENABLED = "0"` boilerplate.~~ done — moved to TODO_LIST T13
-8.~~**Add `completionStyle` option** — enum: "flag" (urfave/cli `--completion`), "subcommand" (cobra `completion`), "none". Fixes enableCompletions for cobra projects.~~ done — moved to TODO_LIST T13
-9.~~**Make `proxyVendor` configurable** even when deps are set — or at least document the behavior change prominently in migration guide.~~ done — moved to TODO_LIST T14
-10.~~**Add `srcFileset` option** — accepts a fileset, wraps in `lib.fileset.toSource`. Avoids needing `lib` in scope.~~ **Won't implement — dormant — the src option accepts filesets directly.**
-11.~~**Deduplicate `enableTestCheck` when `enableCheck = true`** — don't generate `checks.test` if `checks.build` already runs tests.~~ **Won't implement — dormant — dropped (reopen on demand).**
-12.~~**G4 escape hatch** — allow consumers to override `autoDepFodAttrs` phases via `extraBuildAttrs` (currently overwritten by `//` merge order).~~ **Won't implement — dormant — dropped (reopen on demand).**
-13.~~**Add `allowUnfree` option** — avoids nixpkgs re-instantiation in 4 repos (bank-sync, github-local-sync, etc.).~~ **Won't implement — dormant — dropped (reopen on demand).**
-14.~~**Bundle `git-hooks.nix` optionally** — 4 repos use it; currently each must add it as a separate input + import.~~ **Won't implement — dormant — dropped (reopen on demand).**
-15.~~**Add `enableShfmt` to devShell packages** when enabled (currently only adds to treefmt programs, not devShell).~~ **Won't implement — dormant — dropped (reopen on demand).**
+6. ~~**Add `goExperiment` option** — string, default null. When set, adds `GOEXPERIMENT = <value>` to both build env and devShell. Eliminates boilerplate in 7+ repos.~~ done — moved to TODO_LIST T13
+7. ~~**Add `cgoEnabled` option** — bool, default false. Eliminates `CGO_ENABLED = "0"` boilerplate.~~ done — moved to TODO_LIST T13
+8. ~~**Add `completionStyle` option** — enum: "flag" (urfave/cli `--completion`), "subcommand" (cobra `completion`), "none". Fixes enableCompletions for cobra projects.~~ done — moved to TODO_LIST T13
+9. ~~**Make `proxyVendor` configurable** even when deps are set — or at least document the behavior change prominently in migration guide.~~ done — moved to TODO_LIST T14
+10. ~~**Add `srcFileset` option** — accepts a fileset, wraps in `lib.fileset.toSource`. Avoids needing `lib` in scope.~~ **Won't implement — dormant — the src option accepts filesets directly.**
+11. ~~**Deduplicate `enableTestCheck` when `enableCheck = true`** — don't generate `checks.test` if `checks.build` already runs tests.~~ **Won't implement — dormant — dropped (reopen on demand).**
+12. ~~**G4 escape hatch** — allow consumers to override `autoDepFodAttrs` phases via `extraBuildAttrs` (currently overwritten by `//` merge order).~~ **Won't implement — dormant — dropped (reopen on demand).**
+13. ~~**Add `allowUnfree` option** — avoids nixpkgs re-instantiation in 4 repos (bank-sync, github-local-sync, etc.).~~ **Won't implement — dormant — dropped (reopen on demand).**
+14. ~~**Bundle `git-hooks.nix` optionally** — 4 repos use it; currently each must add it as a separate input + import.~~ **Won't implement — dormant — dropped (reopen on demand).**
+15. ~~**Add `enableShfmt` to devShell packages** when enabled (currently only adds to treefmt programs, not devShell).~~ **Won't implement — dormant — dropped (reopen on demand).**
 
 ### Consumer migrations — Tier A remaining (7 repos)
 
-16.~~**Migrate go-humanize-linter** — 287 lines, 8 custom apps (complex but pattern understood)~~ done — done in the 16:50 sprint (`e3d722b`)
-17.~~**Migrate golangci-lint-auto-configure** — 233 lines, fileset + GOEXPERIMENT~~ done — done in the 16:50 sprint (`3ac2cf5`)
-18.~~**Migrate oxlint-auto-configure** — 196 lines, nativeCheckInputs=[oxlint], fileset, custom app wrapping~~ done — done in the 16:50 sprint (`f3182b9`)
-19.~~**Migrate go-auto-upgrade** — 542 lines, the most complex (12 apps, dual GOEXPERIMENT, check derivations with nativeBuildInputs)~~ done — done in the 16:50 sprint (`f89908f`)
-20.~~**Migrate project-dependency-graph** — 231 lines, custom modBuildPhase/modInstallPhase, `go run` app~~ done — done in the 16:50 sprint (`f25e0ec`)
-21.~~**Migrate projects-management-automation** — 267 lines~~ done — done in the 16:50 sprint (`9b47684`)
-22.~~**Migrate standard-bug-tracking-schema** — 386 lines~~ done — done in the 16:50 sprint (`1357206`)
+16. ~~**Migrate go-humanize-linter** — 287 lines, 8 custom apps (complex but pattern understood)~~ done — done in the 16:50 sprint (`e3d722b`)
+17. ~~**Migrate golangci-lint-auto-configure** — 233 lines, fileset + GOEXPERIMENT~~ done — done in the 16:50 sprint (`3ac2cf5`)
+18. ~~**Migrate oxlint-auto-configure** — 196 lines, nativeCheckInputs=[oxlint], fileset, custom app wrapping~~ done — done in the 16:50 sprint (`f3182b9`)
+19. ~~**Migrate go-auto-upgrade** — 542 lines, the most complex (12 apps, dual GOEXPERIMENT, check derivations with nativeBuildInputs)~~ done — done in the 16:50 sprint (`f89908f`)
+20. ~~**Migrate project-dependency-graph** — 231 lines, custom modBuildPhase/modInstallPhase, `go run` app~~ done — done in the 16:50 sprint (`f25e0ec`)
+21. ~~**Migrate projects-management-automation** — 267 lines~~ done — done in the 16:50 sprint (`9b47684`)
+22. ~~**Migrate standard-bug-tracking-schema** — 386 lines~~ done — done in the 16:50 sprint (`1357206`)
 
 ### Consumer migrations — Tier B (6 repos, now unblocked by G2)
 
-23.~~**Migrate KeyCountdown** — 250 lines~~ done — moved to TODO_LIST T4
-24.~~**Migrate StopTube** — 262 lines, needs G2 (per-binary attrs) ✓ shipped~~ done — moved to TODO_LIST T4
-25.~~**Migrate branching-flow** — 328 lines~~ done — moved to TODO_LIST T4
-26.~~**Migrate browser-history** — 600 lines, needs G2 ✓ shipped~~ done — moved to TODO_LIST T4
-27.~~**Migrate overview** — 468 lines, needs G2 ✓ shipped~~ done — moved to TODO_LIST T4
-28.~~**Migrate bank-sync** — 515 lines, allowUnfree~~ done — moved to TODO_LIST T4
-29.~~**Migrate BuildFlow** — 1215 lines, needs G2 ✓ shipped~~ done — moved to TODO_LIST T4
+23. ~~**Migrate KeyCountdown** — 250 lines~~ done — moved to TODO_LIST T4
+24. ~~**Migrate StopTube** — 262 lines, needs G2 (per-binary attrs) ✓ shipped~~ done — moved to TODO_LIST T4
+25. ~~**Migrate branching-flow** — 328 lines~~ done — moved to TODO_LIST T4
+26. ~~**Migrate browser-history** — 600 lines, needs G2 ✓ shipped~~ done — moved to TODO_LIST T4
+27. ~~**Migrate overview** — 468 lines, needs G2 ✓ shipped~~ done — moved to TODO_LIST T4
+28. ~~**Migrate bank-sync** — 515 lines, allowUnfree~~ done — moved to TODO_LIST T4
+29. ~~**Migrate BuildFlow** — 1215 lines, needs G2 ✓ shipped~~ done — moved to TODO_LIST T4
 
 ### Consumer migrations — Tier C (complex/exceptions)
 
-30.~~**Migrate Standup-Killer off deprecated mkGoFlake** — needs G2 for subModules ✓ shipped~~ done — moved to TODO_LIST T5
-31.~~**Migrate crush-daily off deprecated mkGoFlake**~~ done — moved to TODO_LIST T5
-32.~~**Migrate Code-Quality-Agent** — G1 shipped (goPkgOverride), can migrate now~~ done — still open — tracked with the Tier B/C fleet backlog (TODO_LIST T4/T5)
-33.~~**Migrate go-structure-linter** — needs G2 for multi-module postPatchExtra ✓ shipped~~ done — still open — tracked with the Tier B/C fleet backlog (TODO_LIST T4/T5)
-34.~~**Migrate file-and-image-renamer** — needs deps audit first~~ done — still open — tracked with the Tier B/C fleet backlog (TODO_LIST T4/T5)
-35.~~**Migrate library-policy** — 139 lines, uses nix/* submodules~~ done — still open — tracked with the Tier B/C fleet backlog (TODO_LIST T4/T5)
-36.~~**Migrate mr-sync** — 252 lines, own package.nix~~ done — still open — tracked with the Tier B/C fleet backlog (TODO_LIST T4/T5)
-37.~~**Migrate go-cqrs-lite** — 1224 lines, monorepo library~~ done — still open — tracked with the Tier B/C fleet backlog (TODO_LIST T4/T5)
-38.~~**Migrate DiscordSync** — 725 lines, many pinned revs~~ done — still open — tracked with the Tier B/C fleet backlog (TODO_LIST T4/T5)
-39.~~**Migrate github-local-sync** — 279 lines, allowUnfree~~ done — still open — tracked with the Tier B/C fleet backlog (TODO_LIST T4/T5)
+30. ~~**Migrate Standup-Killer off deprecated mkGoFlake** — needs G2 for subModules ✓ shipped~~ done — moved to TODO_LIST T5
+31. ~~**Migrate crush-daily off deprecated mkGoFlake**~~ done — moved to TODO_LIST T5
+32. ~~**Migrate Code-Quality-Agent** — G1 shipped (goPkgOverride), can migrate now~~ done — still open — tracked with the Tier B/C fleet backlog (TODO_LIST T4/T5)
+33. ~~**Migrate go-structure-linter** — needs G2 for multi-module postPatchExtra ✓ shipped~~ done — still open — tracked with the Tier B/C fleet backlog (TODO_LIST T4/T5)
+34. ~~**Migrate file-and-image-renamer** — needs deps audit first~~ done — still open — tracked with the Tier B/C fleet backlog (TODO_LIST T4/T5)
+35. ~~**Migrate library-policy** — 139 lines, uses nix/* submodules~~ done — still open — tracked with the Tier B/C fleet backlog (TODO_LIST T4/T5)
+36. ~~**Migrate mr-sync** — 252 lines, own package.nix~~ done — still open — tracked with the Tier B/C fleet backlog (TODO_LIST T4/T5)
+37. ~~**Migrate go-cqrs-lite** — 1224 lines, monorepo library~~ done — still open — tracked with the Tier B/C fleet backlog (TODO_LIST T4/T5)
+38. ~~**Migrate DiscordSync** — 725 lines, many pinned revs~~ done — still open — tracked with the Tier B/C fleet backlog (TODO_LIST T4/T5)
+39. ~~**Migrate github-local-sync** — 279 lines, allowUnfree~~ done — still open — tracked with the Tier B/C fleet backlog (TODO_LIST T4/T5)
 
 ### CI and infrastructure
 
-40.~~**Add `templateEval` to CI integration-tests job** — currently only in `nix flake check`, not in the explicit CI job list~~ done — shipped — checks.templateEval
-41.~~**Standardize CI workflow across migrated repos** — template for consumer CI~~ **Won't implement — dormant — dropped (reopen on demand).**
-42.~~**Add `flake.lock` freshness check** to consumer repos~~ **Won't implement — dormant — dropped (reopen on demand).**
-43.~~**Add real E2E consumer test** — mock Go project + flake.nix → `nix build`~~ done — moved to TODO_LIST Blocked (needs SSH secret)
-44.~~**Add template-output build test** (not just eval) — generate + `nix build` in CI~~ **Won't implement — dormant — dropped (reopen on demand).**
+40. ~~**Add `templateEval` to CI integration-tests job** — currently only in `nix flake check`, not in the explicit CI job list~~ done — shipped — checks.templateEval
+41. ~~**Standardize CI workflow across migrated repos** — template for consumer CI~~ **Won't implement — dormant — dropped (reopen on demand).**
+42. ~~**Add `flake.lock` freshness check** to consumer repos~~ **Won't implement — dormant — dropped (reopen on demand).**
+43. ~~**Add real E2E consumer test** — mock Go project + flake.nix → `nix build`~~ done — moved to TODO_LIST Blocked (needs SSH secret)
+44. ~~**Add template-output build test** (not just eval) — generate + `nix build` in CI~~ **Won't implement — dormant — dropped (reopen on demand).**
 
 ### Documentation
 
-45.~~**Document `proxyVendor` behavior change** in migration guide (deps → proxyVendor=false)~~ done — shipped — proxyVendor warning recipe in the migration guide (`e6860c5`)
-46.~~**Add migration recipe card** for the GOEXPERIMENT + CGO + fileset pattern~~ done — shipped — GOEXPERIMENT recipe card (`e6860c5`)
-47.~~**Document the public/private LarsArtmann repo split** (which are proxy-served vs SSH-only)~~ **Won't implement — dormant — dropped (reopen on demand).**
-48.~~**Update `docs/flake-patterns.md`** with `goPkgOverride` real-world example (Code-Quality-Agent)~~ **Won't implement — dormant — dropped (reopen on demand).**
-49.~~**Add `enableTestCheck` to template** as a commented example~~ **Won't implement — dormant — dropped (reopen on demand).**
+45. ~~**Document `proxyVendor` behavior change** in migration guide (deps → proxyVendor=false)~~ done — shipped — proxyVendor warning recipe in the migration guide (`e6860c5`)
+46. ~~**Add migration recipe card** for the GOEXPERIMENT + CGO + fileset pattern~~ done — shipped — GOEXPERIMENT recipe card (`e6860c5`)
+47. ~~**Document the public/private LarsArtmann repo split** (which are proxy-served vs SSH-only)~~ **Won't implement — dormant — dropped (reopen on demand).**
+48. ~~**Update `docs/flake-patterns.md`** with `goPkgOverride` real-world example (Code-Quality-Agent)~~ **Won't implement — dormant — dropped (reopen on demand).**
+49. ~~**Add `enableTestCheck` to template** as a commented example~~ **Won't implement — dormant — dropped (reopen on demand).**
 
 ### External
 
-50.~~**Register `maintainers.larsartmann` in nixpkgs** — external PR, mentioned in prior reports~~ done — moved to TODO_LIST Blocked
+50. ~~**Register `maintainers.larsartmann` in nixpkgs** — external PR, mentioned in prior reports~~ done — moved to TODO_LIST Blocked
 
 ---
 
