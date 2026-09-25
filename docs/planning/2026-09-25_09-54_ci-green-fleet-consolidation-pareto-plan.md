@@ -75,7 +75,7 @@ status report `2026-09-25_09-45_*` §f (43 items), and the CI diagnosis above.
 | P26 | CI: `workflow_dispatch` flake-check target (host-broken oracle) + old-nixpkgs pin refresh policy note | 80% | Low | 30m | report §f.31,41 |
 | P27 | Owner-decision batch: T15 verdict, G4 nixpkgs maintainer PR, G5 SSH CI secret, G6 df9a5ff rebase, G7 won't-implement policy, nix.conf auto-GC | 80% | High | 30m | report §g |
 
-## Fine plan (≤12 min each · 106 tasks · sorted by importance within parent)
+## Fine plan (≤12 min each · 93 tasks · sorted by importance within parent)
 
 ### P1 — moduleTest --no-build fix (1%)
 
