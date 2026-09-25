@@ -779,6 +779,12 @@ in
               inherit (combinedConcat) buildInputs;
               inherit (combinedConcat) checkInputs;
               inherit (combinedConcat) configureFlags;
+              # Expose the resolved toolchain for debugging
+              # (`nix eval .#default.go.version`); consumer passthru keys
+              # other than `go` are preserved.
+              passthru = (combinedOther.passthru or { }) // {
+                go = goPkg;
+              };
               meta = {
                 description = pkgDesc;
                 license = lib.licenses.mit;
