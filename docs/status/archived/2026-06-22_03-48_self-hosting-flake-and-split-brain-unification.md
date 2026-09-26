@@ -262,33 +262,33 @@ discoverability. The raw import path still works for backwards compatibility.
 
 ## f) Top 25 Things We Should Get Done Next
 
-| #  | Priority | Task                                                                           | Impact                        |
-| --- | --- | --- | --- |
-| ~~1~~ | ~~P0~~ | ~~Commit the staged round 2 changes (flake.nix + unification + AGENTS.md)~~ | ~~Unblocks everything below~~ |
-| ~~2~~ | ~~P0~~ | ~~Add GitHub Actions CI workflow for the repo itself (`nix flake check` on push)~~ | ~~Automated quality gate~~ |
-| ~~3~~ | ~~P1~~ | ~~Deprecate/drop `goPkg` parameter (dead weight — derivation never invokes `go`)~~ | ~~Cleaner API, smaller closures~~ |
-| ~~4~~ | ~~P1~~ | ~~Verify `subModuleVersionNormalize` is needed; remove if cargo-culted~~ | ~~-15 lines fragile sed~~ |
-| ~~5~~ | ~~P1~~ | ~~Namespace `repoName` by owner to prevent same-name collisions~~ | ~~Correctness~~ |
-| ~~6~~ | ~~P1~~ | ~~Add `CHANGELOG.md` for release tracking~~ | ~~Release discipline~~ |
-| ~~7~~ | ~~P2~~ | ~~Add `FEATURES.md` for feature inventory~~ | ~~Documentation~~ |
-| ~~8~~ | ~~P2~~ | ~~Add `TODO_LIST.md` for short/mid-term task tracking~~ | ~~Planning~~ |
-| ~~9~~ | ~~P2~~ | ~~Dedup `requireDeps` against existing requires~~ | ~~Correctness~~ |
-| ~~10~~ | ~~P2~~ | ~~Document `postPatchExtra` ordering in README~~ | ~~Clarity~~ |
-| ~~11~~ | ~~P2~~ | ~~Make `generate-flake.sh` configurable (target dir, no push default)~~ | ~~Portability~~ |
-| ~~12~~ | ~~P2~~ | ~~Fix `generate-flake.sh` templ sed fragility (use markers not line numbers)~~ | ~~Robustness~~ |
-| ~~13~~ | ~~P2~~ | ~~Migrate `crush-daily` from 14 individual deps to `subModules`~~ | ~~Eliminates boilerplate~~ |
-| ~~14~~ | ~~P2~~ | ~~Audit all consumers for manual `_local_deps/` workarounds~~ | ~~Cleanup~~ |
-| ~~15~~ | ~~P3~~ | ~~Add `--dry-run` option to mkPreparedSource~~ | ~~Debugging DX~~ |
-| ~~16~~ | ~~P3~~ | ~~Support `go.sum` patching~~ | ~~Completeness~~ |
-| ~~17~~ | ~~P3~~ | ~~Add integration test: build a real Go project with mkPreparedSource in CI~~ | ~~Confidence~~ |
-| ~~18~~ | ~~P3~~ | ~~Support nested sub-modules (`foo/bar/baz`)~~ | ~~Edge case~~ |
-| ~~19~~ | ~~P3~~ | ~~Add property-based tests for `repoName`/`stripVersionSuffix`~~ | ~~Regression prevention~~ |
-| ~~20~~ | ~~P3~~ | ~~Migrate consumers to `go-nix-helpers.lib.mkPreparedSource` (flake lib)~~ | ~~Better caching~~ |
-| ~~21~~ | ~~P4~~ | ~~Explore `go.work` support for workspace-based projects~~ | ~~Future-proofing~~ |
-| ~~22~~ | ~~P4~~ | ~~Add `vendorHash` auto-calculation helper~~ | ~~DX improvement~~ |
-| ~~23~~ | ~~P4~~ | ~~Add `overlays.default` for consumers to `pkgs.<name>`~~ | ~~Ergonomics~~ |
-| ~~24~~ | ~~P4~~ | ~~Generate template from source comments (prevent template drift)~~ | ~~Maintainability~~ |
-| ~~25~~ | ~~P4~~ | ~~Consider a `mkPreparedSource` NixOS check option~~ | ~~Discoverability~~ |
+| #      | Priority | Task                                                                               | Impact                            |
+| ------ | -------- | ---------------------------------------------------------------------------------- | --------------------------------- |
+| ~~1~~  | ~~P0~~   | ~~Commit the staged round 2 changes (flake.nix + unification + AGENTS.md)~~        | ~~Unblocks everything below~~     |
+| ~~2~~  | ~~P0~~   | ~~Add GitHub Actions CI workflow for the repo itself (`nix flake check` on push)~~ | ~~Automated quality gate~~        |
+| ~~3~~  | ~~P1~~   | ~~Deprecate/drop `goPkg` parameter (dead weight — derivation never invokes `go`)~~ | ~~Cleaner API, smaller closures~~ |
+| ~~4~~  | ~~P1~~   | ~~Verify `subModuleVersionNormalize` is needed; remove if cargo-culted~~           | ~~-15 lines fragile sed~~         |
+| ~~5~~  | ~~P1~~   | ~~Namespace `repoName` by owner to prevent same-name collisions~~                  | ~~Correctness~~                   |
+| ~~6~~  | ~~P1~~   | ~~Add `CHANGELOG.md` for release tracking~~                                        | ~~Release discipline~~            |
+| ~~7~~  | ~~P2~~   | ~~Add `FEATURES.md` for feature inventory~~                                        | ~~Documentation~~                 |
+| ~~8~~  | ~~P2~~   | ~~Add `TODO_LIST.md` for short/mid-term task tracking~~                            | ~~Planning~~                      |
+| ~~9~~  | ~~P2~~   | ~~Dedup `requireDeps` against existing requires~~                                  | ~~Correctness~~                   |
+| ~~10~~ | ~~P2~~   | ~~Document `postPatchExtra` ordering in README~~                                   | ~~Clarity~~                       |
+| ~~11~~ | ~~P2~~   | ~~Make `generate-flake.sh` configurable (target dir, no push default)~~            | ~~Portability~~                   |
+| ~~12~~ | ~~P2~~   | ~~Fix `generate-flake.sh` templ sed fragility (use markers not line numbers)~~     | ~~Robustness~~                    |
+| ~~13~~ | ~~P2~~   | ~~Migrate `crush-daily` from 14 individual deps to `subModules`~~                  | ~~Eliminates boilerplate~~        |
+| ~~14~~ | ~~P2~~   | ~~Audit all consumers for manual `_local_deps/` workarounds~~                      | ~~Cleanup~~                       |
+| ~~15~~ | ~~P3~~   | ~~Add `--dry-run` option to mkPreparedSource~~                                     | ~~Debugging DX~~                  |
+| ~~16~~ | ~~P3~~   | ~~Support `go.sum` patching~~                                                      | ~~Completeness~~                  |
+| ~~17~~ | ~~P3~~   | ~~Add integration test: build a real Go project with mkPreparedSource in CI~~      | ~~Confidence~~                    |
+| ~~18~~ | ~~P3~~   | ~~Support nested sub-modules (`foo/bar/baz`)~~                                     | ~~Edge case~~                     |
+| ~~19~~ | ~~P3~~   | ~~Add property-based tests for `repoName`/`stripVersionSuffix`~~                   | ~~Regression prevention~~         |
+| ~~20~~ | ~~P3~~   | ~~Migrate consumers to `go-nix-helpers.lib.mkPreparedSource` (flake lib)~~         | ~~Better caching~~                |
+| ~~21~~ | ~~P4~~   | ~~Explore `go.work` support for workspace-based projects~~                         | ~~Future-proofing~~               |
+| ~~22~~ | ~~P4~~   | ~~Add `vendorHash` auto-calculation helper~~                                       | ~~DX improvement~~                |
+| ~~23~~ | ~~P4~~   | ~~Add `overlays.default` for consumers to `pkgs.<name>`~~                          | ~~Ergonomics~~                    |
+| ~~24~~ | ~~P4~~   | ~~Generate template from source comments (prevent template drift)~~                | ~~Maintainability~~               |
+| ~~25~~ | ~~P4~~   | ~~Consider a `mkPreparedSource` NixOS check option~~                               | ~~Discoverability~~               |
 
 ---
 
@@ -339,7 +339,7 @@ and consumer-migration cadence. This is a one-person ecosystem decision.
 ## Downstream Consumers
 
 | Project                        | Uses `/vN` deps               | Uses `subModules`  | Status  |
-| --- | --- | --- | --- |
+| ------------------------------ | ----------------------------- | ------------------ | ------- |
 | BuildFlow                      | No                            | Yes (go-output)    | Working |
 | mr-sync                        | No                            | Yes (go-output)    | Working |
 | projects-management-automation | Yes (v2, v3)                  | Yes (go-output)    | Working |

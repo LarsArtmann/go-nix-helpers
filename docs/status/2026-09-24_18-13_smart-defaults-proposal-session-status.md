@@ -21,13 +21,13 @@ All items below are research/verification work completed and verifiable in this 
 4. **Pure-function inventory** — Confirmed `pure-functions.nix` exposes `stripVersionSuffix`, `repoName`, `newestGoAttrName` with a 41-assertion test harness — the designated home for new inference logic.
 5. **Delivered the 5-tier "smart defaults" proposal** (the session's main deliverable):
 
-   | # | Removes from consumer flake | Mechanism |
-   |---|---|---|
-   | 1 | `vendorHash` chore | eval-time `null` default when go.mod/go.sum has no external requires + `nix run .#update-vendor-hash` app (build → parse `got: sha256-…` → rewrite flake.nix) |
-   | 2 | `deps = { … }` mirror attrset | auto-wire: parse private requires from go.mod, match repo name → flake input name; missing input → error naming the exact input line to add |
-   | 3 | `pname` + `description` | `pname = repoName self`; description = first non-heading line of README.md |
-   | 4 | `enableTempl = true` | detect `github.com/a-h/templ` in go.mod |
-   | 5 | monorepo `packages = { … }` | auto-discover `cmd/*/main.go` → one package per binary |
+   | # | Removes from consumer flake   | Mechanism                                                                                                                                                     |
+   | - | ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+   | 1 | `vendorHash` chore            | eval-time `null` default when go.mod/go.sum has no external requires + `nix run .#update-vendor-hash` app (build → parse `got: sha256-…` → rewrite flake.nix) |
+   | 2 | `deps = { … }` mirror attrset | auto-wire: parse private requires from go.mod, match repo name → flake input name; missing input → error naming the exact input line to add                   |
+   | 3 | `pname` + `description`       | `pname = repoName self`; description = first non-heading line of README.md                                                                                    |
+   | 4 | `enableTempl = true`          | detect `github.com/a-h/templ` in go.mod                                                                                                                       |
+   | 5 | monorepo `packages = { … }`   | auto-discover `cmd/*/main.go` → one package per binary                                                                                                        |
 
    Plus guardrails (self-only reads → no IFD; explicit values always win; new logic → pure-functions + property tests) and the endgame sketch: a consumer flake reduced to inputs + `imports` + one `vendorHash` line.
 6. **Recommendation given:** ship #1 + #2 together (Pareto: ~80% of recurring friction), #3/#4 quick follow-up, #5 last.
@@ -60,7 +60,7 @@ All implementation, intentionally deferred pending user go-ahead:
 
 ## d) TOTALLY FUCKED UP
 
-No code, builds, or tests were touched this session, so nothing is broken **in the repo**. Radical honesty about what *I* got wrong in the analysis itself:
+No code, builds, or tests were touched this session, so nothing is broken **in the repo**. Radical honesty about what _I_ got wrong in the analysis itself:
 
 1. **Unverified claim shipped as fact:** I told you "flake-parts modules receive `inputs`" — I never opened flake-parts source or a consumer module to confirm. That is the single load-bearing assumption of proposal #2. Severity: proposal-invalidating if wrong (though a passthrough option is a workable plan B). Root cause: pattern-matching on familiarity instead of verifying. Mitigation: one `rg "inputs"` against a consumer flake-parts module / flake-parts lib before any implementation.
 2. **Didn't check for an existing vendor-hash helper** in the module's apps before proposing to add one — possible duplication. Root cause: stopped the options inventory at `mkOption` lines and never read the output-assembly section.
@@ -80,61 +80,61 @@ No code, builds, or tests were touched this session, so nothing is broken **in t
 
 ### P1 — unblock tier 1 (verifications + decisions)
 
-| # | Task | Impact | Effort | Category |
-|---|---|---|---|---|
-| 1 | Verify flake-parts passes `inputs` to imported modules (read flake-parts lib or a consumer module) | Critical | S | Research |
-| 2 | Enumerate current `apps` output of go-standard; confirm no existing vendor-hash updater | Critical | S | Research |
-| 3 | User decision: BuildFlow overlap policy for vendorHash app (question g1) | Critical | S | Decision |
-| 4 | User decision: inference default-on vs opt-in gate (question g3) | Critical | S | Decision |
-| 5 | Audit 7+ consumer repos' go-standard blocks; quantify lines removable per proposal | High | M | Research |
-| 6 | Design: how auto-wired deps report themselves (trace/doctor) so failures are debuggable | High | S | Design |
+| # | Task                                                                                               | Impact   | Effort | Category |
+| - | -------------------------------------------------------------------------------------------------- | -------- | ------ | -------- |
+| 1 | Verify flake-parts passes `inputs` to imported modules (read flake-parts lib or a consumer module) | Critical | S      | Research |
+| 2 | Enumerate current `apps` output of go-standard; confirm no existing vendor-hash updater            | Critical | S      | Research |
+| 3 | User decision: BuildFlow overlap policy for vendorHash app (question g1)                           | Critical | S      | Decision |
+| 4 | User decision: inference default-on vs opt-in gate (question g3)                                   | Critical | S      | Decision |
+| 5 | Audit 7+ consumer repos' go-standard blocks; quantify lines removable per proposal                 | High     | M      | Research |
+| 6 | Design: how auto-wired deps report themselves (trace/doctor) so failures are debuggable            | High     | S      | Design   |
 
 ### P2 — implement tier 1 (vendorHash + deps auto-wire)
 
-| # | Task | Impact | Effort | Category |
-|---|---|---|---|---|
-| 7 | `privateRequiresFromGoMod` pure function (parse go.mod requires matching privateDepPattern, minus publicDeps) | High | M | Feature |
-| 8 | Property tests for #7 in `test-pure-functions.nix` (idempotence, /vN paths, publicDeps exclusion, malformed go.mod) | High | M | Quality |
-| 9 | Input-name→repo-name matching pure function + "add input X" error message generator | High | S | Feature |
-| 10 | Wire auto-deps into module: `deps` defaults derive from inputs × go.mod; explicit `deps` wins entirely | High | M | Feature |
-| 11 | Eval-time go.mod/go.sum read → `vendorHash` default `null` when no external requires | High | S | Feature |
-| 12 | `apps.update-vendor-hash`: hermetic build→parse→rewrite script (writeShellScriptBin, no @latest/network tricks) | High | M | Feature |
-| 13 | Test: moduleTest assertions for auto-deps (wired, missing-input error, explicit-override wins) | High | M | Quality |
-| 14 | Test: integration scenario in `test.nix` for auto-wired deps + null vendorHash path | High | M | Quality |
-| 15 | Docs: README + man page + migration guide for both features | High | S | Documentation |
-| 16 | Roll out to 1 pilot consumer; measure flake.nix line delta; then remaining consumers | High | M | Feature |
+| #  | Task                                                                                                                | Impact | Effort | Category      |
+| -- | ------------------------------------------------------------------------------------------------------------------- | ------ | ------ | ------------- |
+| 7  | `privateRequiresFromGoMod` pure function (parse go.mod requires matching privateDepPattern, minus publicDeps)       | High   | M      | Feature       |
+| 8  | Property tests for #7 in `test-pure-functions.nix` (idempotence, /vN paths, publicDeps exclusion, malformed go.mod) | High   | M      | Quality       |
+| 9  | Input-name→repo-name matching pure function + "add input X" error message generator                                 | High   | S      | Feature       |
+| 10 | Wire auto-deps into module: `deps` defaults derive from inputs × go.mod; explicit `deps` wins entirely              | High   | M      | Feature       |
+| 11 | Eval-time go.mod/go.sum read → `vendorHash` default `null` when no external requires                                | High   | S      | Feature       |
+| 12 | `apps.update-vendor-hash`: hermetic build→parse→rewrite script (writeShellScriptBin, no @latest/network tricks)     | High   | M      | Feature       |
+| 13 | Test: moduleTest assertions for auto-deps (wired, missing-input error, explicit-override wins)                      | High   | M      | Quality       |
+| 14 | Test: integration scenario in `test.nix` for auto-wired deps + null vendorHash path                                 | High   | M      | Quality       |
+| 15 | Docs: README + man page + migration guide for both features                                                         | High   | S      | Documentation |
+| 16 | Roll out to 1 pilot consumer; measure flake.nix line delta; then remaining consumers                                | High   | M      | Feature       |
 
 ### P3 — implement tier 2 (identity + tool defaults)
 
-| # | Task | Impact | Effort | Category |
-|---|---|---|---|---|
-| 17 | `pname` default = `repoName self` (store-path base name); test dirty-tree case | Medium | S | Feature |
-| 18 | `description` default = first non-heading README line, with pathExists guard + fallback | Medium | S | Feature |
-| 19 | templ auto-detect: go.mod requires `github.com/a-h/templ` → enableTempl default true | Medium | S | Feature |
-| 20 | Verify/spec `preBuild templ generate` ordering vs mkPreparedSource `postPatch` before any templ magic beyond detection | Medium | S | Design |
-| 21 | Tests + docs for #17–#19 | Medium | M | Quality |
-| 22 | Extend template `templates/go-standard/flake.nix` to the endgame 3-line form once tiers land | Medium | S | Documentation |
+| #  | Task                                                                                                                   | Impact | Effort | Category      |
+| -- | ---------------------------------------------------------------------------------------------------------------------- | ------ | ------ | ------------- |
+| 17 | `pname` default = `repoName self` (store-path base name); test dirty-tree case                                         | Medium | S      | Feature       |
+| 18 | `description` default = first non-heading README line, with pathExists guard + fallback                                | Medium | S      | Feature       |
+| 19 | templ auto-detect: go.mod requires `github.com/a-h/templ` → enableTempl default true                                   | Medium | S      | Feature       |
+| 20 | Verify/spec `preBuild templ generate` ordering vs mkPreparedSource `postPatch` before any templ magic beyond detection | Medium | S      | Design        |
+| 21 | Tests + docs for #17–#19                                                                                               | Medium | M      | Quality       |
+| 22 | Extend template `templates/go-standard/flake.nix` to the endgame 3-line form once tiers land                           | Medium | S      | Documentation |
 
 ### P4 — implement tier 3 (monorepo + observability)
 
-| # | Task | Impact | Effort | Category |
-|---|---|---|---|---|
-| 23 | Generalize `walkTempl` into a reusable source walker (files by predicate, excludes testdata/vendor/example) | Medium | M | Refactor |
-| 24 | `cmd/*/main.go` discovery → default `packages` entries; define merge semantics with explicit `packages` | Medium | M | Feature |
-| 25 | `subPackages` smart default (root main.go vs single cmd/ vs multi) | Medium | M | Feature |
-| 26 | `nix run .#doctor` app or `go-standard.traceInferences` option summarizing every inference | Medium | M | Feature |
-| 27 | Tests for monorepo discovery (mock fixtures exist under test-assets/) | Medium | M | Quality |
+| #  | Task                                                                                                        | Impact | Effort | Category |
+| -- | ----------------------------------------------------------------------------------------------------------- | ------ | ------ | -------- |
+| 23 | Generalize `walkTempl` into a reusable source walker (files by predicate, excludes testdata/vendor/example) | Medium | M      | Refactor |
+| 24 | `cmd/*/main.go` discovery → default `packages` entries; define merge semantics with explicit `packages`     | Medium | M      | Feature  |
+| 25 | `subPackages` smart default (root main.go vs single cmd/ vs multi)                                          | Medium | M      | Feature  |
+| 26 | `nix run .#doctor` app or `go-standard.traceInferences` option summarizing every inference                  | Medium | M      | Feature  |
+| 27 | Tests for monorepo discovery (mock fixtures exist under test-assets/)                                       | Medium | M      | Quality  |
 
 ### P5 — hygiene noticed this session (from git snapshot + AGENTS.md, no new research)
 
-| # | Task | Impact | Effort | Category |
-|---|---|---|---|---|
-| 28 | `.github/dependabot.yml` was untracked at session start — confirm it's committed and CI sees it | Medium | S | Cleanup |
-| 29 | Working tree had 6 modified files at session start (AGENTS.md, README.md, 2 status docs, flake.lock, mock-project asset) — confirm auto-commit daemon captured them sanely | Medium | S | Cleanup |
-| 30 | Register `maintainers.larsartmann` in nixpkgs (long-standing AGENTS.md gotcha) | Low | M | Quality |
-| 31 | Remove deprecated `mkGoFlake.nix` + its trace warning after last consumer migrates | Low | M | Cleanup |
-| 32 | Remove deprecated `templates/go-flake-parts/` (same condition) | Low | S | Cleanup |
-| 33 | Run HARVEST of section (f) into TODO_LIST.md / ROADMAP.md once user approves | Medium | S | Documentation |
+| #  | Task                                                                                                                                                                       | Impact | Effort | Category      |
+| -- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | ------ | ------------- |
+| 28 | `.github/dependabot.yml` was untracked at session start — confirm it's committed and CI sees it                                                                            | Medium | S      | Cleanup       |
+| 29 | Working tree had 6 modified files at session start (AGENTS.md, README.md, 2 status docs, flake.lock, mock-project asset) — confirm auto-commit daemon captured them sanely | Medium | S      | Cleanup       |
+| 30 | Register `maintainers.larsartmann` in nixpkgs (long-standing AGENTS.md gotcha)                                                                                             | Low    | M      | Quality       |
+| 31 | Remove deprecated `mkGoFlake.nix` + its trace warning after last consumer migrates                                                                                         | Low    | M      | Cleanup       |
+| 32 | Remove deprecated `templates/go-flake-parts/` (same condition)                                                                                                             | Low    | S      | Cleanup       |
+| 33 | Run HARVEST of section (f) into TODO_LIST.md / ROADMAP.md once user approves                                                                                               | Medium | S      | Documentation |
 
 ## g) Questions I cannot answer myself
 

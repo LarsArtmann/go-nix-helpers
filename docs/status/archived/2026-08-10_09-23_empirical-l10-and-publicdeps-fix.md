@@ -220,68 +220,68 @@ reverted. All changes are additive or surgical.
 
 ### High impact (prevents real breakage)
 
-| # | Task                                                                                   | Why                                                                      | Effort        |
-| --- | --- | --- | --- |
-| ~~1~~ | ~~Update ROADMAP.md Theme 5 — mark publicDeps versioned-path matching as shipped~~ | ~~Eliminates split-brain: ROADMAP says "planned", CHANGELOG says "shipped"~~ | ~~5min~~ done — done — ROADMAP Theme 5 updated |
-| ~~2~~ | ~~Add `go mod tidy` validation to mkPreparedSource postPatch~~ | ~~Catches malformed replaces at preparation time, not vendor time~~ | ~~30min~~ **Won't implement — subsumed — the FOD runs `go mod tidy` when deps are set.** |
-| ~~3~~ | ~~Set up `DEPLOY_SSH_KEY` secret in GitHub~~ | ~~Enables real private-repo CI test — highest-value blocked item~~ | ~~15min~~ done — moved to TODO_LIST Blocked (SSH secret) |
-| ~~4~~ | ~~Create mock Go project + flake.nix, build via `nix build` in CI~~ | ~~E2E consumer test catches breaking changes before they ship~~ | ~~2h~~ done — moved to TODO_LIST Blocked (E2E) |
-| ~~5~~ | ~~Tag first release (`v0.1.0`)~~ | ~~Consumers pin `ref=master` (rolling); a tag gives them a stable point~~ | ~~15min~~ done — moved to TODO_LIST Blocked (v0.1.0) |
-| ~~6~~ | ~~Decide: delete `mkGoFlake.nix` + `templates/go-flake-parts/` now or keep until v1.0.0?~~ | ~~Removes parallel maintenance burden OR concretizes removal target~~ | ~~5min decision~~ done — deprecation trace shipped; deletion gated on v0.1.0 (TODO_LIST Blocked) |
+| #     | Task                                                                                       | Why                                                                          | Effort                                                                                           |
+| ----- | ------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| ~~1~~ | ~~Update ROADMAP.md Theme 5 — mark publicDeps versioned-path matching as shipped~~         | ~~Eliminates split-brain: ROADMAP says "planned", CHANGELOG says "shipped"~~ | ~~5min~~ done — done — ROADMAP Theme 5 updated                                                   |
+| ~~2~~ | ~~Add `go mod tidy` validation to mkPreparedSource postPatch~~                             | ~~Catches malformed replaces at preparation time, not vendor time~~          | ~~30min~~ **Won't implement — subsumed — the FOD runs `go mod tidy` when deps are set.**         |
+| ~~3~~ | ~~Set up `DEPLOY_SSH_KEY` secret in GitHub~~                                               | ~~Enables real private-repo CI test — highest-value blocked item~~           | ~~15min~~ done — moved to TODO_LIST Blocked (SSH secret)                                         |
+| ~~4~~ | ~~Create mock Go project + flake.nix, build via `nix build` in CI~~                        | ~~E2E consumer test catches breaking changes before they ship~~              | ~~2h~~ done — moved to TODO_LIST Blocked (E2E)                                                   |
+| ~~5~~ | ~~Tag first release (`v0.1.0`)~~                                                           | ~~Consumers pin `ref=master` (rolling); a tag gives them a stable point~~    | ~~15min~~ done — moved to TODO_LIST Blocked (v0.1.0)                                             |
+| ~~6~~ | ~~Decide: delete `mkGoFlake.nix` + `templates/go-flake-parts/` now or keep until v1.0.0?~~ | ~~Removes parallel maintenance burden OR concretizes removal target~~        | ~~5min decision~~ done — deprecation trace shipped; deletion gated on v0.1.0 (TODO_LIST Blocked) |
 
 ### Medium impact (quality and maintainability)
 
-| #  | Task                                                                                      | Why                                                               | Effort |
-| --- | --- | --- | --- |
-| ~~7~~ | ~~Make `privateDepPattern` default empty/wildcard, document LarsArtmann override~~ | ~~General correctness for non-LarsArtmann consumers~~ | ~~20min~~ **Won't implement — LarsArtmann-specific default kept — override documented in the README FAQ.** |
-| ~~8~~ | ~~Remove `goPkg` dead-weight parameter (major version bump)~~ | ~~Eliminates misleading API surface~~ | ~~30min~~ done — gated on a major bump (kept for API compat) |
-| ~~9~~ | ~~Normalize test-module.nix: convert 3 `let`-bound checks to list-item pattern~~ | ~~Makes assertion count programmatically reliable (96 → 99 visible)~~ | ~~10min~~ done — normalization would break the 3 let-bound checks' naming — accepted |
-| ~~10~~ | ~~Add adversarial tests for `publicDeps` regex (metacharacters, `/v0`, `/v100`, empty list)~~ | ~~Rigor beyond the happy-path Test 7~~ | ~~20min~~ done — moved to TODO_LIST T12 |
-| ~~11~~ | ~~Add test for `postPatchExtra` consumer hook (integration level)~~ | ~~Currently relies on unit-level verification only~~ | ~~30min~~ |
-| ~~12~~ | ~~Add test for `excludeSubModuleDirs` custom value~~ | ~~Option exists but custom values are untested~~ | ~~20min~~ |
-| ~~13~~ | ~~Add test for `subModuleVersion` custom value~~ | ~~Option exists but non-default is untested~~ | ~~20min~~ |
-| ~~14~~ | ~~Add test for `stripLocalReplaces = false`~~ | ~~Option exists but disabled state is untested~~ | ~~15min~~ **Won't implement — dormant — dropped (reopen on demand).** |
-| ~~15~~ | ~~Add test for `validatePrivateDeps = false`~~ | ~~Option exists but disabled state is untested~~ | ~~15min~~ |
-| ~~16~~ | ~~Add test for `autoSubModules = false`~~ | ~~Option exists but disabled state is untested~~ | ~~15min~~ |
-| ~~17~~ | ~~Add test for monorepo + deps interaction~~ | ~~Two features tested separately, not combined~~ | ~~30min~~ |
-| ~~18~~ | ~~Add test for monorepo + extraBuildAttrs concatenation~~ | ~~Ensures merge logic works in multi-package mode~~ | ~~30min~~ **Won't implement — dormant — dropped (reopen on demand).** |
-| ~~19~~ | ~~Add test for `shellExtraBuildInputs` propagation~~ | ~~devShell extras may be under-tested~~ | ~~20min~~ |
-| ~~20~~ | ~~Add test for `extraMeta` propagation to all packages in monorepo~~ | ~~Ensures meta flows to each package~~ | ~~20min~~ **Won't implement — dormant — dropped (reopen on demand).** |
-| ~~21~~ | ~~Pin `nixpkgs` to a specific unstable commit for reproducibility tracking~~ | ~~Currently `nixos-unstable` (rolling); a pin makes bisect possible~~ | ~~15min~~ |
-| ~~22~~ | ~~Add `nix flake update` CI job (weekly) with auto-PR if checks pass~~ | ~~Keeps deps fresh without manual toil~~ | ~~45min~~ |
-| ~~23~~ | ~~Audit `.github/workflows/ci.yml` for action version pinning (SHA vs tag)~~ | ~~Tag-pinned actions can be rerouted; SHA is safer~~ | ~~20min~~ |
-| ~~24~~ | ~~Add dependabot config for GitHub Actions~~ | ~~Keeps action versions current~~ | ~~15min~~ done — dependabot.yml added 2026-09 |
+| #      | Task                                                                                          | Why                                                                   | Effort                                                                                                     |
+| ------ | --------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| ~~7~~  | ~~Make `privateDepPattern` default empty/wildcard, document LarsArtmann override~~            | ~~General correctness for non-LarsArtmann consumers~~                 | ~~20min~~ **Won't implement — LarsArtmann-specific default kept — override documented in the README FAQ.** |
+| ~~8~~  | ~~Remove `goPkg` dead-weight parameter (major version bump)~~                                 | ~~Eliminates misleading API surface~~                                 | ~~30min~~ done — gated on a major bump (kept for API compat)                                               |
+| ~~9~~  | ~~Normalize test-module.nix: convert 3 `let`-bound checks to list-item pattern~~              | ~~Makes assertion count programmatically reliable (96 → 99 visible)~~ | ~~10min~~ done — normalization would break the 3 let-bound checks' naming — accepted                       |
+| ~~10~~ | ~~Add adversarial tests for `publicDeps` regex (metacharacters, `/v0`, `/v100`, empty list)~~ | ~~Rigor beyond the happy-path Test 7~~                                | ~~20min~~ done — moved to TODO_LIST T12                                                                    |
+| ~~11~~ | ~~Add test for `postPatchExtra` consumer hook (integration level)~~                           | ~~Currently relies on unit-level verification only~~                  | ~~30min~~                                                                                                  |
+| ~~12~~ | ~~Add test for `excludeSubModuleDirs` custom value~~                                          | ~~Option exists but custom values are untested~~                      | ~~20min~~                                                                                                  |
+| ~~13~~ | ~~Add test for `subModuleVersion` custom value~~                                              | ~~Option exists but non-default is untested~~                         | ~~20min~~                                                                                                  |
+| ~~14~~ | ~~Add test for `stripLocalReplaces = false`~~                                                 | ~~Option exists but disabled state is untested~~                      | ~~15min~~ **Won't implement — dormant — dropped (reopen on demand).**                                      |
+| ~~15~~ | ~~Add test for `validatePrivateDeps = false`~~                                                | ~~Option exists but disabled state is untested~~                      | ~~15min~~                                                                                                  |
+| ~~16~~ | ~~Add test for `autoSubModules = false`~~                                                     | ~~Option exists but disabled state is untested~~                      | ~~15min~~                                                                                                  |
+| ~~17~~ | ~~Add test for monorepo + deps interaction~~                                                  | ~~Two features tested separately, not combined~~                      | ~~30min~~                                                                                                  |
+| ~~18~~ | ~~Add test for monorepo + extraBuildAttrs concatenation~~                                     | ~~Ensures merge logic works in multi-package mode~~                   | ~~30min~~ **Won't implement — dormant — dropped (reopen on demand).**                                      |
+| ~~19~~ | ~~Add test for `shellExtraBuildInputs` propagation~~                                          | ~~devShell extras may be under-tested~~                               | ~~20min~~                                                                                                  |
+| ~~20~~ | ~~Add test for `extraMeta` propagation to all packages in monorepo~~                          | ~~Ensures meta flows to each package~~                                | ~~20min~~ **Won't implement — dormant — dropped (reopen on demand).**                                      |
+| ~~21~~ | ~~Pin `nixpkgs` to a specific unstable commit for reproducibility tracking~~                  | ~~Currently `nixos-unstable` (rolling); a pin makes bisect possible~~ | ~~15min~~                                                                                                  |
+| ~~22~~ | ~~Add `nix flake update` CI job (weekly) with auto-PR if checks pass~~                        | ~~Keeps deps fresh without manual toil~~                              | ~~45min~~                                                                                                  |
+| ~~23~~ | ~~Audit `.github/workflows/ci.yml` for action version pinning (SHA vs tag)~~                  | ~~Tag-pinned actions can be rerouted; SHA is safer~~                  | ~~20min~~                                                                                                  |
+| ~~24~~ | ~~Add dependabot config for GitHub Actions~~                                                  | ~~Keeps action versions current~~                                     | ~~15min~~ done — dependabot.yml added 2026-09                                                              |
 
 ### Low impact (polish)
 
-| #  | Task                                                                              | Why                                                                   | Effort |
-| --- | --- | --- | --- |
-| ~~25~~ | ~~Register `maintainers.larsartmann` in nixpkgs (external PR)~~ | ~~Full correctness for `meta.maintainers`~~ | ~~30min~~ |
-| ~~26~~ | ~~Fix empty commit message in `df9a5ff` (needs rebase + force-push)~~ | ~~Git history hygiene~~ | ~~15min~~ |
-| ~~27~~ | ~~Add shell completion for `generate-flake.sh` flags~~ | ~~UX polish for the bootstrap script~~ | ~~30min~~ |
-| ~~28~~ | ~~Add `--check` flag to `generate-flake.sh` that validates an existing flake.nix~~ | ~~Helps consumers self-diagnose misconfiguration~~ | ~~1h~~ |
-| ~~29~~ | ~~Add `CONTRIBUTORS.md` or contributor section~~ | ~~Onboarding for external contributors~~ | ~~20min~~ |
-| ~~30~~ | ~~Add `flake.lock` update policy to CONTRIBUTING.md~~ | ~~Clarifies when/how to update nixpkgs pin~~ | ~~15min~~ done — done — monorepo version propagation test added (this session, assertion 4/7) |
-| ~~31~~ | ~~Add `CODE_OF_CONDUCT.md`~~ | ~~Standard for public repos expecting contributors~~ | ~~10min~~ |
-| ~~32~~ | ~~Add `SECURITY.md` (vulnerability reporting policy)~~ | ~~Standard for public repos~~ | ~~10min~~ |
-| ~~33~~ | ~~Run `nix flake check --all-systems` on a macOS machine~~ | ~~Linux can't eval darwin; only a real macOS runner proves it~~ | ~~30min~~ done — done — enableGolangciLint=false test added in the 23:04 session |
-| ~~34~~ | ~~Add a `nix flake show` consumer-orientation test~~ | ~~Structural test exists but could be deepened~~ | ~~30min~~ done — done — enableGopls=false test added this session |
-| ~~35~~ | ~~Add test for `buildFlags` with multiple flags~~ | ~~Currently single-flag tested~~ | ~~15min~~ done — done — enableGovulncheck=false test added this session |
-| ~~36~~ | ~~Add test for `ldflags` without version injection (pure consumer ldflags)~~ | ~~Version-injection path tested; pure path may not be~~ | ~~15min~~ done — done — enableTempl=false test added this session |
-| ~~37~~ | ~~Add test for `proxyVendor = true` behavioral effect~~ | ~~Currently eval-only, not behavioral~~ | ~~30min~~ |
-| ~~38~~ | ~~Add test for `completionsPackage` in monorepo~~ | ~~Monorepo + completions interaction untested~~ | ~~30min~~ |
-| ~~39~~ | ~~Add CHANGELOG entry category for "decisions" (skipped-on-merit items)~~ | ~~Currently no place to record deliberate non-actions~~ | ~~10min~~ |
-| ~~40~~ | ~~Document the 6-concatenated-attrs behavior in the man page~~ | ~~Already documented — verify after any future change~~ | ~~5min~~ done — done — man page documents all 6 concatenated attrs (verified 06:51 session) |
-| ~~41~~ | ~~Add integration test for `postPatchExtra` running BEFORE replaces~~ | ~~Ordering dependency is documented but not tested~~ | ~~20min~~ done — recorded — TODO_LIST 'Decided against' section |
-| ~~42~~ | ~~Add test for `enableGolangciLint = false` (golangci-lint absent from devShell)~~ | ~~Toggle exists, disabled state only tested for apps.lint, not devShell~~ | ~~15min~~ done — recorded — TODO_LIST 'Decided against' section |
-| ~~43~~ | ~~Add test for `enableCompletions = true` in monorepo~~ | ~~Monorepo + completions interaction untested~~ | ~~20min~~ |
-| ~~44~~ | ~~Consider `publicDepPattern` (regex exclusion) as alternative to `publicDeps` list~~ | ~~More flexible for orgs with many public repos~~ | ~~30min~~ done — moved to TODO_LIST Blocked (v0.1.0) |
-| ~~45~~ | ~~Add `--from-go-standard` migration subcommand to `generate-flake.sh`~~ | ~~Helps consumers on mkGoFlake/manual migrate~~ | ~~1h~~ |
-| ~~46~~ | ~~Add CI step that verifies man pages render with `man`~~ | ~~Catches man page syntax errors~~ | ~~15min~~ done — dependabot.yml added 2026-09 |
-| ~~47~~ | ~~Add `docs/flake-standard.md` update for versioned-path-aware publicDeps~~ | ~~Reference doc may still mention exact-match~~ | ~~5min~~ done — dependabot.yml added 2026-09 |
-| ~~48~~ | ~~Add a consumer-facing changelog (breaking changes only)~~ | ~~Helps downstream consumers decide when to update~~ | ~~30min~~ **Won't implement — dormant — dropped (reopen on demand).** |
-| ~~49~~ | ~~Add `nix run .#doctor` command that diagnoses common misconfigurations~~ | ~~Reduces support burden~~ | ~~2h~~ |
-| ~~50~~ | ~~Add benchmark: `nix flake check` time tracking in CI~~ | ~~Detects performance regressions~~ | ~~30min~~ |
+| #      | Task                                                                                  | Why                                                                       | Effort                                                                                        |
+| ------ | ------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| ~~25~~ | ~~Register `maintainers.larsartmann` in nixpkgs (external PR)~~                       | ~~Full correctness for `meta.maintainers`~~                               | ~~30min~~                                                                                     |
+| ~~26~~ | ~~Fix empty commit message in `df9a5ff` (needs rebase + force-push)~~                 | ~~Git history hygiene~~                                                   | ~~15min~~                                                                                     |
+| ~~27~~ | ~~Add shell completion for `generate-flake.sh` flags~~                                | ~~UX polish for the bootstrap script~~                                    | ~~30min~~                                                                                     |
+| ~~28~~ | ~~Add `--check` flag to `generate-flake.sh` that validates an existing flake.nix~~    | ~~Helps consumers self-diagnose misconfiguration~~                        | ~~1h~~                                                                                        |
+| ~~29~~ | ~~Add `CONTRIBUTORS.md` or contributor section~~                                      | ~~Onboarding for external contributors~~                                  | ~~20min~~                                                                                     |
+| ~~30~~ | ~~Add `flake.lock` update policy to CONTRIBUTING.md~~                                 | ~~Clarifies when/how to update nixpkgs pin~~                              | ~~15min~~ done — done — monorepo version propagation test added (this session, assertion 4/7) |
+| ~~31~~ | ~~Add `CODE_OF_CONDUCT.md`~~                                                          | ~~Standard for public repos expecting contributors~~                      | ~~10min~~                                                                                     |
+| ~~32~~ | ~~Add `SECURITY.md` (vulnerability reporting policy)~~                                | ~~Standard for public repos~~                                             | ~~10min~~                                                                                     |
+| ~~33~~ | ~~Run `nix flake check --all-systems` on a macOS machine~~                            | ~~Linux can't eval darwin; only a real macOS runner proves it~~           | ~~30min~~ done — done — enableGolangciLint=false test added in the 23:04 session              |
+| ~~34~~ | ~~Add a `nix flake show` consumer-orientation test~~                                  | ~~Structural test exists but could be deepened~~                          | ~~30min~~ done — done — enableGopls=false test added this session                             |
+| ~~35~~ | ~~Add test for `buildFlags` with multiple flags~~                                     | ~~Currently single-flag tested~~                                          | ~~15min~~ done — done — enableGovulncheck=false test added this session                       |
+| ~~36~~ | ~~Add test for `ldflags` without version injection (pure consumer ldflags)~~          | ~~Version-injection path tested; pure path may not be~~                   | ~~15min~~ done — done — enableTempl=false test added this session                             |
+| ~~37~~ | ~~Add test for `proxyVendor = true` behavioral effect~~                               | ~~Currently eval-only, not behavioral~~                                   | ~~30min~~                                                                                     |
+| ~~38~~ | ~~Add test for `completionsPackage` in monorepo~~                                     | ~~Monorepo + completions interaction untested~~                           | ~~30min~~                                                                                     |
+| ~~39~~ | ~~Add CHANGELOG entry category for "decisions" (skipped-on-merit items)~~             | ~~Currently no place to record deliberate non-actions~~                   | ~~10min~~                                                                                     |
+| ~~40~~ | ~~Document the 6-concatenated-attrs behavior in the man page~~                        | ~~Already documented — verify after any future change~~                   | ~~5min~~ done — done — man page documents all 6 concatenated attrs (verified 06:51 session)   |
+| ~~41~~ | ~~Add integration test for `postPatchExtra` running BEFORE replaces~~                 | ~~Ordering dependency is documented but not tested~~                      | ~~20min~~ done — recorded — TODO_LIST 'Decided against' section                               |
+| ~~42~~ | ~~Add test for `enableGolangciLint = false` (golangci-lint absent from devShell)~~    | ~~Toggle exists, disabled state only tested for apps.lint, not devShell~~ | ~~15min~~ done — recorded — TODO_LIST 'Decided against' section                               |
+| ~~43~~ | ~~Add test for `enableCompletions = true` in monorepo~~                               | ~~Monorepo + completions interaction untested~~                           | ~~20min~~                                                                                     |
+| ~~44~~ | ~~Consider `publicDepPattern` (regex exclusion) as alternative to `publicDeps` list~~ | ~~More flexible for orgs with many public repos~~                         | ~~30min~~ done — moved to TODO_LIST Blocked (v0.1.0)                                          |
+| ~~45~~ | ~~Add `--from-go-standard` migration subcommand to `generate-flake.sh`~~              | ~~Helps consumers on mkGoFlake/manual migrate~~                           | ~~1h~~                                                                                        |
+| ~~46~~ | ~~Add CI step that verifies man pages render with `man`~~                             | ~~Catches man page syntax errors~~                                        | ~~15min~~ done — dependabot.yml added 2026-09                                                 |
+| ~~47~~ | ~~Add `docs/flake-standard.md` update for versioned-path-aware publicDeps~~           | ~~Reference doc may still mention exact-match~~                           | ~~5min~~ done — dependabot.yml added 2026-09                                                  |
+| ~~48~~ | ~~Add a consumer-facing changelog (breaking changes only)~~                           | ~~Helps downstream consumers decide when to update~~                      | ~~30min~~ **Won't implement — dormant — dropped (reopen on demand).**                         |
+| ~~49~~ | ~~Add `nix run .#doctor` command that diagnoses common misconfigurations~~            | ~~Reduces support burden~~                                                | ~~2h~~                                                                                        |
+| ~~50~~ | ~~Add benchmark: `nix flake check` time tracking in CI~~                              | ~~Detects performance regressions~~                                       | ~~30min~~                                                                                     |
 
 ---
 

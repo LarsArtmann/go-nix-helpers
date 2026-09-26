@@ -37,4 +37,4 @@ the 2026-09-07 session already confirmed CV's `vendorHash` re-pin
 item 6 first recorded the discrepancy; this note is the promised
 correction.
 
-*Correction written 2026-09-25.*
+_Correction written 2026-09-25._

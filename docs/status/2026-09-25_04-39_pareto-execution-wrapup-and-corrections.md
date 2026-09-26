@@ -102,7 +102,7 @@ still accurate).
 
 - **Verify host health before long batches** (binfmt present, daemon age,
   store size vs max-free, GC activity). A 10-second canary would have saved
-   ~90 minutes across this session. → f.1.
+  ~90 minutes across this session. → f.1.
 - **Never report an action as done without its observable effect** (the
   no-op flake update). Check the diff/rev AFTER the command, always.
 - **Hypothesis discipline:** I had three theories (pathExists-context,
@@ -186,5 +186,5 @@ still accurate).
 
 ---
 
-*Session ended clean: tree clean at 72184a3, nothing pushed, all findings
-on the record in this report pair.*
+_Session ended clean: tree clean at 72184a3, nothing pushed, all findings
+on the record in this report pair._

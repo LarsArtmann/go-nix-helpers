@@ -19,7 +19,7 @@ Fixed all 3 gaps in one commit. Migrated 4 projects from manual `postPatch` to `
 ### Core: go-nix-helpers (3 root-cause fixes)
 
 | Fix                                               | File                           | Commit    | Verified                             |
-| --- | --- | --- | --- |
+| ------------------------------------------------- | ------------------------------ | --------- | ------------------------------------ |
 | `stripVersionSuffix`: filter ALL `/vN` segments   | `mkPreparedSource.nix:97-103`  | `7fdb95c` | ✅ 12 test assertions pass           |
 | `discoverSubModules`: recursive tree walk         | `mkPreparedSource.nix:136-170` | `7fdb95c` | ✅ Depth-2 nested modules discovered |
 | `stripLocalReplacesScript`: strip all local paths | `mkPreparedSource.nix:243-250` | `7fdb95c` | ✅ Covers `/...`, `./...`, `../...`  |
@@ -29,7 +29,7 @@ Fixed all 3 gaps in one commit. Migrated 4 projects from manual `postPatch` to `
 ### Consumer Cleanup: 5 postPatchExtra blocks deleted
 
 | Project            | What was removed                                        | Commit                 | Build |
-| --- | --- | --- | --- |
+| ------------------ | ------------------------------------------------------- | ---------------------- | ----- |
 | **crush-daily**    | eventtest manual replace + \_third_party stub strip     | `649e8a9`              | ✅    |
 | **DiscordSync**    | eventtest manual replace                                | `ff1f0db`              | ✅    |
 | **overview**       | eventtest manual replace                                | `08cce7e`              | ✅    |
@@ -39,7 +39,7 @@ Fixed all 3 gaps in one commit. Migrated 4 projects from manual `postPatch` to `
 ### Migrations: 4 projects migrated to mkPreparedSource
 
 | Project                          | Old pattern                                                        | Commit    | Build |
-| --- | --- | --- | --- |
+| -------------------------------- | ------------------------------------------------------------------ | --------- | ----- |
 | **hierarchical-errors**          | Manual preparedSrc (dep copy + replace block + go.sum merge)       | `aedecad` | ✅    |
 | **go-auto-upgrade**              | Manual preparedSrc (dep copy + go mod edit + find-based discovery) | `3564189` | ✅    |
 | **file-and-image-renamer**       | Manual localReplaces var (conditional echo + sub-module list)      | `7429154` | ✅    |
@@ -48,7 +48,7 @@ Fixed all 3 gaps in one commit. Migrated 4 projects from manual `postPatch` to `
 ### Documentation
 
 | Document                                                            | What changed                                                                          |
-| --- | --- |
+| ------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
 | `mkPreparedSource.nix` header                                       | Updated feature list: recursive discovery, mid-path /vN, generic local-path stripping |
 | `mkPreparedSource.nix` params                                       | Added `excludeSubModuleDirs` parameter documentation                                  |
 | `README.md`                                                         | Updated auto-discovery section (recursive), major version suffix section (all /vN)    |
@@ -58,7 +58,7 @@ Fixed all 3 gaps in one commit. Migrated 4 projects from manual `postPatch` to `
 ### Documentation comments added to genuinely-necessary cases
 
 | Project                          | Comment added                                                             | Commit     |
-| --- | --- | --- |
+| -------------------------------- | ------------------------------------------------------------------------- | ---------- |
 | **standard-bug-tracking-schema** | "NECESSARY: GitHub auth (NETRC/git-credentials)"                          | `0761c9c0` |
 | **go-structure-linter**          | "NECESSARY: multi-module repo, each modules/\*/go.mod needs own replaces" | `76755ac`  |
 
@@ -83,7 +83,7 @@ Fixed all 3 gaps in one commit. Migrated 4 projects from manual `postPatch` to `
 These are documented but intentionally NOT migrated:
 
 | Project                          | Why it stays                                                                                        |
-| --- | --- |
+| -------------------------------- | --------------------------------------------------------------------------------------------------- |
 | **ast-state-analyzer** (×2)      | Stripping local replace loses go.sum entries — must manually append hashes. Fundamental limitation. |
 | **standard-bug-tracking-schema** | GitHub auth setup (NETRC, git-credentials). Orthogonal concern.                                     |
 | **monitor365**                   | Rust/WASM: disables incompatible wasm-opt. Not Go.                                                  |
@@ -120,33 +120,33 @@ These are documented but intentionally NOT migrated:
 
 ## f) Top 25 Things to Get Done Next
 
-| #  | Priority | Task                                                                              | Impact                                   | Effort |
-| --- | --- | --- | --- | --- |
-| ~~1~~ | ~~P0~~ | ~~Fix Cyberdom: update go.mod to cqrs v3.3.0, then retry mkPreparedSource migration~~ | ~~Eliminates instance #6~~ | ~~30min~~ **Won't implement — external — Cyberdom-side.** |
-| ~~2~~ | ~~P0~~ | ~~Verify file-and-image-renamer `sync.go` deletion was intentional~~ | ~~Correctness~~ | ~~10min~~ |
-| ~~3~~ | ~~P1~~ | ~~Add `excludeSubModuleDirs` passthrough in `mkGoFlake.nix`~~ | ~~API completeness~~ | ~~15min~~ done — moot — mkGoFlake deprecated; go-standard forwards all params |
-| ~~4~~ | ~~P1~~ | ~~Make `validatePrivateDeps` smarter: skip repos available on Go proxy~~ | ~~Removes 4× `validatePrivateDeps = false`~~ | ~~60min~~ done — shipped as `publicDeps` (versioned-path aware) |
-| ~~5~~ | ~~P1~~ | ~~Fix overview + branching-flow pre-existing BuildFlow pre-commit failures~~ | ~~Unblocks normal commits~~ | ~~30min~~ **Won't implement — external — BuildFlow-side.** |
-| ~~6~~ | ~~P2~~ | ~~Add `mkPreparedSource` sub-module-level replace support (for go-structure-linter)~~ | ~~Eliminates 1 instance~~ | ~~90min~~ done — G2 shipped (`2f3b6b2`); migration tracked in TODO_LIST |
-| ~~7~~ | ~~P2~~ | ~~Add property-based tests for `stripVersionSuffix` edge cases~~ | ~~Regression prevention~~ | ~~30min~~ done — shipped — checks.pureFunctions (41 assertions) |
-| ~~8~~ | ~~P2~~ | ~~Add property-based tests for recursive `discoverSubModules`~~ | ~~Regression prevention~~ | ~~30min~~ done — shipped — 9 integration scenarios in test.nix |
-| ~~9~~ | ~~P2~~ | ~~Change Cyberdom `path:` input to `git+ssh://...ref=v3.3.0`~~ | ~~Reproducibility~~ | ~~10min~~ **Won't implement — external — Cyberdom-side.** |
-| ~~2~~ | ~~P3~~ | ~~Audit remaining ~80 flakes that DON'T use mkPreparedSource~~ | ~~Adoption~~ | ~~4h~~ |
-| ~~11~~ | ~~P3~~ | ~~Create migration guide: "How to adopt mkPreparedSource" in README~~ | ~~Adoption~~ | ~~30min~~ done — shipped — docs/migration-guide.md |
-| ~~12~~ | ~~P3~~ | ~~Add `nix flake check` to go-nix-helpers CI~~ | ~~CI quality~~ | ~~15min~~ done — shipped — CI workflow since 2026-07-24 |
-| ~~13~~ | ~~P3~~ | ~~Consider go.sum auto-generation for stripped replaces (ast-state-analyzer)~~ | ~~Eliminates 2 instances~~ | ~~2h~~ **Won't implement — dormant since 2026-06 — dropped.** |
-| ~~14~~ | ~~P3~~ | ~~Migrate ast-state-analyzer overlay `postPatch` to use shared var~~ | ~~DRY~~ | ~~15min~~ **Won't implement — external — ast-state-analyzer-side.** |
-| ~~15~~ | ~~P3~~ | ~~Document `overrideModAttrs` pattern for `go mod tidy` in FOD~~ | ~~Knowledge~~ | ~~15min~~ done — superseded — the module's autoDepFodAttrs handles tidy+vendor (G4 audit correction, 2026-08-10) |
-| ~~16~~ | ~~P4~~ | ~~Explore go.work support for buildGoModule (Nixpkgs upstream)~~ | ~~Future-proofing~~ | ~~8h+~~ **Won't implement — upstream nixpkgs scope — dropped here.** |
-| ~~17~~ | ~~P4~~ | ~~Add `nix build` smoke test to all consumer CI pipelines~~ | ~~CI quality~~ | ~~2h~~ done — moved to TODO_LIST T3 |
-| ~~18~~ | ~~P4~~ | ~~Create `mkMultiModuleFlake` for repos like go-structure-linter~~ | ~~New capability~~ | ~~4h~~ done — superseded — G2 packages + per-package extraBuildAttrs |
-| ~~19~~ | ~~P4~~ | ~~Add vendorHash update helper script (`nix run .#update-vendor-hash`)~~ | ~~DX~~ | ~~2h~~ **Won't implement — dormant since 2026-06 — dropped.** |
-| ~~20~~ | ~~P4~~ | ~~Collect all go-nix-helpers consumers into a flake aggregate~~ | ~~Visibility~~ | ~~1h~~ **Won't implement — dormant since 2026-06 — dropped.** |
-| ~~21~~ | ~~P4~~ | ~~Add versioning policy for go-nix-helpers (semver tags)~~ | ~~Safety~~ | ~~30min~~ done — moved to TODO_LIST Blocked (v0.1.0) |
-| ~~22~~ | ~~P4~~ | ~~Consider flake-parts module for Cyberdom-style CGO+sqlc+templ projects~~ | ~~DX~~ | ~~4h~~ **Won't implement — dormant since 2026-06 — dropped.** |
-| ~~23~~ | ~~P4~~ | ~~Add `autoSubModules` exclusion for `cmd/` directories (cqrs-gen, api-stability)~~ | ~~Correctness~~ | ~~15min~~ **Won't implement — no incidents since — dropped.** |
-| ~~24~~ | ~~P4~~ | ~~Document migration path from `cleanSourceWith` to `lib.fileset`~~ | ~~Modernization~~ | ~~30min~~ **Won't implement — dormant since 2026-06 — dropped.** |
-| ~~25~~ | ~~P4~~ | ~~Write ADR: "Why we use replace directives instead of go.work for Nix builds"~~ | ~~Knowledge~~ | ~~30min~~ **Won't implement — documented inline in mkPreparedSource header instead.** |
+| #      | Priority | Task                                                                                  | Impact                                       | Effort                                                                                                           |
+| ------ | -------- | ------------------------------------------------------------------------------------- | -------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| ~~1~~  | ~~P0~~   | ~~Fix Cyberdom: update go.mod to cqrs v3.3.0, then retry mkPreparedSource migration~~ | ~~Eliminates instance #6~~                   | ~~30min~~ **Won't implement — external — Cyberdom-side.**                                                        |
+| ~~2~~  | ~~P0~~   | ~~Verify file-and-image-renamer `sync.go` deletion was intentional~~                  | ~~Correctness~~                              | ~~10min~~                                                                                                        |
+| ~~3~~  | ~~P1~~   | ~~Add `excludeSubModuleDirs` passthrough in `mkGoFlake.nix`~~                         | ~~API completeness~~                         | ~~15min~~ done — moot — mkGoFlake deprecated; go-standard forwards all params                                    |
+| ~~4~~  | ~~P1~~   | ~~Make `validatePrivateDeps` smarter: skip repos available on Go proxy~~              | ~~Removes 4× `validatePrivateDeps = false`~~ | ~~60min~~ done — shipped as `publicDeps` (versioned-path aware)                                                  |
+| ~~5~~  | ~~P1~~   | ~~Fix overview + branching-flow pre-existing BuildFlow pre-commit failures~~          | ~~Unblocks normal commits~~                  | ~~30min~~ **Won't implement — external — BuildFlow-side.**                                                       |
+| ~~6~~  | ~~P2~~   | ~~Add `mkPreparedSource` sub-module-level replace support (for go-structure-linter)~~ | ~~Eliminates 1 instance~~                    | ~~90min~~ done — G2 shipped (`2f3b6b2`); migration tracked in TODO_LIST                                          |
+| ~~7~~  | ~~P2~~   | ~~Add property-based tests for `stripVersionSuffix` edge cases~~                      | ~~Regression prevention~~                    | ~~30min~~ done — shipped — checks.pureFunctions (41 assertions)                                                  |
+| ~~8~~  | ~~P2~~   | ~~Add property-based tests for recursive `discoverSubModules`~~                       | ~~Regression prevention~~                    | ~~30min~~ done — shipped — 9 integration scenarios in test.nix                                                   |
+| ~~9~~  | ~~P2~~   | ~~Change Cyberdom `path:` input to `git+ssh://...ref=v3.3.0`~~                        | ~~Reproducibility~~                          | ~~10min~~ **Won't implement — external — Cyberdom-side.**                                                        |
+| ~~2~~  | ~~P3~~   | ~~Audit remaining ~80 flakes that DON'T use mkPreparedSource~~                        | ~~Adoption~~                                 | ~~4h~~                                                                                                           |
+| ~~11~~ | ~~P3~~   | ~~Create migration guide: "How to adopt mkPreparedSource" in README~~                 | ~~Adoption~~                                 | ~~30min~~ done — shipped — docs/migration-guide.md                                                               |
+| ~~12~~ | ~~P3~~   | ~~Add `nix flake check` to go-nix-helpers CI~~                                        | ~~CI quality~~                               | ~~15min~~ done — shipped — CI workflow since 2026-07-24                                                          |
+| ~~13~~ | ~~P3~~   | ~~Consider go.sum auto-generation for stripped replaces (ast-state-analyzer)~~        | ~~Eliminates 2 instances~~                   | ~~2h~~ **Won't implement — dormant since 2026-06 — dropped.**                                                    |
+| ~~14~~ | ~~P3~~   | ~~Migrate ast-state-analyzer overlay `postPatch` to use shared var~~                  | ~~DRY~~                                      | ~~15min~~ **Won't implement — external — ast-state-analyzer-side.**                                              |
+| ~~15~~ | ~~P3~~   | ~~Document `overrideModAttrs` pattern for `go mod tidy` in FOD~~                      | ~~Knowledge~~                                | ~~15min~~ done — superseded — the module's autoDepFodAttrs handles tidy+vendor (G4 audit correction, 2026-08-10) |
+| ~~16~~ | ~~P4~~   | ~~Explore go.work support for buildGoModule (Nixpkgs upstream)~~                      | ~~Future-proofing~~                          | ~~8h+~~ **Won't implement — upstream nixpkgs scope — dropped here.**                                             |
+| ~~17~~ | ~~P4~~   | ~~Add `nix build` smoke test to all consumer CI pipelines~~                           | ~~CI quality~~                               | ~~2h~~ done — moved to TODO_LIST T3                                                                              |
+| ~~18~~ | ~~P4~~   | ~~Create `mkMultiModuleFlake` for repos like go-structure-linter~~                    | ~~New capability~~                           | ~~4h~~ done — superseded — G2 packages + per-package extraBuildAttrs                                             |
+| ~~19~~ | ~~P4~~   | ~~Add vendorHash update helper script (`nix run .#update-vendor-hash`)~~              | ~~DX~~                                       | ~~2h~~ **Won't implement — dormant since 2026-06 — dropped.**                                                    |
+| ~~20~~ | ~~P4~~   | ~~Collect all go-nix-helpers consumers into a flake aggregate~~                       | ~~Visibility~~                               | ~~1h~~ **Won't implement — dormant since 2026-06 — dropped.**                                                    |
+| ~~21~~ | ~~P4~~   | ~~Add versioning policy for go-nix-helpers (semver tags)~~                            | ~~Safety~~                                   | ~~30min~~ done — moved to TODO_LIST Blocked (v0.1.0)                                                             |
+| ~~22~~ | ~~P4~~   | ~~Consider flake-parts module for Cyberdom-style CGO+sqlc+templ projects~~            | ~~DX~~                                       | ~~4h~~ **Won't implement — dormant since 2026-06 — dropped.**                                                    |
+| ~~23~~ | ~~P4~~   | ~~Add `autoSubModules` exclusion for `cmd/` directories (cqrs-gen, api-stability)~~   | ~~Correctness~~                              | ~~15min~~ **Won't implement — no incidents since — dropped.**                                                    |
+| ~~24~~ | ~~P4~~   | ~~Document migration path from `cleanSourceWith` to `lib.fileset`~~                   | ~~Modernization~~                            | ~~30min~~ **Won't implement — dormant since 2026-06 — dropped.**                                                 |
+| ~~25~~ | ~~P4~~   | ~~Write ADR: "Why we use replace directives instead of go.work for Nix builds"~~      | ~~Knowledge~~                                | ~~30min~~ **Won't implement — documented inline in mkPreparedSource header instead.**                            |
 
 ---
 
@@ -170,7 +170,7 @@ I don't know which repos are actually private vs public in the LarsArtmann org, 
 ## Metrics
 
 | Metric                                 | Before | After            | Delta        |
-| --- | --- | --- | --- |
+| -------------------------------------- | ------ | ---------------- | ------------ |
 | `postPatch`/`postPatchExtra` instances | 15     | 6                | **-9 (60%)** |
 | Projects using `mkPreparedSource`      | ~5     | ~9               | **+4**       |
 | `mkPreparedSource` test assertions     | 6      | 12               | **+6**       |

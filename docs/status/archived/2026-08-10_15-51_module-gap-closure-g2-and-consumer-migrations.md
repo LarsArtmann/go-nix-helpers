@@ -98,7 +98,7 @@ The pre-existing template bug (`inputs@{ self, ... }` calling unbound `flake-par
 All verified with `nix flake check --no-build`:
 
 | Repo         | Before    | After     | Reduction | Key Features Migrated                                                                                                                                                        |
-| --- | --- | --- | --- | --- |
+| ------------ | --------- | --------- | --------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | go-localsync | 237 lines | 86 lines  | **64%**   | deps (3 private), monorepo packages (cqrs-lint), GOEXPERIMENT, custom checks (cqrs-lint architectural gate), GOFLAGS                                                         |
 | erraudit     | 258 lines | 119 lines | **54%**   | deps (10 private), custom ldflags (version/commit injection), GOEXPERIMENT, `enableCheck=false`, CGO_ENABLED=0, extra devShell packages                                      |
 | project-meta | 268 lines | 158 lines | **41%**   | deps (7 private) + subModules (13 sub-modules for project-discovery-sdk), git-hooks.nix integration, cobra completions (custom postInstall), GOEXPERIMENT, enableCompletions |
@@ -108,7 +108,7 @@ All verified with `nix flake check --no-build`:
 Removed dead `systems` and `treefmt-nix` inputs from 4 repos that had already adopted go-standard (which bundles both internally):
 
 | Repo                          | Inputs Removed            | Status                 |
-| --- | --- | --- |
+| ----------------------------- | ------------------------- | ---------------------- |
 | lean-business-plan            | `systems` + `treefmt-nix` | ✅ `--no-build` passes |
 | storbi                        | `systems` + `treefmt-nix` | ✅ `--no-build` passes |
 | template-arch-lint            | `systems` + `treefmt-nix` | ✅ `--no-build` passes |

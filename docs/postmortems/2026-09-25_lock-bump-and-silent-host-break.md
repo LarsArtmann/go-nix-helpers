@@ -1,7 +1,7 @@
 # Postmortem: lock bumps are eval changes; and the silent host break
 
-*Written 2026-09-25. Two cases that cost hours each and share one lesson:
-the failure was invisible until a full `nix flake check` with builds ran.*
+_Written 2026-09-25. Two cases that cost hours each and share one lesson:
+the failure was invisible until a full `nix flake check` with builds ran._
 
 ## Case 1 — "just a lock bump" broke evaluation (2026-09-07)
 
@@ -70,4 +70,5 @@ restart the daemon.
 *Evidence: `docs/status/2026-09-25_04-33_pareto-execution-session-interrupted.md`
 (theory 1, later retracted), `docs/status/2026-09-25_04-39_pareto-execution-wrapup-and-corrections.md`
 (corrected root-cause analysis), commit `105c981` (the 8-assertion repair
-+ `cgoEnabled` fix).*
+
+- `cgoEnabled` fix).*

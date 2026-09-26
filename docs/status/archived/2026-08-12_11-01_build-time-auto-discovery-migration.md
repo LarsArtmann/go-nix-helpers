@@ -11,7 +11,7 @@
 The user pasted output from a formatting/check run containing errors from multiple tools:
 
 | Tool        | Errors                                                                 | Severity      |
-| --- | --- | --- |
+| ----------- | ---------------------------------------------------------------------- | ------------- |
 | shfmt       | 3 shell scripts using spaces instead of tabs                           | Formatting    |
 | deadnix     | Unused lambda patterns in flake.nix, templates, test-module.nix        | Lint warning  |
 | statix      | Assignment-instead-of-inherit, empty patterns                          | Lint warning  |
@@ -56,7 +56,7 @@ The **real bug** was `nix flake check --no-build` failing because `mkPreparedSou
 ### 2. Confirmed Already-Fixed Items (from commit c0a8290)
 
 | Issue                    | Status          |
-| --- | --- |
+| ------------------------ | --------------- |
 | shfmt: spaces → tabs     | Already fixed   |
 | deadnix: unused vars     | Already fixed   |
 | statix: inherit/patterns | Already fixed   |

@@ -41,7 +41,7 @@ The session produced two kinds of artefact:
 4. **7 annotations applied**, each file-specific with real commit hashes:
 
 | File                         | Placement              | Resolution cited                                                                                           |
-| --- | --- | --- |
+| ---------------------------- | ---------------------- | ---------------------------------------------------------------------------------------------------------- |
 | `2026-06-08` v2-fix          | appendix               | infra gaps closed (`3c22ce4`, `befd406`, `a31fec9`); `/v2` shipped `532752a`                               |
 | `2026-06-09` subModules      | inline + appendix      | "uncommitted" → `7b69382`; deepened by `7fdb95c`                                                           |
 | `2026-06-22` self-hosting    | inline + appendix      | header "6 files staged" → `3c22ce4`                                                                        |
@@ -312,7 +312,7 @@ this annotation task?**
 ## File Inventory (this session)
 
 | File                                | Action                 | In working tree?            |
-| --- | --- | --- |
+| ----------------------------------- | ---------------------- | --------------------------- |
 | `docs/status/2026-06-08_*.md`       | appendix               | auto-committed in `7418028` |
 | `docs/status/2026-06-09_*.md`       | inline + appendix      | auto-committed in `7418028` |
 | `docs/status/2026-06-22_*.md`       | inline + appendix      | auto-committed in `7418028` |

@@ -12,7 +12,7 @@ All `nix flake check`, integration tests, and module tests (70 assertions) pass.
 ### Code Changes
 
 | Task                                              | What was done                                                                                                                                       | Files                                           |
-| --- | --- | --- |
+| ------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
 | **H1** — `autoGoPrivateEnv` aware of `publicDeps` | When `publicDeps` is non-empty, GOPRIVATE switches from broad glob `github.com/larsartmann/*` to specific dep paths so public repos fetch via proxy | `modules/go-standard.nix:503-519`               |
 | **H3** — `enableCompletions` UX                   | Checks `--completion bash` support before installing; emits clear stderr warning with remediation options instead of silent no-op                   | `modules/go-standard.nix:429-447`               |
 | **M5** — `nativeBuildInputs` merge protection     | Consumer's `extraBuildAttrs.nativeBuildInputs` is now concatenated to module's list instead of overriding                                           | `modules/go-standard.nix:411-421, 464-467`      |
@@ -23,7 +23,7 @@ All `nix flake check`, integration tests, and module tests (70 assertions) pass.
 ### CI Changes
 
 | Task                                    | What was done                                                                         |
-| --- | --- |
+| --------------------------------------- | ------------------------------------------------------------------------------------- |
 | **M1** — `generate-flake.sh` smoke test | New CI job tests 3 template variants, validates output with `nix-instantiate --parse` |
 | **M11** — macOS CI runner               | Matrix strategy adds `macos-latest` to the check job                                  |
 | **M13** — `flake.lock` freshness        | New CI job runs `nix flake update`, diffs against committed lock file                 |
@@ -31,7 +31,7 @@ All `nix flake check`, integration tests, and module tests (70 assertions) pass.
 ### Script Changes
 
 | Task                                      | What was done                                                                          |
-| --- | --- |
+| ----------------------------------------- | -------------------------------------------------------------------------------------- |
 | **L2** — `--go-mod` flag                  | Creates `go.mod` + `main.go` skeleton during generation                                |
 | **L3** — `--private-deps` for go-standard | Adds `deps = { ... }` section to go-standard template output                           |
 | **Bonus fix** — Placeholder mismatch      | Fixed pre-existing bug: `YOUR-PROJECT-NAME` in go-standard template was never replaced |
@@ -39,7 +39,7 @@ All `nix flake check`, integration tests, and module tests (70 assertions) pass.
 ### Documentation Changes
 
 | Task                              | What was done                                                                                                                                                                     |
-| --- | --- |
+| --------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **M3/M4** — FAQ entries           | Added `vendorHash = null` (committed vendor) and monorepo vendorHash sharing entries                                                                                              |
 | **M6** — enableCompletions caveat | Options table now notes cobra/urfave/cli requirement                                                                                                                              |
 | **M7** — Troubleshooting fix      | Updated error text from old wording to current `"modules without local replace"`, added `publicDeps` as remediation option 3                                                      |
@@ -52,7 +52,7 @@ All `nix flake check`, integration tests, and module tests (70 assertions) pass.
 ### Test Changes
 
 | Task                            | What was done                                                                                                                                                                                            | Assertion count |
-| --- | --- | --- |
+| ------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------- |
 | **L1** — Remaining option tests | Added `enableNixfmt` default, `devShellExtraPackages` callable, systems override propagation                                                                                                             | +3              |
 | **H2** — Behavioral tests       | Added meta propagation (description, mainProgram, license, maintainers, extraMeta), monorepo meta, formatter toggles (nixfmt, all-off), enableTempl, custom ldflags, shellExtraEnv, apps.fmt conditional | +12             |
 | Total                           | 70 assertions (up from 57)                                                                                                                                                                               | +13 net         |
@@ -83,7 +83,7 @@ All `nix flake check`, integration tests, and module tests (70 assertions) pass.
 All non-blocked TODO items were addressed. The 4 blocked items remain:
 
 | Task                                          | Status  | Blocker                            |
-| --- | --- | --- |
+| --------------------------------------------- | ------- | ---------------------------------- |
 | Register `maintainers.larsartmann` in nixpkgs | BLOCKED | External PR to nixpkgs             |
 | Real private-repo integration test in CI      | BLOCKED | Needs SSH key secret               |
 | Audit all downstream consumers                | BLOCKED | Needs access to 7+ repos           |

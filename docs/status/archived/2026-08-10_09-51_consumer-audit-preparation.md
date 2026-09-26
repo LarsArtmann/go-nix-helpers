@@ -172,88 +172,88 @@
 
 ### Tier 1: Critical path (blocks the consumer audit)
 
-| # | Task                                                                                  | Why                                                                    | Effort |
-| --- | --- | --- | --- |
-| ~~1~~ | ~~Fix the `\s` grep bug in the triage script (use `[[:space:]]`)~~ | ~~Script is broken on POSIX grep; will silently miss redundant overrides~~ | ~~2min~~ done — fixed `26b7620` |
-| ~~2~~ | ~~Run the triage script against go-nix-helpers' own flake.nix and at least one consumer~~ | ~~Validate the script works before relying on it~~ | ~~10min~~ done — done in the 14:39 session (34 repos) |
-| ~~3~~ | ~~Fix/rewrite the awk `flake = false` detection in the triage script~~ | ~~Untested stateful awk is fragile~~ | ~~10min~~ done — fixed `26b7620` |
-| ~~4~~ | ~~Check which consumer repos exist locally under `/home/lars/projects/`~~ | ~~May unblock the "BLOCKED" audit immediately~~ | ~~2min~~ done — done — fleet audit (11:02) |
-| ~~5~~ | ~~Add `docs/consumer-audit-checklist.md` to AGENTS.md key files table~~ | ~~Doc discoverability~~ | ~~2min~~ done — done in the 14:39 session |
-| ~~6~~ | ~~Link the checklist from `docs/migration-guide.md`~~ | ~~Natural companion doc~~ | ~~2min~~ done — done in the 14:39 session |
+| #     | Task                                                                                      | Why                                                                        | Effort                                                |
+| ----- | ----------------------------------------------------------------------------------------- | -------------------------------------------------------------------------- | ----------------------------------------------------- |
+| ~~1~~ | ~~Fix the `\s` grep bug in the triage script (use `[[:space:]]`)~~                        | ~~Script is broken on POSIX grep; will silently miss redundant overrides~~ | ~~2min~~ done — fixed `26b7620`                       |
+| ~~2~~ | ~~Run the triage script against go-nix-helpers' own flake.nix and at least one consumer~~ | ~~Validate the script works before relying on it~~                         | ~~10min~~ done — done in the 14:39 session (34 repos) |
+| ~~3~~ | ~~Fix/rewrite the awk `flake = false` detection in the triage script~~                    | ~~Untested stateful awk is fragile~~                                       | ~~10min~~ done — fixed `26b7620`                      |
+| ~~4~~ | ~~Check which consumer repos exist locally under `/home/lars/projects/`~~                 | ~~May unblock the "BLOCKED" audit immediately~~                            | ~~2min~~ done — done — fleet audit (11:02)            |
+| ~~5~~ | ~~Add `docs/consumer-audit-checklist.md` to AGENTS.md key files table~~                   | ~~Doc discoverability~~                                                    | ~~2min~~ done — done in the 14:39 session             |
+| ~~6~~ | ~~Link the checklist from `docs/migration-guide.md`~~                                     | ~~Natural companion doc~~                                                  | ~~2min~~ done — done in the 14:39 session             |
 
 ### Tier 2: Template and docs polish
 
-| #  | Task                                                                      | Why                                               | Effort |
-| --- | --- | --- | --- |
-| ~~7~~ | ~~Add commented monorepo example to the template~~ | ~~Consumers discover the `packages` option~~ | ~~5min~~ done — shipped `26b7620` |
-| ~~8~~ | ~~Replace `GOTOOLCHAIN` example in template with something non-default~~ | ~~GOTOOLCHAIN is already set by default; misleading~~ | ~~2min~~ |
-| ~~9~~ | ~~Fix duplicate `### Added` section in CHANGELOG~~ | ~~Structural confusion~~ | ~~5min~~ done — fixed in the 14:39 session |
-| ~~10~~ | ~~Test the template by creating a throwaway project and running `nix build`~~ | ~~Confirm template produces a working derivation~~ | ~~15min~~ done — shipped — `templateEval` (`2f3b6b2`) + end-to-end template verification (`26b7620`) |
-| ~~11~~ | ~~Add checklist link to README troubleshooting/FAQ section~~ | ~~Consumer discoverability~~ | ~~5min~~ |
+| #      | Task                                                                          | Why                                                   | Effort                                                                                               |
+| ------ | ----------------------------------------------------------------------------- | ----------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| ~~7~~  | ~~Add commented monorepo example to the template~~                            | ~~Consumers discover the `packages` option~~          | ~~5min~~ done — shipped `26b7620`                                                                    |
+| ~~8~~  | ~~Replace `GOTOOLCHAIN` example in template with something non-default~~      | ~~GOTOOLCHAIN is already set by default; misleading~~ | ~~2min~~                                                                                             |
+| ~~9~~  | ~~Fix duplicate `### Added` section in CHANGELOG~~                            | ~~Structural confusion~~                              | ~~5min~~ done — fixed in the 14:39 session                                                           |
+| ~~10~~ | ~~Test the template by creating a throwaway project and running `nix build`~~ | ~~Confirm template produces a working derivation~~    | ~~15min~~ done — shipped — `templateEval` (`2f3b6b2`) + end-to-end template verification (`26b7620`) |
+| ~~11~~ | ~~Add checklist link to README troubleshooting/FAQ section~~                  | ~~Consumer discoverability~~                          | ~~5min~~                                                                                             |
 
 ### Tier 3: Consumer audit execution (once repos are available)
 
-| #  | Task                                                                                                                        | Why                                        | Effort     |
-| --- | --- | --- | --- |
-| ~~12~~ | ~~Check out each consumer repo (BuildFlow, mr-sync, PMA, go-structure-linter, branching-flow, Standup-Killer, library-policy)~~ | ~~Required for audit~~ | ~~15min~~ done — done — 34 repos audited (11:02) |
-| ~~13~~ | ~~Run triage script against each consumer~~ | ~~Fast first-pass identification of issues~~ | ~~5min each~~ done — done — fleet audit (11:02) |
-| ~~14~~ | ~~Deep audit each consumer using the 8-section checklist~~ | ~~Systematic verification~~ | ~~20min each~~ done — done — fleet audit (11:02) |
-| ~~15~~ | ~~Document findings per consumer (migration status, issues found)~~ | ~~Track what needs fixing~~ | ~~10min each~~ done — done — fleet audit report (11:02) |
-| ~~16~~ | ~~Fix consumers still using mkGoFlake.nix~~ | ~~Deprecated path, maintenance burden~~ | ~~30min each~~ done — moved to TODO_LIST T5 |
-| ~~17~~ | ~~Fix consumers still using go-flake-parts template~~ | ~~Deprecated path~~ | ~~20min each~~ |
-| ~~18~~ | ~~Remove unnecessary treefmt-nix input from consumers~~ | ~~Bundled internally now~~ | ~~10min each~~ done — done — inputs removed in the 16:50 sweep |
-| ~~19~~ | ~~Remove unnecessary systems input from consumers~~ | ~~Configurable via go-standard.systems~~ | ~~10min each~~ done — done — inputs removed in the 16:50 sweep |
-| ~~20~~ | ~~Fix placeholder vendorHash in any consumer~~ | ~~Build correctness~~ | ~~5min each~~ |
-| ~~21~~ | ~~Fix missing `nixpkgs.follows` chains in consumer inputs~~ | ~~Reproducibility~~ | ~~5min each~~ |
-| ~~22~~ | ~~Add `publicDeps` to consumers with public LarsArtmann deps~~ | ~~Prevent false-positive validation failures~~ | ~~10min each~~ done — addressed per-repo during migration; gaps tracked in TODO_LIST T4 |
-| ~~23~~ | ~~Remove redundant default overrides from consumer flake.nix files~~ | ~~Cleanliness, reduce noise~~ | ~~5min each~~ |
-| ~~24~~ | ~~Verify `nix flake check` passes in every consumer after fixes~~ | ~~End-to-end validation~~ | ~~5min each~~ done — spot-checked in the fleet audit; full build-verify in TODO_LIST T3 |
-| ~~25~~ | ~~Verify `nix build` succeeds in every consumer after fixes~~ | ~~Build correctness~~ | ~~5min each~~ done — folded into TODO_LIST T3 |
+| #      | Task                                                                                                                            | Why                                            | Effort                                                                                  |
+| ------ | ------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------- | --------------------------------------------------------------------------------------- |
+| ~~12~~ | ~~Check out each consumer repo (BuildFlow, mr-sync, PMA, go-structure-linter, branching-flow, Standup-Killer, library-policy)~~ | ~~Required for audit~~                         | ~~15min~~ done — done — 34 repos audited (11:02)                                        |
+| ~~13~~ | ~~Run triage script against each consumer~~                                                                                     | ~~Fast first-pass identification of issues~~   | ~~5min each~~ done — done — fleet audit (11:02)                                         |
+| ~~14~~ | ~~Deep audit each consumer using the 8-section checklist~~                                                                      | ~~Systematic verification~~                    | ~~20min each~~ done — done — fleet audit (11:02)                                        |
+| ~~15~~ | ~~Document findings per consumer (migration status, issues found)~~                                                             | ~~Track what needs fixing~~                    | ~~10min each~~ done — done — fleet audit report (11:02)                                 |
+| ~~16~~ | ~~Fix consumers still using mkGoFlake.nix~~                                                                                     | ~~Deprecated path, maintenance burden~~        | ~~30min each~~ done — moved to TODO_LIST T5                                             |
+| ~~17~~ | ~~Fix consumers still using go-flake-parts template~~                                                                           | ~~Deprecated path~~                            | ~~20min each~~                                                                          |
+| ~~18~~ | ~~Remove unnecessary treefmt-nix input from consumers~~                                                                         | ~~Bundled internally now~~                     | ~~10min each~~ done — done — inputs removed in the 16:50 sweep                          |
+| ~~19~~ | ~~Remove unnecessary systems input from consumers~~                                                                             | ~~Configurable via go-standard.systems~~       | ~~10min each~~ done — done — inputs removed in the 16:50 sweep                          |
+| ~~20~~ | ~~Fix placeholder vendorHash in any consumer~~                                                                                  | ~~Build correctness~~                          | ~~5min each~~                                                                           |
+| ~~21~~ | ~~Fix missing `nixpkgs.follows` chains in consumer inputs~~                                                                     | ~~Reproducibility~~                            | ~~5min each~~                                                                           |
+| ~~22~~ | ~~Add `publicDeps` to consumers with public LarsArtmann deps~~                                                                  | ~~Prevent false-positive validation failures~~ | ~~10min each~~ done — addressed per-repo during migration; gaps tracked in TODO_LIST T4 |
+| ~~23~~ | ~~Remove redundant default overrides from consumer flake.nix files~~                                                            | ~~Cleanliness, reduce noise~~                  | ~~5min each~~                                                                           |
+| ~~24~~ | ~~Verify `nix flake check` passes in every consumer after fixes~~                                                               | ~~End-to-end validation~~                      | ~~5min each~~ done — spot-checked in the fleet audit; full build-verify in TODO_LIST T3 |
+| ~~25~~ | ~~Verify `nix build` succeeds in every consumer after fixes~~                                                                   | ~~Build correctness~~                          | ~~5min each~~ done — folded into TODO_LIST T3                                           |
 
 ### Tier 4: Breaking changes (during or after audit)
 
-| #  | Task                                                                    | Why                                               | Effort |
-| --- | --- | --- | --- |
-| ~~26~~ | ~~Delete `mkGoFlake.nix` after confirming no consumers use it~~ | ~~Removes parallel maintenance burden~~ | ~~20min~~ done — gated on the v0.1.0 tag (TODO_LIST Blocked) |
-| ~~27~~ | ~~Delete `templates/go-flake-parts/` after confirming no consumers use it~~ | ~~Removes deprecated path~~ | ~~10min~~ done — gated on the v0.1.0 tag (TODO_LIST Blocked) |
-| ~~28~~ | ~~Remove `goPkg` parameter from mkPreparedSource (major version bump)~~ | ~~Dead weight — derivation has `dontBuild = true`~~ | ~~30min~~ done — gated on a major bump (goPkg is dead weight, kept for API compat) |
-| ~~29~~ | ~~Make `privateDepPattern` default empty/wildcard~~ | ~~General correctness for non-LarsArtmann consumers~~ | ~~20min~~ **Won't implement — LarsArtmann default kept — override documented in the README FAQ.** |
-| ~~30~~ | ~~Tag first release (`v0.1.0`) after all consumers verified~~ | ~~Lets consumers pin a stable point~~ | ~~30min~~ done — moved to TODO_LIST Blocked (v0.1.0) |
+| #      | Task                                                                        | Why                                                   | Effort                                                                                            |
+| ------ | --------------------------------------------------------------------------- | ----------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| ~~26~~ | ~~Delete `mkGoFlake.nix` after confirming no consumers use it~~             | ~~Removes parallel maintenance burden~~               | ~~20min~~ done — gated on the v0.1.0 tag (TODO_LIST Blocked)                                      |
+| ~~27~~ | ~~Delete `templates/go-flake-parts/` after confirming no consumers use it~~ | ~~Removes deprecated path~~                           | ~~10min~~ done — gated on the v0.1.0 tag (TODO_LIST Blocked)                                      |
+| ~~28~~ | ~~Remove `goPkg` parameter from mkPreparedSource (major version bump)~~     | ~~Dead weight — derivation has `dontBuild = true`~~   | ~~30min~~ done — gated on a major bump (goPkg is dead weight, kept for API compat)                |
+| ~~29~~ | ~~Make `privateDepPattern` default empty/wildcard~~                         | ~~General correctness for non-LarsArtmann consumers~~ | ~~20min~~ **Won't implement — LarsArtmann default kept — override documented in the README FAQ.** |
+| ~~30~~ | ~~Tag first release (`v0.1.0`) after all consumers verified~~               | ~~Lets consumers pin a stable point~~                 | ~~30min~~ done — moved to TODO_LIST Blocked (v0.1.0)                                              |
 
 ### Tier 5: Test coverage (lower priority)
 
-| #  | Task                                                    | Why                                   | Effort |
-| --- | --- | --- | --- |
-| ~~31~~ | ~~Add integration test for `postPatchExtra` consumer hook~~ | ~~Currently unit-level only~~ | ~~30min~~ **Won't implement — dormant — dropped (reopen on demand).** |
-| ~~32~~ | ~~Add test for `excludeSubModuleDirs` custom value~~ | ~~Option exists, custom values untested~~ | ~~20min~~ **Won't implement — dormant — dropped (reopen on demand).** |
-| ~~33~~ | ~~Add test for `subModuleVersion` custom value~~ | ~~Option exists, non-default untested~~ | ~~20min~~ **Won't implement — dormant — dropped (reopen on demand).** |
-| ~~34~~ | ~~Add test for `stripLocalReplaces = false`~~ | ~~Disabled state untested~~ | ~~15min~~ **Won't implement — dormant — dropped (reopen on demand).** |
-| ~~35~~ | ~~Add test for `validatePrivateDeps = false`~~ | ~~Disabled state untested~~ | ~~15min~~ **Won't implement — dormant — dropped (reopen on demand).** |
-| ~~36~~ | ~~Add test for `autoSubModules = false`~~ | ~~Disabled state untested~~ | ~~15min~~ **Won't implement — dormant — dropped (reopen on demand).** |
-| ~~37~~ | ~~Add test for monorepo + deps interaction~~ | ~~Two features tested separately~~ | ~~30min~~ **Won't implement — dormant — dropped (reopen on demand).** |
-| ~~38~~ | ~~Add test for monorepo + extraBuildAttrs concatenation~~ | ~~Merge logic in multi-package mode~~ | ~~30min~~ **Won't implement — dormant — dropped (reopen on demand).** |
-| ~~39~~ | ~~Add test for `version` override in monorepo~~ | ~~Ensures version propagates~~ | ~~20min~~ **Won't implement — dormant — dropped (reopen on demand).** |
-| ~~40~~ | ~~Add test for `shellExtraBuildInputs` propagation~~ | ~~devShell extras may be under-tested~~ | ~~20min~~ **Won't implement — dormant — dropped (reopen on demand).** |
+| #      | Task                                                        | Why                                       | Effort                                                                |
+| ------ | ----------------------------------------------------------- | ----------------------------------------- | --------------------------------------------------------------------- |
+| ~~31~~ | ~~Add integration test for `postPatchExtra` consumer hook~~ | ~~Currently unit-level only~~             | ~~30min~~ **Won't implement — dormant — dropped (reopen on demand).** |
+| ~~32~~ | ~~Add test for `excludeSubModuleDirs` custom value~~        | ~~Option exists, custom values untested~~ | ~~20min~~ **Won't implement — dormant — dropped (reopen on demand).** |
+| ~~33~~ | ~~Add test for `subModuleVersion` custom value~~            | ~~Option exists, non-default untested~~   | ~~20min~~ **Won't implement — dormant — dropped (reopen on demand).** |
+| ~~34~~ | ~~Add test for `stripLocalReplaces = false`~~               | ~~Disabled state untested~~               | ~~15min~~ **Won't implement — dormant — dropped (reopen on demand).** |
+| ~~35~~ | ~~Add test for `validatePrivateDeps = false`~~              | ~~Disabled state untested~~               | ~~15min~~ **Won't implement — dormant — dropped (reopen on demand).** |
+| ~~36~~ | ~~Add test for `autoSubModules = false`~~                   | ~~Disabled state untested~~               | ~~15min~~ **Won't implement — dormant — dropped (reopen on demand).** |
+| ~~37~~ | ~~Add test for monorepo + deps interaction~~                | ~~Two features tested separately~~        | ~~30min~~ **Won't implement — dormant — dropped (reopen on demand).** |
+| ~~38~~ | ~~Add test for monorepo + extraBuildAttrs concatenation~~   | ~~Merge logic in multi-package mode~~     | ~~30min~~ **Won't implement — dormant — dropped (reopen on demand).** |
+| ~~39~~ | ~~Add test for `version` override in monorepo~~             | ~~Ensures version propagates~~            | ~~20min~~ **Won't implement — dormant — dropped (reopen on demand).** |
+| ~~40~~ | ~~Add test for `shellExtraBuildInputs` propagation~~        | ~~devShell extras may be under-tested~~   | ~~20min~~ **Won't implement — dormant — dropped (reopen on demand).** |
 
 ### Tier 6: CI and infrastructure
 
-| #  | Task                                                           | Why                                       | Effort |
-| --- | --- | --- | --- |
-| ~~41~~ | ~~Create mock Go project for E2E consumer CI test~~ | ~~Catches breaking changes before they ship~~ | ~~2h~~ done — moved to TODO_LIST Blocked (E2E) |
-| ~~42~~ | ~~Add `nix flake update` weekly CI job with auto-PR~~ | ~~Keeps deps fresh~~ | ~~45min~~ **Won't implement — dormant — dropped (reopen on demand).** |
-| ~~43~~ | ~~Audit CI workflow for action SHA pinning~~ | ~~Tag-pinned actions can be rerouted~~ | ~~20min~~ **Won't implement — dormant — dropped (reopen on demand).** |
-| ~~44~~ | ~~Add dependabot config for GitHub Actions~~ | ~~Keeps action versions current~~ | ~~15min~~ done — dependabot.yml added 2026-09 |
-| ~~45~~ | ~~Suppress or document `vendorHash` placeholder warning in tests~~ | ~~Reduces CI noise~~ | ~~15min~~ **Won't implement — dormant — dropped (reopen on demand).** |
-| ~~46~~ | ~~Add `--check` flag to `generate-flake.sh` for self-diagnosis~~ | ~~Helps consumers validate configuration~~ | ~~1h~~ **Won't implement — dormant — dropped (reopen on demand).** |
+| #      | Task                                                               | Why                                           | Effort                                                                |
+| ------ | ------------------------------------------------------------------ | --------------------------------------------- | --------------------------------------------------------------------- |
+| ~~41~~ | ~~Create mock Go project for E2E consumer CI test~~                | ~~Catches breaking changes before they ship~~ | ~~2h~~ done — moved to TODO_LIST Blocked (E2E)                        |
+| ~~42~~ | ~~Add `nix flake update` weekly CI job with auto-PR~~              | ~~Keeps deps fresh~~                          | ~~45min~~ **Won't implement — dormant — dropped (reopen on demand).** |
+| ~~43~~ | ~~Audit CI workflow for action SHA pinning~~                       | ~~Tag-pinned actions can be rerouted~~        | ~~20min~~ **Won't implement — dormant — dropped (reopen on demand).** |
+| ~~44~~ | ~~Add dependabot config for GitHub Actions~~                       | ~~Keeps action versions current~~             | ~~15min~~ done — dependabot.yml added 2026-09                         |
+| ~~45~~ | ~~Suppress or document `vendorHash` placeholder warning in tests~~ | ~~Reduces CI noise~~                          | ~~15min~~ **Won't implement — dormant — dropped (reopen on demand).** |
+| ~~46~~ | ~~Add `--check` flag to `generate-flake.sh` for self-diagnosis~~   | ~~Helps consumers validate configuration~~    | ~~1h~~ **Won't implement — dormant — dropped (reopen on demand).**    |
 
 ### Tier 7: Polish
 
-| #  | Task                                                              | Why                                  | Effort |
-| --- | --- | --- | --- |
-| ~~47~~ | ~~Register `maintainers.larsartmann` in nixpkgs (external PR)~~ | ~~Full meta.maintainers correctness~~ | ~~30min~~ done — moved to TODO_LIST Blocked |
-| ~~48~~ | ~~Fix empty commit message in `df9a5ff` (needs rebase + force-push)~~ | ~~Git history hygiene~~ | ~~15min~~ done — moved to TODO_LIST Blocked |
-| ~~49~~ | ~~Add `CONTRIBUTORS.md` or contributor section~~ | ~~Onboarding for external contributors~~ | ~~20min~~ **Won't implement — dormant — dropped (reopen on demand).** |
-| ~~50~~ | ~~Add `SECURITY.md` (vulnerability reporting policy)~~ | ~~Standard for public repos~~ | ~~10min~~ **Won't implement — dormant — dropped (reopen on demand).** |
+| #      | Task                                                                  | Why                                      | Effort                                                                |
+| ------ | --------------------------------------------------------------------- | ---------------------------------------- | --------------------------------------------------------------------- |
+| ~~47~~ | ~~Register `maintainers.larsartmann` in nixpkgs (external PR)~~       | ~~Full meta.maintainers correctness~~    | ~~30min~~ done — moved to TODO_LIST Blocked                           |
+| ~~48~~ | ~~Fix empty commit message in `df9a5ff` (needs rebase + force-push)~~ | ~~Git history hygiene~~                  | ~~15min~~ done — moved to TODO_LIST Blocked                           |
+| ~~49~~ | ~~Add `CONTRIBUTORS.md` or contributor section~~                      | ~~Onboarding for external contributors~~ | ~~20min~~ **Won't implement — dormant — dropped (reopen on demand).** |
+| ~~50~~ | ~~Add `SECURITY.md` (vulnerability reporting policy)~~                | ~~Standard for public repos~~            | ~~10min~~ **Won't implement — dormant — dropped (reopen on demand).** |
 
 ---
 

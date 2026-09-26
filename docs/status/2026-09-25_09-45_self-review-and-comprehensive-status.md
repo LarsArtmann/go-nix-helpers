@@ -16,34 +16,34 @@ shellcheck). A closing full sweep is queued as next-work #1.
 
 ## a) FULLY DONE (verified this session)
 
-| Item | Evidence |
-| --- | --- |
-| E1–E4 docs-annotation gates | `checks.docsAnnotations` vendored checker + grep gate; guard-the-guard tripped BOTH gates on planted defects (named file/line/row) then green; built green in full check; exemption notes in 07-38 §B + 06-51 |
-| 8 never-green moduleTest assertions repaired | Root-caused individually: wrong warning-text expectation, `.env` reads after mkDerivation consumes it, `toString` of tryEval errors = `""` on Nix 2.34, `or`-precedence surprises, wrong expected values. Rewritten against real observables |
-| **Real bug fix: cgoEnabled** | `toString false` = `""` → CGO_ENABLED unset → cgo silently ENABLED. Now canonical `0`/`1`. Found BECAUSE the assertions were repaired — the bug was hiding behind broken tests |
-| Real bug fix: completions comment | postInstall comment hardcoded `--completion` regardless of completionStyle; now interpolates the configured word |
-| Floor-check message → pure builder | `goModFloorMessage` in pure-functions.nix; module throws it; 5 content tests |
-| Stale-pin warning (F16) | `staleGoAttrName` decision function + module trace + 6 pure tests + module eval-survival test |
-| systems option wired | Was documented-but-DEAD (flake-parts default silently won). Composite now maps it; consumer probe proved `packages.x86_64-darwin` absent with `systems = ["x86_64-linux"]`; our flake's own list fixed; x86_64-darwin warning GONE from check output |
-| Old-nixpkgs CI guard (T24) | Pinned 2026-06 nixpkgs (go_1_26 era) moduleTest job — verified green locally on BOTH pins before wiring |
-| Tier A 10/10 (T3) | 7 remaining repos eval+BUILD green, vendorHash intact (go-localsync, project-meta, oxlint-auto-configure, project-dependency-graph, golangci-lint-auto-configure, go-humanize-linter, standard-bug-tracking-schema) |
-| C8 sbts | Hand-rolled modBuildPhase/preBuild removed; publicDeps + go-etag sub-modules (exact-match gap found by fresh rebuild); lock bumped to a437284 (go.mod floor 1.27.1 had outgrown old rev's go_1_26 — a latent time bomb); built green |
-| F1, F3–F9, F11, F12, F15 | F1 spacing (28 files, diff-audited), F3 man render clean, F4 symlinks trashed, F5/F6 comments, F7 override markers, F8 go_1_XX patterns, F9 GO_LATEST from new `lib.newestGoAttr` (eval-verified `go_1_27`), F11 correction note, F12 postmortem (2 cases), F15 `passthru.go` made explicit (it never existed) |
-| nix-health.sh canary | Detected the host RECOVERY mid-session; drives verification batching now |
-| verifyValidation | PASS (D6 content greps validated) |
-| Docs | AGENTS (real counts 139/61, 5 new gotchas), README, man pages, CHANGELOG (Fixed+Added), FEATURES, TODO_LIST lifecycle (26 rows across sessions; T15 preserved as Blocked), status reports |
-| Session-close hygiene | /tmp probes trashed, worktree pruned, shellcheck clean on new scripts (after fixing my own SC2086 — see d) |
+| Item                                         | Evidence                                                                                                                                                                                                                                                                                                       |
+| -------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| E1–E4 docs-annotation gates                  | `checks.docsAnnotations` vendored checker + grep gate; guard-the-guard tripped BOTH gates on planted defects (named file/line/row) then green; built green in full check; exemption notes in 07-38 §B + 06-51                                                                                                  |
+| 8 never-green moduleTest assertions repaired | Root-caused individually: wrong warning-text expectation, `.env` reads after mkDerivation consumes it, `toString` of tryEval errors = `""` on Nix 2.34, `or`-precedence surprises, wrong expected values. Rewritten against real observables                                                                   |
+| **Real bug fix: cgoEnabled**                 | `toString false` = `""` → CGO_ENABLED unset → cgo silently ENABLED. Now canonical `0`/`1`. Found BECAUSE the assertions were repaired — the bug was hiding behind broken tests                                                                                                                                 |
+| Real bug fix: completions comment            | postInstall comment hardcoded `--completion` regardless of completionStyle; now interpolates the configured word                                                                                                                                                                                               |
+| Floor-check message → pure builder           | `goModFloorMessage` in pure-functions.nix; module throws it; 5 content tests                                                                                                                                                                                                                                   |
+| Stale-pin warning (F16)                      | `staleGoAttrName` decision function + module trace + 6 pure tests + module eval-survival test                                                                                                                                                                                                                  |
+| systems option wired                         | Was documented-but-DEAD (flake-parts default silently won). Composite now maps it; consumer probe proved `packages.x86_64-darwin` absent with `systems = ["x86_64-linux"]`; our flake's own list fixed; x86_64-darwin warning GONE from check output                                                           |
+| Old-nixpkgs CI guard (T24)                   | Pinned 2026-06 nixpkgs (go_1_26 era) moduleTest job — verified green locally on BOTH pins before wiring                                                                                                                                                                                                        |
+| Tier A 10/10 (T3)                            | 7 remaining repos eval+BUILD green, vendorHash intact (go-localsync, project-meta, oxlint-auto-configure, project-dependency-graph, golangci-lint-auto-configure, go-humanize-linter, standard-bug-tracking-schema)                                                                                            |
+| C8 sbts                                      | Hand-rolled modBuildPhase/preBuild removed; publicDeps + go-etag sub-modules (exact-match gap found by fresh rebuild); lock bumped to a437284 (go.mod floor 1.27.1 had outgrown old rev's go_1_26 — a latent time bomb); built green                                                                           |
+| F1, F3–F9, F11, F12, F15                     | F1 spacing (28 files, diff-audited), F3 man render clean, F4 symlinks trashed, F5/F6 comments, F7 override markers, F8 go_1_XX patterns, F9 GO_LATEST from new `lib.newestGoAttr` (eval-verified `go_1_27`), F11 correction note, F12 postmortem (2 cases), F15 `passthru.go` made explicit (it never existed) |
+| nix-health.sh canary                         | Detected the host RECOVERY mid-session; drives verification batching now                                                                                                                                                                                                                                       |
+| verifyValidation                             | PASS (D6 content greps validated)                                                                                                                                                                                                                                                                              |
+| Docs                                         | AGENTS (real counts 139/61, 5 new gotchas), README, man pages, CHANGELOG (Fixed+Added), FEATURES, TODO_LIST lifecycle (26 rows across sessions; T15 preserved as Blocked), status reports                                                                                                                      |
+| Session-close hygiene                        | /tmp probes trashed, worktree pruned, shellcheck clean on new scripts (after fixing my own SC2086 — see d)                                                                                                                                                                                                     |
 
 ## b) PARTIALLY DONE
 
-| Item | What's missing |
-| --- | --- |
+| Item                         | What's missing                                                                                                                                                                                                                    |
+| ---------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | E2 derivation-level red test | Guard-the-guard ran at SCRIPT level in /tmp; the runCommand derivation itself was only ever green. Wiring risk (python3 nativeBuildInputs, store-path root arg) is covered by the green build, but no derivation-red proof exists |
-| T27/F2 render-verify | 5 tables render with intact shapes via glow, but glow echoes `~~` literally (no strikethrough ANSI) — the visual property the task cared about was NOT confirmed; pandoc→HTML would show `<del>` |
-| F7 marker silencing | `__intentionallyOverridingVersion` set in both test configs; the actual warning noise it should silence was never observed/grep'd this session (claim inherited from prior session) |
-| C8 GOEXPERIMENT swap | modBuildPhase gone; GOEXPERIMENT remains in sbts extraBuildAttrs — the `goExperiment` option only exists in UNPUSHED master |
-| Final full-check sweep | Last complete `nix flake check` predates `passthru.go` + script fix + reports; individual rebuilds green, full sweep queued |
-| F13 (CV proof) | DROPPED on a single probe (`~/projects/cv` has no go-nix-helpers input) — premise possibly stale, possibly wrong repo name; one grep is thin evidence for dropping a watchlist item |
+| T27/F2 render-verify         | 5 tables render with intact shapes via glow, but glow echoes `~~` literally (no strikethrough ANSI) — the visual property the task cared about was NOT confirmed; pandoc→HTML would show `<del>`                                  |
+| F7 marker silencing          | `__intentionallyOverridingVersion` set in both test configs; the actual warning noise it should silence was never observed/grep'd this session (claim inherited from prior session)                                               |
+| C8 GOEXPERIMENT swap         | modBuildPhase gone; GOEXPERIMENT remains in sbts extraBuildAttrs — the `goExperiment` option only exists in UNPUSHED master                                                                                                       |
+| Final full-check sweep       | Last complete `nix flake check` predates `passthru.go` + script fix + reports; individual rebuilds green, full sweep queued                                                                                                       |
+| F13 (CV proof)               | DROPPED on a single probe (`~/projects/cv` has no go-nix-helpers input) — premise possibly stale, possibly wrong repo name; one grep is thin evidence for dropping a watchlist item                                               |
 
 ## c) NOT STARTED (this session's remaining scope)
 
@@ -127,4 +127,5 @@ shellcheck). A closing full sweep is queued as next-work #1.
 3. **The binfmt fix happened but nix.conf auto-GC did not** (min-free=5G / max-free=30G still armed). The canary will keep warning and the mid-check source-copy deletion risk remains. Will you raise/disable auto-GC + restart the daemon (root), or should the workflow keep working around it (worktrees, commit-before-check)?
 
 ---
-*Then: WAITING FOR INSTRUCTIONS.*
+
+_Then: WAITING FOR INSTRUCTIONS._

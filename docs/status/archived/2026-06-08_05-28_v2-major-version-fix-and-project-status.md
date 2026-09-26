@@ -48,7 +48,7 @@
 Two projects use versioned deps via mkPreparedSource and will need `vendorHash` recalculated after this fix:
 
 | Project                          | Versioned Deps                        | Risk                                                   |
-| --- | --- | --- |
+| -------------------------------- | ------------------------------------- | ------------------------------------------------------ |
 | `projects-management-automation` | `go-filewatcher/v2`, `gogenfilter/v3` | Low — `_local_deps` names change but no hardcoded refs |
 | `go-structure-linter`            | `gogenfilter/v3`                      | Low — `_local_deps` names change but no hardcoded refs |
 
@@ -132,33 +132,33 @@ The `templates/go-flake-parts/` template is manually maintained. Consider genera
 
 ## f) Top 25 Things We Should Get Done Next
 
-| #  | Priority | Task                                                                                                                              | Impact               |
-| --- | --- | --- | --- |
-| ~~1~~ | ~~P0~~ | ~~Recalculate `vendorHash` in `projects-management-automation` after `/v2` fix~~ | ~~Unblocks downstream~~ |
-| ~~2~~ | ~~P0~~ | ~~Recalculate `vendorHash` in `go-structure-linter` after `/v2` fix~~ | ~~Unblocks downstream~~ |
-| ~~3~~ | ~~P0~~ | ~~Recalculate `vendorHash` in `BuildFlow` if it has versioned deps~~ | ~~Unblocks downstream~~ |
-| ~~4~~ | ~~P1~~ | ~~Add `flake.nix` with `nix fmt` (treefmt-nix) for the repo itself~~ | ~~Code quality~~ |
-| ~~5~~ | ~~P1~~ | ~~Add Nix-based tests for `repoName` helper via `nix eval` checks~~ | ~~Prevents regressions~~ |
-| ~~6~~ | ~~P1~~ | ~~Add Nix-based tests for full `mkPreparedSource` output (copyDeps, replaceLines, subModuleReplace)~~ | ~~Prevents regressions~~ |
-| ~~7~~ | ~~P1~~ | ~~Create `AGENTS.md` with project context for AI sessions~~ | ~~Session continuity~~ |
-| ~~8~~ | ~~P1~~ | ~~Move `cmdguard` manual workaround in PMA into `deps` map~~ | ~~Reduces duplication~~ |
-| ~~9~~ | ~~P2~~ | ~~Audit all 7 consumers for manual `_local_deps/` workarounds that mkPreparedSource should handle~~ | ~~Cleanup~~ |
-| ~~10~~ | ~~P2~~ | ~~Add `CHANGELOG.md`~~ | ~~Release tracking~~ |
-| ~~11~~ | ~~P2~~ | ~~Add `version` field to template `flake.nix` that references mkPreparedSource version~~ | ~~Consistency~~ |
-| ~~12~~ | ~~P2~~ | ~~Document edge case: what happens with `deps` that have overlapping repo names (e.g., two forks)~~ | ~~Clarity~~ |
-| ~~13~~ | ~~P2~~ | ~~Consider adding `name` override per dep (e.g., `"go-output" = { source = go-output; name = "go-output-v2"; }`) for disambiguation~~ | ~~Flexibility~~ |
-| ~~14~~ | ~~P2~~ | ~~Remove empty `report/` directory or document its purpose~~ | ~~Cleanup~~ |
-| ~~15~~ | ~~P3~~ | ~~Add CI pipeline (GitHub Actions) that runs `nix eval` tests~~ | ~~Automation~~ |
-| ~~16~~ | ~~P3~~ | ~~Support `go.sum` patching (currently only `go.mod` is patched)~~ | ~~Completeness~~ |
-| ~~17~~ | ~~P3~~ | ~~Add `--dry-run` option to mkPreparedSource that outputs the generated script without building~~ | ~~Debugging~~ |
-| ~~18~~ | ~~P3~~ | ~~Support nested sub-modules (e.g., `subModules."foo/bar" = [ "baz" ]` → `foo/bar/baz`)~~ | ~~Edge case~~ |
-| ~~19~~ | ~~P3~~ | ~~Add `FEATURES.md` for feature inventory~~ | ~~Documentation~~ |
-| ~~20~~ | ~~P3~~ | ~~Add `TODO_LIST.md` for short/mid-term tasks~~ | ~~Planning~~ |
-| ~~21~~ | ~~P4~~ | ~~Consider publishing as a proper flake (not `flake = false`) for better caching~~ | ~~Performance~~ |
-| ~~22~~ | ~~P4~~ | ~~Add `lib` overlay so consumers can `inherit (go-nix-helpers.lib) mkPreparedSource;`~~ | ~~Ergonomics~~ |
-| ~~23~~ | ~~P4~~ | ~~Support `vendorHash` auto-calculation in mkPreparedSource (return derivation with hash)~~ | ~~DX improvement~~ |
-| ~~24~~ | ~~P4~~ | ~~Add integration test: build a real Go project with mkPreparedSource in CI~~ | ~~Confidence~~ |
-| ~~25~~ | ~~P4~~ | ~~Explore `go.work` support for workspace-based projects~~ | ~~Future-proofing~~ |
+| #      | Priority | Task                                                                                                                                  | Impact                   |
+| ------ | -------- | ------------------------------------------------------------------------------------------------------------------------------------- | ------------------------ |
+| ~~1~~  | ~~P0~~   | ~~Recalculate `vendorHash` in `projects-management-automation` after `/v2` fix~~                                                      | ~~Unblocks downstream~~  |
+| ~~2~~  | ~~P0~~   | ~~Recalculate `vendorHash` in `go-structure-linter` after `/v2` fix~~                                                                 | ~~Unblocks downstream~~  |
+| ~~3~~  | ~~P0~~   | ~~Recalculate `vendorHash` in `BuildFlow` if it has versioned deps~~                                                                  | ~~Unblocks downstream~~  |
+| ~~4~~  | ~~P1~~   | ~~Add `flake.nix` with `nix fmt` (treefmt-nix) for the repo itself~~                                                                  | ~~Code quality~~         |
+| ~~5~~  | ~~P1~~   | ~~Add Nix-based tests for `repoName` helper via `nix eval` checks~~                                                                   | ~~Prevents regressions~~ |
+| ~~6~~  | ~~P1~~   | ~~Add Nix-based tests for full `mkPreparedSource` output (copyDeps, replaceLines, subModuleReplace)~~                                 | ~~Prevents regressions~~ |
+| ~~7~~  | ~~P1~~   | ~~Create `AGENTS.md` with project context for AI sessions~~                                                                           | ~~Session continuity~~   |
+| ~~8~~  | ~~P1~~   | ~~Move `cmdguard` manual workaround in PMA into `deps` map~~                                                                          | ~~Reduces duplication~~  |
+| ~~9~~  | ~~P2~~   | ~~Audit all 7 consumers for manual `_local_deps/` workarounds that mkPreparedSource should handle~~                                   | ~~Cleanup~~              |
+| ~~10~~ | ~~P2~~   | ~~Add `CHANGELOG.md`~~                                                                                                                | ~~Release tracking~~     |
+| ~~11~~ | ~~P2~~   | ~~Add `version` field to template `flake.nix` that references mkPreparedSource version~~                                              | ~~Consistency~~          |
+| ~~12~~ | ~~P2~~   | ~~Document edge case: what happens with `deps` that have overlapping repo names (e.g., two forks)~~                                   | ~~Clarity~~              |
+| ~~13~~ | ~~P2~~   | ~~Consider adding `name` override per dep (e.g., `"go-output" = { source = go-output; name = "go-output-v2"; }`) for disambiguation~~ | ~~Flexibility~~          |
+| ~~14~~ | ~~P2~~   | ~~Remove empty `report/` directory or document its purpose~~                                                                          | ~~Cleanup~~              |
+| ~~15~~ | ~~P3~~   | ~~Add CI pipeline (GitHub Actions) that runs `nix eval` tests~~                                                                       | ~~Automation~~           |
+| ~~16~~ | ~~P3~~   | ~~Support `go.sum` patching (currently only `go.mod` is patched)~~                                                                    | ~~Completeness~~         |
+| ~~17~~ | ~~P3~~   | ~~Add `--dry-run` option to mkPreparedSource that outputs the generated script without building~~                                     | ~~Debugging~~            |
+| ~~18~~ | ~~P3~~   | ~~Support nested sub-modules (e.g., `subModules."foo/bar" = [ "baz" ]` → `foo/bar/baz`)~~                                             | ~~Edge case~~            |
+| ~~19~~ | ~~P3~~   | ~~Add `FEATURES.md` for feature inventory~~                                                                                           | ~~Documentation~~        |
+| ~~20~~ | ~~P3~~   | ~~Add `TODO_LIST.md` for short/mid-term tasks~~                                                                                       | ~~Planning~~             |
+| ~~21~~ | ~~P4~~   | ~~Consider publishing as a proper flake (not `flake = false`) for better caching~~                                                    | ~~Performance~~          |
+| ~~22~~ | ~~P4~~   | ~~Add `lib` overlay so consumers can `inherit (go-nix-helpers.lib) mkPreparedSource;`~~                                               | ~~Ergonomics~~           |
+| ~~23~~ | ~~P4~~   | ~~Support `vendorHash` auto-calculation in mkPreparedSource (return derivation with hash)~~                                           | ~~DX improvement~~       |
+| ~~24~~ | ~~P4~~   | ~~Add integration test: build a real Go project with mkPreparedSource in CI~~                                                         | ~~Confidence~~           |
+| ~~25~~ | ~~P4~~   | ~~Explore `go.work` support for workspace-based projects~~                                                                            | ~~Future-proofing~~      |
 
 ---
 
@@ -184,7 +184,7 @@ I cannot determine whether cross-namespace same-name deps exist in your ecosyste
 ## File Inventory
 
 | File                                 | Lines | Status                                              |
-| --- | --- | --- |
+| ------------------------------------ | ----- | --------------------------------------------------- |
 | `mkPreparedSource.nix`               | 164   | Modified (added `repoName`, `/v2` fix)              |
 | `README.md`                          | 81    | Modified (added `/v2` docs, sub-modules section)    |
 | `templates/go-flake-parts/flake.nix` | 188   | New (template with `/v2` and `subModules` examples) |
@@ -196,7 +196,7 @@ I cannot determine whether cross-namespace same-name deps exist in your ecosyste
 ## Downstream Consumers
 
 | Project                        | Uses `/vN` deps               | Uses `subModules` | Uses `requireDeps` | Uses `postPatchExtra` | Needs `vendorHash` update |
-| --- | --- | --- | --- | --- | --- |
+| ------------------------------ | ----------------------------- | ----------------- | ------------------ | --------------------- | ------------------------- |
 | BuildFlow                      | No                            | Yes               | No                 | No                    | Unlikely                  |
 | mr-sync                        | No                            | Yes               | No                 | No                    | Unlikely                  |
 | projects-management-automation | Yes (v2, v3)                  | Yes               | Yes                | No (empty)            | **Yes**                   |

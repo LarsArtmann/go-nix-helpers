@@ -625,7 +625,7 @@ in
           let
             newest = pure.staleGoAttrName {
               inherit pkgs;
-              goPkgAttr = cfg.goPkgAttr;
+              inherit (cfg) goPkgAttr;
             };
           in
           if newest != null then

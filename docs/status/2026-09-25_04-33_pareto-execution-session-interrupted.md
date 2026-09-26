@@ -52,8 +52,8 @@ failure and session end.
 - **D5:** templ-committed negative test now asserts the throw MESSAGE contains
   "without a committed *_templ.go sibling" (intended-throw vs eval-error).
 - **D6:** verifyValidation now also asserts the error NAMES the missing module
-  (`github.com/larsartmann/nonexistent-dep`). *(Script change eval-verified;
-  execution blocked by host issue — see §d.)*
+  (`github.com/larsartmann/nonexistent-dep`). _(Script change eval-verified;
+  execution blocked by host issue — see §d.)_
 - **D7:** publicDeps paths ERE-escaped (`sed 's/[.[\*^$()+?{|]/\\&/g'`) before
   `grep -vE` — domain dots no longer act as wildcards that silently skip
   validation for a different module.
@@ -232,4 +232,4 @@ failure and session end.
 
 ---
 
-*Report written at session interruption; living task source: TODO_LIST.md.*
+_Report written at session interruption; living task source: TODO_LIST.md._

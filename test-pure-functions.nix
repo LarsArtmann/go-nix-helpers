@@ -211,7 +211,7 @@ let
     gopls = stubPkg "gopls";
   };
 
-  goBaseFrom = pure.goBaseFrom;
+  inherit (pure) goBaseFrom;
 
   goBaseBasic = [
     (assertEq "goBaseFrom: explicit pin wins over auto"

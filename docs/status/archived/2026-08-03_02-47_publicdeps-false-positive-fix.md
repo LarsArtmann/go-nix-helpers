@@ -19,7 +19,7 @@ However, I missed several documentation updates and one significant functional g
 ## A) Fully Done
 
 | Item                             | Details                                                                                                                                                                       |
-| --- | --- |
+| -------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `publicDeps` in mkPreparedSource | New parameter added, filtering implemented via `grep -vFx` in validateScript, documented in header comments                                                                   |
 | Improved error message           | Changed "private modules without local replace" → "modules without local replace", added 3 remediation options (add to deps / set validatePrivateDeps=false / use publicDeps) |
 | go-standard.nix options          | Added `publicDeps` (list str) and `privateDepPattern` (str) options with defaults, forwarded to mkPreparedSource call                                                         |

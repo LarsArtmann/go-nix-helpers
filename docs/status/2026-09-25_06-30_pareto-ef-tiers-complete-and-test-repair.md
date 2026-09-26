@@ -6,18 +6,18 @@
 
 ## a) What got done
 
-| Area | Outcome |
-| --- | --- |
-| E1–E4 docs-annotation gates | `checks.docsAnnotations` (vendored check-rows.py + grep gate, attribution kept), guard-the-guard verified red on planted defects, exemption notes added, green in full check |
-| 8 never-green assertions repaired | Root causes: wrong warning text, `.env` read after mkDerivation consumes it, `toString` of tryEval errors (always `""` on Nix 2.34). Now 139 moduleTest / 61 pureFunctions assertions, ALL green and BUILT |
-| 2 real module bugs fixed | `cgoEnabled` used `toString false` → `CGO_ENABLED=""` (silent no-op; now canonical `0`/`1`); completions postInstall comment hardcoded `--completion` |
-| F-tier | F1 spacing pass (28 files), F2 render-verify (5 tables, glow), F3 man checks, F4 symlinks, F5/F6 comments, F7 `__intentionallyOverridingVersion`, F8 nix-lint `go_1_XX`, F9 GO_LATEST from new `lib.newestGoAttr`, F11 correction note, F12 postmortem, F15 `passthru.go`, F16 stale-pin warning (`staleGoAttrName`, 6 tests) |
-| systems option WIRED | `go-standard.systems` was documented-but-dead; composite now maps it to flake-parts' `systems` (consumer-probe verified); our flake drops x86_64-darwin (F14 warning gone from check output) |
-| Old-nixpkgs CI guard | `old-nixpkgs-module-test` job (2026-06 nixpkgs, go_1_26 era); it IMMEDIATELY caught the stale-pin test ignoring the floor interaction — assertion now encodes "eval survives above floor; floor-check throws below it", verified on BOTH pins |
-| Tier A 10/10 (T3/C1–C10) | All 7 remaining repos eval+build green, vendorHash intact: go-localsync, project-meta, oxlint-auto-configure, project-dependency-graph, golangci-lint-auto-configure, go-humanize-linter, standard-bug-tracking-schema |
-| C8 (sbts) | Hand-rolled modBuildPhase/preBuild removed; publicDeps extended with go-etag sub-modules (exact-match missed them — found by the fresh rebuild); lock bumped to a437284 (its go.mod floor 1.27.1 had outgrown the old rev's go_1_26); vendorHash updated; built green |
-| nix-health.sh canary | Born from the host incident; it is what DETECTED the host recovery mid-session |
-| Docs | AGENTS (counts 139/61, 5 new gotchas incl. tryEval-messages and the clean-worktree recipe), README, man pages, CHANGELOG (Fixed+Added), FEATURES, TODO_LIST (26 rows removed across both sessions; T15 preserved as Blocked-pending-owner) |
+| Area                              | Outcome                                                                                                                                                                                                                                                                                                                       |
+| --------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| E1–E4 docs-annotation gates       | `checks.docsAnnotations` (vendored check-rows.py + grep gate, attribution kept), guard-the-guard verified red on planted defects, exemption notes added, green in full check                                                                                                                                                  |
+| 8 never-green assertions repaired | Root causes: wrong warning text, `.env` read after mkDerivation consumes it, `toString` of tryEval errors (always `""` on Nix 2.34). Now 139 moduleTest / 61 pureFunctions assertions, ALL green and BUILT                                                                                                                    |
+| 2 real module bugs fixed          | `cgoEnabled` used `toString false` → `CGO_ENABLED=""` (silent no-op; now canonical `0`/`1`); completions postInstall comment hardcoded `--completion`                                                                                                                                                                         |
+| F-tier                            | F1 spacing pass (28 files), F2 render-verify (5 tables, glow), F3 man checks, F4 symlinks, F5/F6 comments, F7 `__intentionallyOverridingVersion`, F8 nix-lint `go_1_XX`, F9 GO_LATEST from new `lib.newestGoAttr`, F11 correction note, F12 postmortem, F15 `passthru.go`, F16 stale-pin warning (`staleGoAttrName`, 6 tests) |
+| systems option WIRED              | `go-standard.systems` was documented-but-dead; composite now maps it to flake-parts' `systems` (consumer-probe verified); our flake drops x86_64-darwin (F14 warning gone from check output)                                                                                                                                  |
+| Old-nixpkgs CI guard              | `old-nixpkgs-module-test` job (2026-06 nixpkgs, go_1_26 era); it IMMEDIATELY caught the stale-pin test ignoring the floor interaction — assertion now encodes "eval survives above floor; floor-check throws below it", verified on BOTH pins                                                                                 |
+| Tier A 10/10 (T3/C1–C10)          | All 7 remaining repos eval+build green, vendorHash intact: go-localsync, project-meta, oxlint-auto-configure, project-dependency-graph, golangci-lint-auto-configure, go-humanize-linter, standard-bug-tracking-schema                                                                                                        |
+| C8 (sbts)                         | Hand-rolled modBuildPhase/preBuild removed; publicDeps extended with go-etag sub-modules (exact-match missed them — found by the fresh rebuild); lock bumped to a437284 (its go.mod floor 1.27.1 had outgrown the old rev's go_1_26); vendorHash updated; built green                                                         |
+| nix-health.sh canary              | Born from the host incident; it is what DETECTED the host recovery mid-session                                                                                                                                                                                                                                                |
+| Docs                              | AGENTS (counts 139/61, 5 new gotchas incl. tryEval-messages and the clean-worktree recipe), README, man pages, CHANGELOG (Fixed+Added), FEATURES, TODO_LIST (26 rows removed across both sessions; T15 preserved as Blocked-pending-owner)                                                                                    |
 
 ## b) Verification trail (all tool-output, this session)
 
@@ -43,4 +43,4 @@
 3. T33: module test for the systems mapping
 4. #46: re-run the consumer attr-probe after future nixpkgs bumps (the 10/10 proof relied on no-newer-go existing)
 
-*Session ended clean: tree clean, nothing pushed, all claims above backed by tool output from this session.*
+_Session ended clean: tree clean, nothing pushed, all claims above backed by tool output from this session._

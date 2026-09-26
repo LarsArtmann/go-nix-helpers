@@ -446,7 +446,7 @@ let
   # the stale-pin config must THROW via the floor check — correct
   # behavior, not a warning-path regression.
   mockFloor = "1.26";
-  olderMeetsFloor = olderGoAttr == null || lib.versionAtLeast (pkgs.${olderGoAttr}.version) mockFloor;
+  olderMeetsFloor = olderGoAttr == null || lib.versionAtLeast pkgs.${olderGoAttr}.version mockFloor;
 
   # --- lintAsCheck test ------------------------------------------------------
   lintAsCheckCfg = mkPerSystemConfig { lintAsCheck = true; };
@@ -515,15 +515,13 @@ let
     inherit pkgs lib;
     goPkg = pkgs.go;
   };
-  badExcludeEval = builtins.tryEval (
-    (mkPreparedSourceLib {
+  badExcludeEval = builtins.tryEval (mkPreparedSourceLib {
       name = "bad-exclude";
       version = "test";
       src = mockSrc;
       deps = { };
       excludeSubModuleDirs = [ "test*dir" ];
-    }).outPath
-  );
+    }).outPath;
 
   # --- mkGoFlake (deprecated) eval smoke ------------------------------------
   # Two consumers still ship the deprecated path; a minimal config must keep

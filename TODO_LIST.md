@@ -10,36 +10,36 @@
 | Status      | Meaning                                                 |
 | ----------- | ------------------------------------------------------- |
 | TODO        | Not started. Needs doing.                               |
-| IN_PROGRESS | Actively being worked on.                                |
+| IN_PROGRESS | Actively being worked on.                               |
 | BLOCKED     | Cannot proceed, external dependency or decision needed. |
 
 ## High impact
 
-| #  | Task                                                                                                      | Status | Effort | Evidence                                                                                                                                                     |
-| -- | --------------------------------------------------------------------------------------------------------- | ------ | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| T4 | Migrate Tier B consumers to go-standard (KeyCountdown, StopTube, branching-flow, bank-sync, overview, BuildFlow) — G2 unblocks all | TODO   | 4h     | `docs/status/2026-08-10_11-02_*` Tier B table; G2 shipped `2f3b6b2`                                                                                          |
-| T5 | Migrate Tier C consumers off deprecated `mkGoFlake` (Standup-Killer, crush-daily)                          | TODO   | 2h     | `mkGoFlake.nix` deprecation trace; only 2 repos remain on the deprecated path                                                                                 |
+| #  | Task                                                                                                                               | Status | Effort | Evidence                                                                      |
+| -- | ---------------------------------------------------------------------------------------------------------------------------------- | ------ | ------ | ----------------------------------------------------------------------------- |
+| T4 | Migrate Tier B consumers to go-standard (KeyCountdown, StopTube, branching-flow, bank-sync, overview, BuildFlow) — G2 unblocks all | TODO   | 4h     | `docs/status/2026-08-10_11-02_*` Tier B table; G2 shipped `2f3b6b2`           |
+| T5 | Migrate Tier C consumers off deprecated `mkGoFlake` (Standup-Killer, crush-daily)                                                  | TODO   | 2h     | `mkGoFlake.nix` deprecation trace; only 2 repos remain on the deprecated path |
 
 ## Medium impact
 
-| #  | Task                                                                                                       | Status | Effort | Evidence                                                                                                        |
-| -- | ---------------------------------------------------------------------------------------------------------- | ------ | ------ | ---------------------------------------------------------------------------------------------------------------- |
-| T33 | Wire `go-standard.systems` mapping verification into `test-module.nix` (the composite mapping is verified by CI + the 2026-09-25 consumer probe, but not by a module test) | TODO | 30min | commit `105c981`+ — probe was manual; regression coverage missing |
-| T34 | Sweep consumers: GOEXPERIMENT boilerplate → `goExperiment` option; cobra repos → `completionStyle = "subcommand"` (7/10 Tier A repeat it; sbts's extraBuildAttrs GOEXPERIMENT included — its modBuildPhase override is already gone) | TODO | 2h | `docs/status/2026-08-10_16-50_*` E.9–E.11; options shipped 2026-09-24; requires go-nix-helpers master push |
+| #   | Task                                                                                                                                                                                                                                 | Status | Effort | Evidence                                                                                                   |
+| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------ | ------ | ---------------------------------------------------------------------------------------------------------- |
+| T33 | Wire `go-standard.systems` mapping verification into `test-module.nix` (the composite mapping is verified by CI + the 2026-09-25 consumer probe, but not by a module test)                                                           | TODO   | 30min  | commit `105c981`+ — probe was manual; regression coverage missing                                          |
+| T34 | Sweep consumers: GOEXPERIMENT boilerplate → `goExperiment` option; cobra repos → `completionStyle = "subcommand"` (7/10 Tier A repeat it; sbts's extraBuildAttrs GOEXPERIMENT included — its modBuildPhase override is already gone) | TODO   | 2h     | `docs/status/2026-08-10_16-50_*` E.9–E.11; options shipped 2026-09-24; requires go-nix-helpers master push |
 
 ## Decided against / rejected
 
-| Task                                            | Reason                                                                                                                                                             |
-| ----------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Task                                              | Reason                                                                                                                                                                                               |
+| ------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Extract `postPatch` to a separate `.sh` (old L10) | Empirically rejected 2026-08-10: prototype passed all tests but needs 11 env vars, 8 `eval` calls, splits logic across 2 files — a Verschlimmbesserung. Inline `postPatch` is the idiomatic pattern. |
 
 ## Blocked
 
-| Task                                          | Status  | Impact | Effort | Evidence                                                       |
-| --------------------------------------------- | ------- | ------ | ------ | --------------------------------------------------------------- |
-| Register `maintainers.larsartmann` in nixpkgs | BLOCKED | Low    | 30min  | Requires external PR to nixpkgs repo                           |
-| Real private-repo integration test in CI      | BLOCKED | High   | 2h     | CI job scaffolded (`if: false`); needs SSH key secret (`DEPLOY_SSH_KEY`) |
-| Fix empty commit message in `df9a5ff`         | BLOCKED | Low    | 15min  | Requires interactive rebase + force-push; user approval needed  |
-| Cut first tagged release (v0.1.0)             | BLOCKED | Medium | 30min  | Owner decision — unlocks the `mkGoFlake` removal contract and consumer version pinning |
-| Decide the Won't-implement policy (age threshold / cap / owner sign-off for "dormant — dropped") | BLOCKED | Low | 15min | Owner decision — ~120 unilateral verdicts were stamped during the 2026-09-24 annotation pass |
-| T15: `templ generate` in `modBuildPhase` when `enableTempl` | BLOCKED | Low | 30min | Owner decision pending (2026-09-25 §g.3: propose won't-implement — consumers commit `*_templ.go`; build-time generation is dead weight + templ-version reproducibility risk; C8/T34b removes the motivating override instead) |
+| Task                                                                                             | Status  | Impact | Effort | Evidence                                                                                                                                                                                                                      |
+| ------------------------------------------------------------------------------------------------ | ------- | ------ | ------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Register `maintainers.larsartmann` in nixpkgs                                                    | BLOCKED | Low    | 30min  | Requires external PR to nixpkgs repo                                                                                                                                                                                          |
+| Real private-repo integration test in CI                                                         | BLOCKED | High   | 2h     | CI job scaffolded (`if: false`); needs SSH key secret (`DEPLOY_SSH_KEY`)                                                                                                                                                      |
+| Fix empty commit message in `df9a5ff`                                                            | BLOCKED | Low    | 15min  | Requires interactive rebase + force-push; user approval needed                                                                                                                                                                |
+| Cut first tagged release (v0.1.0)                                                                | BLOCKED | Medium | 30min  | Owner decision — unlocks the `mkGoFlake` removal contract and consumer version pinning                                                                                                                                        |
+| Decide the Won't-implement policy (age threshold / cap / owner sign-off for "dormant — dropped") | BLOCKED | Low    | 15min  | Owner decision — ~120 unilateral verdicts were stamped during the 2026-09-24 annotation pass                                                                                                                                  |
+| T15: `templ generate` in `modBuildPhase` when `enableTempl`                                      | BLOCKED | Low    | 30min  | Owner decision pending (2026-09-25 §g.3: propose won't-implement — consumers commit `*_templ.go`; build-time generation is dead weight + templ-version reproducibility risk; C8/T34b removes the motivating override instead) |
