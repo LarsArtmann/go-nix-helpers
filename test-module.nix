@@ -515,13 +515,15 @@ let
     inherit pkgs lib;
     goPkg = pkgs.go;
   };
-  badExcludeEval = builtins.tryEval (mkPreparedSourceLib {
-      name = "bad-exclude";
-      version = "test";
-      src = mockSrc;
-      deps = { };
-      excludeSubModuleDirs = [ "test*dir" ];
-    }).outPath;
+  badExcludeEval =
+    builtins.tryEval
+      (mkPreparedSourceLib {
+        name = "bad-exclude";
+        version = "test";
+        src = mockSrc;
+        deps = { };
+        excludeSubModuleDirs = [ "test*dir" ];
+      }).outPath;
 
   # --- mkGoFlake (deprecated) eval smoke ------------------------------------
   # Two consumers still ship the deprecated path; a minimal config must keep
