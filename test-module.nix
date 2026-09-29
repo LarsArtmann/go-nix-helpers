@@ -454,6 +454,15 @@ let
   # --- enableTestCheck test --------------------------------------------------
   enableTestCheckCfg = mkPerSystemConfig { enableTestCheck = true; };
 
+  # --- enableVendorHashCheck tests -------------------------------------------
+  vendorHashCfg = mkPerSystemConfig {
+    vendorHash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+  };
+  vendorHashOffCfg = mkPerSystemConfig {
+    vendorHash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+    enableVendorHashCheck = false;
+  };
+
   # --- templ-committed check tests -------------------------------------------
   # Exercised through static fixture dirs (see templSelf below).
   mkTemplChecks =
@@ -1124,6 +1133,17 @@ let
     (assertCheck "enableTestCheck=true exposes checks.test" (
       enableTestCheckCfg.checks ? test
     ) "checks.test exists")
+    # --- Behavioral: enableVendorHashCheck exposes checks.vendor-hash ----------
+    (assertCheck "enableVendorHashCheck default is true" (cfg.enableVendorHashCheck == true) "true")
+    (assertCheck "vendorHash=null has no checks.vendor-hash" (
+      !(psCfg.checks ? vendor-hash)
+    ) "no vendor-hash with committed vendor")
+    (assertCheck "vendorHash set exposes checks.vendor-hash" (
+      vendorHashCfg.checks ? vendor-hash
+    ) "checks.vendor-hash exists")
+    (assertCheck "enableVendorHashCheck=false disables the check" (
+      !(vendorHashOffCfg.checks ? vendor-hash)
+    ) "no vendor-hash when disabled")
     systemsOverrideCheck
     monorepoOverlayCheck
   ];

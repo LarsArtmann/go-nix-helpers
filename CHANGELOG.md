@@ -10,6 +10,17 @@ This project has not made a tagged release yet; all changes below are in
 
 ## [Unreleased]
 
+### Added
+
+- `go-standard.enableVendorHashCheck` (default `true`): new
+  `checks.vendor-hash` derivation whose string context forces the
+  goModules fixed-output derivation to realize, so a vendorHash that
+  drifted from go.mod/go.sum fails `nix flake check` with a plain hash
+  mismatch BEFORE any Go code compiles. Auto-disabled when
+  `vendorHash` is null (committed vendor/ — no FOD to realize). Every
+  consumer inherits the gate for free; pattern proven in the fleet
+  remediation (branching-flow) and dry-run-verified in Phase V.
+
 ### Fixed
 
 - `go-standard.systems` was documented but never wired — flake-parts' own

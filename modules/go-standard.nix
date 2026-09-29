@@ -206,6 +206,19 @@ in
       '';
     };
 
+    enableVendorHashCheck = lib.mkOption {
+      type = lib.types.bool;
+      default = true;
+      description = ''
+        Generate `checks.vendor-hash` — a cheap derivation whose string
+        context forces the goModules fixed-output derivation to realize,
+        so a vendorHash that drifted from go.mod/go.sum fails
+        `nix flake check` with a hash mismatch BEFORE any Go code
+        compiles. Auto-disabled when vendorHash is null (committed
+        vendor/ — there is no FOD to realize).
+      '';
+    };
+
     enableOverlay = lib.mkOption {
       type = lib.types.bool;
       default = true;
@@ -953,6 +966,16 @@ in
             test = config.packages.default.overrideAttrs (_old: {
               doCheck = true;
             });
+          }
+          // lib.optionalAttrs (cfg.enableVendorHashCheck && cfg.vendorHash != null) {
+            # The interpolated goModules derivation rides the string
+            # context into this script, forcing the FOD to build when the
+            # check is built — a drifted vendorHash fails here FIRST, with
+            # a plain hash-mismatch error instead of mid-compile surprises.
+            vendor-hash = pkgs.runCommand "${cfg.pname}-vendor-hash" { } ''
+              echo "vendor hash verified: ${config.packages.${cfg.pname}.goModules}"
+              touch $out
+            '';
           }
           // (
             let
