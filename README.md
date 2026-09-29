@@ -166,6 +166,8 @@ See the full option table below, or copy one of the [templates](#templates).
 | `enableCheck`           | `true`                       | Run `go test` during the Nix build (`doCheck`)                                                                       |
 | `enableTestCheck`       | `false`                      | Generate `checks.test` — force `go test` in CI even when `enableCheck = false`                                       |
 | `enableVendorHashCheck` | `true`                       | Generate `checks.vendor-hash` — realize the goModules FOD so a drifted vendorHash fails `nix flake check` fast      |
+| `enableLockGuards`      | `false`                      | Eval-time flake.lock guards (registry-tarball trap, fleet-pin drift, dropped `follows`) — nix-email pattern        |
+| `lockGuards`            | `{ }`                        | Guard tunables: `expectedNixpkgsRev`, `expectedFollows` (see module docs)                                            |
 | `enableOverlay`         | `true`                       | Generate `flake.overlays.default`                                                                                    |
 | `enableTempl`           | `false`                      | Include `templ` in devShells and treefmt                                                                             |
 | `enableGovulncheck`     | `true`                       | Include `govulncheck` in the default devShell                                                                        |

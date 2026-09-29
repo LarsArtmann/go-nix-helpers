@@ -12,6 +12,17 @@ This project has not made a tagged release yet; all changes below are in
 
 ### Added
 
+- `lib.mkSecretTokens prefix: entries` (telephony `fsSecrets`
+  extraction): derives a `@PREFIX_ID@` placeholder-token table from
+  `{ file, target }` entries for systemd LoadCredential splicing;
+  derived-token collisions throw. Unit-tested (derivation, hyphens,
+  case-collision throw).
+- `lib.evalLockGuards` + `go-standard.enableLockGuards` (default false,
+  nix-email `allEvalGuards` extraction): eval-time flake.lock guards —
+  registry-tarball trap on the nixpkgs original, optional fleet-pin
+  rev equality, `follows`-shape checks. Guards fire on every
+  outputs-forcing command; forced through generated packages.
+  Unit-tested with injected drift (all three regressions throw).
 - `go-standard.enableVendorHashCheck` (default `true`): new
   `checks.vendor-hash` derivation whose string context forces the
   goModules fixed-output derivation to realize, so a vendorHash that

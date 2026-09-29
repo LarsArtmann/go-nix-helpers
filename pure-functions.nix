@@ -132,6 +132,111 @@ let
         )
     else
       goPkgOverride goBase;
+  # Eval-time flake.lock guards (extracted from nix-email's allEvalGuards;
+  # telephony and private-cloud share the pattern). Fails every
+  # outputs-forcing command (nix eval / check / build / run) loudly on the
+  # lock regressions that otherwise ship silently:
+  #   1. the nix global registry rewriting nixpkgs to a stale tarball,
+  #   2. nixpkgs drifting from a coordinated fleet pin,
+  #   3. a dropped `follows` smuggling a second nixpkgs rev into every
+  #      consumer lock (flake.lock encodes follows as a node-name LIST; a
+  #      real input is a plain STRING).
+  # Returns true when all guards pass (force with builtins.seq).
+  # NOTE (measured in nix-email 2026-09-22): `nix flake lock` is NOT
+  # outputs-forcing — it runs no guards; drift is caught at the next
+  # outputs-forcing command.
+  evalLockGuards =
+    {
+      lockJson,
+      expectedNixpkgsRev ? null,
+      nixpkgsOriginalType ? "github",
+      expectedFollows ? [
+        {
+          node = "flake-parts";
+          input = "nixpkgs-lib";
+          follows = "nixpkgs";
+        }
+      ],
+    }:
+    let
+      nixpkgsNode =
+        lockJson.nodes.nixpkgs or (throw ''
+          lock guard: flake.lock has no nixpkgs node.
+        '');
+      type = nixpkgsNode.original.type or "unknown";
+      rev = nixpkgsNode.locked.rev or "unknown";
+    in
+    builtins.seq
+      (
+        assert
+          type == nixpkgsOriginalType
+          || throw ''
+            lock guard: nixpkgs original type is "${type}", expected "${nixpkgsOriginalType}".
+            The nix global registry likely rewrote nixpkgs to a tarball pointer
+            that can be stale by months. Fix: edit flake.lock
+            nodes.nixpkgs.original back to type "${nixpkgsOriginalType}".
+          '';
+        true
+      )
+      (
+        builtins.seq
+          (
+            assert
+              expectedNixpkgsRev == null
+              || rev == expectedNixpkgsRev
+              || throw ''
+                lock guard: nixpkgs pin drift.
+                  flake.lock rev: ${rev}
+                  expected:       ${toString expectedNixpkgsRev}
+                Fix: diff the flake.locks, re-verify downstream package
+                presence, advance both pins together, update the expected rev.
+              '';
+            true
+          )
+          (
+            lib.foldl' (
+              acc: f:
+              builtins.seq (
+                assert
+                  (lockJson.nodes.${f.node}.inputs.${f.input} or null) == [ f.follows ]
+                  || throw ''
+                    lock guard: follows regression on ${f.node}.inputs.${f.input}.
+                      actual:   ${builtins.toJSON (lockJson.nodes.${f.node}.inputs.${f.input} or null)}
+                      expected: ["${f.follows}"]
+                    A dropped follow smuggles a second nixpkgs rev into every
+                    consumer lock. Fix: restore follows = "${f.follows}" in
+                    flake.nix, then `nix flake lock`.
+                  '';
+                true
+              ) acc
+            ) true expectedFollows
+          )
+      );
+
+  # Secret-token table (extracted from nix-international-telephony's
+  # fsSecrets): map credential ids to { file, target, token } where the
+  # placeholder token is derived as @<PREFIX>_<ID_WITH_UNDERSCORES>@ so
+  # world-readable generated configs carry placeholders, never secrets
+  # (systemd LoadCredential + replace-secret splice at activation).
+  # Derived-token collisions throw: two entries producing the same
+  # placeholder is always a bug (ambiguous splicing).
+  mkSecretTokens =
+    prefix: entries:
+    let
+      table = lib.mapAttrs (id: e: {
+        inherit (e) file target;
+        token = "@${prefix}_${lib.toUpper (lib.replaceStrings [ "-" ] [ "_" ] id)}@";
+      }) entries;
+      tokens = builtins.attrValues (lib.mapAttrs (_: v: v.token) table);
+    in
+    assert
+      lib.length (lib.unique tokens) == lib.length tokens
+      || throw ''
+        mkSecretTokens: derived token collision — two entries produce the same
+        placeholder token: [${builtins.concatStringsSep ", " tokens}]
+      '';
+    table;
+
 in
 {
   inherit
@@ -141,5 +246,7 @@ in
     staleGoAttrName
     goModFloorMessage
     goBaseFrom
+    evalLockGuards
+    mkSecretTokens
     ;
 }

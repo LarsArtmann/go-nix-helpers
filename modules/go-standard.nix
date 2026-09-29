@@ -206,6 +206,64 @@ in
       '';
     };
 
+    enableLockGuards = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = ''
+        Eval-time flake.lock guards (nix-email pattern), forced through
+        the generated packages: the nixpkgs lock node must be a github
+        original (the nix global registry rewrites github: URLs to tarball
+        pointers that can be stale by months), every expected follows pair
+        must be intact (a dropped follow smuggles a second nixpkgs rev
+        into every consumer lock), and — when lockGuards.expectedNixpkgsRev
+        is set — the locked rev must equal it. Guards fire on every
+        outputs-forcing command (nix eval, check, build, run);
+        `nix flake lock` itself never evaluates outputs.
+      '';
+    };
+
+    lockGuards = lib.mkOption {
+      type = lib.types.submodule {
+        options = {
+          expectedNixpkgsRev = lib.mkOption {
+            type = lib.types.nullOr lib.types.str;
+            default = null;
+            description = "Exact nixpkgs rev the lock must pin (fleet pin). null skips the pin guard.";
+          };
+          expectedFollows = lib.mkOption {
+            type = lib.types.listOf (
+              lib.types.submodule {
+                options = {
+                  node = lib.mkOption {
+                    type = lib.types.str;
+                    description = "Lock node name (e.g. flake-parts).";
+                  };
+                  input = lib.mkOption {
+                    type = lib.types.str;
+                    description = "Input name on that node (e.g. nixpkgs-lib).";
+                  };
+                  follows = lib.mkOption {
+                    type = lib.types.str;
+                    description = "Followed node name (e.g. nixpkgs).";
+                  };
+                };
+              }
+            );
+            default = [
+              {
+                node = "flake-parts";
+                input = "nixpkgs-lib";
+                follows = "nixpkgs";
+              }
+            ];
+            description = "follows pairs that must be encoded as node-name lists in flake.lock.";
+          };
+        };
+      };
+      default = { };
+      description = "Tunables for enableLockGuards.";
+    };
+
     enableVendorHashCheck = lib.mkOption {
       type = lib.types.bool;
       default = true;
@@ -824,10 +882,24 @@ in
         # vendorHashWarning/proxyVendorWarning/goModFloorCheck/stalePinWarning
         # are referenced here to force evaluation of their checks when
         # packages are evaluated.
-        package = builtins.seq goModFloorCheck (
-          builtins.seq proxyVendorWarning (
-            builtins.seq vendorHashWarning (
-              builtins.seq stalePinWarning (mkGoPackage cfg.pname cfg.subPackages cfg.description { })
+        # Lock guards (opt-in): forced whenever packages are evaluated —
+        # checks.build / checks.vendor-hash / flake check all flow through
+        # here, so a drifted lock fails loudly before anything builds.
+        lockGuardsValue =
+          if !cfg.enableLockGuards then
+            true
+          else
+            pure.evalLockGuards {
+              lockJson = builtins.fromJSON (builtins.readFile (self.outPath + "/flake.lock"));
+              inherit (cfg.lockGuards) expectedNixpkgsRev expectedFollows;
+            };
+
+        package = builtins.seq lockGuardsValue (
+          builtins.seq goModFloorCheck (
+            builtins.seq proxyVendorWarning (
+              builtins.seq vendorHashWarning (
+                builtins.seq stalePinWarning (mkGoPackage cfg.pname cfg.subPackages cfg.description { })
+              )
             )
           )
         );

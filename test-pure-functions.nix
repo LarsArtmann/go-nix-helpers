@@ -348,6 +348,158 @@ let
     ) true)
   ];
 
+  # --- evalLockGuards tests (nix-email lock-guard extraction) ---
+  goodLock = {
+    nodes = {
+      nixpkgs = {
+        original = {
+          type = "github";
+          owner = "NixOS";
+          repo = "nixpkgs";
+          ref = "nixos-unstable";
+        };
+        locked = {
+          rev = "abcdef1234";
+        };
+      };
+      flake-parts = {
+        inputs = {
+          nixpkgs-lib = [ "nixpkgs" ];
+        };
+      };
+    };
+  };
+
+  lockGuardsBasic = [
+    (assertEq "guards: happy path returns true" (pure.evalLockGuards {
+      lockJson = goodLock;
+      expectedNixpkgsRev = "abcdef1234";
+      expectedFollows = [
+        {
+          node = "flake-parts";
+          input = "nixpkgs-lib";
+          follows = "nixpkgs";
+        }
+      ];
+    }) true)
+    (assertEq "guards: null expectedNixpkgsRev skips pin check" (pure.evalLockGuards {
+      lockJson = goodLock;
+      expectedNixpkgsRev = null;
+    }) true)
+    (assertEq "guards: pin mismatch throws" (
+      let
+        r = builtins.tryEval (
+          pure.evalLockGuards {
+            lockJson = goodLock;
+            expectedNixpkgsRev = "different";
+          }
+        );
+      in
+      r.success
+    ) false)
+    (assertEq "guards: registry tarball rewrite throws" (
+      let
+        r = builtins.tryEval (
+          pure.evalLockGuards {
+            lockJson = goodLock // {
+              nodes = goodLock.nodes // {
+                nixpkgs = goodLock.nodes.nixpkgs // {
+                  original = {
+                    type = "tarball";
+                  };
+                };
+              };
+            };
+          }
+        );
+      in
+      r.success
+    ) false)
+    (assertEq "guards: dropped follow (string instead of list) throws" (
+      let
+        r = builtins.tryEval (
+          pure.evalLockGuards {
+            lockJson = goodLock // {
+              nodes = goodLock.nodes // {
+                flake-parts = {
+                  inputs = {
+                    nixpkgs-lib = "nixpkgs-real-node";
+                  };
+                };
+              };
+            };
+          }
+        );
+      in
+      r.success
+    ) false)
+    (assertEq "guards: missing nixpkgs node throws" (
+      let
+        r = builtins.tryEval (
+          pure.evalLockGuards {
+            lockJson = {
+              nodes = { };
+            };
+          }
+        );
+      in
+      r.success
+    ) false)
+  ];
+
+  # --- mkSecretTokens tests (telephony fsSecrets extraction) ---
+  tokenTable = pure.mkSecretTokens "TELEPHONY" {
+    "event-socket-password" = {
+      file = "/run/creds/es";
+      target = "event_socket.conf.xml";
+    };
+    "ext-100-password" = {
+      file = "/run/creds/ext100";
+      target = "directory/default.xml";
+    };
+  };
+
+  mkSecretTokensBasic = [
+    (assertEq "tokens: derives underscore placeholder from prefix+id"
+      (tokenTable.event-socket-password.token)
+      "@TELEPHONY_EVENT_SOCKET_PASSWORD@"
+    )
+    (assertEq "tokens: hyphenated ids become underscores" (tokenTable.ext-100-password.token
+    ) "@TELEPHONY_EXT_100_PASSWORD@")
+    (assertEq "tokens: file and target pass through" (tokenTable.ext-100-password.target
+    ) "directory/default.xml")
+    (assertEq "tokens: same id under different prefixes yields distinct tokens" (
+      (pure.mkSecretTokens "A" {
+        x = {
+          file = "f";
+          target = "t";
+        };
+      }).x.token != (pure.mkSecretTokens "B" {
+        x = {
+          file = "f";
+          target = "t";
+        };
+      }).x.token
+    ) true)
+    (assertEq "tokens: case-insensitive id collision throws" (
+      let
+        r = builtins.tryEval (
+          pure.mkSecretTokens "P" {
+            "a-b" = {
+              file = "f1";
+              target = "t1";
+            };
+            "A_B" = {
+              file = "f2";
+              target = "t2";
+            };
+          }
+        );
+      in
+      r.success
+    ) false)
+  ];
+
   allChecks =
     stripBasic
     ++ stripIdempotence
@@ -358,7 +510,9 @@ let
     ++ newestGoBasic
     ++ staleGoBasic
     ++ floorMsgBasic
-    ++ goBaseBasic;
+    ++ goBaseBasic
+    ++ lockGuardsBasic
+    ++ mkSecretTokensBasic;
 in
 pkgs.runCommand "test-pure-functions" { } ''
   ${builtins.concatStringsSep "\n" allChecks}
