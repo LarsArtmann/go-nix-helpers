@@ -594,6 +594,14 @@ in
   config = {
     inherit (cfg) systems;
 
+    # proxyVendor is only meaningful for vendorHash builds — prepared-source
+    # builds force it false when rendering buildGoModule. The option's default
+    # of true therefore made EVERY deps consumer emit the "ignored when deps
+    # are set" warning without anyone setting anything. mkDefault keeps an
+    # explicit consumer setting authoritative, and the warning still guards a
+    # genuine explicit true + deps misconfiguration.
+    go-standard.proxyVendor = lib.mkDefault (cfg.deps == { });
+
     perSystem =
       {
         config,
@@ -618,14 +626,6 @@ in
             goTarballHash
             ;
         };
-
-        # proxyVendor is only meaningful for vendorHash builds — prepared-source
-        # builds force it false when rendering buildGoModule. The option's
-        # default of true therefore made EVERY deps consumer emit the
-        # "ignored when deps are set" warning without anyone setting anything.
-        # mkDefault keeps an explicit consumer setting authoritative, and the
-        # warning still guards a genuine explicit true + deps misconfiguration.
-        proxyVendor = lib.mkDefault (cfg.deps == { });
 
         usePreparedSource = cfg.deps != { };
 
