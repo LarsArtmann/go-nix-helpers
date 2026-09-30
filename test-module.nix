@@ -553,7 +553,9 @@ let
   mkFreshnessChecks =
     fixture: extraCfg:
     let
-      fixtureSelf = { outPath = fixture; };
+      fixtureSelf = {
+        outPath = fixture;
+      };
       modEval = lib.evalModules {
         modules = [
           flakePartsStub
@@ -562,7 +564,8 @@ let
             go-standard = {
               pname = "test-project";
               vendorHash = null;
-            } // extraCfg;
+            }
+            // extraCfg;
           }
         ];
         specialArgs = {
@@ -1207,10 +1210,9 @@ let
     (assertCheck "stale fixture: check evaluates (stale is a build-time failure)" (
       freshnessStaleCfg ? templ-freshness
     ) "checks.templ-freshness evaluates on stale input")
-    (assertCheck "stale fixture: script carries the stale-detection mechanics" (
-      lib.hasInfix "differs from templ generate output" (
-        freshnessStaleCfg.templ-freshness.buildCommand or ""
-      )
+    (assertCheck "stale fixture: script carries the stale-detection mechanics" (lib.hasInfix
+      "differs from templ generate output"
+      (freshnessStaleCfg.templ-freshness.buildCommand or "")
     ) "stale echo + diff in buildCommand")
     (assertCheck "enableTemplFreshnessCheck + preBuild policy throws at eval" (
       !freshnessPreBuildEval.success
@@ -1354,6 +1356,15 @@ in
     mkdir $out
     echo "all module tests passed" > $out/result.txt
   '';
+
+  # Build-behavioral templ-freshness test: the FRESH fixture's check must
+  # build green — proving templ generate runs hermetically in the sandbox
+  # and the committed fixture is byte-fresh against the locked templ
+  # (0.3.1020). The stale fixture's build-time failure path cannot be a
+  # check (nix checks cannot expect failure); its eval-level and script
+  # mechanics are asserted in moduleTest above and were verified by hand
+  # once against the stale fixture.
+  moduleTestTemplFreshness = freshnessFreshCfg.templ-freshness;
 
   # Test enableOverlay=false removes overlay
   moduleTestNoOverlay =

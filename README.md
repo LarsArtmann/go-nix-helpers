@@ -171,6 +171,7 @@ See the full option table below, or copy one of the [templates](#templates).
 | `enableOverlay`         | `true`                       | Generate `flake.overlays.default`                                                                                    |
 | `enableTempl`           | `false`                      | Include `templ` in devShells and treefmt                                                                             |
 | `templGenerationPolicy` | `"committed"`                | `"committed"` enforces committed `*_templ.go` siblings (templ-committed check); `"preBuild"` skips it for build-time generation |
+| `enableTemplFreshnessCheck` | `false`                  | Generate `checks.templ-freshness` — regenerate-and-diff gate: committed `*_templ.go` must match `templ generate` output (nixpkgs-pinned templ); requires `templGenerationPolicy = "committed"` |
 | `enableGovulncheck`     | `true`                       | Include `govulncheck` in the default devShell                                                                        |
 | `enableGopls`           | `true`                       | Include `gopls` in the default devShell                                                                              |
 | `enableGolangciLint`    | `true`                       | Include `golangci-lint` in devShells and the lint app                                                                |

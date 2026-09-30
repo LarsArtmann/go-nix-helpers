@@ -114,6 +114,7 @@
             inherit (tests) autoDiscovery explicitOnly;
             inherit (tests) verify;
             inherit (moduleTests) moduleTest moduleTestNoOverlay;
+            inherit (moduleTests) moduleTestTemplFreshness;
             pureFunctions = pureFunctionTests;
             # Fixture-integrity tripwire: test-assets/mock-templ-missing-generated
             # must NEVER contain generated *_templ.go files — the

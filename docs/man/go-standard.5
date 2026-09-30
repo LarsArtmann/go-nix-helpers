@@ -114,6 +114,14 @@ Generate flake.overlays.default.
 .BR enableTempl " (bool, default: false)"
 Include templ in devShells and treefmt.
 .TP
+.BR enableTemplFreshnessCheck " (bool, default: false)"
+Generate \fBchecks.templ-freshness\fR: copies the full source, runs
+\fBtempl generate\fR, and diffs every regenerated \fB*_templ.go\fR against
+the committed one. templ-committed only proves sibling existence; this
+gate proves content freshness against the nixpkgs-pinned templ. Requires
+templGenerationPolicy = "committed" (enabling it under preBuild throws
+at eval).
+.TP
 .BR enableGovulncheck " (bool, default: true)"
 Include govulncheck in the default devShell.
 .TP
@@ -228,6 +236,12 @@ matching Go's own semantics.
 .BR templ-committed
 Throws at eval when any \fB.templ\fR file lacks its committed
 \fB*_templ.go\fR sibling.
+.TP
+.BR templ-freshness
+Opt-in (enableTemplFreshnessCheck) regenerate-and-diff derivation:
+prints the unified diff and fails the build when a committed
+\fB*_templ.go\fR no longer matches \fBtempl generate\fR output \
+ the fix is regenerating and committing.
 .TP
 .BR stale-pin\ warning
 Traces a warning when \fBgoPkgAttr\fR pins a real but non-newest go_1_XX

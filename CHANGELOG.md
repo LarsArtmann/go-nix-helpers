@@ -12,6 +12,15 @@ This project has not made a tagged release yet; all changes below are in
 
 ### Added
 
+- `go-standard.enableTemplFreshnessCheck` (default `false`): generates
+  `checks.templ-freshness`, a regenerate-and-diff gate that copies the full
+  source, runs `templ generate` with the nixpkgs-pinned templ, and fails
+  with a unified diff when any committed `*_templ.go` no longer matches the
+  generator output. Complements `templ-committed` (existence) with content
+  freshness: a `.templ` edit or templ bump whose regeneration was never
+  committed now fails `nix flake check`. Requires
+  `templGenerationPolicy = "committed"`; enabling under `preBuild` throws
+  at eval. Fleet remediation C9 (14 templ repos queued to adopt).
 - `go-standard.extraBuildAttrs` (top level and per `packages.<name>` entry)
   now accepts a function `pkgs: attrs` in addition to a static attrset,
   evaluated with the perSystem `pkgs` at render time. Unblocks consumers

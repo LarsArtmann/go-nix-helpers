@@ -1194,57 +1194,59 @@ in
                 go-standard: enableTemplFreshnessCheck requires templGenerationPolicy = "committed".
                 preBuild repos gitignore *_templ.go — there are no committed files to diff.
               ''
-            else {
-              # Regenerate-and-diff gate: templ-committed proves a *_templ.go
-              # sibling EXISTS; this proves its CONTENT matches what the
-              # nixpkgs-pinned templ produces today. Runs on the FULL source
-              # copy (templ resolves types across sibling .go files), not a
-              # filtered one. On drift, prints the unified diff and fails —
-              # the fix ritual is exactly `templ generate` + commit.
-              templ-freshness = pkgs.runCommand "${cfg.pname}-templ-freshness"
-                {
-                  nativeBuildInputs = [
-                    pkgs.templ
-                    pkgs.findutils
-                    pkgs.diffutils
-                  ];
-                }
-                ''
-                  export HOME=$TMPDIR
-                  cp -r ${cfg.src} src
-                  chmod -R u+w src
-                  cd src
+            else
+              {
+                # Regenerate-and-diff gate: templ-committed proves a *_templ.go
+                # sibling EXISTS; this proves its CONTENT matches what the
+                # nixpkgs-pinned templ produces today. Runs on the FULL source
+                # copy (templ resolves types across sibling .go files), not a
+                # filtered one. On drift, prints the unified diff and fails —
+                # the fix ritual is exactly `templ generate` + commit.
+                templ-freshness =
+                  pkgs.runCommand "${cfg.pname}-templ-freshness"
+                    {
+                      nativeBuildInputs = [
+                        pkgs.templ
+                        pkgs.findutils
+                        pkgs.diffutils
+                      ];
+                    }
+                    ''
+                      export HOME=$TMPDIR
+                      cp -r ${cfg.src} src
+                      chmod -R u+w src
+                      cd src
 
-                  # Snapshot the committed generated files so the diff is
-                  # committed-vs-regenerated, not regenerated-vs-regenerated.
-                  mkdir -p $TMPDIR/committed
-                  find . -name '*_templ.go' -type f | while IFS= read -r f; do
-                    mkdir -p "$TMPDIR/committed/$(dirname "$f")"
-                    cp "$f" "$TMPDIR/committed/$f"
-                  done
+                      # Snapshot the committed generated files so the diff is
+                      # committed-vs-regenerated, not regenerated-vs-regenerated.
+                      mkdir -p $TMPDIR/committed
+                      find . -name '*_templ.go' -type f | while IFS= read -r f; do
+                        mkdir -p "$TMPDIR/committed/$(dirname "$f")"
+                        cp "$f" "$TMPDIR/committed/$f"
+                      done
 
-                  templ generate
+                      templ generate
 
-                  : > $TMPDIR/stale.list
-                  find . -name '*_templ.go' -type f | while IFS= read -r f; do
-                    if ! cmp -s "$f" "$TMPDIR/committed/$f"; then
-                      echo "$f" >> $TMPDIR/stale.list
-                    fi
-                  done
+                      : > $TMPDIR/stale.list
+                      find . -name '*_templ.go' -type f | while IFS= read -r f; do
+                        if ! cmp -s "$f" "$TMPDIR/committed/$f"; then
+                          echo "$f" >> $TMPDIR/stale.list
+                        fi
+                      done
 
-                  if [ -s $TMPDIR/stale.list ]; then
-                    echo "go-standard templ-freshness: committed *_templ.go differs from templ generate output — regenerate and commit:" >&2
-                    while IFS= read -r f; do
-                      echo "  $f" >&2
-                      diff -u "$TMPDIR/committed/$f" "$f" >&2 || true
-                    done < $TMPDIR/stale.list
-                    exit 1
-                  fi
+                      if [ -s $TMPDIR/stale.list ]; then
+                        echo "go-standard templ-freshness: committed *_templ.go differs from templ generate output — regenerate and commit:" >&2
+                        while IFS= read -r f; do
+                          echo "  $f" >&2
+                          diff -u "$TMPDIR/committed/$f" "$f" >&2 || true
+                        done < $TMPDIR/stale.list
+                        exit 1
+                      fi
 
-                  echo "templ-freshness: committed *_templ.go files match templ generate output"
-                  touch $out
-                '';
-            }
+                      echo "templ-freshness: committed *_templ.go files match templ generate output"
+                      touch $out
+                    '';
+              }
           );
 
         treefmt = {
