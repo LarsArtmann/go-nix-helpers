@@ -619,6 +619,14 @@ in
             ;
         };
 
+        # proxyVendor is only meaningful for vendorHash builds — prepared-source
+        # builds force it false when rendering buildGoModule. The option's
+        # default of true therefore made EVERY deps consumer emit the
+        # "ignored when deps are set" warning without anyone setting anything.
+        # mkDefault keeps an explicit consumer setting authoritative, and the
+        # warning still guards a genuine explicit true + deps misconfiguration.
+        proxyVendor = lib.mkDefault (cfg.deps == { });
+
         usePreparedSource = cfg.deps != { };
 
         # Eval-time go.mod floor check: the `go` directive in the consumer's
