@@ -312,6 +312,24 @@ let
     packages.worker.extraBuildAttrs.nativeBuildInputs = [ pkgs.makeWrapper ];
   };
 
+  # --- Function-of-pkgs extraBuildAttrs tests --------------------------------
+  # extraBuildAttrs may be `pkgs: attrs` (top level AND per package) so
+  # consumers can carry perSystem-built derivations a static attrset
+  # cannot express (the nsfw onnxruntime-go buildInputs class).
+  fnExtraCfg = mkPerSystemConfig {
+    extraBuildAttrs = pkgs': { passthru.fntest = "fn-form-works"; };
+  };
+
+  fnExtraPkgCfg = mkPerSystemConfig {
+    extraBuildAttrs = pkgs': { passthru.toplevel = "fn-top"; };
+    packages.worker.subPackages = [ "cmd/worker" ];
+    packages.worker.extraBuildAttrs = pkgs': { passthru.perpkg = "fn-per-pkg"; };
+  };
+
+  fnBuildInputsCfg = mkPerSystemConfig {
+    extraBuildAttrs = pkgs': { buildInputs = [ pkgs'.zlib ]; };
+  };
+
   # --- No-lint tests -------------------------------------------------------
   noLintCfg = mkPerSystemConfig { enableGolangciLint = false; };
 
@@ -1168,6 +1186,29 @@ let
     (assertCheck "G2: per-package + top-level concat evaluates" (
       perPackageMergeCfg.packages ? worker
     ) "worker package with merged attrs exists")
+    # --- Behavioral: function-of-pkgs extraBuildAttrs -------------------------
+    (assertCheck "extraBuildAttrs fn form: default package evaluates" (
+      fnExtraCfg.packages ? default
+    ) "packages.default with fn extraBuildAttrs")
+    (assertCheck "extraBuildAttrs fn form: attrs applied" (
+      fnExtraCfg.packages.default.passthru.fntest or "MISSING" == "fn-form-works"
+    ) "passthru value from fn form visible")
+    (assertCheck
+      "extraBuildAttrs fn form: per-package fn applies (overrides top-level fn for non-concat keys)"
+      (
+        fnExtraPkgCfg.packages ? worker
+        && fnExtraPkgCfg.packages.worker.passthru.perpkg or "MISSING" == "fn-per-pkg"
+      )
+      "per-pkg fn form value visible in worker passthru"
+    )
+    (assertCheck "extraBuildAttrs fn form: pkgs derivations land in buildInputs" (
+      let
+        pkg = fnBuildInputsCfg.packages.default;
+        buildInputs = pkg.buildInputs or pkg.drvAttrs.buildInputs or [ ];
+        hasZlib = builtins.any (x: x.pname or x.name or "" == "zlib") buildInputs;
+      in
+      hasZlib
+    ) "zlib from fn-form buildInputs")
     # --- Behavioral: enableTestCheck exposes checks.test ----------------------
     (assertCheck "enableTestCheck=false has no checks.test" (
       !(psCfg.checks ? test)

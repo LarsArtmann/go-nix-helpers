@@ -198,12 +198,15 @@ Custom ldflags. null = ["-s" "-w" "-X main.version=${version}"].
 .BR extraMeta " (attrs, default: {})"
 Extra attributes merged into package meta.
 .TP
-.BR extraBuildAttrs " (attrs, default: {})"
-Extra attributes merged into buildGoModule.
-Six attributes concatenate with module values: nativeBuildInputs, buildInputs,
+.BR extraBuildAttrs " (attrs or function, default: {})"
+Extra attributes merged into buildGoModule. May be a static attrset or a
+function pkgs -> attrs, evaluated with the perSystem pkgs at render time
+(enables perSystem-built derivations in buildInputs et al.). Six attributes
+concatenate with module values: nativeBuildInputs, buildInputs,
 checkInputs, configureFlags, preBuild, postInstall (all appended — user values
 come after module-generated values). All other attributes override module
-defaults via the // operator.
+defaults via the // operator. The function form is supported at the top
+level and per package (packages.<name>.extraBuildAttrs).
 .TP
 .BR devShellExtraPackages " (function, default: _: [])"
 Function receiving pkgs, returns extra devShell packages.

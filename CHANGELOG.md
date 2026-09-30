@@ -12,6 +12,13 @@ This project has not made a tagged release yet; all changes below are in
 
 ### Added
 
+- `go-standard.extraBuildAttrs` (top level and per `packages.<name>` entry)
+  now accepts a function `pkgs: attrs` in addition to a static attrset,
+  evaluated with the perSystem `pkgs` at render time. Unblocks consumers
+  that need perSystem-built derivations in their build (nsfw-classifier's
+  onnxruntime-go `buildInputs` + wrapper class — previously impossible
+  with the static `types.attrs`). Discovered migrating nsfw (fleet
+  remediation; the blocker was documented as an upstream API gap).
 - `go-standard.templGenerationPolicy` (`"committed"` default, or
   `"preBuild"`): repos that regenerate `*_templ.go` at build time
   (gitignored generated files, `templ generate` in preBuild — the Zlota44

@@ -405,7 +405,7 @@ in
               description = "Short description for this package's meta";
             };
             extraBuildAttrs = lib.mkOption {
-              type = lib.types.attrs;
+              type = lib.types.either lib.types.attrs (lib.types.functionTo lib.types.attrs);
               default = { };
               description = ''
                 Per-package extra attributes merged into this entry's buildGoModule.
@@ -413,6 +413,12 @@ in
                 `nativeBuildInputs`, `buildInputs`, `checkInputs`,
                 `configureFlags`, `preBuild`, `postInstall` are appended to
                 top-level values; all other attrs override.
+
+                May be a static attrset or a function `pkgs: attrs` —
+                the function form is evaluated with the perSystem `pkgs`
+                at render time, so it can carry perSystem-built derivations
+                (buildInputs, nativeBuildInputs) that a static attrset
+                cannot express.
               '';
             };
           };
@@ -552,10 +558,14 @@ in
     };
 
     extraBuildAttrs = lib.mkOption {
-      type = lib.types.attrs;
+      type = lib.types.either lib.types.attrs (lib.types.functionTo lib.types.attrs);
       default = { };
       description = ''
-        Extra attributes merged into buildGoModule.
+        Extra attributes merged into buildGoModule. May be a static
+        attrset or a function `pkgs: attrs` — the function form is
+        evaluated with the perSystem `pkgs` at render time, so it can
+        carry perSystem-built derivations (e.g. nixpkgs libraries in
+        `buildInputs`) that a static attrset cannot express.
         Six attributes receive special concatenation handling:
         - `nativeBuildInputs` — appended to module's list (templ, installShellFiles)
         - `buildInputs` — appended to module's list
@@ -794,6 +804,12 @@ in
           "configureFlags"
         ];
 
+        # extraBuildAttrs may be a static attrset or a function `pkgs: attrs`
+        # (both at top level and per package). Normalize to the attrs form
+        # at render time — the function form exists so consumers can carry
+        # perSystem-built derivations a static attrset cannot express.
+        evalExtraBuildAttrs = v: if lib.isFunction v then v pkgs else v;
+
         # Reusable package builder for monorepo support.
         # Builds one Go binary with the given name, subPackages, description,
         # and optional per-package extraBuildAttrs (G2).
@@ -829,8 +845,8 @@ in
         mkGoPackage =
           pkgName: subPkgs: pkgDesc: pkgExtraBuildAttrs:
           let
-            topLevel = cfg.extraBuildAttrs;
-            perPkg = pkgExtraBuildAttrs;
+            topLevel = evalExtraBuildAttrs cfg.extraBuildAttrs;
+            perPkg = evalExtraBuildAttrs pkgExtraBuildAttrs;
             combinedConcat = {
               nativeBuildInputs = (topLevel.nativeBuildInputs or [ ]) ++ (perPkg.nativeBuildInputs or [ ]);
               buildInputs = (topLevel.buildInputs or [ ]) ++ (perPkg.buildInputs or [ ]);

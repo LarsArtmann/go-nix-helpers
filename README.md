@@ -196,7 +196,7 @@ See the full option table below, or copy one of the [templates](#templates).
 | `proxyVendor`           | `true`                       | Pass `proxyVendor` to `buildGoModule`                                                                                |
 | `ldflags`               | `null` (auto)                | Custom ldflags (`null` = `["-s" "-w" "-X main.version=${version}"]`)                                                 |
 | `extraMeta`             | `{}`                         | Extra attributes merged into package meta                                                                            |
-| `extraBuildAttrs`       | `{}`                         | Extra attributes merged into `buildGoModule` (see merge rules below)                                                 |
+| `extraBuildAttrs`       | `{}` or `_: {}`              | Extra attributes merged into `buildGoModule`; attrs or a function `pkgs: attrs` (see merge rules below)               |
 | `devShellExtraPackages` | `_: []`                      | Function receiving `pkgs`, returns extra devShell packages                                                           |
 | `shellExtraEnv`         | `{}`                         | Extra env vars for devShells                                                                                         |
 | `devShellHook`          | `""`                         | Shell script run when entering the generated devShells (default and ci)                                              |
@@ -217,6 +217,11 @@ values rather than overriding them:
 | `postInstall`       | Completion install hook                     | Yes                  |
 
 All other attributes override module defaults via the `//` operator.
+
+`extraBuildAttrs` may also be a **function of `pkgs`** (`extraBuildAttrs = pkgs: { buildInputs = [ pkgs.onnxruntime ]; }`)
+— evaluated with the perSystem `pkgs` at render time so it can carry
+perSystem-built derivations that a static attrset cannot express. The function
+form is supported at the top level and per package (`packages.<name>.extraBuildAttrs`).
 
 ---
 
