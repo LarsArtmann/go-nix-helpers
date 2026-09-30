@@ -68,7 +68,11 @@ let
         default = { };
       };
       apps = lib.mkOption {
-        type = lib.types.attrs;
+        # Faithful to flake-parts: apps is attrsOf submodule there, so
+        # per-key definitions (apps.test etc.) route through the module
+        # system and lib.mkDefault priorities apply. A plain types.attrs
+        # shallow-merges and silently ignores priorities.
+        type = lib.types.attrsOf (lib.types.submodule { freeformType = lib.types.attrs; });
         default = { };
       };
       devShells = lib.mkOption {
@@ -162,6 +166,10 @@ let
     (assertCheck "lintAsCheck default is false" (cfg.lintAsCheck == false) "false")
     (assertCheck "enableTestCheck default is false" (cfg.enableTestCheck == false) "false")
     (assertCheck "enableTempl default is false" (cfg.enableTempl == false) "false")
+    (assertCheck "templGenerationPolicy default is \"committed\"" (
+      cfg.templGenerationPolicy == "committed"
+    ) "committed")
+    (assertCheck "devShellHook default is empty string" (cfg.devShellHook == "") "\"\"")
     (assertCheck "enableGovulncheck default is true" (cfg.enableGovulncheck == true) "true")
     (assertCheck "enableGopls default is true" (cfg.enableGopls == true) "true")
     (assertCheck "deps default is empty" (cfg.deps == { }) "{}")
@@ -466,7 +474,7 @@ let
   # --- templ-committed check tests -------------------------------------------
   # Exercised through static fixture dirs (see templSelf below).
   mkTemplChecks =
-    withTempl: withGenerated:
+    withTempl: withGenerated: policy:
     let
       # Static fixture dirs (NOT derivations): the templ-committed check does
       # `builtins.readDir self.outPath` at eval time, and readDir on a
@@ -490,6 +498,7 @@ let
             go-standard = {
               pname = "test-project";
               vendorHash = null;
+              templGenerationPolicy = policy;
             };
           }
         ];
@@ -515,6 +524,32 @@ let
       };
     in
     perSysEval.config.checks;
+
+  # --- devShellHook behavioral test ------------------------------------------
+  shellHookCfg = mkPerSystemConfig { devShellHook = "echo shell-hook-ran"; };
+
+  # --- apps override test (consumer defs win over mkDefault module apps) ----
+  appsOverrideEval = lib.evalModules {
+    modules = [
+      perSystemStubOptions
+      (
+        let
+          fn = moduleEval.config.perSystem;
+        in
+        if builtins.isFunction fn then fn else _: fn
+      )
+      {
+        apps.test = {
+          type = "app";
+          program = "/consumer/override";
+        };
+      }
+    ];
+    specialArgs = {
+      inherit pkgs lib;
+      config = appsOverrideEval.config or { };
+    };
+  };
 
   # --- mkPreparedSource rejects glob metachars in excludeSubModuleDirs -----
   # Entries are spliced into a shell case PATTERN; a metachar would silently
@@ -1047,17 +1082,17 @@ let
       !(psCfg.checks ? templ-committed)
     ) "no checks.templ-committed")
     (assertCheck "committed .templ + _templ.go: no templ-committed check emitted" (
-      !((mkTemplChecks true true) ? templ-committed)
+      !((mkTemplChecks true true "committed") ? templ-committed)
     ) "no checks.templ-committed")
     (assertCheck ".templ without _templ.go: templ-committed throws at eval" (
       let
-        result = builtins.tryEval (mkTemplChecks true false).templ-committed;
+        result = builtins.tryEval (mkTemplChecks true false "committed").templ-committed;
       in
       !result.success
     ) "eval throw")
     (assertCheck "templ-committed throw message names the committed-generated contract" (
       let
-        result = builtins.tryEval (mkTemplChecks true false).templ-committed;
+        result = builtins.tryEval (mkTemplChecks true false "committed").templ-committed;
       in
       # Nix 2.34: tryEval cannot recover thrown messages (toString of a
       # captured error is ""), so assert the static contract sentence at
@@ -1067,6 +1102,13 @@ let
         builtins.readFile ./modules/go-standard.nix
       )
     ) "throw message content")
+    (assertCheck "templGenerationPolicy=preBuild: no templ-committed check emitted" (
+      !((mkTemplChecks true false "preBuild") ? templ-committed)
+    ) "no checks.templ-committed under preBuild")
+    (assertCheck "templ-committed throw message points at preBuild policy escape hatch"
+      (lib.hasInfix "templGenerationPolicy = \"preBuild\"" (builtins.readFile ./modules/go-standard.nix))
+      "policy hint in throw source"
+    )
     (assertCheck "excludeSubModuleDirs rejects glob metacharacters at eval" (
       !badExcludeEval.success
       && lib.hasInfix "literal directory names" (builtins.readFile ./mkPreparedSource.nix)
@@ -1144,6 +1186,20 @@ let
     (assertCheck "enableVendorHashCheck=false disables the check" (
       !(vendorHashOffCfg.checks ? vendor-hash)
     ) "no vendor-hash when disabled")
+    # --- Behavioral: devShellHook reaches both generated shells ---------------
+    (assertCheck "devShellHook reaches devShells.default" (lib.hasInfix "shell-hook-ran" (
+      shellHookCfg.devShells.default.shellHook or ""
+    )) "hook text in default shell")
+    (assertCheck "devShellHook reaches devShells.ci" (lib.hasInfix "shell-hook-ran" (
+      shellHookCfg.devShells.ci.shellHook or ""
+    )) "hook text in ci shell")
+    (assertCheck "shellHook stays empty when devShellHook is unset" (
+      (psCfg.devShells.default.shellHook or "") == ""
+    ) "empty by default (mkShell always emits the attr)")
+    # --- Behavioral: consumer apps override module defaults -------------------
+    (assertCheck "consumer apps.test overrides the module mkDefault app" (
+      (appsOverrideEval.config.apps.test.program or "MISSING") == "/consumer/override"
+    ) "consumer program wins")
     systemsOverrideCheck
     monorepoOverlayCheck
   ];

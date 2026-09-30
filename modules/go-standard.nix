@@ -158,6 +158,22 @@ in
       description = "Include templ in devShells and treefmt";
     };
 
+    templGenerationPolicy = lib.mkOption {
+      type = lib.types.enum [
+        "committed"
+        "preBuild"
+      ];
+      default = "committed";
+      description = ''
+        How *_templ.go files reach the build. "committed" (default):
+        every .templ file ships a committed *_templ.go sibling, enforced
+        by the eval-time templ-committed check. "preBuild": the repo
+        regenerates *_templ.go in the package build (generated files are
+        gitignored, templ generate runs in preBuild); the templ-committed
+        check is skipped.
+      '';
+    };
+
     enableGovulncheck = lib.mkOption {
       type = lib.types.bool;
       default = true;
@@ -562,6 +578,17 @@ in
       default = { };
       description = "Extra env vars for devShells";
     };
+
+    devShellHook = lib.mkOption {
+      type = lib.types.str;
+      default = "";
+      description = ''
+        Shell script run when entering the generated devShells (default
+        and ci). Use for environment probes and banners that must run at
+        shell-entry time; anything reaching for the network here defeats
+        the shell's reproducibility (hermeticity invariant).
+      '';
+    };
   };
 
   config = {
@@ -932,22 +959,29 @@ in
         // extraPackages;
 
         apps = {
-          default = {
+          # mkDefault: a consumer's own apps.<name> (e.g. a test app that
+          # runs templ generate first, or tests a second Go module) wins
+          # over these generic runners without mkForce gymnastics.
+          default = lib.mkDefault {
             type = "app";
             program = lib.getExe config.packages.default;
           };
-          test = mkApp "run-test" [ goPkg ] "go test -race -v -coverprofile=coverage.out ./...";
+          test = lib.mkDefault (
+            mkApp "run-test" [ goPkg ] "go test -race -v -coverprofile=coverage.out ./..."
+          );
         }
         // lib.optionalAttrs cfg.enableGolangciLint {
-          lint = mkApp "run-lint" [
-            goPkg
-            pkgs.golangci-lint
-          ] "golangci-lint run ./...";
+          lint = lib.mkDefault (
+            mkApp "run-lint" [
+              goPkg
+              pkgs.golangci-lint
+            ] "golangci-lint run ./..."
+          );
         }
         //
           lib.optionalAttrs (cfg.enableGofumpt || cfg.enableGoimports || cfg.enableNixfmt || cfg.enableTempl)
             {
-              fmt = {
+              fmt = lib.mkDefault {
                 type = "app";
                 program = lib.getExe (
                   pkgs.writeShellApplication {
@@ -981,6 +1015,7 @@ in
               GOTOOLCHAIN = "local";
             }
             // finalShellExtraEnv
+            // (lib.optionalAttrs (cfg.devShellHook != "") { shellHook = cfg.devShellHook; })
           );
 
           ci = pkgs.mkShellNoCC (
@@ -990,6 +1025,7 @@ in
               GOTOOLCHAIN = "local";
             }
             // finalShellExtraEnv
+            // (lib.optionalAttrs (cfg.devShellHook != "") { shellHook = cfg.devShellHook; })
           );
         };
 
@@ -1091,7 +1127,7 @@ in
               templFiles = walkTempl self.outPath;
               missing = builtins.filter (f: !builtins.pathExists f.generated) templFiles;
             in
-            lib.optionalAttrs (missing != [ ]) {
+            lib.optionalAttrs (cfg.templGenerationPolicy == "committed" && missing != [ ]) {
               templ-committed = builtins.throw ''
                 go-standard: ${toString (builtins.length missing)} .templ file(s) without a committed *_templ.go sibling:
                 ${lib.concatStringsSep "\n" (map (f: "  ${toString f.templ}") missing)}
@@ -1100,6 +1136,10 @@ in
                 the build fails with `undefined: someFragment`. Run `templ generate`
                 and commit the generated *_templ.go files:
                   git add -- '*_templ.go'
+
+                If this repo regenerates *_templ.go at build time (gitignored,
+                templ generate in preBuild), set
+                go-standard.templGenerationPolicy = "preBuild" instead.
               '';
             }
           );

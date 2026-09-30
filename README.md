@@ -170,6 +170,7 @@ See the full option table below, or copy one of the [templates](#templates).
 | `lockGuards`            | `{ }`                        | Guard tunables: `expectedNixpkgsRev`, `expectedFollows` (see module docs)                                            |
 | `enableOverlay`         | `true`                       | Generate `flake.overlays.default`                                                                                    |
 | `enableTempl`           | `false`                      | Include `templ` in devShells and treefmt                                                                             |
+| `templGenerationPolicy` | `"committed"`                | `"committed"` enforces committed `*_templ.go` siblings (templ-committed check); `"preBuild"` skips it for build-time generation |
 | `enableGovulncheck`     | `true`                       | Include `govulncheck` in the default devShell                                                                        |
 | `enableGopls`           | `true`                       | Include `gopls` in the default devShell                                                                              |
 | `enableGolangciLint`    | `true`                       | Include `golangci-lint` in devShells and the lint app                                                                |
@@ -198,6 +199,7 @@ See the full option table below, or copy one of the [templates](#templates).
 | `extraBuildAttrs`       | `{}`                         | Extra attributes merged into `buildGoModule` (see merge rules below)                                                 |
 | `devShellExtraPackages` | `_: []`                      | Function receiving `pkgs`, returns extra devShell packages                                                           |
 | `shellExtraEnv`         | `{}`                         | Extra env vars for devShells                                                                                         |
+| `devShellHook`          | `""`                         | Shell script run when entering the generated devShells (default and ci)                                              |
 
 #### `extraBuildAttrs` merge rules
 

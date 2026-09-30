@@ -12,6 +12,22 @@ This project has not made a tagged release yet; all changes below are in
 
 ### Added
 
+- `go-standard.templGenerationPolicy` (`"committed"` default, or
+  `"preBuild"`): repos that regenerate `*_templ.go` at build time
+  (gitignored generated files, `templ generate` in preBuild — the Zlota44
+  pattern) were unmigratable — the eval-time templ-committed check threw
+  on every missing sibling with advice that is wrong for them. The
+  `"preBuild"` policy skips the check; the throw message now points at
+  the escape hatch. Discovered migrating Zlota44 (fleet remediation U6).
+- `go-standard.devShellHook` (default `""`): shell script run when
+  entering the generated devShells (default and ci) — completes the
+  devShellExtraPackages/shellExtraEnv trio for consumers that need an
+  entry-time environment probe (e.g. nsfw-classifier's dead
+  /mnt/buildcache cache redirect) without redefining the whole shell.
+- `apps.default`/`test`/`lint`/`fmt` are now `lib.mkDefault`: a
+  consumer's own richer app under the same name (e.g. a test app that
+  runs `templ generate` first or covers a second Go module) wins
+  naturally instead of colliding with the module's definition.
 - `lib.mkSecretTokens prefix: entries` (telephony `fsSecrets`
   extraction): derives a `@PREFIX_ID@` placeholder-token table from
   `{ file, target }` entries for systemd LoadCredential splicing;
