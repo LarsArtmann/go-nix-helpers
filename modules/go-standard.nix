@@ -4,7 +4,8 @@
 #
 # Provides: packages.default, apps.default/test/lint, devShells.default/ci,
 #           checks.format/build, checks.templ-committed (eval-time throw when
-#           any .templ lacks its committed *_templ.go sibling), treefmt,
+#           any .templ lacks its committed *_templ.go sibling), checks.
+#           templ-freshness (opt-in regenerate-and-diff gate), treefmt,
 #           flake.overlays.default
 #
 # Usage (consumer's flake.nix — only 3 inputs needed!):
@@ -171,6 +172,24 @@ in
         regenerates *_templ.go in the package build (generated files are
         gitignored, templ generate runs in preBuild); the templ-committed
         check is skipped.
+      '';
+    };
+
+    enableTemplFreshnessCheck = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = ''
+        Generate `checks.templ-freshness` — a derivation that copies the
+        full source, runs `templ generate`, and diffs every regenerated
+        *_templ.go against the committed one. The templ-committed check
+        only enforces sibling EXISTENCE; this catches a .templ edit (or a
+        templ version bump) whose regeneration was never committed. The
+        oracle is the nixpkgs-pinned templ (the same one treefmt uses),
+        so a templ bump that changes generated output fails `nix flake
+        check` until `templ generate` is re-run and committed. Requires
+        templGenerationPolicy = "committed" (preBuild repos gitignore
+        the generated files — there is nothing to diff); enabling it
+        under preBuild throws at eval.
       '';
     };
 
@@ -1165,6 +1184,66 @@ in
                 templ generate in preBuild), set
                 go-standard.templGenerationPolicy = "preBuild" instead.
               '';
+            }
+          )
+          // (
+            if !cfg.enableTemplFreshnessCheck then
+              { }
+            else if cfg.templGenerationPolicy != "committed" then
+              builtins.throw ''
+                go-standard: enableTemplFreshnessCheck requires templGenerationPolicy = "committed".
+                preBuild repos gitignore *_templ.go — there are no committed files to diff.
+              ''
+            else {
+              # Regenerate-and-diff gate: templ-committed proves a *_templ.go
+              # sibling EXISTS; this proves its CONTENT matches what the
+              # nixpkgs-pinned templ produces today. Runs on the FULL source
+              # copy (templ resolves types across sibling .go files), not a
+              # filtered one. On drift, prints the unified diff and fails —
+              # the fix ritual is exactly `templ generate` + commit.
+              templ-freshness = pkgs.runCommand "${cfg.pname}-templ-freshness"
+                {
+                  nativeBuildInputs = [
+                    pkgs.templ
+                    pkgs.findutils
+                    pkgs.diffutils
+                  ];
+                }
+                ''
+                  export HOME=$TMPDIR
+                  cp -r ${cfg.src} src
+                  chmod -R u+w src
+                  cd src
+
+                  # Snapshot the committed generated files so the diff is
+                  # committed-vs-regenerated, not regenerated-vs-regenerated.
+                  mkdir -p $TMPDIR/committed
+                  find . -name '*_templ.go' -type f | while IFS= read -r f; do
+                    mkdir -p "$TMPDIR/committed/$(dirname "$f")"
+                    cp "$f" "$TMPDIR/committed/$f"
+                  done
+
+                  templ generate
+
+                  : > $TMPDIR/stale.list
+                  find . -name '*_templ.go' -type f | while IFS= read -r f; do
+                    if ! cmp -s "$f" "$TMPDIR/committed/$f"; then
+                      echo "$f" >> $TMPDIR/stale.list
+                    fi
+                  done
+
+                  if [ -s $TMPDIR/stale.list ]; then
+                    echo "go-standard templ-freshness: committed *_templ.go differs from templ generate output — regenerate and commit:" >&2
+                    while IFS= read -r f; do
+                      echo "  $f" >&2
+                      diff -u "$TMPDIR/committed/$f" "$f" >&2 || true
+                    done < $TMPDIR/stale.list
+                    exit 1
+                  fi
+
+                  echo "templ-freshness: committed *_templ.go files match templ generate output"
+                  touch $out
+                '';
             }
           );
 

@@ -169,6 +169,9 @@ let
     (assertCheck "templGenerationPolicy default is \"committed\"" (
       cfg.templGenerationPolicy == "committed"
     ) "committed")
+    (assertCheck "enableTemplFreshnessCheck default is false" (
+      cfg.enableTemplFreshnessCheck == false
+    ) "false")
     (assertCheck "devShellHook default is empty string" (cfg.devShellHook == "") "\"\"")
     (assertCheck "enableGovulncheck default is true" (cfg.enableGovulncheck == true) "true")
     (assertCheck "enableGopls default is true" (cfg.enableGopls == true) "true")
@@ -542,6 +545,73 @@ let
       };
     in
     perSysEval.config.checks;
+
+  # --- templ-freshness check tests -------------------------------------------
+  # Like mkTemplChecks but for the opt-in regenerate-and-diff gate: the
+  # fixture is selected directly (fresh vs stale) and extra go-standard
+  # config is merged in, so the preBuild-policy throw path is also testable.
+  mkFreshnessChecks =
+    fixture: extraCfg:
+    let
+      fixtureSelf = { outPath = fixture; };
+      modEval = lib.evalModules {
+        modules = [
+          flakePartsStub
+          ./modules/go-standard.nix
+          {
+            go-standard = {
+              pname = "test-project";
+              vendorHash = null;
+            } // extraCfg;
+          }
+        ];
+        specialArgs = {
+          inputs = gnhInputs;
+          self = fixtureSelf;
+        };
+      };
+      perSysEval = lib.evalModules {
+        modules = [
+          perSystemStubOptions
+          (
+            let
+              fn = modEval.config.perSystem;
+            in
+            if builtins.isFunction fn then fn else _: fn
+          )
+        ];
+        specialArgs = {
+          inherit pkgs lib;
+          config = perSysEval.config or { };
+        };
+      };
+    in
+    perSysEval.config.checks;
+
+  # Fresh fixture: committed *_templ.go matches templ generate byte-for-byte
+  # (locked templ 0.3.1020) — this derivation BUILDS green as a flake check
+  # (moduleTestTemplFreshness below), proving the gate's happy path runs
+  # templ hermetically in the sandbox.
+  freshnessFreshCfg = mkFreshnessChecks ./test-assets/mock-templ-committed {
+    enableTemplFreshnessCheck = true;
+  };
+
+  # Stale fixture: home_templ.go carries a marker line templ never emits.
+  # The check must EVALUATE fine (stale is a BUILD-time failure by design —
+  # the diff needs templ execution, impossible at eval time) and its script
+  # must carry the stale-detection mechanics.
+  freshnessStaleCfg = mkFreshnessChecks ./test-assets/mock-templ-stale {
+    enableTemplFreshnessCheck = true;
+  };
+
+  # preBuild policy + freshness enabled: must THROW at eval (nothing
+  # committed to diff).
+  freshnessPreBuildEval = builtins.tryEval (
+    mkFreshnessChecks ./test-assets/mock-templ-committed {
+      enableTemplFreshnessCheck = true;
+      templGenerationPolicy = "preBuild";
+    }
+  );
 
   # --- devShellHook behavioral test ------------------------------------------
   shellHookCfg = mkPerSystemConfig { devShellHook = "echo shell-hook-ran"; };
@@ -1127,6 +1197,30 @@ let
       (lib.hasInfix "templGenerationPolicy = \"preBuild\"" (builtins.readFile ./modules/go-standard.nix))
       "policy hint in throw source"
     )
+    # --- templ-freshness check ------------------------------------------------
+    (assertCheck "enableTemplFreshnessCheck=false: no checks.templ-freshness" (
+      !(psCfg.checks ? templ-freshness)
+    ) "no checks.templ-freshness by default")
+    (assertCheck "enableTemplFreshnessCheck=true + committed: checks.templ-freshness exists" (
+      freshnessFreshCfg ? templ-freshness
+    ) "checks.templ-freshness exists")
+    (assertCheck "stale fixture: check evaluates (stale is a build-time failure)" (
+      freshnessStaleCfg ? templ-freshness
+    ) "checks.templ-freshness evaluates on stale input")
+    (assertCheck "stale fixture: script carries the stale-detection mechanics" (
+      lib.hasInfix "differs from templ generate output" (
+        freshnessStaleCfg.templ-freshness.buildCommand or ""
+      )
+    ) "stale echo + diff in buildCommand")
+    (assertCheck "enableTemplFreshnessCheck + preBuild policy throws at eval" (
+      !freshnessPreBuildEval.success
+    ) "eval throw")
+    (assertCheck "preBuild throw message names the policy requirement" (
+      !freshnessPreBuildEval.success
+      && lib.hasInfix "requires templGenerationPolicy = \"committed\"" (
+        builtins.readFile ./modules/go-standard.nix
+      )
+    ) "throw message content")
     (assertCheck "excludeSubModuleDirs rejects glob metacharacters at eval" (
       !badExcludeEval.success
       && lib.hasInfix "literal directory names" (builtins.readFile ./mkPreparedSource.nix)
