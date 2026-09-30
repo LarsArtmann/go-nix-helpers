@@ -492,6 +492,25 @@ let
     enableVendorHashCheck = false;
   };
 
+  # --- vendorHashes per-system override tests ---------------------------------
+  # Rendered under the stub's pkgs (x86_64-linux): an entry for the CURRENT
+  # system wins over vendorHash; entries for OTHER systems leave the
+  # fallback (and the vendor-hash check emission) untouched.
+  vendorHashesCurrentCfg = mkPerSystemConfig {
+    vendorHash = "sha256-FALLBACKHASHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+    vendorHashes.x86_64-linux = "sha256-CURRENTHASHAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+  };
+  vendorHashesOtherCfg = mkPerSystemConfig {
+    vendorHash = "sha256-FALLBACKHASHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+    vendorHashes.aarch64-darwin = "sha256-DARWINHASHAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+  };
+  vendorHashesOnlyCurrentCfg = mkPerSystemConfig {
+    vendorHashes.x86_64-linux = "sha256-CURRENTHASHAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+  };
+  vendorHashesOnlyOtherCfg = mkPerSystemConfig {
+    vendorHashes.aarch64-darwin = "sha256-DARWINHASHAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+  };
+
   # --- templ-committed check tests -------------------------------------------
   # Exercised through static fixture dirs (see templSelf below).
   mkTemplChecks =
@@ -1323,6 +1342,19 @@ let
     (assertCheck "enableVendorHashCheck=false disables the check" (
       !(vendorHashOffCfg.checks ? vendor-hash)
     ) "no vendor-hash when disabled")
+    # --- Behavioral: vendorHashes per-system resolution ------------------------
+    (assertCheck "vendorHashes entry for the current system wins" (
+      vendorHashesCurrentCfg.packages.default.vendorHash == "sha256-CURRENTHASHAAAAAAAAAAAAAAAAAAAAAAAAAAAA="
+    ) "per-system hash used")
+    (assertCheck "vendorHashes entries for other systems leave vendorHash" (
+      vendorHashesOtherCfg.packages.default.vendorHash == "sha256-FALLBACKHASHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="
+    ) "fallback hash used")
+    (assertCheck "vendorHash=current-only (vendorHash null) exposes checks.vendor-hash" (
+      vendorHashesOnlyCurrentCfg.checks ? vendor-hash
+    ) "checks.vendor-hash exists")
+    (assertCheck "vendorHashes only for other systems emits no checks.vendor-hash" (
+      !(vendorHashesOnlyOtherCfg.checks ? vendor-hash)
+    ) "no vendor-hash when effective hash is null")
     # --- Behavioral: devShellHook reaches both generated shells ---------------
     (assertCheck "devShellHook reaches devShells.default" (lib.hasInfix "shell-hook-ran" (
       shellHookCfg.devShells.default.shellHook or ""

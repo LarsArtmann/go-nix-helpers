@@ -65,6 +65,22 @@ in
       description = "Vendor hash for buildGoModule (null = committed vendor/)";
     };
 
+    vendorHashes = lib.mkOption {
+      type = lib.types.attrsOf lib.types.str;
+      default = { };
+      example = {
+        aarch64-darwin = "sha256-...";
+      };
+      description = ''
+        Per-system vendor hash overrides, keyed by system (e.g.
+        "aarch64-darwin"). A system present here uses its entry INSTEAD
+        of vendorHash; every other system falls back to vendorHash.
+        Needed when the vendored FOD hashes differently per platform
+        (typically proxyVendor builds, whose proxy layout embeds
+        platform-specific module sets).
+      '';
+    };
+
     src = lib.mkOption {
       type = lib.types.path;
       default = self.outPath;
@@ -735,11 +751,19 @@ in
 
         buildGoModule = pkgs.buildGoModule.override { go = goPkg; };
 
-        # Warn if vendorHash looks like a placeholder that the consumer
-        # forgot to replace with a real hash after initial setup.
+        # Per-system resolution: an entry in vendorHashes for the system
+        # being rendered wins; everything else falls back to vendorHash.
+        effectiveVendorHash =
+          if cfg.vendorHashes ? pkgs.stdenv.hostPlatform.system then
+            cfg.vendorHashes.${pkgs.stdenv.hostPlatform.system}
+          else
+            cfg.vendorHash;
+
+        # Warn if the effective vendorHash looks like a placeholder that
+        # the consumer forgot to replace with a real hash after setup.
         vendorHashWarning =
-          if cfg.vendorHash != null && builtins.match "sha256-(AAA[A+/]*=*)" cfg.vendorHash != null then
-            builtins.trace "warning: go-standard.vendorHash appears to be a placeholder (${cfg.vendorHash}). Set the real hash after the first build." null
+          if effectiveVendorHash != null && builtins.match "sha256-(AAA[A+/]*=*)" effectiveVendorHash != null then
+            builtins.trace "warning: go-standard.vendorHash appears to be a placeholder (${effectiveVendorHash}). Set the real hash after the first build." null
           else
             null;
 
@@ -905,7 +929,7 @@ in
               pname = pkgName;
               inherit version;
               src = finalSrc;
-              inherit (cfg) vendorHash;
+              vendorHash = effectiveVendorHash;
               proxyVendor = if usePreparedSource then false else cfg.proxyVendor;
               subPackages = subPkgs;
               doCheck = cfg.enableCheck;
@@ -1118,7 +1142,7 @@ in
               doCheck = true;
             });
           }
-          // lib.optionalAttrs (cfg.enableVendorHashCheck && cfg.vendorHash != null) {
+          // lib.optionalAttrs (cfg.enableVendorHashCheck && effectiveVendorHash != null) {
             # The interpolated goModules derivation rides the string
             # context into this script, forcing the FOD to build when the
             # check is built — a drifted vendorHash fails here FIRST, with
