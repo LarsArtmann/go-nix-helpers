@@ -153,6 +153,7 @@ See the full option table below, or copy one of the [templates](#templates).
 | ----------------------- | ---------------------------- | -------------------------------------------------------------------------------------------------------------------- |
 | `pname`                 | (required)                   | Package name, overlay attr, and `mainProgram`                                                                        |
 | `vendorHash`            | `null`                       | Vendor hash for `buildGoModule` (`null` = committed `vendor/`)                                                       |
+| `vendorHashes`          | `{ }`                        | Per-system vendor hash overrides, keyed by system — an entry wins over `vendorHash` on that system (for FODs that hash differently per platform, e.g. `proxyVendor`) |
 | `src`                   | `self.outPath`               | Source path (use `lib.fileset` to filter)                                                                            |
 | `description`           | `"A LarsArtmann Go project"` | Short description for package meta                                                                                   |
 | `version`               | `self.rev or "dev"`          | Version string (defaults to git revision)                                                                            |

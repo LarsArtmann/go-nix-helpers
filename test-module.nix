@@ -1344,10 +1344,12 @@ let
     ) "no vendor-hash when disabled")
     # --- Behavioral: vendorHashes per-system resolution ------------------------
     (assertCheck "vendorHashes entry for the current system wins" (
-      vendorHashesCurrentCfg.packages.default.vendorHash == "sha256-CURRENTHASHAAAAAAAAAAAAAAAAAAAAAAAAAAAA="
+      vendorHashesCurrentCfg.packages.default.vendorHash
+      == "sha256-CURRENTHASHAAAAAAAAAAAAAAAAAAAAAAAAAAAA="
     ) "per-system hash used")
     (assertCheck "vendorHashes entries for other systems leave vendorHash" (
-      vendorHashesOtherCfg.packages.default.vendorHash == "sha256-FALLBACKHASHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="
+      vendorHashesOtherCfg.packages.default.vendorHash
+      == "sha256-FALLBACKHASHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="
     ) "fallback hash used")
     (assertCheck "vendorHash=current-only (vendorHash null) exposes checks.vendor-hash" (
       vendorHashesOnlyCurrentCfg.checks ? vendor-hash

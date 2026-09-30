@@ -35,6 +35,12 @@ Package name. Used as the overlay attribute and mainProgram.
 .BR vendorHash " (null|str, default: null)"
 Vendor hash for buildGoModule. Use null for committed vendor directories.
 .TP
+.BR vendorHashes " (attrsOf str, default: {})"
+Per-system vendor hash overrides, keyed by system (e.g. aarch64-darwin).
+An entry wins over vendorHash on that system; other systems fall back to
+vendorHash. Needed when the vendored FOD hashes differently per platform
+(typically proxyVendor builds).
+.TP
 .BR src " (path, default: self.outPath)"
 Source path for the Go module.
 .TP

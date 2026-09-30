@@ -753,8 +753,10 @@ in
 
         # Per-system resolution: an entry in vendorHashes for the system
         # being rendered wins; everything else falls back to vendorHash.
+        # hasAttr, not `?`: `a ? b.c` parses b.c as a LITERAL attrpath —
+        # the dynamic system string must go through hasAttr.
         effectiveVendorHash =
-          if cfg.vendorHashes ? pkgs.stdenv.hostPlatform.system then
+          if builtins.hasAttr pkgs.stdenv.hostPlatform.system cfg.vendorHashes then
             cfg.vendorHashes.${pkgs.stdenv.hostPlatform.system}
           else
             cfg.vendorHash;
@@ -762,7 +764,9 @@ in
         # Warn if the effective vendorHash looks like a placeholder that
         # the consumer forgot to replace with a real hash after setup.
         vendorHashWarning =
-          if effectiveVendorHash != null && builtins.match "sha256-(AAA[A+/]*=*)" effectiveVendorHash != null then
+          if
+            effectiveVendorHash != null && builtins.match "sha256-(AAA[A+/]*=*)" effectiveVendorHash != null
+          then
             builtins.trace "warning: go-standard.vendorHash appears to be a placeholder (${effectiveVendorHash}). Set the real hash after the first build." null
           else
             null;

@@ -12,6 +12,13 @@ This project has not made a tagged release yet; all changes below are in
 
 ### Added
 
+- `go-standard.vendorHashes` (attrsOf str, default `{}`): per-system vendor
+  hash overrides. An entry for the system being built wins over
+  `vendorHash`; other systems keep the fallback. For FODs that hash
+  differently per platform (typically `proxyVendor` builds whose proxy
+  layout embeds platform-specific module sets — the gogenfilter darwin
+  case). The `vendor-hash` check and the placeholder warning follow the
+  effective per-system hash.
 - `go-standard.enableTemplFreshnessCheck` (default `false`): generates
   `checks.templ-freshness`, a regenerate-and-diff gate that copies the full
   source, runs `templ generate` with the nixpkgs-pinned templ, and fails
