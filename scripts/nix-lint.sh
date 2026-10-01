@@ -119,6 +119,20 @@ for target in "${TARGETS[@]}"; do
   # Pattern 12: treefmtFlake schema errors
   check 'treefmtFlake\.\w+\s*=\s*true' "treefmtFlake.X = true (wrong schema, use treefmtFlake.formatters.X.enable)"
 
+  # Pattern 16 (fleet sweep 2026-10-01): apps.program must resolve to an
+  # executable path. A raw derivation evals fine and breaks `nix run`.
+  check 'program\s*=\s*(?!\(?\s*(?:lib|pkgs\.lib)\.getExe|"\$\{)' "apps program must be lib.getExe drv (or \"\${drv}/bin/name\"), not a raw derivation"
+
+  # Pattern 17: systems regression locks (nixpkgs 26.11 dropped x86_64-darwin)
+  check '"x86_64-darwin"' "x86_64-darwin unsupported since nixpkgs 26.11 — remove from systems (KanyuNix pending hardware decision is the known exception)"
+  check '(nix-)?systems\.url\s*=\s*"github:nix-systems/default' "github:nix-systems/default input re-adds dropped x86_64-darwin — inline the systems list"
+
+  # Pattern 18: placeholder hashes on any *Hash attr (fakeHash repos stayed
+  # unbuildable for months because the old rule only matched vendorHash)
+  if grep -qE '(vendorHash|cargoHash|npmDepsHash|hash|outputHash)[^=]*=\s*(lib\.)?fake(Sha256|Hash)?\s*;|\b(vendorHash|cargoHash|hash)[^=]*=\s*""\s*;' "$flake"; then
+    echo -e "  ${CYAN}INFO${NC} placeholder hash present (compute the real hash: build once, read the got: value)"
+  fi
+
   # Pattern 15: overlay using _prev but referencing prev
   # (inconsistency between param name and usage)
 
@@ -132,8 +146,9 @@ for target in "${TARGETS[@]}"; do
     fi
   fi
 
-  # Check: checks.format exists
-  if grep -q 'perSystem' "$flake" && ! grep -q 'checks.*format\|format.*checks' "$flake"; then
+  # Check: checks.format exists (treefmt flakeModule auto-exports checks,
+  # so importing it satisfies this without a literal checks.format)
+  if grep -q 'perSystem' "$flake" && ! grep -q 'flakeModule' "$flake" && ! grep -q 'checks.*format\|format.*checks' "$flake"; then
     if [ "$FIX" = true ]; then
       # Add checks.format if checks block exists but no format
       if grep -q '^\s*checks\s*=' "$flake"; then
