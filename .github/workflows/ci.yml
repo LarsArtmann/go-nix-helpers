@@ -20,7 +20,8 @@ jobs:
 
       - name: Cache Nix Store
         uses: DeterminateSystems/magic-nix-cache-action@84c0677f58dcedf3b91f8223ce36a9ea5b3c84b7 # v15
-        use-flakehub: false
+        with:
+          use-flakehub: false
 
       - name: Check Flake
         # --no-build: evaluate all outputs without building (faster CI).
@@ -45,7 +46,8 @@ jobs:
 
       - name: Cache Nix Store
         uses: DeterminateSystems/magic-nix-cache-action@84c0677f58dcedf3b91f8223ce36a9ea5b3c84b7 # v15
-        use-flakehub: false
+        with:
+          use-flakehub: false
 
       - name: Run Integration and Module Tests
         run: |
@@ -71,7 +73,8 @@ jobs:
 
       - name: Cache Nix Store
         uses: DeterminateSystems/magic-nix-cache-action@84c0677f58dcedf3b91f8223ce36a9ea5b3c84b7 # v15
-        use-flakehub: false
+        with:
+          use-flakehub: false
 
       - name: Module test against the pinned old nixpkgs
         run: |
@@ -90,7 +93,8 @@ jobs:
 
       - name: Cache Nix Store
         uses: DeterminateSystems/magic-nix-cache-action@84c0677f58dcedf3b91f8223ce36a9ea5b3c84b7 # v15
-        use-flakehub: false
+        with:
+          use-flakehub: false
 
       - name: Generate flake from go-standard template
         run: |
@@ -162,7 +166,8 @@ jobs:
 
       - name: Cache Nix Store
         uses: DeterminateSystems/magic-nix-cache-action@84c0677f58dcedf3b91f8223ce36a9ea5b3c84b7 # v15
-        use-flakehub: false
+        with:
+          use-flakehub: false
 
       - name: Run shellcheck on all scripts
         run: nix run nixpkgs#shellcheck -- scripts/*.sh
@@ -177,7 +182,8 @@ jobs:
 
       - name: Cache Nix Store
         uses: DeterminateSystems/magic-nix-cache-action@84c0677f58dcedf3b91f8223ce36a9ea5b3c84b7 # v15
-        use-flakehub: false
+        with:
+          use-flakehub: false
 
       - name: Check flake.lock freshness
         run: |
