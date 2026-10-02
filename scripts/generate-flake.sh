@@ -199,7 +199,7 @@ fi
 # For go-standard template, add deps section when --private-deps is requested
 if [ "$USE_PRIVATE_DEPS" = true ] && [ "$TEMPLATE" = "go-standard" ]; then
   sed -i '/description = "One-line description of the project";/a\
-
+\
         # Private dependencies (add each as a flake = false input)\
         deps = {\
           # "github.com/larsartmann/go-cqrs-lite" = inputs.go-cqrs-lite;\
