@@ -343,6 +343,16 @@ pkgs.stdenv.mkDerivation {
     mkdir -p _local_deps
     ${copyDeps}
     chmod -R u+w _local_deps
+    # Strip exec bits from _local_deps regular files: stdenv's fixupPhase
+    # auto-runs patchShebangs on every executable in the prepared tree,
+    # rewriting shebangs to absolute store paths. `go mod vendor` then copies
+    # such files (e.g. bundled *.sh scripts) into the go-modules FOD output,
+    # and a FOD must not reference store paths — downstream builds fail with
+    # "fixed-output derivations must not reference store paths". Nothing in a
+    # Nix build executes scripts from _local_deps, so the exec bit is dead
+    # weight that only attracts patchShebangs (found via library-policy's
+    # go-datastar/static/fetch-bundle.sh, 2026-10-02).
+    find _local_deps -type f -perm -0100 -exec chmod -x {} +
 
     ${lib.optionalString stripLocalReplaces stripLocalReplacesScript}
 
