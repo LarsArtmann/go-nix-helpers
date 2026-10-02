@@ -28,7 +28,16 @@ jobs:
         # --all-systems is NOT used because Linux cannot evaluate darwin
         # derivations. Cross-platform coverage is achieved via the
         # ubuntu-latest + macos-latest matrix below.
-        run: nix flake check --no-build
+        #
+        # Evaluate from a clean worktree (AGENTS.md "daemon + GC race"
+        # recipe): the moduleTest self-hosting check imports
+        # mkPreparedSource.nix by interpolating the flake source path, and
+        # evaluating against the actions/checkout working tree made that
+        # path intermittently "not valid" on fresh runners. A worktree of
+        # HEAD gives nix a stable git state to fetch from.
+        run: |
+          git worktree add /tmp/clean-check HEAD
+          cd /tmp/clean-check && nix flake check --no-build
 
       - name: Format Check
         run: nix fmt -- --ci
@@ -50,7 +59,12 @@ jobs:
           use-flakehub: false
 
       - name: Run Integration and Module Tests
+        # Build from a clean worktree of HEAD (see Check Flake note): the
+        # moduleTest build intermittently failed with "Cannot build" when
+        # nix re-fetched the flake source from the actions/checkout tree.
         run: |
+          git worktree add /tmp/clean-integration HEAD
+          cd /tmp/clean-integration
           SYSTEM=$(nix eval --raw --impure --expr 'builtins.currentSystem')
           nix build .#checks.$SYSTEM.verify
           nix build .#checks.$SYSTEM.moduleTest
