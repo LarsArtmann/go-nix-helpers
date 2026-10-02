@@ -121,7 +121,7 @@ for target in "${TARGETS[@]}"; do
 
   # Pattern 16 (fleet sweep 2026-10-01): apps.program must resolve to an
   # executable path. A raw derivation evals fine and breaks `nix run`.
-  check 'program\s*=\s*(?!\(?\s*(?:lib|pkgs\.lib)\.getExe|"\$\{)' "apps program must be lib.getExe drv (or \"\${drv}/bin/name\"), not a raw derivation"
+  check 'program\s*=\s*(?!\(?\s*(?:lib|pkgs\.lib)\.getExe|"\$\{)' 'apps program must be lib.getExe drv (or "${drv}/bin/name"), not a raw derivation'
 
   # Pattern 17: systems regression locks (nixpkgs 26.11 dropped x86_64-darwin)
   check '"x86_64-darwin"' "x86_64-darwin unsupported since nixpkgs 26.11 — remove from systems (KanyuNix pending hardware decision is the known exception)"

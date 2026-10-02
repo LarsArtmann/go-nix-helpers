@@ -727,7 +727,14 @@ in
 
         preparedSrc =
           if usePreparedSource then
-            (import "${inputs.go-nix-helpers}/mkPreparedSource.nix" {
+            # Import mkPreparedSource relative to this module's own file:
+            # module and helper ship in the same source tree (both in this
+            # repo's self-hosting eval and in consumers' locked input copy).
+            # A literal path is copied to the store at eval time, unlike
+            # interpolating inputs.go-nix-helpers, which forced realization
+            # of a git-fetched source path mid-eval and made
+            # `nix flake check --no-build` fail with "path ... is not valid".
+            (import ../mkPreparedSource.nix {
               inherit pkgs lib goPkg;
             })
               {
