@@ -102,6 +102,14 @@ This project has not made a tagged release yet; all changes below are in
   on Nix 2.34. Rewritten against real observables (flattened derivation
   attrs, the pure floor-message builder, throw-site source text). Suites
   now honestly green: moduleTest 139 assertions, pureFunctions 61 checks.
+- Module-generated apps (`go-standard` and `mkGoFlake`: `default`, `test`,
+  `lint`, `fmt`, `extraPackages` apps) carried no `meta.description`, so
+  every consumer repo got an
+  `app 'apps.<system>.<name>' lacks attribute 'meta.description'` warning
+  per app per system on `nix flake check`. All generated apps now carry
+  descriptions (derived from the app name and command for shell apps,
+  pname-based for `default`); verified on a consumer probe: 12 warnings →
+  0 with `--override-input` against the local checkout.
 
 ### Added
 
