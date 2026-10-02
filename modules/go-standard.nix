@@ -1022,6 +1022,7 @@ in
         mkApp = name: runtimeInputs: text: {
           type = "app";
           program = lib.getExe (pkgs.writeShellApplication { inherit name runtimeInputs text; });
+          meta.description = "nix run .#${name}: ${text}";
         };
 
         autoGoPrivateEnv =
@@ -1043,6 +1044,7 @@ in
           default = lib.mkDefault {
             type = "app";
             program = lib.getExe config.packages.default;
+            meta.description = "Run the ${cfg.pname} binary";
           };
           test = lib.mkDefault (
             mkApp "run-test" [ goPkg ] "go test -race -v -coverprofile=coverage.out ./..."
@@ -1068,6 +1070,7 @@ in
                     text = "treefmt";
                   }
                 );
+                meta.description = "Format the repository tree with treefmt";
               };
             }
         // lib.mapAttrs' (
@@ -1075,6 +1078,7 @@ in
           lib.nameValuePair name {
             type = "app";
             program = lib.getExe pkg;
+            meta.description = "Run the ${name} helper app";
           }
         ) extraPackages;
 

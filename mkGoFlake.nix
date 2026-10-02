@@ -158,6 +158,7 @@
       mkApp = name: runtimeInputs: text: {
         type = "app";
         program = "${pkgs.writeShellApplication { inherit name runtimeInputs text; }}/bin/${name}";
+        meta.description = "nix run .#${name}: ${text}";
       };
 
       finalShellHook =
@@ -187,6 +188,7 @@
         default = {
           type = "app";
           program = lib.getExe config.packages.default;
+          meta.description = "Run the ${pname} binary";
         };
         test = mkApp "run-test" [ goPkg ] "go test -race -v -coverprofile=coverage.out ./...";
         lint = mkApp "run-lint" [
