@@ -192,8 +192,10 @@ fi
 
 # Remove private deps section if not requested (go-flake-parts template only)
 if [ "$USE_PRIVATE_DEPS" = false ] && [ "$TEMPLATE" = "go-flake-parts" ]; then
-  sed -i '/go-nix-helpers/,/flake = false/s/^/# /' "$TARGET"
-  sed -i '/-- Private deps/,/^  };/s/^/# /' "$TARGET"
+  # Anchor on the input declaration line and its own closing brace so the
+  # range cannot spill into the header comment (which also mentions
+  # go-nix-helpers) or orphan the inputs closing brace.
+  sed -i '/^    go-nix-helpers = {/,/^    };/s/^/# /' "$TARGET"
 fi
 
 # For go-standard template, add deps section when --private-deps is requested
