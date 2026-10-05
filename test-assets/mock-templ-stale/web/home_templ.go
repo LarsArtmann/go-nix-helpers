@@ -9,6 +9,3 @@ import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
 var _ = templruntime.GeneratedTemplate
-
-// deliberately stale: this line does not survive templ generate
-var _staleMarker = 1
