@@ -10,6 +10,19 @@ This project has not made a tagged release yet; all changes below are in
 
 ## [Unreleased]
 
+### Fixed
+
+- `mkPreparedSource`: a `publicDeps` entry with the BASE path now also
+  excludes NESTED sub-modules (`base/command/v4`, `base/htmx`) from
+  private-dep validation, not just the exact path and `/vN` variants.
+  Monorepo members inherit the base repo's visibility, so a new public
+  sub-module entering indirect requires no longer re-trips "private
+  modules without local replace" (the go-cqrs-lite trap). The match
+  stays slash-anchored (`base-other` never matches). Tradeoff: a
+  genuinely private sub-module under a listed base is also excluded —
+  mixed-visibility monorepos must keep such members covered by an
+  explicit replace.
+
 ### Added
 
 - `go-standard.vendorHashes` (attrsOf str, default `{}`): per-system vendor
