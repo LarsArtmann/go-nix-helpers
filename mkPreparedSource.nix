@@ -278,16 +278,23 @@ let
   # publicDeps are excluded from validation: repos that match privateDepPattern
   # but are actually public (served by proxy.golang.org) can be listed here to
   # avoid false positives while keeping validation active for truly private repos.
-  # Versioned-path aware: listing "github.com/foo/bar" also matches
-  # "github.com/foo/bar/v2", "github.com/foo/bar/v3", etc. Consumers no longer
-  # need to enumerate every /vN variant separately.
+  # Versioned-path AND sub-module aware: listing "github.com/foo/bar" also matches
+  # "github.com/foo/bar/v2", "github.com/foo/bar/v3", AND nested sub-modules like
+  # "github.com/foo/bar/command/v4" or "github.com/foo/bar/htmx" — monorepo
+  # members inherit the base repo's visibility, so consumers no longer need to
+  # enumerate every sub-module separately (the go-cqrs-lite trap: a NEW public
+  # sub-module entering indirect requires re-tripped validation). Tradeoff: a
+  # genuinely PRIVATE sub-module under a publicDep-listed base is also excluded
+  # from validation — mixed-visibility monorepos must keep such members covered
+  # by an explicit replace instead. The match stays anchored: the next path
+  # segment must start with "/" so "github.com/foo/bar-other" never matches.
   # ERE metacharacters in the path (the domain dots) are escaped before the
   # grep -vE: an unescaped dot would make "go.sse" also exclude a required
   # module literally named "goXsse", silently skipping validation for it.
   publicDepsFilter = lib.optionalString (publicDeps != [ ]) ''
     for pub in ${lib.concatMapStringsSep " " lib.escapeShellArg publicDeps}; do
       pub_re=$(printf '%s' "$pub" | sed 's/[.[\*^$()+?{|]/\\&/g')
-      REQUIRED=$(printf '%s\n' "$REQUIRED" | grep -vE "^''${pub_re}(/v[0-9]+)?\$" || true)
+      REQUIRED=$(printf '%s\n' "$REQUIRED" | grep -vE "^''${pub_re}(/v[0-9]+)?(/.*)?\$" || true)
     done
   '';
 

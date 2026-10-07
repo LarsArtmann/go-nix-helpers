@@ -296,6 +296,41 @@ let
   };
 
   # ---------------------------------------------------------------------------
+  # Test 10: publicDeps SUB-MODULE-aware matching — a publicDeps entry with the
+  # BASE path also excludes NESTED sub-modules (the go-cqrs-lite trap: a NEW
+  # public sub-module entering indirect requires, e.g. .../command/v4, used to
+  # re-trip "private modules without local replace" because the filter matched
+  # only exact path + /vN suffix). The match stays slash-anchored: a sibling
+  # module like "mock-subpub-other" never matches the base path.
+  # ---------------------------------------------------------------------------
+  mockSubPubSrc = pkgs.writeTextDir "go.mod" ''
+    module github.com/larsartmann/mock-consumer
+
+    go 1.26
+
+    require (
+      github.com/larsartmann/mock-dep/codec/v2 v0.0.0
+      github.com/larsartmann/mock-subpub/command/v4 v1.0.0
+    )
+  '';
+
+  subModulePublicDepsTest = mkPreparedSource {
+    name = "test-submodule-public-deps";
+    version = "test";
+    src = mockSubPubSrc;
+    deps = {
+      "github.com/larsartmann/mock-dep" = mockDep;
+    };
+    autoSubModules = false;
+    subModules = {
+      "github.com/larsartmann/mock-dep" = [ "codec/v2" ];
+    };
+    # Only the BASE path is listed — the sub-module-aware filter matches
+    # "github.com/larsartmann/mock-subpub/command/v4" in go.mod.
+    publicDeps = [ "github.com/larsartmann/mock-subpub" ];
+  };
+
+  # ---------------------------------------------------------------------------
   # Test 8: pseudo-version normalization covers BOTH shapes
   #   - no-base form:     v0.0.0-<ts>-<rev>
   #   - base form:        vX.Y.Z-0.<ts>-<rev>  (go-cqrs-lite master pins, e.g.
@@ -341,6 +376,7 @@ in
     requireDedupTest
     multiDepsTest
     versionedPublicDepsTest
+    subModulePublicDepsTest
     inTreeReplaceTest
     pseudoVersionNormalizeTest
     ;
@@ -592,6 +628,27 @@ in
       exit 1
     else
       echo "PASS: no pseudo-version fragments remain"
+    fi
+
+    echo ""
+    echo "=== Test 10: publicDeps sub-module-aware matching ==="
+    GOMOD9=${subModulePublicDepsTest}/go.mod
+    cat "$GOMOD9"
+    echo ""
+    # Build succeeded — validation excluded the nested sub-module via the BASE
+    # publicDeps path alone (previously: "private modules without local replace").
+    if grep -qF "mock-subpub/command/v4 => " "$GOMOD9"; then
+      echo "FAIL: public sub-module should not have a replace directive"
+      exit 1
+    else
+      echo "PASS: nested public sub-module excluded by base publicDeps path"
+    fi
+    # The private dep still needs (and has) its replace.
+    if grep -qF "codec/v2 => " "$GOMOD9"; then
+      echo "PASS: private dep still has replace"
+    else
+      echo "FAIL: private dep missing replace"
+      exit 1
     fi
 
     echo ""
