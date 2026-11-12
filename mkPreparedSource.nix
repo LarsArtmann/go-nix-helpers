@@ -122,16 +122,42 @@ let
   # Shell script generation
   # ---------------------------------------------------------------------------
 
-  # Copy each dep into _local_deps/<basename>
-  copyDeps = lib.concatStringsSep "\n" (
-    lib.mapAttrsToList (
-      path: _:
-      let
-        basename = repoName path;
-      in
-      "cp -r ${deps.${path}} _local_deps/${basename}"
-    ) deps
+  # Fail fast at evaluation when two `deps` entries share a repo basename:
+  # both would copy into the same _local_deps/<basename> directory and collide
+  # at build time with an opaque `Permission denied`. One entry per repo —
+  # sub-modules are auto-discovered, so never list a sub-module path of a repo
+  # that is already present.
+  basenameCollisions = lib.filterAttrs (_: paths: lib.length paths > 1) (
+    lib.foldlAttrs (
+      acc: path: _:
+      acc // { ${repoName path} = (acc.${repoName path} or [ ]) ++ [ path ]; }
+    ) { } deps
   );
+
+  # Copy each dep into _local_deps/<basename>
+  copyDeps =
+    if basenameCollisions != { } then
+      throw ''
+        mkPreparedSource: duplicate `deps` entries share a repo basename and would collide in _local_deps/:
+        ${lib.concatStringsSep "\n" (
+          lib.mapAttrsToList (
+            base: paths: "  ${base} <- ${lib.concatStringsSep ", " paths}"
+          ) basenameCollisions
+        )}
+        Use ONE `deps` entry per repository; sub-modules are auto-discovered
+        (autoSubModules), so never add a separate entry for a sub-module path
+        of a repo that already has an entry.
+      ''
+    else
+      lib.concatStringsSep "\n" (
+        lib.mapAttrsToList (
+          path: _:
+          let
+            basename = repoName path;
+          in
+          "cp -r ${deps.${path}} _local_deps/${basename}"
+        ) deps
+      );
 
   # Replace directives for main deps:
   # "github.com/.../go-cqrs-lite" => ./_local_deps/go-cqrs-lite
