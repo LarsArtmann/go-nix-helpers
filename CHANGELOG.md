@@ -10,7 +10,49 @@ This project has not made a tagged release yet; all changes below are in
 
 ## [Unreleased]
 
+### Added
+
+- **OCI container image support** — `go-standard.container` (17-key submodule:
+  enable, packageName, registry, imageName, tag, entrypoint, cmd, user,
+  exposedPorts, volumes, env, labels, extraPackages, pathsToLink, maxLayers,
+  created, nix2container): one config block ships a true-OCI nix2container
+  image with no Dockerfile and no docker daemon. Emits (Linux-only)
+  `packages.<package>-image`, daemon-less `apps.<package>-image-load` /
+  `-image-push` (skopeo `nix:` transport), and `checks.container-structure`
+  (jq gate over image.json: non-root user, entrypoint, labels, arch, layers,
+  config equality). Superb defaults: non-root `65532:65532`, cacert +
+  `SSL_CERT_FILE`, auto `org.opencontainers.image.*` labels,
+  `/bin/<mainProgram>` entrypoint, volumes pre-created with the right
+  ownership, content-hash tag + zero-epoch `created` (byte-reproducible),
+  `maxLayers = 20`. nix2container is bundled by the composite module —
+  consumers stay at 3 inputs. The registry defaults to
+  `ghcr.io/larsartmann` (owner-confirmed 2026-11-17); Forgejo-remote projects
+  override `container.registry` or use a registry-less `imageName` (the git
+  remote is invisible to Nix eval, so the choice is explicit). Backed by
+  `container.nix` (mkImageConfig, envList, mkVolumeDirs, mkContainerImage,
+  mkContainerStructureCheck), 43 container assertions in moduleTest, and
+  `checks.containerSmoke` which exercises the REAL nix2container Go binary
+  end-to-end. Piloted on PapDashboard (branch `oci-go-standard-pilot`,
+  verified via `--override-input`).
+- `go-standard.container.extraPackages` accepts a `pkgs: list` function in
+  addition to a static package list (mirrors `extraBuildAttrs`) — the
+  flake-parts top level has no `pkgs` in scope, so `[ pkgs.busybox ]`
+  could never eval there.
+
 ### Fixed
+
+- Red master CI (every push since ≥2026-10-30): chronic shellcheck SC2016 in
+  `nix-lint.sh`, a darwin-leg-only `vendorHashes` test hardcoding
+  `x86_64-linux` (configs now keyed off `pkgs.stdenv.hostPlatform.system`),
+  and shfmt tab-drift on five scripts (swept in twice by the auto-commit
+  daemon while a concurrent session re-indented them; treefmt format is the
+  canon and is restored each time). A stray 1.9MB `mock-go-project` build
+  artifact the daemon committed into `test-assets/` was evicted and
+  gitignored.
+- `container.entrypoint` / `container.packageName` documentation drift — man
+  page, option description, and README now all document the
+  `meta.mainProgram`-aware default (`[ "/bin/<mainProgram>" ]`) instead of
+  three different stories.
 
 - `mkPreparedSource`: a `publicDeps` entry with the BASE path now also
   excludes NESTED sub-modules (`base/command/v4`, `base/htmx`) from

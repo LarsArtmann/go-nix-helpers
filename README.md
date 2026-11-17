@@ -52,7 +52,7 @@ After copying it in:
 nix build      # produces the package
 nix run        # runs the default app
 nix develop    # enters the full dev shell
-nix flake check # formats, builds, and runs checks
+nix flake check # evaluates and runs all checks
 ```
 
 ---
@@ -207,6 +207,8 @@ See the full option table below, or copy one of the [templates](#templates).
 | `enableLockGuards`          | `false`                      | Eval-time flake.lock guards (registry-tarball trap, fleet-pin drift, dropped `follows`) — nix-email pattern                                                                                    |
 | `lockGuards`                | `{ }`                        | Guard tunables: `expectedNixpkgsRev`, `expectedFollows` (see module docs)                                                                                                                      |
 | `enableOverlay`             | `true`                       | Generate `flake.overlays.default`                                                                                                                                                              |
+| `enableDefaultPackage`      | `true`                       | Generate `packages.default` (set `false` in monorepos that alias `default` themselves)                                                                                                          |
+| `enableDevShells`           | `true`                       | Generate `devShells.default` and `devShells.ci`                                                                                                                                                |
 | `enableTempl`               | `false`                      | Include `templ` in devShells and treefmt                                                                                                                                                       |
 | `templGenerationPolicy`     | `"committed"`                | `"committed"` enforces committed `*_templ.go` siblings (templ-committed check); `"preBuild"` skips it for build-time generation                                                                |
 | `enableTemplFreshnessCheck` | `false`                      | Generate `checks.templ-freshness` — regenerate-and-diff gate: committed `*_templ.go` must match `templ generate` output (nixpkgs-pinned templ); requires `templGenerationPolicy = "committed"` |
@@ -223,6 +225,7 @@ See the full option table below, or copy one of the [templates](#templates).
 | `cgoEnabled`                | `null`                       | `CGO_ENABLED` for the package build AND devShells, as Go's canonical `0`/`1`; `null` = platform default                                                                                        |
 | `buildFlags`                | `[]`                         | Extra build flags for `go build` (e.g. build tags)                                                                                                                                             |
 | `packages`                  | `{}`                         | Additional packages for monorepo support                                                                                                                                                       |
+| `container`                 | `{ }` (disabled)             | OCI image shipping via nix2container (17-key submodule) — see [Ship OCI images, natively](#ship-oci-images-natively)                                                                             |
 | `deps`                      | `{}`                         | Private Go deps for `mkPreparedSource`                                                                                                                                                         |
 | `subModules`                | `{}`                         | Explicit sub-modules (merged with auto-discovered)                                                                                                                                             |
 | `requireDeps`               | `{}`                         | Manually inject `require` lines (deduped against go.mod; for sub-modules not yet required)                                                                                                     |
@@ -293,6 +296,7 @@ preparedSrc = mkPreparedSource {
 | `deps`                | (required)                          | Attrset of `{ "import/path" = flake-input; }`                                                              |
 | `version`             | `"dev"`                             | Version string                                                                                             |
 | `autoSubModules`      | `true`                              | Auto-discover sub-modules from dep source trees                                                            |
+| `excludeSubModuleDirs` | example/testdata/vendor/...         | Directory names skipped during recursive auto-discovery (validated: literal names only)                    |
 | `subModules`          | `{}`                                | Explicit sub-modules (merged with auto-discovered)                                                         |
 | `requireDeps`         | `{}`                                | Manually inject `require` lines                                                                            |
 | `subModuleVersion`    | `"v0.0.0"`                          | Version for pseudo-version normalization                                                                   |
@@ -492,10 +496,12 @@ organizations (e.g. `"github\\.com/(myorg|otherorg)/"`).
 ## Development
 
 ```bash
-nix flake check                    # all checks (autoDiscovery, explicitOnly, verify, moduleTest, treefmt)
+nix flake check                    # all checks (autoDiscovery, explicitOnly, verify, moduleTest,
+                                   # moduleTestNoOverlay, pureFunctions, structural, templateEval,
+                                   # templFixtureGuard, docsAnnotations, treefmt, containerSmoke)
 nix build .#verifyValidation       # build the validation test runner
 nix run .#verifyValidation         # run the negative-case validation outside the sandbox
-nix fmt                            # format all .nix files
+nix fmt                            # format all .nix files and scripts
 ```
 
 See [`CONTRIBUTING.md`](CONTRIBUTING.md) for the development guide.

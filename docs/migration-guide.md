@@ -333,3 +333,28 @@ migrated repo uses go-standard correctly and idiomatically — 8 sections
 covering module adoption, input minimalism, private deps wiring, redundant
 overrides, verification commands, and flake.lock hygiene. It includes a quick
 triage script for a fast first pass.
+
+---
+
+## Early adopter: migrating to an UNPUSHED go-nix-helpers feature
+
+When a go-standard option exists only on local go-nix-helpers master (not yet
+pushed), consumer hooks that EVAL the flake (BuildFlow's nix-fmt pre-commit
+step) hard-fail on `go-standard.<option> does not exist`. The lane that works:
+
+1. Branch the consumer (`git switch -c <feature>-pilot`).
+2. Verify against the local checkout:
+   `nix flake check --override-input go-nix-helpers path:/home/lars/projects/go-nix-helpers --no-build`
+   (build the specific outputs you touched, too).
+3. Commit with `--no-verify` and the lock reason in the message — bypassing
+   the whole hook lane is acceptable ONLY because every lane that ran in the
+   failed attempt was green and only the eval-bound step could not pass.
+4. After go-nix-helpers master is pushed: `nix flake lock --update-input
+   go-nix-helpers` (or `nix flake update go-nix-helpers`), merge, and run the
+   hooks clean — the merge commit must never skip hooks.
+
+Before branching in any repo with an auto-commit daemon: `git stash push --
+<paths>` foreign working-tree modifications first, and check whether THAT
+repo's daemon pushes branches (go-nix-helpers' commits only; PapDashboard's
+pushes) — a daemon that pushes will publish your branch, the foreign files it
+swept into it, and all.
