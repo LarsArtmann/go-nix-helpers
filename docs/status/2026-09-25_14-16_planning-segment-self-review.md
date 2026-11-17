@@ -74,27 +74,27 @@ sed bug, plan P2). My pre-push prediction of exactly this outcome held.
 The authoritative list is the plan's 93 fine tasks; top-10 extraction plus
 this segment's new items:
 
-1. **P1: fix moduleTest `--no-build`** (start by READING test-module.nix:1136 — see b/d above)
-2. **P2: fix generate-flake.sh sed** + full local smoke suite
-3. **P3: push fixes, watch CI fully green** — the gate for everything below
-4. P4: v0.1.0 tag (CHANGELOG section, annotated tag, proxy watch)
-5. P5/P6: delete mkGoFlake + old template (post-tag)
-6. P7/P8: Tier C migrations → mkGoFlake at zero consumers
-7. P9–P14: Tier B migrations (6 repos)
-8. P15: consumer option sweep (goExperiment/completionStyle)
-9. P16–P20: systems test, self-host, buildflow issue, lessons, consumer re-verify
-10. **NEW — fix the plan's own defects:** split 15.2 into honest rows; consider
+~~1. **P1: fix moduleTest `--no-build`** (start by READING test-module.nix:1136 — see b/d above)~~ done — fixed (clean-worktree CI evaluation, 9a7f85d era); moduleTest green under --no-build since, re-proven 2026-11-17
+~~2. **P2: fix generate-flake.sh sed** + full local smoke suite~~ done — fixed (c692ecc: sed append + pin comment); smoke-tested since in CI
+~~3. **P3: push fixes, watch CI fully green** — the gate for everything below~~ done — first fully green master CI run 44152413584 (2026-11-17 18:51), after the shfmt/SC2016/darwin fixes
+~~4. P4: v0.1.0 tag (CHANGELOG section, annotated tag, proxy watch)~~ routed — TODO_LIST Blocked (v0.1.0 owner decision)
+~~5. P5/P6: delete mkGoFlake + old template (post-tag)~~ routed — TODO_LIST Blocked (v0.1.0-gated deletions)
+~~6. P7/P8: Tier C migrations → mkGoFlake at zero consumers~~ routed — TODO_LIST T5
+~~7. P9–P14: Tier B migrations (6 repos)~~ routed — TODO_LIST T4
+~~8. P15: consumer option sweep (goExperiment/completionStyle)~~ routed — TODO_LIST T34
+~~9. P16–P20: systems test, self-host, buildflow issue, lessons, consumer re-verify~~ routed — T33 / T64 / BuildFlow-repo / T63 / T57 respectively
+~~10. **NEW — fix the plan's own defects:** split 15.2 into honest rows; consider~~ done — 15.2 split into an honest batch row with real effort (2026-11-17); HTML rendering follow-up dropped as dormant
     the skill's HTML rendering as a follow-up artifact
-11. **NEW — triage the FlakeHub auth failure line** in the CI run summary
+~~11. **NEW — triage the FlakeHub auth failure line** in the CI run summary~~ Won't implement — dormant (magic-nix-cache post-step warning; no observed cache-hit loss; revisit only if cache metrics degrade)
     (magic-nix-cache post-step; likely harmless warning, confirm it's not
     costing cache hits)
-12. P21–P27 polish + owner batch
+~~12. P21–P27 polish + owner batch~~ routed — T65 (P21-P26 polish batch) + TODO_LIST Blocked rows (P27 owner decisions)
 
 ## g) Up to 3 questions I CANNOT answer myself
 
-1. **T15 (templ generate in module builds):** confirm won't-implement? (Unchanged from this morning; the sbts motivating override is already gone.)
-2. **nix.conf auto-GC (5G/30G) still armed** — will you fix it at root, or do we keep the commit-before-check / worktree discipline forever?
-3. **v0.1.0 tag:** CI will be green once P1–P3 land — is tagging + releasing v0.1.0 pre-approved then, or do you want to see the green run first?
+~~1. **T15 (templ generate in module builds):** confirm won't-implement? (Unchanged from this morning; the sbts motivating override is already gone.)~~ routed — TODO_LIST Blocked (owner verdict; proposal = won't-implement)
+~~2. **nix.conf auto-GC (5G/30G) still armed** — will you fix it at root, or do we keep the commit-before-check / worktree discipline forever?~~ routed — owner/root decision open; standing workarounds: nix-health canary + commit-before-check + clean worktree (AGENTS)
+~~3. **v0.1.0 tag:** CI will be green once P1–P3 land — is tagging + releasing v0.1.0 pre-approved then, or do you want to see the green run first?~~ routed — TODO_LIST Blocked (v0.1.0 owner decision; CI green since 2026-11-17)
 
 ---
 

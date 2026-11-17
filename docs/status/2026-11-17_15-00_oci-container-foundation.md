@@ -116,7 +116,7 @@ in-session, plus two live blemishes:
 ## g) QUESTIONS (cannot figure out myself)
 
 1. **Push approval:** go-nix-helpers master has all container work local and unpushed; no consumer can use it until pushed. Push to origin now (CI becomes the oracle for aarch64), or hold?
-2. **Registry target:** the default `registry = "ghcr.io/larsartmann"` was assumed (bank-sync hand-rolled image has NO registry prefix; nothing in the fleet pushes to GHCR today that I found). Is GHCR the intended target (auth already set up?), or should the default be neutral/empty and each repo opt in?
+2. **Registry target:** the default `registry = "ghcr.io/larsartmann"` was assumed (bank-sync hand-rolled image has NO registry prefix; nothing in the fleet pushes to GHCR today that I found). Is GHCR the intended target (auth already set up?), or should the default be neutral/empty and each repo opt in? — ✅ **ANSWERED 2026-11-17 (owner, via the 18-52 session §g.3):** default CONFIRMED (`ghcr.io/larsartmann`), with a Forgejo-remote carve-out — those repos override `container.registry` or use a registry-less `imageName`; encoded in the option description, man page, and README.
 3. **PapDashboard sequencing + tag:** migrate now against `path:` override (unpushed module), or wait until go-nix-helpers is pushed and pilot against locked master? And keep `papdashboard:latest` (compose contract) or move to content-hash tags and let compose reference them explicitly? — 🔄 answered by action 2026-11-17: migrated NOW on branch `oci-go-standard-pilot` (master stays green; merge + relock after push). Tag: `latest` kept — the compose contract pins it; revisit content-hash when compose templating is on the table.
 
 ---

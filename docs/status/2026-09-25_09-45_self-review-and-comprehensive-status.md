@@ -66,65 +66,65 @@ shellcheck). A closing full sweep is queued as next-work #1.
 
 ## e) WHAT WE SHOULD IMPROVE
 
-1. **Kill the piped-exit-code class permanently**: never `cmd | tail; echo $?` on verification commands; use `set -o pipefail`, separate commands, or check `${PIPESTATUS[0]}`. Should become an AGENTS recipe (session-behavior rule), and CI should stay the backstop.
-2. **Run assertions in every environment they claim to cover BEFORE committing them** — the 8-assertion incident and my stale-pin repeat are the same lesson. The old-nixpkgs job exists now; consider making "assertion added → both-pins eval" a reflex.
-3. **Self-hosting gap**: our own flake hand-rolls perSystem outputs instead of importing `flakeModules.go-standard` — the dogfood gap is why the dead `systems` option and missing `passthru.go` survived unnoticed. Migrating our flake onto its own module would make the module self-verifying.
-4. **Vendoring drift**: check-rows.py carries a provenance header but no upstream revision marker/date — add a vendored-from version note and a re-vendor reminder when the skill updates.
-5. **Cross-project lessons not exported** (toString/bools, tryEval messages, `or` precedence) — they live only in this repo's AGENTS; crush-config lessons.md is the right home for the generalized ones.
-6. **Verification-depth honesty in labels**: distinguish "script-level red" vs "derivation-level red", "shapes render" vs "strikethrough renders" — this report does it; future status reports should keep doing it.
-7. **buildflow nix-hash-fix classifier bug** (mismatch in a dependency-of-check misclassified as non-hash failure → 5-run loop): needs an upstream BuildFlow issue/fix; the tool left me no sanctioned path and forced a documented rule-bend (applying the tool's own reported hash).
+~~1. **Kill the piped-exit-code class permanently**: never `cmd | tail; echo $?` on verification commands; use `set -o pipefail`, separate commands, or check `${PIPESTATUS[0]}`. Should become an AGENTS recipe (session-behavior rule), and CI should stay the backstop.~~ Won't implement — dormant as an AGENTS recipe; routed cross-repo — TODO_LIST T63 (repo: crush-config lessons export carries the piped-exit lesson)
+~~2. **Run assertions in every environment they claim to cover BEFORE committing them** — the 8-assertion incident and my stale-pin repeat are the same lesson. The old-nixpkgs job exists now; consider making "assertion added → both-pins eval" a reflex.~~ Won't implement — dormant (discipline lesson; the old-nixpkgs CI job is the mechanical backstop that caught the repeat)
+~~3. **Self-hosting gap**: our own flake hand-rolls perSystem outputs instead of importing `flakeModules.go-standard` — the dogfood gap is why the dead `systems` option and missing `passthru.go` survived unnoticed. Migrating our flake onto its own module would make the module self-verifying.~~ routed — TODO_LIST T64 (self-host on flakeModules.go-standard)
+~~4. **Vendoring drift**: check-rows.py carries a provenance header but no upstream revision marker/date — add a vendored-from version note and a re-vendor reminder when the skill updates.~~ routed — TODO_LIST T65 (vendored-from revision marker)
+~~5. **Cross-project lessons not exported** (toString/bools, tryEval messages, `or` precedence) — they live only in this repo's AGENTS; crush-config lessons.md is the right home for the generalized ones.~~ routed — TODO_LIST T63 (repo: crush-config)
+~~6. **Verification-depth honesty in labels**: distinguish "script-level red" vs "derivation-level red", "shapes render" vs "strikethrough renders" — this report does it; future status reports should keep doing it.~~ Won't implement — dormant (convention observed in later reports by practice)
+~~7. **buildflow nix-hash-fix classifier bug** (mismatch in a dependency-of-check misclassified as non-hash failure → 5-run loop): needs an upstream BuildFlow issue/fix; the tool left me no sanctioned path and forced a documented rule-bend (applying the tool's own reported hash).~~ routed — BuildFlow repo owns the classifier fix (dependency-of-check mismatch); workaround documented (apply the tool's reported got: hash, verify by rebuild)
 
 ## f) Up to 50 things to do next
 
-1. Closing full `nix flake check` at current HEAD (last one predates final commits)
-2. Push master (owner-gated) → CI validates all 31 commits end-to-end
-3. T4: migrate KeyCountdown
-4. T4: migrate branching-flow (go-enum via extraBuildAttrs)
-5. T4: migrate StopTube (per-package attrs in anger)
-6. T4: migrate overview (git-hooks input consumer-side; nixosModules via perSystem)
-7. T4: migrate bank-sync (allowUnfree consumer-side)
-8. T4: migrate BuildFlow (1215 lines, multi-tool packages)
-9. T5: migrate Standup-Killer (subModules + doCheck=false)
-10. T5: migrate crush-daily (NixOS module via perSystem) → mkGoFlake at ZERO consumers
-11. T33: module test for the systems mapping (kill the manual-probe-only coverage)
-12. T34: sweep consumers to `goExperiment` (needs push) — incl. sbts's remaining extraBuildAttrs GOEXPERIMENT
-13. T34: sweep cobra consumers to `completionStyle = "subcommand"`
-14. Self-host properly: import flakeModules.go-standard in our own flake (dogfood gap)
-15. G1: v0.1.0 tag once pushed + CI green (CHANGELOG section, annotated tag, module-proxy watch)
-16. G2: delete mkGoFlake.nix + trace wrapper + structural-check reference update
-17. G3: delete templates/go-flake-parts + references
-18. G4: maintainers.larsartmann nixpkgs PR (external)
-19. G5: SSH CI job (DEPLOY_SSH_KEY secret, flip `if: false`)
-20. G6: df9a5ff empty-message rebase (owner-approved force-with-lease)
-21. G7: record the won't-implement policy once owner decides
-22. Verify F13's "CV" premise (what repo was meant?) before fully dropping it
-23. File the buildflow nix-hash-fix classifier bug upstream (dependency-of-check mismatches)
-24. Derivation-level red proof for docsAnnotations (throwaway branch with a planted broken table)
-25. Render struck tables via pandoc→HTML and confirm `<del>` output (finish T27 properly)
-26. Observe/grep the nixpkgs overridden-version warning to confirm F7's markers actually silence it
-27. Export cross-project lessons to crush-config references/lessons.md (toString-bools, tryEval-message, `or` precedence, piped-exit)
-28. Add "no piped exit codes on verification" recipe to this repo's AGENTS (session hygiene)
-29. Re-run consumer attr-probe after any future nixpkgs bump (the 10/10 proof assumed no newer go attr exists)
-30. sbts: post-push lock bump + GOEXPERIMENT → goExperiment swap
-31. Old-nixpkgs CI pin refresh policy (the 2026-06 rev will rot; define refresh cadence or pin by date query)
-32. check-rows.py: record vendored-from upstream revision/date in header; re-vendor when skill updates
-33. Consider extending docs gates to docs/planning + docs/reviews (currently docs/status only)
-34. nix-health.sh: warn when the working tree is dirty (the daemon+GC flake-check hazard)
-35. Consider exposing `go` on devShells via passthru too (parity with packages)
-36. moduleTest: print/emit assertion count in the derivation output for drift detection
-37. goModFloorMessage: add malformed-floor robustness tests ("1.x", "v1.26", empty)
-38. README FAQ: "why does my flake check warn about incompatible systems?" (post-fix behavior)
-39. Monitor CI's first run of old-nixpkgs-module-test (new job, never executed on GitHub)
-40. Trash/commit sweep: confirm no other result* symlinks accumulated since F4
-41. Consider `nix flake check` workflow_dispatch target for host-broken scenarios (from prior backlog #42)
-42. Post-push: re-verify a consumer against the PUSHED rev without --override-input (kills the PMA-class time bomb pattern)
-43. Dashboard: surface nix-health in dashboard.sh output header (one-line canary)
+~~1. Closing full `nix flake check` at current HEAD (last one predates final commits)~~ done — full check all-passed repeatedly since (06-30 through 2026-11-17 sessions; green CI run 44152413584)
+~~2. Push master (owner-gated) → CI validates all 31 commits end-to-end~~ done — pushed + synced; CI validated end-to-end (incl. old-nixpkgs job; first fully green master 2026-11-17)
+~~3. T4: migrate KeyCountdown~~ routed — TODO_LIST T4
+~~4. T4: migrate branching-flow (go-enum via extraBuildAttrs)~~ routed — TODO_LIST T4
+~~5. T4: migrate StopTube (per-package attrs in anger)~~ routed — TODO_LIST T4
+~~6. T4: migrate overview (git-hooks input consumer-side; nixosModules via perSystem)~~ routed — TODO_LIST T4
+~~7. T4: migrate bank-sync (allowUnfree consumer-side)~~ routed — TODO_LIST T4
+~~8. T4: migrate BuildFlow (1215 lines, multi-tool packages)~~ routed — TODO_LIST T4
+~~9. T5: migrate Standup-Killer (subModules + doCheck=false)~~ routed — TODO_LIST T5
+~~10. T5: migrate crush-daily (NixOS module via perSystem) → mkGoFlake at ZERO consumers~~ routed — TODO_LIST T5
+~~11. T33: module test for the systems mapping (kill the manual-probe-only coverage)~~ routed — TODO_LIST T33
+~~12. T34: sweep consumers to `goExperiment` (needs push) — incl. sbts's remaining extraBuildAttrs GOEXPERIMENT~~ routed — TODO_LIST T34
+~~13. T34: sweep cobra consumers to `completionStyle = "subcommand"`~~ routed — TODO_LIST T34
+~~14. Self-host properly: import flakeModules.go-standard in our own flake (dogfood gap)~~ routed — TODO_LIST T64
+~~15. G1: v0.1.0 tag once pushed + CI green (CHANGELOG section, annotated tag, module-proxy watch)~~ routed — TODO_LIST Blocked (v0.1.0 owner decision)
+~~16. G2: delete mkGoFlake.nix + trace wrapper + structural-check reference update~~ routed — TODO_LIST Blocked (v0.1.0-gated)
+~~17. G3: delete templates/go-flake-parts + references~~ routed — TODO_LIST Blocked (v0.1.0-gated)
+~~18. G4: maintainers.larsartmann nixpkgs PR (external)~~ routed — TODO_LIST Blocked (external nixpkgs PR)
+~~19. G5: SSH CI job (DEPLOY_SSH_KEY secret, flip `if: false`)~~ routed — TODO_LIST Blocked (needs the secret)
+~~20. G6: df9a5ff empty-message rebase (owner-approved force-with-lease)~~ routed — TODO_LIST Blocked (rebase approval)
+~~21. G7: record the won't-implement policy once owner decides~~ routed — TODO_LIST Blocked (owner policy decision)
+~~22. Verify F13's "CV" premise (what repo was meant?) before fully dropping it~~ done — verified 2026-11-17: ~/projects/cv's flake.lock DOES carry go-nix-helpers (ADR-0003 A12, 0a889d5dd) and builds green; the "no input" drop-premise was stale
+~~23. File the buildflow nix-hash-fix classifier bug upstream (dependency-of-check mismatches)~~ routed — BuildFlow repo owns the classifier fix (documented workaround in the meantime)
+~~24. Derivation-level red proof for docsAnnotations (throwaway branch with a planted broken table)~~ routed — TODO_LIST T65 (P23 polish batch)
+~~25. Render struck tables via pandoc→HTML and confirm `<del>` output (finish T27 properly)~~ routed — TODO_LIST T65 (P23 polish batch)
+~~26. Observe/grep the nixpkgs overridden-version warning to confirm F7's markers actually silence it~~ done — verified 2026-11-17: the moduleTest build log carries NO version-override warning (markers present, warning absent)
+~~27. Export cross-project lessons to crush-config references/lessons.md (toString-bools, tryEval-message, `or` precedence, piped-exit)~~ routed — TODO_LIST T63 (repo: crush-config)
+~~28. Add "no piped exit codes on verification" recipe to this repo's AGENTS (session hygiene)~~ routed — TODO_LIST T63 (lesson rides the crush-config export)
+~~29. Re-run consumer attr-probe after any future nixpkgs bump (the 10/10 proof assumed no newer go attr exists)~~ routed — ROADMAP Theme 3 (raw idea added 2026-11-17)
+~~30. sbts: post-push lock bump + GOEXPERIMENT → goExperiment swap~~ routed — TODO_LIST T34 (sweep covers the GOEXPERIMENT swap; T57 covers post-push relocks)
+~~31. Old-nixpkgs CI pin refresh policy (the 2026-06 rev will rot; define refresh cadence or pin by date query)~~ routed — TODO_LIST T65 (P26 policy note)
+~~32. check-rows.py: record vendored-from upstream revision/date in header; re-vendor when skill updates~~ routed — TODO_LIST T65 (P21 vendored-from marker)
+~~33. Consider extending docs gates to docs/planning + docs/reviews (currently docs/status only)~~ routed — TODO_LIST T65 (P21 gate extension to planning/reviews)
+~~34. nix-health.sh: warn when the working tree is dirty (the daemon+GC flake-check hazard)~~ routed — TODO_LIST T65 (P22 dirty-tree warning)
+~~35. Consider exposing `go` on devShells via passthru too (parity with packages)~~ routed — TODO_LIST T65 (P25 watchlist batch)
+~~36. moduleTest: print/emit assertion count in the derivation output for drift detection~~ done — the moduleTest log prints "(N checks)"; counts re-derived from it 2026-11-17 (218). AGENTS carries the re-derive recipe
+~~37. goModFloorMessage: add malformed-floor robustness tests ("1.x", "v1.26", empty)~~ routed — TODO_LIST T65 (P25 watchlist batch)
+~~38. README FAQ: "why does my flake check warn about incompatible systems?" (post-fix behavior)~~ done — moot: the warning is GONE (systems default dropped x86_64-darwin, option wired); nothing left to FAQ about
+~~39. Monitor CI's first run of old-nixpkgs-module-test (new job, never executed on GitHub)~~ done — job green on GitHub since 2026-09-25 (runs green through 2026-11-17)
+~~40. Trash/commit sweep: confirm no other result* symlinks accumulated since F4~~ done — gitignore holds; one untracked gitignored result link is normal dev residue (re-checked 2026-11-17)
+~~41. Consider `nix flake check` workflow_dispatch target for host-broken scenarios (from prior backlog #42)~~ routed — TODO_LIST T65 (P26)
+~~42. Post-push: re-verify a consumer against the PUSHED rev without --override-input (kills the PMA-class time bomb pattern)~~ done — consumers re-verified against pushed revs during the ADR-0003 A12 convergence (2026-11); the PMA-class override-input time-bomb pattern is documented in the migration guide's early-adopter recipe
+~~43. Dashboard: surface nix-health in dashboard.sh output header (one-line canary)~~ routed — TODO_LIST T65 (P22 canary line)
 
 ## g) Up to 3 questions I CANNOT answer myself
 
-1. **Push:** master through `bb56b78` is now on origin (external push, ~09:47) — CI should be validating the suite right now. The two remaining commits (script fix + this report) are unpushed: push them as-is, or hold until CI's verdict on the batch?
-2. **T15 (templ generate inside module builds):** confirm closing as won't-implement? (Consumers commit `*_templ.go`; build-time generation is dead weight and a templ-version reproducibility risk; the motivating override is already gone from sbts.)
-3. **The binfmt fix happened but nix.conf auto-GC did not** (min-free=5G / max-free=30G still armed). The canary will keep warning and the mid-check source-copy deletion risk remains. Will you raise/disable auto-GC + restart the daemon (root), or should the workflow keep working around it (worktrees, commit-before-check)?
+~~1. **Push:** master through `bb56b78` is now on origin (external push, ~09:47) — CI should be validating the suite right now. The two remaining commits (script fix + this report) are unpushed: push them as-is, or hold until CI's verdict on the batch?~~ done — moot: everything through f5b3b85 is on origin (synced 2026-11-17); CI green on the fix chain after the three root-cause fixes
+~~2. **T15 (templ generate inside module builds):** confirm closing as won't-implement? (Consumers commit `*_templ.go`; build-time generation is dead weight and a templ-version reproducibility risk; the motivating override is already gone from sbts.)~~ routed — TODO_LIST Blocked (owner verdict; proposal = won't-implement)
+~~3. **The binfmt fix happened but nix.conf auto-GC did not** (min-free=5G / max-free=30G still armed). The canary will keep warning and the mid-check source-copy deletion risk remains. Will you raise/disable auto-GC + restart the daemon (root), or should the workflow keep working around it (worktrees, commit-before-check)?~~ routed — owner/root decision still open (auto-GC armed); standing workarounds: nix-health canary + commit-before-check + clean-worktree recipe (AGENTS)
 
 ---
 
