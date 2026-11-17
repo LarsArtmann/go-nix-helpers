@@ -61,11 +61,11 @@ I read `list-private-deps.sh` but never **ran it** against a real `go.mod` to ve
 
 ## c) NOT STARTED
 
-1. **Running the skill end-to-end** — Never executed the skill's prescribed workflow on a real consumer project to verify the instructions actually work as documented.
-2. **Checking CI YAML action versions** — `cachix/install-nix-action@v27` in `ci-auth.md` may be outdated (v27 was current ~mid-2024; latest may be v30+). Did not verify.
-3. **Validating Nix snippet syntax** — Never ran `nix-instantiate --parse` on any code block in the skill to confirm syntactic correctness.
-4. **Checking skill trigger description completeness** — The frontmatter `description` field doesn't mention `publicDeps` as a trigger keyword, which could cause the skill to not activate when a user asks about that option.
-5. **Reviewing `allowed-tools` field** — Lists `bash view edit grep` but I used `multiedit` which isn't listed. May or may not be covered by `edit`.
+~~1. **Running the skill end-to-end** — Never executed the skill's prescribed workflow on a real consumer project to verify the instructions actually work as documented.~~ Won't implement — dormant (SKILLS-repo scope, 3+ months; reopen on demand)
+~~2. **Checking CI YAML action versions** — `cachix/install-nix-action@v27` in `ci-auth.md` may be outdated (v27 was current ~mid-2024; latest may be v30+). Did not verify.~~ done — round-2 session updated ci-auth.md (2026-08-12_10-24 §a.8)
+~~3. **Validating Nix snippet syntax** — Never ran `nix-instantiate --parse` on any code block in the skill to confirm syntactic correctness.~~ done — round-2 session parsed every block (2026-08-12_10-24 §a.9)
+~~4. **Checking skill trigger description completeness** — The frontmatter `description` field doesn't mention `publicDeps` as a trigger keyword, which could cause the skill to not activate when a user asks about that option.~~ done — round-2 session added publicDeps/validatePrivateDeps triggers (§a.5); re-verified in the live skill 2026-11-17
+~~5. **Reviewing `allowed-tools` field** — Lists `bash view edit grep` but I used `multiedit` which isn't listed. May or may not be covered by `edit`.~~ routed — ROADMAP Open questions (allowed-tools enforcement)
 
 ---
 
@@ -120,20 +120,20 @@ For a documentation-only change this is lower risk, but the AGENTS.md mandate sa
 
 ### Skill content improvements
 
-1. **Add `proxyVendor = false` behavior documentation** — When `deps` is non-empty, go-standard automatically sets `proxyVendor = false`. This is important but undocumented in the skill.
-2. **Document the FOD `go mod tidy` behavior** — When deps are set, the module runs `go mod tidy` + `go mod vendor` in the modBuildPhase and syncs go.mod/go.sum to the main build. This affects build behavior significantly but is invisible to skill readers.
-3. **Add `autoGoPrivate` and `privateGlobPattern` to the gotcha table or guide** — These options control GOPRIVATE injection and are only mentioned in the verification status block, not in the actionable guide content.
-4. **Clarify Option A vs Option B distinction** — The skill presents two paths but doesn't clearly state when to use which. The implementation-guide.md full example is Option B only.
-5. **Add monorepo + private deps guidance** — The `packages` option with private deps is not covered. How do per-package `extraBuildAttrs` interact with `deps`?
-6. **Add `lintAsCheck` guidance for CI** — CI setups with private repos may want linting as a hermetic check. Not mentioned.
-7. **Mention `vendorHash = null` for committed vendor/** — The skill's migration path assumes moving AWAY from vendor/, but doesn't document that `vendorHash = null` is the signal for committed vendor/ in go-standard.
+~~1. **Add `proxyVendor = false` behavior documentation** — When `deps` is non-empty, go-standard automatically sets `proxyVendor = false`. This is important but undocumented in the skill.~~ done — round-2 auto-behaviors table (2026-08-12_10-24 §a.3)
+~~2. **Document the FOD `go mod tidy` behavior** — When deps are set, the module runs `go mod tidy` + `go mod vendor` in the modBuildPhase and syncs go.mod/go.sum to the main build. This affects build behavior significantly but is invisible to skill readers.~~ done — round-2 auto-behaviors table (2026-08-12_10-24 §a.3)
+~~3. **Add `autoGoPrivate` and `privateGlobPattern` to the gotcha table or guide** — These options control GOPRIVATE injection and are only mentioned in the verification status block, not in the actionable guide content.~~ done — round-2 auto-behaviors table (2026-08-12_10-24 §a.3)
+~~4. **Clarify Option A vs Option B distinction** — The skill presents two paths but doesn't clearly state when to use which. The implementation-guide.md full example is Option B only.~~ done — round-2 note + reference table (2026-08-12_10-24 §a.6)
+~~5. **Add monorepo + private deps guidance** — The `packages` option with private deps is not covered. How do per-package `extraBuildAttrs` interact with `deps`?~~ routed — TODO_LIST T61 (repo: SKILLS)
+~~6. **Add `lintAsCheck` guidance for CI** — CI setups with private repos may want linting as a hermetic check. Not mentioned.~~ Won't implement — dormant (SKILLS-repo scope; reopen on demand)
+~~7. **Mention `vendorHash = null` for committed vendor/** — The skill's migration path assumes moving AWAY from vendor/, but doesn't document that `vendorHash = null` is the signal for committed vendor/ in go-standard.~~ Won't implement — dormant (escape hatch documented in go-nix-helpers README/migration guide; skill-level never picked up)
 
 ### Skill process improvements
 
-8. **Always run scripts during skill audits** — Reading a script is not enough. Execute it against test inputs.
-9. **Validate Nix snippets with `nix-instantiate --parse`** — Quick syntax check that catches typos.
-10. **Check frontmatter `description` triggers against new options** — When adding `publicDeps` to the skill, also add it as a trigger keyword if users might search for it.
-11. **Diff old vs new verification blocks** — The verification status was stale; this pattern will recur. Skills referencing "current state" should be re-verified periodically.
+~~8. **Always run scripts during skill audits** — Reading a script is not enough. Execute it against test inputs.~~ done — lesson recorded and applied in round-2 (misdiagnosis caught by actually running the script, §d.1)
+~~9. **Validate Nix snippets with `nix-instantiate --parse`** — Quick syntax check that catches typos.~~ done — round-2 session (2026-08-12_10-24 §a.9)
+~~10. **Check frontmatter `description` triggers against new options** — When adding `publicDeps` to the skill, also add it as a trigger keyword if users might search for it.~~ done — round-2 session (§a.5); re-verified 2026-11-17
+~~11. **Diff old vs new verification blocks** — The verification status was stale; this pattern will recur. Skills referencing "current state" should be re-verified periodically.~~ done — verification block rewritten with date stamp in round-2
 
 ---
 
@@ -141,71 +141,71 @@ For a documentation-only change this is lower risk, but the AGENTS.md mandate sa
 
 ### Immediate (this skill)
 
-1. **Fix `list-private-deps.sh` bash `#` expansion bug** — Replace `${dep#pattern}` with `sed` extraction (CRITICAL)
-2. **Run the fixed script against a real go.mod** — Verify output is valid Nix
-3. **Add `bash -n` syntax check** — Quick validation for the script
-4. **Fix GOWORK gotcha table row** — Note it's automatic for go-standard users
-5. **Add `publicDeps` to frontmatter description trigger keywords**
-6. **Verify CI action versions in ci-auth.md** — `cachix/install-nix-action@v27` may be outdated
-7. **Add `proxyVendor = false` auto-behavior documentation**
-8. **Add FOD `go mod tidy` auto-behavior documentation**
-9. **Document `autoGoPrivate` and `privateGlobPattern` in guide content**
-10. **Add monorepo + private deps interaction guidance**
-11. **Add `lintAsCheck` guidance for private-repo CI setups**
-12. **Run `nix-instantiate --parse` on all Nix code blocks in the skill**
-13. **Clarify Option A vs Option B in implementation-guide.md** — Add a note that Option A users skip the full example
-14. **Sync fixes to installed copy after script fix** — Both copies must stay in sync
-15. **Consider a symlink instead of copy** — Eliminates sync drift permanently
+~~1. **Fix `list-private-deps.sh` bash `#` expansion bug** — Replace `${dep#pattern}` with `sed` extraction (CRITICAL)~~ done — round-2 fixed the REAL bugs (grep matching module line + set -e crash; d2f01f8); the `#`-expansion diagnosis here was WRONG (see §d.1 of 10-24)
+~~2. **Run the fixed script against a real go.mod** — Verify output is valid Nix~~ done — 4 scenarios verified (2026-08-12_10-24 §a.2)
+~~3. **Add `bash -n` syntax check** — Quick validation for the script~~ Won't implement — dormant (script verified by execution, not syntax-lint)
+~~4. **Fix GOWORK gotcha table row** — Note it's automatic for go-standard users~~ done — round-2 session (2026-08-12_10-24 §a.4)
+~~5. **Add `publicDeps` to frontmatter description trigger keywords**~~ done — round-2 session (§a.5); verified in the live skill frontmatter 2026-11-17
+~~6. **Verify CI action versions in ci-auth.md** — `cachix/install-nix-action@v27` may be outdated~~ done — round-2 session (2026-08-12_10-24 §a.8)
+~~7. **Add `proxyVendor = false` auto-behavior documentation**~~ done — round-2 auto-behaviors table (§a.3)
+~~8. **Add FOD `go mod tidy` auto-behavior documentation**~~ done — round-2 auto-behaviors table (§a.3)
+~~9. **Document `autoGoPrivate` and `privateGlobPattern` in guide content**~~ done — round-2 auto-behaviors table (§a.3)
+~~10. **Add monorepo + private deps interaction guidance**~~ routed — TODO_LIST T61 (repo: SKILLS)
+~~11. **Add `lintAsCheck` guidance for private-repo CI setups**~~ Won't implement — dormant (SKILLS-repo scope)
+~~12. **Run `nix-instantiate --parse` on all Nix code blocks in the skill**~~ done — round-2 session validated all blocks (§a.9)
+~~13. **Clarify Option A vs Option B in implementation-guide.md** — Add a note that Option A users skip the full example~~ done — round-2 session (§a.6)
+~~14. **Sync fixes to installed copy after script fix** — Both copies must stay in sync~~ done — round-2 synced (§a.11); moot since the fleet fan-out switched to symlinks (verified 2026-11-15)
+~~15. **Consider a symlink instead of copy** — Eliminates sync drift permanently~~ done — the skills fan-out IS symlinks now (topology verified 2026-11-15, crush-config AGENTS)
 
 ### Skill ecosystem (broader)
 
-16. **Check if other skills have the same `#` expansion bug** — Pattern may be repeated
-17. **Audit all skills against their source projects** — Same drift pattern likely exists elsewhere
-18. **Create a skill verification checklist** — Script execution, Nix parse, trigger keywords, API verification
-19. **Add "last verified" date stamps to all skills** — Makes staleness visible
-20. **Consider a CI check for skill/source drift** — Automated detection
+~~16. **Check if other skills have the same `#` expansion bug** — Pattern may be repeated~~ NOT-DO — premise refuted: bash `#` expansion DOES support `[Ll]` classes (round-2 §d.1 reproduced and corrected); the real bug was grep matching the module line, fixed + regression-tested
+~~17. **Audit all skills against their source projects** — Same drift pattern likely exists elsewhere~~ Won't implement — dormant (SKILLS-repo scope; reopen on demand)
+~~18. **Create a skill verification checklist** — Script execution, Nix parse, trigger keywords, API verification~~ Won't implement — dormant (SKILLS-repo scope)
+~~19. **Add "last verified" date stamps to all skills** — Makes staleness visible~~ done — nix-private-go-repos carries the verified-with-date block (round-2)
+~~20. **Consider a CI check for skill/source drift** — Automated detection~~ Won't implement — dormant (SKILLS-repo scope)
 
 ### go-nix-helpers (noticed during audit)
 
-21. **`goPkg` parameter in mkPreparedSource is dead weight** — `dontBuild = true`, never invokes `go`. Already in AGENTS.md but could be cleaned up.
-22. **Man pages (`docs/man/go-standard.5`) could be cross-referenced from the skill** — They document all 39 options
-23. **`docs/consumer-audit-checklist.md` references `publicDeps` — skill could link to it**
-24. **`templates/go-standard/flake.nix` has a `publicDeps` example in comments** — Skill could reference this
-25. **`docs/flake-patterns.md` exists** — Skill doesn't link to it
+~~21. **`goPkg` parameter in mkPreparedSource is dead weight** — `dontBuild = true`, never invokes `go`. Already in AGENTS.md but could be cleaned up.~~ routed — removal gated on the v0.1.0 tag (TODO_LIST Blocked); documented as dead weight in AGENTS.md
+~~22. **Man pages (`docs/man/go-standard.5`) could be cross-referenced from the skill** — They document all 39 options~~ Won't implement — dormant (cross-link polish)
+~~23. **`docs/consumer-audit-checklist.md` references `publicDeps` — skill could link to it**~~ Won't implement — dormant (cross-link polish)
+~~24. **`templates/go-standard/flake.nix` has a `publicDeps` example in comments** — Skill could reference this~~ Won't implement — dormant (cross-link polish)
+~~25. **`docs/flake-patterns.md` exists** — Skill doesn't link to it~~ Won't implement — dormant (cross-link polish)
 
 ### Consumer fleet (from prior status reports)
 
-26. **`terraform-diagrams-aggregator`**: needs unused inputs removed + `publicDeps` expansion
-27. **`index`**: needs `enableCheck=true` removal + `deps`/`publicDeps` expansion
-28. **Several consumers have manual GOPRIVATE** that could be removed (auto when deps set)
-29. **Several consumers have unused `systems` + `treefmt-nix` inputs** (pre-composite-module)
-30. **`file-and-image-renamer`**: 21 private requires with only 13 dep mappings — gap
-31. **`projects-management-automation`**: 15 private requires with only 4 dep mappings — gap
-32. **`project-dependency-graph`**: 13 private requires with only 9 dep mappings — gap
+~~26. **`terraform-diagrams-aggregator`**: needs unused inputs removed + `publicDeps` expansion~~ done — 4 module adopters cleaned of dead inputs 2026-08 (CHANGELOG [Unreleased])
+~~27. **`index`**: needs `enableCheck=true` removal + `deps`/`publicDeps` expansion~~ routed — Tier B/C fleet state; TODO_LIST T4/T5 + T60 (fleet audit re-run)
+~~28. **Several consumers have manual GOPRIVATE** that could be removed (auto when deps set)~~ routed — TODO_LIST T60 (fleet audit covers manual-GOPRIVATE cleanup)
+~~29. **Several consumers have unused `systems` + `treefmt-nix` inputs** (pre-composite-module)~~ done — 4 adopters cleaned 2026-08 (CHANGELOG); the rest ride T4/T5 migrations
+~~30. **`file-and-image-renamer`**: 21 private requires with only 13 dep mappings — gap~~ done — gap closed by later fleet work: 13→18 dep mappings + ADR-0003 A12 pin convergence (file-and-image-renamer 11d5c6c8, 2026-11)
+~~31. **`projects-management-automation`**: 15 private requires with only 4 dep mappings — gap~~ done — PMA on go-standard (Tier A 10/10, 2026-09-25); requireDeps resolves sub-modules from remote master
+~~32. **`project-dependency-graph`**: 13 private requires with only 9 dep mappings — gap~~ done — Tier A 10/10 build-verified 2026-09-25
 
 ### Documentation / process
 
-33. **Add a "how to verify a skill" doc** — Standardized audit procedure
-34. **Create skill test fixtures** — Synthetic go.mod files for script testing
-35. **Document the two-copy sync problem** — Source vs installed, when to sync
-36. **Add skill versioning** — Track when skills were last verified
-37. **Review all skills for the "could not be verified" pattern** — Update any that now CAN be verified
+~~33. **Add a "how to verify a skill" doc** — Standardized audit procedure~~ Won't implement — dormant (SKILLS-repo scope)
+~~34. **Create skill test fixtures** — Synthetic go.mod files for script testing~~ Won't implement — dormant (script verified by 4-scenario execution instead)
+~~35. **Document the two-copy sync problem** — Source vs installed, when to sync~~ done — moot: the fan-out switched to symlinks (2026-11); the two-copy problem no longer exists
+~~36. **Add skill versioning** — Track when skills were last verified~~ Won't implement — dormant (SKILLS-repo scope)
+~~37. **Review all skills for the "could not be verified" pattern** — Update any that now CAN be verified~~ done — this skill's verification block was rewritten with dates (round-2 §2)
 
 ### Deeper skill improvements
 
-38. **Add a "common errors" decision tree** — Error message → cause → fix flowchart
-39. **Add troubleshooting for `vendorHash` mismatch with deps** — Different from normal vendorHash issues
-40. **Document the `modBuildPhase`/`modInstallPhase` auto-injection** — What runs in the FOD and why
-41. **Add guidance for `subModules` explicit entries** — When auto-discovery isn't enough
-42. **Document `requireDeps` deduplication behavior** — Already in AGENTS.md but not in skill
-43. **Add `stripLocalReplaces` to the gotcha catalog** — Dev-machine replaces being cleaned up
-44. **Document `excludeSubModuleDirs` defaults** — What gets skipped during auto-discovery
-45. **Add guidance for `postPatchExtra` ordering** — Runs BEFORE replaces are injected
-46. **Cross-reference `docs/migration-guide.md` from the skill** — Existing migration doc not linked
-47. **Add `GOTOOLCHAIN = "local"` explanation** — Why it's set and when to override
-48. **Document interaction between `enableOverlay` and private deps** — Overlay includes pname attr
-49. **Add a "new consumer onboarding" quickstart** — Fastest path from zero to working build
-50. **Review whether the skill should be split** — Growing large; maybe separate "migration" and "reference" skills
+~~38. **Add a "common errors" decision tree** — Error message → cause → fix flowchart~~ Won't implement — dormant (SKILLS-repo scope)
+~~39. **Add troubleshooting for `vendorHash` mismatch with deps** — Different from normal vendorHash issues~~ Won't implement — dormant (covered in go-nix-helpers README FAQ; skill-level never picked up)
+~~40. **Document the `modBuildPhase`/`modInstallPhase` auto-injection** — What runs in the FOD and why~~ done — round-2 auto-behaviors table documents the FOD phases (§a.3)
+~~41. **Add guidance for `subModules` explicit entries** — When auto-discovery isn't enough~~ Won't implement — dormant (build-time auto-discovery made explicit lists rare)
+~~42. **Document `requireDeps` deduplication behavior** — Already in AGENTS.md but not in skill~~ done — documented in go-nix-helpers migration guide (§ requireDeps for sub-module version pins) + AGENTS
+~~43. **Add `stripLocalReplaces` to the gotcha catalog** — Dev-machine replaces being cleaned up~~ Won't implement — dormant (behavior documented in AGENTS + migration guide)
+~~44. **Document `excludeSubModuleDirs` defaults** — What gets skipped during auto-discovery~~ done — documented in docs/man/mkPreparedSource.5 (2026-09-24 docs pass)
+~~45. **Add guidance for `postPatchExtra` ordering** — Runs BEFORE replaces are injected~~ done — ordering documented in AGENTS.md gotchas + migration guide
+~~46. **Cross-reference `docs/migration-guide.md` from the skill** — Existing migration doc not linked~~ Won't implement — dormant (cross-link polish)
+~~47. **Add `GOTOOLCHAIN = "local"` explanation** — Why it's set and when to override~~ done — round-2 auto-behaviors table (§a.3)
+~~48. **Document interaction between `enableOverlay` and private deps** — Overlay includes pname attr~~ Won't implement — dormant
+~~49. **Add a "new consumer onboarding" quickstart** — Fastest path from zero to working build~~ Won't implement — dormant (README quickstart covers the zero path)
+~~50. **Review whether the skill should be split** — Growing large; maybe separate "migration" and "reference" skills~~ Won't implement — dormant (skill size never became a problem)
 
 ---
 
