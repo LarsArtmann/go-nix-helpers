@@ -117,7 +117,10 @@
               containerLib = import ./container.nix { inherit pkgs lib; };
               smokeConfig = containerLib.mkImageConfig {
                 entrypoint = [ "/bin/hello" ];
-                cmd = [ "-g" "hi" ];
+                cmd = [
+                  "-g"
+                  "hi"
+                ];
                 env = containerLib.envList { SSL_CERT_FILE = "/etc/ssl/certs/ca-bundle.crt"; };
                 user = "65532:65532";
                 exposedPorts = [ "8080/tcp" ];
