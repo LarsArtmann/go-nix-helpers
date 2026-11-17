@@ -6,7 +6,10 @@
 #           checks.format/build, checks.templ-committed (eval-time throw when
 #           any .templ lacks its committed *_templ.go sibling), checks.
 #           templ-freshness (opt-in regenerate-and-diff gate), treefmt,
-#           flake.overlays.default
+#           flake.overlays.default, and (opt-in, Linux) OCI container image
+#           outputs via the `container` option (nix2container backend —
+#           packages.<pkg>-image, image-load/image-push apps,
+#           checks.container-structure)
 #
 # Usage (consumer's flake.nix — only 3 inputs needed!):
 #
@@ -657,6 +660,200 @@ in
         the shell's reproducibility (hermeticity invariant).
       '';
     };
+
+    # OCI container image (nix2container backend). All outputs are
+    # Linux-only: packages.<package>-image, apps <package>-image-load /
+    # <package>-image-push, checks.container-structure.
+    container = lib.mkOption {
+      type = lib.types.submodule {
+        options = {
+          enable = lib.mkOption {
+            type = lib.types.bool;
+            default = false;
+            description = ''
+              Generate an OCI container image for the configured package
+              via nix2container (true OCI image spec, daemon-less — skopeo
+              assembles at load/push time, store-path layers so glibc/Go
+              closures are shared across every fleet image in the same
+              registry). Emits (Linux only):
+              `packages.<package>-image`, `apps.<package>-image-load`,
+              `apps.<package>-image-push`, `checks.container-structure`.
+            '';
+          };
+
+          packageName = lib.mkOption {
+            type = lib.types.nullOr lib.types.str;
+            default = null;
+            description = ''
+              Which generated package to containerize: the main package
+              (null, the default) or any `go-standard.packages` monorepo
+              entry by name. The image is named after it
+              (`registry/packageName` by default) and the default
+              entrypoint becomes `/bin/packageName`.
+            '';
+          };
+
+          registry = lib.mkOption {
+            type = lib.types.str;
+            default = "ghcr.io/larsartmann";
+            description = ''
+              Registry prefix for the default image name
+              (`registry/packageName`). The registry is NOT contacted at
+              build time — it is a string baked into the image name and
+              only used by skopeo when you run `<package>-image-push`.
+            '';
+          };
+
+          imageName = lib.mkOption {
+            type = lib.types.nullOr lib.types.str;
+            default = null;
+            description = ''
+              Full image name (registry/repository). null (the default)
+              derives it as `registry/packageName`. nix2container
+              lowercases the name, per OCI rules.
+            '';
+          };
+
+          tag = lib.mkOption {
+            type = lib.types.nullOr lib.types.str;
+            default = null;
+            description = ''
+              Image tag. null (the default) uses nix2container's
+              content-hash tag — the tag IS the image output hash, so
+              identical closures produce identical tags (reproducible).
+              Override with a version string when a registry needs one.
+            '';
+          };
+
+          entrypoint = lib.mkOption {
+            type = lib.types.nullOr (lib.types.listOf lib.types.str);
+            default = null;
+            description = ''
+              OCI Entrypoint. null (the default) uses
+              `[ "/bin/packageName" ]` — the binary relocated to /bin by
+              the image's buildEnv (symlink into /nix/store, never a
+              duplicated closure).
+            '';
+          };
+
+          cmd = lib.mkOption {
+            type = lib.types.listOf lib.types.str;
+            default = [ ];
+            description = "OCI Cmd — default arguments passed to the entrypoint.";
+          };
+
+          user = lib.mkOption {
+            type = lib.types.str;
+            default = "65532:65532";
+            description = ''
+              OCI User the container runs as. Defaults to the distroless
+              nonroot uid:gid — images never run as root. Declared
+              volumes are auto-provisioned with this ownership (numeric
+              uid[:gid] only; named users get no auto-provisioned dirs).
+            '';
+          };
+
+          exposedPorts = lib.mkOption {
+            type = lib.types.listOf lib.types.str;
+            default = [ ];
+            example = [ "8080/tcp" ];
+            description = ''Ports the container listens on ("8080/tcp").'';
+          };
+
+          volumes = lib.mkOption {
+            type = lib.types.listOf lib.types.str;
+            default = [ ];
+            example = [ "/data" ];
+            description = ''
+              Volume paths ("/data") declared in the image config AND
+              pre-created in the image with the `user`'s ownership —
+              runtimes mount anonymous volumes as root, which would make
+              them unwritable for a non-root User.
+            '';
+          };
+
+          env = lib.mkOption {
+            type = lib.types.attrsOf lib.types.str;
+            default = { };
+            description = ''
+              Environment variables baked into the image (merged OVER the
+              SSL_CERT_FILE default — cacert ships in every image, so TLS
+              works out of the box). Keys are sorted for reproducible
+              image hashes.
+            '';
+          };
+
+          labels = lib.mkOption {
+            type = lib.types.attrsOf lib.types.str;
+            default = { };
+            description = ''
+              OCI labels, merged over the auto-generated
+              org.opencontainers.image.{title,description,version,source}
+              (from pname/description/version and the LarsArtmann GitHub
+              URL). Consumer labels win on key collisions.
+            '';
+          };
+
+          extraPackages = lib.mkOption {
+            type = lib.types.listOf lib.types.package;
+            default = [ ];
+            description = ''
+              Extra packages copied into the image root (e.g. pkgs.busybox
+              for healthcheck tools and interactive debugging, ~1 MB).
+            '';
+          };
+
+          pathsToLink = lib.mkOption {
+            type = lib.types.listOf lib.types.str;
+            default = [
+              "/bin"
+              "/etc"
+            ];
+            description = ''
+              Paths linked into the image root from the package closure
+              (/bin for the binary, /etc for cacert's SSL certs). Extend
+              when extraPackages need more (e.g. "/share" for tzdata).
+            '';
+          };
+
+          maxLayers = lib.mkOption {
+            type = lib.types.ints.positive;
+            default = 20;
+            description = ''
+              Maximum number of layers (store-path closure split by
+              reference popularity). 20 keeps glibc/Go-runtime layers
+              stable and shared across images; nix2container's own default
+              of 1 would put the whole closure in one layer.
+            '';
+          };
+
+          created = lib.mkOption {
+            type = lib.types.str;
+            default = "0001-01-01T00:00:00Z";
+            description = ''
+              Image creation timestamp (RFC3339). The zero-time default
+              keeps builds byte-reproducible; set a real date only if a
+              registry or scanner requires one (it breaks bit-for-bit
+              reproducibility).
+            '';
+          };
+
+          nix2container = lib.mkOption {
+            type = lib.types.attrsOf lib.types.attrs;
+            default = { };
+            description = ''
+              Per-system nix2container builders (the nix2container flake's
+              `packages` set). Wired AUTOMATICALLY by the composite
+              `flakeModules.go-standard` — only set this when importing
+              modules/go-standard.nix directly:
+              `go-standard.container.nix2container = inputs.nix2container.packages;`
+            '';
+          };
+        };
+      };
+      default = { };
+      description = "OCI container image configuration (nix2container backend).";
+    };
   };
 
   config = {
@@ -1053,6 +1250,118 @@ in
           if cfg.deps != { } && cfg.autoGoPrivate then { GOPRIVATE = cfg.privateGlobPattern; } else { };
 
         finalShellExtraEnv = autoGoPrivateEnv // optionEnv // cfg.shellExtraEnv;
+
+        # ---- OCI container image (nix2container backend) ---------------------
+        # Assembly helpers live in ../container.nix (also used by the
+        # self-hosted containerSmoke check, which exercises the real
+        # nix2container binary end-to-end).
+        container = import ../container.nix { inherit pkgs lib; };
+
+        # Linux-only: images target linux runtimes; darwin systems simply
+        # get no container outputs (fleet precedent — PapDashboard).
+        containerEnabled = cfg.container.enable && pkgs.stdenv.hostPlatform.isLinux;
+
+        # Submodule options cannot see outer config — resolve defaults here.
+        containerPackageName = if cfg.container.packageName != null then cfg.container.packageName else cfg.pname;
+
+        containerAvailablePackages =
+          lib.optional cfg.enableDefaultPackage cfg.pname ++ lib.attrNames cfg.packages;
+
+        containerN2c =
+          (cfg.container.nix2container.${pkgs.stdenv.hostPlatform.system} or { }).nix2container
+          or null;
+
+        containerPkgDesc =
+          if containerPackageName == cfg.pname then
+            cfg.description
+          else
+            cfg.packages.${containerPackageName}.description or cfg.description;
+
+        containerDefaultEnv = {
+          SSL_CERT_FILE = "/etc/ssl/certs/ca-bundle.crt";
+        } // cfg.container.env;
+
+        containerLabels = {
+          "org.opencontainers.image.title" = containerPackageName;
+          "org.opencontainers.image.description" = containerPkgDesc;
+          "org.opencontainers.image.version" = version;
+          "org.opencontainers.image.source" = "https://github.com/LarsArtmann/${cfg.pname}";
+        } // cfg.container.labels;
+
+        containerConfig = container.mkImageConfig {
+          entrypoint = if cfg.container.entrypoint != null then cfg.container.entrypoint else [ "/bin/${containerPackageName}" ];
+          cmd = cfg.container.cmd;
+          env = container.envList containerDefaultEnv;
+          user = cfg.container.user;
+          exposedPorts = cfg.container.exposedPorts;
+          volumes = cfg.container.volumes;
+          labels = containerLabels;
+        };
+
+        containerImageName =
+          if cfg.container.imageName != null then
+            cfg.container.imageName
+          else
+            "${cfg.container.registry}/${containerPackageName}";
+
+        # Only forced when containerEnabled (attrset laziness) — a missing
+        # backend or package name must NOT fire for consumers that never
+        # enable the container.
+        image =
+          let
+            n2c =
+              if containerN2c == null then
+                throw ''
+                  go-standard.container is enabled but the nix2container backend is not wired.
+                  The composite module sets it automatically — import the module via:
+                    imports = [ inputs.go-nix-helpers.flakeModules.go-standard ];
+                  If you import modules/go-standard.nix directly, set:
+                    go-standard.container.nix2container = inputs.nix2container.packages;
+                ''
+              else
+                containerN2c;
+            mainPackage =
+              if !(lib.elem containerPackageName containerAvailablePackages) then
+                throw ''
+                  go-standard.container.packageName "${containerPackageName}" is not a generated package.
+                  Available: ${toString containerAvailablePackages}
+                ''
+              else
+                config.packages.${containerPackageName};
+            vols =
+              if cfg.container.volumes == [ ] then
+                {
+                  dirs = null;
+                  perms = [ ];
+                }
+              else
+                container.mkVolumeDirs {
+                  name = cfg.pname;
+                  inherit (cfg.container) volumes user;
+                };
+          in
+          container.mkContainerImage {
+            inherit n2c;
+            imageName = containerImageName;
+            tag = cfg.container.tag;
+            config = containerConfig;
+            mainPackage = mainPackage;
+            inherit (cfg.container) extraPackages pathsToLink maxLayers created;
+            volumeDirs = vols.dirs;
+            volumePerms = vols.perms;
+            meta = {
+              description = "OCI container image for ${cfg.pname} — ${cfg.description} (nix2container; nix run .#${containerPackageName}-image-load to load locally)";
+              platforms = [ pkgs.stdenv.hostPlatform.system ];
+            };
+          };
+
+        containerStructureCheck = container.mkContainerStructureCheck {
+          name = cfg.pname;
+          inherit image;
+          config = containerConfig;
+          arch = pkgs.go.GOARCH;
+          inherit (cfg.container) created;
+        };
       in
       {
         packages =
@@ -1060,7 +1369,8 @@ in
             default = package;
             ${cfg.pname} = package;
           })
-          // extraPackages;
+          // extraPackages
+          // lib.optionalAttrs containerEnabled { "${containerPackageName}-image" = image; };
 
         apps = {
           # mkDefault: a consumer's own apps.<name> (e.g. a test app that
@@ -1109,7 +1419,19 @@ in
             program = lib.getExe pkg;
             meta.description = "Run the ${name} helper app";
           }
-        ) extraPackages;
+        ) extraPackages
+        // lib.optionalAttrs containerEnabled {
+          "${containerPackageName}-image-load" = lib.mkDefault {
+            type = "app";
+            program = lib.getExe image.copyToDockerDaemon;
+            meta.description = "Load ${containerImageName} into the local Docker daemon (skopeo — no docker build)";
+          };
+          "${containerPackageName}-image-push" = lib.mkDefault {
+            type = "app";
+            program = lib.getExe image.copyToRegistry;
+            meta.description = "Push ${containerImageName} to its registry (skopeo — authenticate with docker login first)";
+          };
+        };
 
         devShells = lib.optionalAttrs cfg.enableDevShells {
           default = pkgs.mkShell (
@@ -1262,6 +1584,9 @@ in
               '';
             }
           )
+          // lib.optionalAttrs containerEnabled {
+            container-structure = containerStructureCheck;
+          }
           // (
             if !cfg.enableTemplFreshnessCheck then
               { }
