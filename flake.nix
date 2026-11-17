@@ -13,6 +13,13 @@
       url = "github:numtide/treefmt-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    # OCI image building for the go-standard `container` option — bundled by
+    # the composite module, so consumers do NOT declare it as an input.
+    nix2container = {
+      url = "github:nlewo/nix2container";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
@@ -54,8 +61,9 @@
             import ./mkGoFlake.nix args
           );
 
-        # go-standard is a composite module that bundles treefmt-nix internally,
-        # so consumers do NOT need to declare treefmt-nix or systems as inputs.
+        # go-standard is a composite module that bundles treefmt-nix and
+        # nix2container internally, so consumers do NOT need to declare
+        # treefmt-nix, nix2container or systems as inputs.
         # Consumer needs only: nixpkgs, flake-parts, go-nix-helpers.
         flakeModules.go-standard =
           { config, ... }:
@@ -70,6 +78,11 @@
             # wired — flake-parts' own default silently won, and consumers
             # with x86_64-darwin inherited a nixpkgs-dropped system.)
             config.systems = config.go-standard.systems;
+            # OCI image support: hand the per-system nix2container builders
+            # to the module, the same closure-over-own-inputs trick as
+            # treefmt-nix above. Consumers get container images without
+            # declaring a fourth input.
+            config.go-standard.container.nix2container = inputs.nix2container.packages;
           };
       };
 
