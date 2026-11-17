@@ -43,6 +43,15 @@
 | --- | -------------------------------------------------------------------------------- | ------ | ------ | ----------------------------------------- |
 | T66 | Inspect `origin/systemnix-vn-version-fix` (contents, creator; delete if dead)    | TODO   | 15min  | `docs/status/2026-11-17_19-43_*` c.1, f.3 |
 | T67 | Decompose CI run 44059828196 (2026-11-17 09:54, ALL jobs failed — infra vs real) | TODO   | 15min  | `docs/status/2026-11-17_19-43_*` b.3, f.9 |
+| T69 | View the 3 unopened 2026-0* snapshots (review HTML, feedback, postmortem) + trash the `result` symlink | TODO | 15min | 2026-11-17_21-05 report b.1/d |
+| T70 | Concurrent-actor detector: pre-final check that no file outside the session's edit set changed (mtime scan) — the 2026-11-17 formatter incident bit twice | TODO | 30min | 2026-11-17_21-05 report e.4 |
+| T71 | Heading-mode canon: teach annotate.go a `### 1.` heading-item mode (or codify "headings stay bare" in the docs-health skill) so 08-12-shape files need no silent judgment call | TODO | 1h | 2026-11-17_21-05 report b/e |
+
+## Tooling upstream (2026-11-17 plan)
+
+| #   | Task                                                                                                     | Status | Effort | Evidence                                        |
+| --- | -------------------------------------------------------------------------------------------------------- | ------ | ------ | ----------------------------------------------- |
+| T68 | Upstream the ROUTED-arrow row classification to the docs-gates repo, then re-vendor `check-rows.py` cleanly | TODO   | 1h     | commit `4c6c8b9` (local patch); 21-05 report e.5 |
 
 ## Container foundation (2026-11-17 harvest)
 
