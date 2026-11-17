@@ -320,13 +320,13 @@ let
   # consumers can carry perSystem-built derivations a static attrset
   # cannot express (the nsfw onnxruntime-go buildInputs class).
   fnExtraCfg = mkPerSystemConfig {
-    extraBuildAttrs = pkgs': { passthru.fntest = "fn-form-works"; };
+    extraBuildAttrs = _pkgs': { passthru.fntest = "fn-form-works"; };
   };
 
   fnExtraPkgCfg = mkPerSystemConfig {
-    extraBuildAttrs = pkgs': { passthru.toplevel = "fn-top"; };
+    extraBuildAttrs = _pkgs': { passthru.toplevel = "fn-top"; };
     packages.worker.subPackages = [ "cmd/worker" ];
-    packages.worker.extraBuildAttrs = pkgs': { passthru.perpkg = "fn-per-pkg"; };
+    packages.worker.extraBuildAttrs = _pkgs': { passthru.perpkg = "fn-per-pkg"; };
   };
 
   fnBuildInputsCfg = mkPerSystemConfig {
@@ -482,6 +482,13 @@ let
 
   # --- enableTestCheck test --------------------------------------------------
   enableTestCheckCfg = mkPerSystemConfig { enableTestCheck = true; };
+
+  # --- enableDefaultPackage / enableDevShells (library-mode) tests ------------
+  # Library workspace shape: no main package, hand-tuned shells.
+  libraryModeCfg = mkPerSystemConfig {
+    enableDefaultPackage = false;
+    enableDevShells = false;
+  };
 
   # --- enableVendorHashCheck tests -------------------------------------------
   vendorHashCfg = mkPerSystemConfig {
@@ -1187,6 +1194,40 @@ let
           ? lint
       )
     ) "no checks.lint when enableGolangciLint=false")
+    # --- Behavioral: library mode (enableDefaultPackage / enableDevShells) ---
+    (assertCheck "enableDefaultPackage=false removes packages.default" (
+      !(libraryModeCfg.packages ? default)
+    ) "no packages.default in library mode")
+    (assertCheck "enableDefaultPackage=false removes packages.<pname>" (
+      !(libraryModeCfg.packages ? test-project)
+    ) "no packages.test-project in library mode")
+    (assertCheck "enableDefaultPackage=false removes apps.default" (
+      !(libraryModeCfg.apps ? default)
+    ) "no apps.default in library mode")
+    (assertCheck "enableDefaultPackage=false removes checks.build" (
+      !(libraryModeCfg.checks ? build)
+    ) "no checks.build in library mode")
+    (assertCheck "enableDefaultPackage=false keeps checks.format (guard anchor)" (
+      libraryModeCfg.checks ? format
+    ) "checks.format survives library mode")
+    (assertCheck "enableDefaultPackage=false keeps apps.test" (
+      libraryModeCfg.apps ? test
+    ) "apps.test survives library mode")
+    (assertCheck "enableDevShells=false removes devShells.default" (
+      !(libraryModeCfg.devShells ? default)
+    ) "no devShells.default in library mode")
+    (assertCheck "enableDevShells=false removes devShells.ci" (
+      !(libraryModeCfg.devShells ? ci)
+    ) "no devShells.ci in library mode")
+    (assertCheck "lintAsCheck+enableDefaultPackage=false has no checks.lint" (
+      !(
+        (mkPerSystemConfig {
+          lintAsCheck = true;
+          enableDefaultPackage = false;
+        }).checks
+          ? lint
+      )
+    ) "no checks.lint when the package it rides is disabled")
     # --- templ-committed eval check -----------------------------------------
     (assertCheck "no .templ files: no templ-committed check emitted" (
       !(psCfg.checks ? templ-committed)

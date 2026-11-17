@@ -461,13 +461,15 @@ let
 
   mkSecretTokensBasic = [
     (assertEq "tokens: derives underscore placeholder from prefix+id"
-      (tokenTable.event-socket-password.token)
+      tokenTable.event-socket-password.token
       "@TELEPHONY_EVENT_SOCKET_PASSWORD@"
     )
-    (assertEq "tokens: hyphenated ids become underscores" (tokenTable.ext-100-password.token
-    ) "@TELEPHONY_EXT_100_PASSWORD@")
-    (assertEq "tokens: file and target pass through" (tokenTable.ext-100-password.target
-    ) "directory/default.xml")
+    (assertEq "tokens: hyphenated ids become underscores" tokenTable.ext-100-password.token
+      "@TELEPHONY_EXT_100_PASSWORD@"
+    )
+    (assertEq "tokens: file and target pass through" tokenTable.ext-100-password.target
+      "directory/default.xml"
+    )
     (assertEq "tokens: same id under different prefixes yields distinct tokens" (
       (pure.mkSecretTokens "A" {
         x = {

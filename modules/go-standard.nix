@@ -34,7 +34,6 @@
 {
   config,
   lib,
-  inputs,
   self,
   ...
 }:
@@ -1028,9 +1027,7 @@ in
           v:
           builtins.seq lockGuardsValue (
             builtins.seq goModFloorCheck (
-              builtins.seq proxyVendorWarning (
-                builtins.seq vendorHashWarning (builtins.seq stalePinWarning v)
-              )
+              builtins.seq proxyVendorWarning (builtins.seq vendorHashWarning (builtins.seq stalePinWarning v))
             )
           );
 
@@ -1194,20 +1191,19 @@ in
               doCheck = true;
             });
           }
-          // lib.optionalAttrs (
-            cfg.enableVendorHashCheck
-            && effectiveVendorHash != null
-            && cfg.enableDefaultPackage
-          ) {
-            # The interpolated goModules derivation rides the string
-            # context into this script, forcing the FOD to build when the
-            # check is built — a drifted vendorHash fails here FIRST, with
-            # a plain hash-mismatch error instead of mid-compile surprises.
-            vendor-hash = pkgs.runCommand "${cfg.pname}-vendor-hash" { } ''
-              echo "vendor hash verified: ${config.packages.${cfg.pname}.goModules}"
-              touch $out
-            '';
-          }
+          //
+            lib.optionalAttrs
+              (cfg.enableVendorHashCheck && effectiveVendorHash != null && cfg.enableDefaultPackage)
+              {
+                # The interpolated goModules derivation rides the string
+                # context into this script, forcing the FOD to build when the
+                # check is built — a drifted vendorHash fails here FIRST, with
+                # a plain hash-mismatch error instead of mid-compile surprises.
+                vendor-hash = pkgs.runCommand "${cfg.pname}-vendor-hash" { } ''
+                  echo "vendor hash verified: ${config.packages.${cfg.pname}.goModules}"
+                  touch $out
+                '';
+              }
           // (
             let
               # Every .templ file in the flake source must ship its generated
