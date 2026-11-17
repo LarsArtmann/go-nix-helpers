@@ -77,6 +77,41 @@ nix flake check # formats, builds, and runs checks
 
 ---
 
+## Ship OCI images, natively
+
+One block ships a superb OCI image — no Dockerfile, no docker daemon, ever:
+
+```nix
+go-standard = {
+  # ...pname, vendorHash, description as usual...
+  container = {
+    enable = true;              # Linux-only outputs
+    cmd = [ "run" "--addr" "0.0.0.0:8097" ];
+    exposedPorts = [ "8097/tcp" ];
+    volumes = [ "/data" ];
+    env.BANK_SYNC_LOG_LEVEL = "info";
+  };
+};
+```
+
+```bash
+nix run .#my-project-image-load    # into the local Docker daemon (skopeo)
+nix run .#my-project-image-push    # to ghcr.io (skopeo; docker login first)
+```
+
+Why nix2container (bundled — still only 3 inputs):
+
+- **True OCI image spec** — image.json + skopeo `nix:` transport; works with any registry, cosign, etc.
+- **Shared layers across the fleet** — one layer per store-path group, so glibc/Go-runtime layers dedupe between *all* your images in the same registry
+- **Daemon-less** — skopeo assembles at load/push time; nothing runs docker
+- **Reproducible** — zero-epoch creation time and a content-hash tag by default: identical closures produce identical tags
+- **Superb defaults** — non-root user (`65532:65532`, distroless style), cacert + `SSL_CERT_FILE`, auto `org.opencontainers.image.*` labels, `/bin/<name>` entrypoint, volumes pre-created with the right ownership
+- **`checks.container-structure`** — a jq gate over the built image asserting the whole contract (non-root, entrypoint, labels, arch, layers), so drift fails `nix flake check`
+
+Full options: `man go-standard` after entering the devShell, or `docs/man/go-standard.5`.
+
+---
+
 ## Private dependencies, solved
 
 The Nix sandbox has no SSH and no network, so `go` cannot fetch private modules. `go-nix-helpers` solves this transparently:

@@ -227,6 +227,91 @@ Function receiving pkgs, returns extra devShell packages.
 .TP
 .BR shellExtraEnv " (attrs, default: {})"
 Extra environment variables for devShells.
+.TP
+.BR devShellHook " (str, default: \"\")"
+Shell script run when entering the generated devShells.
+.TP
+.BR container " (attrs, default: {})"
+OCI container image configuration (nix2container backend; all outputs are
+Linux-only). See the \fBCONTAINER\fR section below.
+.SH CONTAINER
+Setting \fBcontainer.enable = true\fR generates an OCI image for the
+configured package via nix2container (true OCI image spec, daemon-less —
+skopeo assembles at load/push time, one layer per store-path group so
+glibc/Go-runtime layers are shared across every image in the same registry).
+The backend is bundled by the composite flakeModules.go-standard; consumers
+need no extra input.
+.TP
+.BR container.enable " (bool, default: false)"
+Emit packages.<package>-image, apps.<package>-image-load/-image-push, and
+checks.container-structure.
+.TP
+.BR container.packageName " (null|str, default: null)"
+Which generated package to containerize: the main package (null) or any
+go-standard.packages monorepo entry by name. Names the image and the default
+entrypoint (/bin/<package>).
+.TP
+.BR container.registry " (str, default: \"ghcr.io/larsartmann\")"
+Registry prefix for the default image name (registry/packageName). Never
+contacted at build time — skopeo uses it only when you run image-push.
+.TP
+.BR container.imageName " (null|str, default: null)"
+Full image name. null derives registry/packageName; nix2container lowercases
+it per OCI rules.
+.TP
+.BR container.tag " (null|str, default: null)"
+null uses nix2container's content-hash tag: identical closures produce
+identical tags (reproducible).
+.TP
+.BR container.entrypoint " (null|list str, default: null)"
+null uses [ "/bin/<package>" ] — the binary relocated to /bin via the
+image's buildEnv (symlink into /nix/store, never a duplicated closure).
+.TP
+.BR container.cmd " (list str, default: [])"
+Default arguments passed to the entrypoint.
+.TP
+.BR container.user " (str, default: \"65532:65532\")"
+OCI User the container runs as (distroless nonroot). Declared volumes are
+auto-provisioned with this ownership (numeric uid[:gid] only).
+.TP
+.BR container.exposedPorts " (list str, default: [])"
+Ports the container listens on (e.g. "8080/tcp").
+.TP
+.BR container.volumes " (list str, default: [])"
+Volume paths ("/data") declared in the image config AND pre-created with
+the user's ownership — runtimes mount anonymous volumes as root, which
+would be unwritable for a non-root User.
+.TP
+.BR container.env " (attrs str, default: {})"
+Environment variables baked into the image, merged over the SSL_CERT_FILE
+default (cacert ships in every image). Keys are sorted for reproducible
+image hashes.
+.TP
+.BR container.labels " (attrs str, default: {})"
+OCI labels merged over auto-generated
+org.opencontainers.image.{title,description,version,source}. Consumer
+labels win on key collisions.
+.TP
+.BR container.extraPackages " (list package, default: [])"
+Extra packages copied into the image root (e.g. pkgs.busybox for
+healthchecks/debugging, ~1 MB).
+.TP
+.BR container.pathsToLink " (list str, default: [\"/bin\" \"/etc\"])"
+Paths linked into the image root from the package closure. Extend when
+extraPackages need more (e.g. "/share" for tzdata).
+.TP
+.BR container.maxLayers " (positive int, default: 20)"
+Maximum layers (store-path closure split by reference popularity). 20 keeps
+glibc/Go layers stable and shared across images.
+.TP
+.BR container.created " (str, default: \"0001-01-01T00:00:00Z\")"
+Image creation timestamp (RFC3339). The zero-time default keeps builds
+byte-reproducible.
+.TP
+.BR container.nix2container " (attrs, default: {})"
+Per-system nix2container builders (the nix2container flake's packages set).
+Wired automatically by the composite module; only set it when importing
+modules/go-standard.nix directly.
 .SH EVAL-TIME CHECKS
 .TP
 .BR go.mod\ floor\ check
@@ -304,6 +389,27 @@ Useful for CI when normal builds skip tests.
 .TP
 .BR overlays.default
 Exposes pkgs.\\fIpname\\fR to other flakes.
+.TP
+.BR packages.\\fIpackage\\fR\\-image
+(Linux, container.enable) The OCI image (nix2container). Content-hash tag by
+default; also runnable as
+.BR packages.\\fIpackage\\fR\\-image.copyToDockerDaemon
+and
+.BR .copyToRegistry
+directly.
+.TP
+.BR apps.\\fIpackage\\fR\\-image\\-load
+(Linux, container.enable) Load the image into the local Docker daemon via
+skopeo (no docker build, no daemon at build time).
+.TP
+.BR apps.\\fIpackage\\fR\\-image\\-push
+(Linux, container.enable) Push the image to its registry via skopeo
+(authenticate with docker login first).
+.TP
+.BR checks.container\\-structure
+(Linux, container.enable) Builds the image and asserts the contract with jq
+over image.json: non-root User, entrypoint set, labels present, deterministic
+creation time, correct arch, non-empty layers, config matching the options.
 .SH SEE ALSO
 .BR mkPreparedSource (5),
 .BR nix (1),

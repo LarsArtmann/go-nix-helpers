@@ -88,6 +88,16 @@
         #     description = "Background worker";
         #   };
         # };
+
+        # Optional: ship an OCI image (nix2container, bundled — still 3 inputs).
+        # nix run .#YOUR-PROJECT-NAME-image-load | local docker; -image-push | registry.
+        # Non-root user, cacert, auto OCI labels, content-hash tag by default.
+        # container = {
+        #   enable = true;
+        #   cmd = [ "run" "--addr" "0.0.0.0:8080" ];
+        #   exposedPorts = [ "8080/tcp" ];
+        #   volumes = [ "/data" ];
+        # };
       };
     };
 }
