@@ -220,6 +220,25 @@ let
     (assertCheck "devShellExtraPackages default returns empty list" (
       builtins.length (cfg.devShellExtraPackages pkgs) == 0
     ) "empty list when called")
+    # --- Container (OCI image) option defaults --------------------------------
+    (assertCheck "container.enable default is false" (cfg.container.enable == false) "false")
+    (assertCheck "container.user default is distroless nonroot" (
+      cfg.container.user == "65532:65532"
+    ) "65532:65532")
+    (assertCheck "container.registry default is LarsArtmann GHCR" (
+      cfg.container.registry == "ghcr.io/larsartmann"
+    ) "ghcr.io/larsartmann")
+    (assertCheck "container.maxLayers default is 20" (cfg.container.maxLayers == 20) "20")
+    (assertCheck "container.packageName default is null" (cfg.container.packageName == null) "null")
+    (assertCheck "container.entrypoint default is null" (cfg.container.entrypoint == null) "null")
+    (assertCheck "container.imageName default is null" (cfg.container.imageName == null) "null")
+    (assertCheck "container.tag default is null (content hash)" (cfg.container.tag == null) "null")
+    (assertCheck "container.created default is the zero epoch" (
+      cfg.container.created == "0001-01-01T00:00:00Z"
+    ) "0001-01-01T00:00:00Z")
+    (assertCheck "container.nix2container default is empty" (
+      cfg.container.nix2container == { }
+    ) "{}")
   ];
 
   perSystemChecks = [
@@ -368,6 +387,84 @@ let
   customGlobCfg = mkPerSystemConfig {
     privateGlobPattern = "github.com/myorg/*,github.com/MyOrg/*";
   };
+
+  # --- Container (OCI image) tests -------------------------------------------
+  # Stub backend: captures every buildImage argument as eval-visible
+  # passthru attrs — no derivation output is ever read, so assertions stay
+  # IFD-free (passthru attrs are plain Nix values riding the derivation).
+  n2cStub = {
+    buildImage =
+      args:
+      pkgs.runCommand "stub-n2c-image"
+        {
+          passthru = {
+            imageArgs = args;
+            copyToDockerDaemon = pkgs.hello;
+            copyToRegistry = pkgs.hello;
+          };
+        }
+        "touch $out";
+  };
+  containerBackendStub = {
+    ${pkgs.stdenv.hostPlatform.system}.nix2container = n2cStub;
+  };
+
+  containerCfg = mkPerSystemConfig {
+    container = {
+      enable = true;
+      nix2container = containerBackendStub;
+    };
+  };
+
+  containerOverrideCfg = mkPerSystemConfig {
+    container = {
+      enable = true;
+      nix2container = containerBackendStub;
+      registry = "registry.example.com/team";
+      tag = "v1.2.3";
+      entrypoint = [
+        "/custom-entry"
+        "arg"
+      ];
+      cmd = [ "serve" ];
+      user = "1000:1000";
+      exposedPorts = [ "9090/tcp" ];
+      volumes = [ "/data" ];
+      env = {
+        SSL_CERT_FILE = "/custom/ca.crt";
+        APP_MODE = "prod";
+      };
+      labels = {
+        "org.opencontainers.image.title" = "custom-title";
+        "com.example.extra" = "yes";
+      };
+      extraPackages = [ pkgs.hello ];
+      maxLayers = 5;
+    };
+  };
+
+  containerMonorepoCfg = mkPerSystemConfig {
+    packages.worker.subPackages = [ "cmd/worker" ];
+    packages.worker.description = "Worker binary";
+    container = {
+      enable = true;
+      nix2container = containerBackendStub;
+      packageName = "worker";
+    };
+  };
+
+  # Invalid packageName must throw when the image is forced (asserted via
+  # tryEval success=false in additionalChecks).
+  containerBadPkgCfg = mkPerSystemConfig {
+    container = {
+      enable = true;
+      nix2container = containerBackendStub;
+      packageName = "nope";
+    };
+  };
+
+  # Enabled without a backend must throw with wiring instructions.
+  containerNoBackendCfg = mkPerSystemConfig { container.enable = true; };
 
   # --- GOPRIVATE behavioral test: deps triggers GOPRIVATE injection --------
   # When deps is non-empty, GOPRIVATE should be injected into the devShell.
@@ -1412,6 +1509,130 @@ let
     (assertCheck "consumer apps.test overrides the module mkDefault app" (
       (appsOverrideEval.config.apps.test.program or "MISSING") == "/consumer/override"
     ) "consumer program wins")
+    # --- Behavioral: container (OCI image, nix2container) ----------------------
+    (assertCheck "container disabled emits no image package" (
+      !(psCfg.packages ? test-project-image)
+    ) "no test-project-image")
+    (assertCheck "container disabled emits no image apps" (
+      !(psCfg.apps ? test-project-image-load) && !(psCfg.apps ? test-project-image-push)
+    ) "no image-load/push apps")
+    (assertCheck "container disabled emits no structure check" (
+      !(psCfg.checks ? container-structure)
+    ) "no container-structure")
+    (assertCheck "container enable emits packages.test-project-image" (
+      containerCfg.packages ? test-project-image
+    ) "test-project-image exists")
+    (assertCheck "container default image name is registry/pname" (
+      containerCfg.packages.test-project-image.imageArgs.name
+      == "ghcr.io/larsartmann/test-project"
+    ) "ghcr.io/larsartmann/test-project")
+    (assertCheck "container default tag is null (content-hash)" (
+      containerCfg.packages.test-project-image.imageArgs.tag == null
+    ) "null")
+    (assertCheck "container default entrypoint is /bin/pname" (
+      containerCfg.packages.test-project-image.imageArgs.config.Entrypoint
+      == [ "/bin/test-project" ]
+    ) "[ /bin/test-project ]")
+    (assertCheck "container default user is distroless nonroot" (
+      containerCfg.packages.test-project-image.imageArgs.config.User == "65532:65532"
+    ) "65532:65532")
+    (assertCheck "container default env carries SSL_CERT_FILE only" (
+      containerCfg.packages.test-project-image.imageArgs.config.Env
+      == [ "SSL_CERT_FILE=/etc/ssl/certs/ca-bundle.crt" ]
+    ) "single sorted SSL_CERT_FILE entry")
+    (assertCheck "container auto labels include title/version/source" (
+      let
+        labels = containerCfg.packages.test-project-image.imageArgs.config.Labels;
+      in
+      labels ? "org.opencontainers.image.title"
+      && labels ? "org.opencontainers.image.version"
+      && labels ? "org.opencontainers.image.source"
+    ) "auto OCI labels present")
+    (assertCheck "container default maxLayers is 20" (
+      containerCfg.packages.test-project-image.imageArgs.maxLayers == 20
+    ) "20")
+    (assertCheck "container created defaults to the zero epoch" (
+      containerCfg.packages.test-project-image.imageArgs.created == "0001-01-01T00:00:00Z"
+    ) "0001-01-01T00:00:00Z")
+    (assertCheck "container copyToRoot is non-empty" (
+      builtins.length containerCfg.packages.test-project-image.imageArgs.copyToRoot > 0
+    ) "at least the image root env")
+    (assertCheck "container emits image-load app" (
+      containerCfg.apps ? test-project-image-load
+    ) "app exists")
+    (assertCheck "container emits image-push app" (
+      containerCfg.apps ? test-project-image-push
+    ) "app exists")
+    (assertCheck "container emits checks.container-structure derivation" (
+      containerCfg.checks.container-structure ? outPath
+    ) "derivation")
+    (assertCheck "container meta carries the current platform" (
+      containerCfg.packages.test-project-image.imageArgs.meta.platforms
+      == [ pkgs.stdenv.hostPlatform.system ]
+    ) "current system")
+    (assertCheck "container registry override builds custom name" (
+      containerOverrideCfg.packages.test-project-image.imageArgs.name
+      == "registry.example.com/team/test-project"
+    ) "registry.example.com/team/test-project")
+    (assertCheck "container tag override wins" (
+      containerOverrideCfg.packages.test-project-image.imageArgs.tag == "v1.2.3"
+    ) "v1.2.3")
+    (assertCheck "container entrypoint override wins" (
+      containerOverrideCfg.packages.test-project-image.imageArgs.config.Entrypoint
+      == [
+        "/custom-entry"
+        "arg"
+      ]
+    ) "custom entrypoint")
+    (assertCheck "container cmd override reaches config" (
+      containerOverrideCfg.packages.test-project-image.imageArgs.config.Cmd == [ "serve" ]
+    ) "[ serve ]")
+    (assertCheck "container user override reaches config" (
+      containerOverrideCfg.packages.test-project-image.imageArgs.config.User == "1000:1000"
+    ) "1000:1000")
+    (assertCheck "container exposedPorts override reaches config" (
+      builtins.attrNames containerOverrideCfg.packages.test-project-image.imageArgs.config.ExposedPorts
+      == [ "9090/tcp" ]
+    ) "[ 9090/tcp ]")
+    (assertCheck "container env override wins over default and stays sorted" (
+      containerOverrideCfg.packages.test-project-image.imageArgs.config.Env
+      == [
+        "APP_MODE=prod"
+        "SSL_CERT_FILE=/custom/ca.crt"
+      ]
+    ) "APP_MODE then SSL_CERT_FILE")
+    (assertCheck "container label override wins, extras ride along" (
+      containerOverrideCfg.packages.test-project-image.imageArgs.config.Labels."org.opencontainers.image.title" == "custom-title"
+      && containerOverrideCfg.packages.test-project-image.imageArgs.config.Labels."com.example.extra" == "yes"
+    ) "custom-title + com.example.extra")
+    (assertCheck "container maxLayers override wins" (
+      containerOverrideCfg.packages.test-project-image.imageArgs.maxLayers == 5
+    ) "5")
+    (assertCheck "container volumes provision dirs and ownership perms" (
+      let
+        args = containerOverrideCfg.packages.test-project-image.imageArgs;
+        perm = builtins.head (args.perms);
+      in
+      builtins.length args.perms == 1
+      && perm.uid == 1000
+      && perm.gid == 1000
+      && perm.regex == "/data.*"
+      && builtins.length args.copyToRoot == 2
+    ) "one perms entry uid 1000, two copyToRoot roots")
+    (assertCheck "container packageName selects the monorepo package" (
+      containerMonorepoCfg.packages ? worker-image
+      && containerMonorepoCfg.packages.worker-image.imageArgs.name == "ghcr.io/larsartmann/worker"
+      && containerMonorepoCfg.packages.worker-image.imageArgs.config.Entrypoint == [ "/bin/worker" ]
+    ) "worker image named and entrypoint /bin/worker")
+    (assertCheck "container monorepo label description comes from the package" (
+      containerMonorepoCfg.packages.worker-image.imageArgs.config.Labels."org.opencontainers.image.description" == "Worker binary"
+    ) "Worker binary")
+    (assertCheck "container invalid packageName throws at eval" (
+      !(builtins.tryEval containerBadPkgCfg.packages.nope-image).success
+    ) "eval error")
+    (assertCheck "container enabled without backend throws at eval" (
+      !(builtins.tryEval containerNoBackendCfg.packages.test-project-image).success
+    ) "eval error")
     systemsOverrideCheck
     monorepoOverlayCheck
   ];
