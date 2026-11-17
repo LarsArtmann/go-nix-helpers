@@ -462,6 +462,16 @@ let
   # Enabled without a backend must throw with wiring instructions.
   containerNoBackendCfg = mkPerSystemConfig { container.enable = true; };
 
+  # meta.mainProgram overrides the entrypoint binary name (e.g. cmd/server
+  # builds bin/server while the package is named after the repo).
+  containerMainProgramCfg = mkPerSystemConfig {
+    extraMeta.mainProgram = "server";
+    container = {
+      enable = true;
+      nix2container = containerBackendStub;
+    };
+  };
+
   # --- GOPRIVATE behavioral test: deps triggers GOPRIVATE injection --------
   # When deps is non-empty, GOPRIVATE should be injected into the devShell.
   # We use a mock dep path — the devShell doesn't trigger mkPreparedSource
@@ -1531,6 +1541,9 @@ let
     (assertCheck "container default entrypoint is /bin/pname" (
       containerCfg.packages.test-project-image.imageArgs.config.Entrypoint == [ "/bin/test-project" ]
     ) "[ /bin/test-project ]")
+    (assertCheck "container entrypoint follows meta.mainProgram" (
+      containerMainProgramCfg.packages.test-project-image.imageArgs.config.Entrypoint == [ "/bin/server" ]
+    ) "[ /bin/server ]")
     (assertCheck "container default user is distroless nonroot" (
       containerCfg.packages.test-project-image.imageArgs.config.User == "65532:65532"
     ) "65532:65532")

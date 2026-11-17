@@ -730,9 +730,10 @@ in
             default = null;
             description = ''
               OCI Entrypoint. null (the default) uses
-              `[ "/bin/packageName" ]` — the binary relocated to /bin by
-              the image's buildEnv (symlink into /nix/store, never a
-              duplicated closure).
+              `[ "/bin/<mainProgram>" ]` — the package's meta.mainProgram
+              (falling back to the package name), relocated to /bin by the
+              image's buildEnv (symlink into /nix/store, never a duplicated
+              closure).
             '';
           };
 
@@ -1290,12 +1291,18 @@ in
         }
         // cfg.container.labels;
 
+        # Binary name inside the image: the package's meta.mainProgram when
+        # declared (e.g. cmd/server builds bin/server while the package is
+        # named after the repo — PapDashboard), packageName otherwise.
+        containerBinaryName =
+          config.packages.${containerPackageName}.meta.mainProgram or containerPackageName;
+
         containerConfig = container.mkImageConfig {
           entrypoint =
             if cfg.container.entrypoint != null then
               cfg.container.entrypoint
             else
-              [ "/bin/${containerPackageName}" ];
+              [ "/bin/${containerBinaryName}" ];
           cmd = cfg.container.cmd;
           env = container.envList containerDefaultEnv;
           user = cfg.container.user;
