@@ -222,7 +222,7 @@ failure and session end.
    systemd-binfmt.service` as root? Everything local-build-shaped is blocked
    on it; without it I can only eval-verify (CI would cover the rest after a
    push you haven't requested).
-2. **Nixpkgs bump question withdrawn** — the attempted bump was a no-op
+2. **Nixpkgs bump question withdrawn** — the attempted bump was a no-op — resolved as a no-op (4975466 was the unstable tip; correction on the record in 04-39 §d.5)
    (4975466 is the current nixos-unstable tip). No lock change is pending.
 ~~3. **D10 redesign confirmation:** I chose NOT to add `templ generate` to~~ routed — TODO_LIST Blocked (T15: templ generate in module builds — propose won't-implement, owner verdict pending)
    module build phases (sbts commits generated files; regenerating in builds
