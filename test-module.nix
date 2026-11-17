@@ -236,9 +236,7 @@ let
     (assertCheck "container.created default is the zero epoch" (
       cfg.container.created == "0001-01-01T00:00:00Z"
     ) "0001-01-01T00:00:00Z")
-    (assertCheck "container.nix2container default is empty" (
-      cfg.container.nix2container == { }
-    ) "{}")
+    (assertCheck "container.nix2container default is empty" (cfg.container.nix2container == { }) "{}")
   ];
 
   perSystemChecks = [
@@ -395,15 +393,13 @@ let
   n2cStub = {
     buildImage =
       args:
-      pkgs.runCommand "stub-n2c-image"
-        {
-          passthru = {
-            imageArgs = args;
-            copyToDockerDaemon = pkgs.hello;
-            copyToRegistry = pkgs.hello;
-          };
-        }
-        "touch $out";
+      pkgs.runCommand "stub-n2c-image" {
+        passthru = {
+          imageArgs = args;
+          copyToDockerDaemon = pkgs.hello;
+          copyToRegistry = pkgs.hello;
+        };
+      } "touch $out";
   };
   containerBackendStub = {
     ${pkgs.stdenv.hostPlatform.system}.nix2container = n2cStub;
@@ -1523,15 +1519,13 @@ let
       containerCfg.packages ? test-project-image
     ) "test-project-image exists")
     (assertCheck "container default image name is registry/pname" (
-      containerCfg.packages.test-project-image.imageArgs.name
-      == "ghcr.io/larsartmann/test-project"
+      containerCfg.packages.test-project-image.imageArgs.name == "ghcr.io/larsartmann/test-project"
     ) "ghcr.io/larsartmann/test-project")
     (assertCheck "container default tag is null (content-hash)" (
       containerCfg.packages.test-project-image.imageArgs.tag == null
     ) "null")
     (assertCheck "container default entrypoint is /bin/pname" (
-      containerCfg.packages.test-project-image.imageArgs.config.Entrypoint
-      == [ "/bin/test-project" ]
+      containerCfg.packages.test-project-image.imageArgs.config.Entrypoint == [ "/bin/test-project" ]
     ) "[ /bin/test-project ]")
     (assertCheck "container default user is distroless nonroot" (
       containerCfg.packages.test-project-image.imageArgs.config.User == "65532:65532"
@@ -1578,8 +1572,7 @@ let
       containerOverrideCfg.packages.test-project-image.imageArgs.tag == "v1.2.3"
     ) "v1.2.3")
     (assertCheck "container entrypoint override wins" (
-      containerOverrideCfg.packages.test-project-image.imageArgs.config.Entrypoint
-      == [
+      containerOverrideCfg.packages.test-project-image.imageArgs.config.Entrypoint == [
         "/custom-entry"
         "arg"
       ]
@@ -1595,15 +1588,17 @@ let
       == [ "9090/tcp" ]
     ) "[ 9090/tcp ]")
     (assertCheck "container env override wins over default and stays sorted" (
-      containerOverrideCfg.packages.test-project-image.imageArgs.config.Env
-      == [
+      containerOverrideCfg.packages.test-project-image.imageArgs.config.Env == [
         "APP_MODE=prod"
         "SSL_CERT_FILE=/custom/ca.crt"
       ]
     ) "APP_MODE then SSL_CERT_FILE")
     (assertCheck "container label override wins, extras ride along" (
-      containerOverrideCfg.packages.test-project-image.imageArgs.config.Labels."org.opencontainers.image.title" == "custom-title"
-      && containerOverrideCfg.packages.test-project-image.imageArgs.config.Labels."com.example.extra" == "yes"
+      containerOverrideCfg.packages.test-project-image.imageArgs.config.Labels."org.opencontainers.image.title"
+      == "custom-title"
+      &&
+        containerOverrideCfg.packages.test-project-image.imageArgs.config.Labels."com.example.extra"
+        == "yes"
     ) "custom-title + com.example.extra")
     (assertCheck "container maxLayers override wins" (
       containerOverrideCfg.packages.test-project-image.imageArgs.maxLayers == 5
@@ -1611,7 +1606,7 @@ let
     (assertCheck "container volumes provision dirs and ownership perms" (
       let
         args = containerOverrideCfg.packages.test-project-image.imageArgs;
-        perm = builtins.head (args.perms);
+        perm = builtins.head args.perms;
       in
       builtins.length args.perms == 1
       && perm.uid == 1000
@@ -1625,7 +1620,8 @@ let
       && containerMonorepoCfg.packages.worker-image.imageArgs.config.Entrypoint == [ "/bin/worker" ]
     ) "worker image named and entrypoint /bin/worker")
     (assertCheck "container monorepo label description comes from the package" (
-      containerMonorepoCfg.packages.worker-image.imageArgs.config.Labels."org.opencontainers.image.description" == "Worker binary"
+      containerMonorepoCfg.packages.worker-image.imageArgs.config.Labels."org.opencontainers.image.description"
+      == "Worker binary"
     ) "Worker binary")
     (assertCheck "container invalid packageName throws at eval" (
       !(builtins.tryEval containerBadPkgCfg.packages.nope-image).success

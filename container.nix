@@ -45,9 +45,7 @@ rec {
   # Deterministic Env list from an attrset. Attrset iteration order is
   # undefined in Nix; sorting by key keeps image hashes stable and diffs
   # reviewable. Consumer values override defaults BEFORE this call.
-  envList =
-    env:
-    map (k: "${k}=${env.${k}}") (lib.naturalSort (lib.attrNames env));
+  envList = env: map (k: "${k}=${env.${k}}") (lib.naturalSort (lib.attrNames env));
 
   # OCI image-spec config (see capitalization note in the file header).
   mkImageConfig =
@@ -77,7 +75,11 @@ rec {
   # landing at /<volume>), perms rides nix2container's tar-time chmod (uid/gid
   # applied without polluting the Nix store).
   mkVolumeDirs =
-    { name, volumes, user }:
+    {
+      name,
+      volumes,
+      user,
+    }:
     let
       owner = numericOwner user;
       dirs = pkgs.runCommand "${name}-volume-dirs" { } ''
@@ -90,17 +92,12 @@ rec {
         if owner == null then
           [ ]
         else
-          map
-            (
-              v:
-              {
-                path = dirs;
-                regex = "${v}.*";
-                mode = "0755";
-                inherit (owner) uid gid;
-              }
-            )
-            volumes;
+          map (v: {
+            path = dirs;
+            regex = "${v}.*";
+            mode = "0755";
+            inherit (owner) uid gid;
+          }) volumes;
     };
 
   # Assemble the full image. `config` comes from mkImageConfig; `mainPackage`
@@ -131,19 +128,24 @@ rec {
     in
     n2c.buildImage {
       name = lib.toLower imageName;
-      inherit tag maxLayers created meta;
-      copyToRoot =
-        [
-          (pkgs.buildEnv {
-            name = "${baseName}-image-root";
-            paths = [
-              mainPackage
-              pkgs.cacert
-            ] ++ extraPackages;
-            inherit pathsToLink;
-          })
-        ]
-        ++ lib.optional (volumeDirs != null) volumeDirs;
+      inherit
+        tag
+        maxLayers
+        created
+        meta
+        ;
+      copyToRoot = [
+        (pkgs.buildEnv {
+          name = "${baseName}-image-root";
+          paths = [
+            mainPackage
+            pkgs.cacert
+          ]
+          ++ extraPackages;
+          inherit pathsToLink;
+        })
+      ]
+      ++ lib.optional (volumeDirs != null) volumeDirs;
       perms = volumePerms;
       inherit config;
     };
@@ -162,18 +164,16 @@ rec {
       created ? "0001-01-01T00:00:00Z",
     }:
     let
-      expectedConfig = pkgs.writeText "${name}-expected-image-config.json" (
-        builtins.toJSON config
-      );
+      expectedConfig = pkgs.writeText "${name}-expected-image-config.json" (builtins.toJSON config);
       configMatch = ''
         (
-          (.image-config.User // "") == ($want[0].User // "")
-          and (.image-config.Entrypoint // []) == ($want[0].Entrypoint // [])
-          and (.image-config.Cmd // []) == ($want[0].Cmd // [])
-          and (.image-config.Env // []) == ($want[0].Env // [])
-          and (((.image-config.Labels // {}) * ($want[0].Labels // {})) == (.image-config.Labels // {}))
-          and ([(.image-config.ExposedPorts // {}) | keys[]] | sort) == ([($want[0].ExposedPorts // {}) | keys[]] | sort)
-          and ([(.image-config.Volumes // {}) | keys[]] | sort) == ([($want[0].Volumes // {}) | keys[]] | sort)
+          (."image-config".User // "") == ($want[0].User // "")
+          and (."image-config".Entrypoint // []) == ($want[0].Entrypoint // [])
+          and (."image-config".Cmd // []) == ($want[0].Cmd // [])
+          and (."image-config".Env // []) == ($want[0].Env // [])
+          and (((."image-config".Labels // {}) * ($want[0].Labels // {})) == (."image-config".Labels // {}))
+          and ([(."image-config".ExposedPorts // {}) | keys[]] | sort) == ([($want[0].ExposedPorts // {}) | keys[]] | sort)
+          and ([(."image-config".Volumes // {}) | keys[]] | sort) == ([($want[0].Volumes // {}) | keys[]] | sort)
         )
       '';
     in
@@ -187,7 +187,7 @@ rec {
         fail() {
           echo "FAIL: $1" >&2
           echo "--- image.json summary:" >&2
-          jq '{arch, created, image-config, layers: (.layers | length)}' "$imageJson" >&2
+          jq '{arch, created, "image-config": .["image-config"], layers: (.layers | length)}' "$imageJson" >&2
           echo "--- expected image-config:" >&2
           cat "${expectedConfig}" >&2
           exit 1
@@ -200,7 +200,7 @@ rec {
         jq -e --arg created "${created}" '.created == $created' "$imageJson" >/dev/null \
           || fail "image creation time is not the deterministic epoch"
         jq -e \
-          '.image-config.User != "" and .image-config.User != "root" and .image-config.User != "0:0"' \
+          '."image-config".User != "" and ."image-config".User != "root" and ."image-config".User != "0:0"' \
           "$imageJson" >/dev/null \
           || fail "image runs as root — container.user default was overridden with a root user"
         jq -e --slurpfile want "${expectedConfig}" '${configMatch}' "$imageJson" >/dev/null \

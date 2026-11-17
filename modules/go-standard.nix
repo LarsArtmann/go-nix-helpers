@@ -1262,14 +1262,14 @@ in
         containerEnabled = cfg.container.enable && pkgs.stdenv.hostPlatform.isLinux;
 
         # Submodule options cannot see outer config — resolve defaults here.
-        containerPackageName = if cfg.container.packageName != null then cfg.container.packageName else cfg.pname;
+        containerPackageName =
+          if cfg.container.packageName != null then cfg.container.packageName else cfg.pname;
 
         containerAvailablePackages =
           lib.optional cfg.enableDefaultPackage cfg.pname ++ lib.attrNames cfg.packages;
 
         containerN2c =
-          (cfg.container.nix2container.${pkgs.stdenv.hostPlatform.system} or { }).nix2container
-          or null;
+          (cfg.container.nix2container.${pkgs.stdenv.hostPlatform.system} or { }).nix2container or null;
 
         containerPkgDesc =
           if containerPackageName == cfg.pname then
@@ -1279,17 +1279,23 @@ in
 
         containerDefaultEnv = {
           SSL_CERT_FILE = "/etc/ssl/certs/ca-bundle.crt";
-        } // cfg.container.env;
+        }
+        // cfg.container.env;
 
         containerLabels = {
           "org.opencontainers.image.title" = containerPackageName;
           "org.opencontainers.image.description" = containerPkgDesc;
           "org.opencontainers.image.version" = version;
           "org.opencontainers.image.source" = "https://github.com/LarsArtmann/${cfg.pname}";
-        } // cfg.container.labels;
+        }
+        // cfg.container.labels;
 
         containerConfig = container.mkImageConfig {
-          entrypoint = if cfg.container.entrypoint != null then cfg.container.entrypoint else [ "/bin/${containerPackageName}" ];
+          entrypoint =
+            if cfg.container.entrypoint != null then
+              cfg.container.entrypoint
+            else
+              [ "/bin/${containerPackageName}" ];
           cmd = cfg.container.cmd;
           env = container.envList containerDefaultEnv;
           user = cfg.container.user;
@@ -1304,30 +1310,35 @@ in
           else
             "${cfg.container.registry}/${containerPackageName}";
 
+        # Eager validation, forced whenever any container output is touched.
+        # The derivation arguments assembled below stay lazy (deliberately —
+        # `nix flake check --no-build` must not build anything), so a missing
+        # backend or bogus packageName would otherwise surface as a cryptic
+        # mid-build error instead of a clear eval-time one.
+        containerValidate =
+          if !containerEnabled then
+            true
+          else if containerN2c == null then
+            throw ''
+              go-standard.container is enabled but the nix2container backend is not wired.
+              The composite module sets it automatically — import the module via:
+                imports = [ inputs.go-nix-helpers.flakeModules.go-standard ];
+              If you import modules/go-standard.nix directly, set:
+                go-standard.container.nix2container = inputs.nix2container.packages;
+            ''
+          else if !(lib.elem containerPackageName containerAvailablePackages) then
+            throw ''
+              go-standard.container.packageName "${containerPackageName}" is not a generated package.
+              Available: ${toString containerAvailablePackages}
+            ''
+          else
+            true;
+
         # Only forced when containerEnabled (attrset laziness) — a missing
         # backend or package name must NOT fire for consumers that never
-        # enable the container.
+        # enable the container (containerValidate owns those errors).
         image =
           let
-            n2c =
-              if containerN2c == null then
-                throw ''
-                  go-standard.container is enabled but the nix2container backend is not wired.
-                  The composite module sets it automatically — import the module via:
-                    imports = [ inputs.go-nix-helpers.flakeModules.go-standard ];
-                  If you import modules/go-standard.nix directly, set:
-                    go-standard.container.nix2container = inputs.nix2container.packages;
-                ''
-              else
-                containerN2c;
-            mainPackage =
-              if !(lib.elem containerPackageName containerAvailablePackages) then
-                throw ''
-                  go-standard.container.packageName "${containerPackageName}" is not a generated package.
-                  Available: ${toString containerAvailablePackages}
-                ''
-              else
-                config.packages.${containerPackageName};
             vols =
               if cfg.container.volumes == [ ] then
                 {
@@ -1341,12 +1352,17 @@ in
                 };
           in
           container.mkContainerImage {
-            inherit n2c;
+            n2c = containerN2c;
             imageName = containerImageName;
             tag = cfg.container.tag;
             config = containerConfig;
-            mainPackage = mainPackage;
-            inherit (cfg.container) extraPackages pathsToLink maxLayers created;
+            mainPackage = config.packages.${containerPackageName};
+            inherit (cfg.container)
+              extraPackages
+              pathsToLink
+              maxLayers
+              created
+              ;
             volumeDirs = vols.dirs;
             volumePerms = vols.perms;
             meta = {
@@ -1355,9 +1371,13 @@ in
             };
           };
 
+        # The output-facing image: validates eagerly, then hands over the
+        # (lazy) image derivation.
+        containerImage = builtins.seq containerValidate image;
+
         containerStructureCheck = container.mkContainerStructureCheck {
           name = cfg.pname;
-          inherit image;
+          image = containerImage;
           config = containerConfig;
           arch = pkgs.go.GOARCH;
           inherit (cfg.container) created;
@@ -1370,7 +1390,7 @@ in
             ${cfg.pname} = package;
           })
           // extraPackages
-          // lib.optionalAttrs containerEnabled { "${containerPackageName}-image" = image; };
+          // lib.optionalAttrs containerEnabled { "${containerPackageName}-image" = containerImage; };
 
         apps = {
           # mkDefault: a consumer's own apps.<name> (e.g. a test app that
@@ -1423,12 +1443,12 @@ in
         // lib.optionalAttrs containerEnabled {
           "${containerPackageName}-image-load" = lib.mkDefault {
             type = "app";
-            program = lib.getExe image.copyToDockerDaemon;
+            program = lib.getExe containerImage.copyToDockerDaemon;
             meta.description = "Load ${containerImageName} into the local Docker daemon (skopeo — no docker build)";
           };
           "${containerPackageName}-image-push" = lib.mkDefault {
             type = "app";
-            program = lib.getExe image.copyToRegistry;
+            program = lib.getExe containerImage.copyToRegistry;
             meta.description = "Push ${containerImageName} to its registry (skopeo — authenticate with docker login first)";
           };
         };

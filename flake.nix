@@ -90,6 +90,7 @@
         {
           pkgs,
           lib,
+          system,
           ...
         }:
         let
@@ -105,6 +106,48 @@
           };
           # Pure function property tests for stripVersionSuffix/repoName.
           pureFunctionTests = import ./test-pure-functions.nix { inherit pkgs lib; };
+          # Real-backend container smoke test: assemble an actual OCI image
+          # with the locked nix2container (the same builder the composite
+          # module wires into consumers) and run the module's structure gate
+          # against the produced image.json. Covers what the stubbed module
+          # tests cannot: the nix2container Go binary assembling layers,
+          # perms handling, and the jq contract assertions.
+          containerSmoke =
+            let
+              containerLib = import ./container.nix { inherit pkgs lib; };
+              smokeConfig = containerLib.mkImageConfig {
+                entrypoint = [ "/bin/hello" ];
+                cmd = [ "-g" "hi" ];
+                env = containerLib.envList { SSL_CERT_FILE = "/etc/ssl/certs/ca-bundle.crt"; };
+                user = "65532:65532";
+                exposedPorts = [ "8080/tcp" ];
+                volumes = [ "/data" ];
+                labels = {
+                  "org.opencontainers.image.title" = "container-smoke";
+                  "org.opencontainers.image.version" = "smoke";
+                };
+              };
+              smokeVols = containerLib.mkVolumeDirs {
+                name = "container-smoke";
+                volumes = [ "/data" ];
+                user = "65532:65532";
+              };
+              smokeImage = containerLib.mkContainerImage {
+                n2c = inputs.nix2container.packages.${system}.nix2container;
+                imageName = "ghcr.io/larsartmann/container-smoke";
+                config = smokeConfig;
+                mainPackage = pkgs.hello;
+                volumeDirs = smokeVols.dirs;
+                volumePerms = smokeVols.perms;
+                meta.description = "go-nix-helpers container smoke test image";
+              };
+            in
+            containerLib.mkContainerStructureCheck {
+              name = "container-smoke";
+              image = smokeImage;
+              config = smokeConfig;
+              arch = pkgs.go.GOARCH;
+            };
           # Man pages for go-standard and mkPreparedSource
           manPages = pkgs.stdenv.mkDerivation {
             name = "go-nix-helpers-manpages";
@@ -127,6 +170,7 @@
             inherit (moduleTests) moduleTest moduleTestNoOverlay;
             inherit (moduleTests) moduleTestTemplFreshness;
             pureFunctions = pureFunctionTests;
+            inherit containerSmoke;
             # Fixture-integrity tripwire: test-assets/mock-templ-missing-generated
             # must NEVER contain generated *_templ.go files — the
             # templ-committed check depends on their absence, and the
