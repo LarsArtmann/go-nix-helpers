@@ -16,6 +16,8 @@ shellcheck). A closing full sweep is queued as next-work #1.
 
 ## a) FULLY DONE (verified this session)
 
+<!-- check-rows:ledger -->
+_Done-work record — intentionally bare; rows are history, not open items (docs-annotations exempt)._
 | Item                                         | Evidence                                                                                                                                                                                                                                                                                                       |
 | -------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | E1–E4 docs-annotation gates                  | `checks.docsAnnotations` vendored checker + grep gate; guard-the-guard tripped BOTH gates on planted defects (named file/line/row) then green; built green in full check; exemption notes in 07-38 §B + 06-51                                                                                                  |

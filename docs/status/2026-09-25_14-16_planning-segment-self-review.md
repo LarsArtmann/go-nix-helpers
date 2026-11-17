@@ -13,6 +13,8 @@ sed bug, plan P2). My pre-push prediction of exactly this outcome held.
 
 ## a) FULLY DONE
 
+<!-- check-rows:ledger -->
+_Done-work record — intentionally bare; rows are history, not open items (docs-annotations exempt)._
 | Item                                                                                                | Evidence                                                                                                                                                                                                              |
 | --------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | CI failure diagnosis (3 causes, all reproduced locally)                                             | `gh run view 36108978307` + local repro: moduleTest trace → `test-module.nix:1136` context realisation under `--no-build`; `generate-flake.sh --private-deps` sed error char 136; SC2086 (already fixed in `499187f`) |
