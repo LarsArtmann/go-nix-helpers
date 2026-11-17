@@ -614,22 +614,27 @@ let
   };
 
   # --- vendorHashes per-system override tests ---------------------------------
-  # Rendered under the stub's pkgs (x86_64-linux): an entry for the CURRENT
-  # system wins over vendorHash; entries for OTHER systems leave the
-  # fallback (and the vendor-hash check emission) untouched.
+  # Rendered under the eval system's pkgs (runner-dependent: x86_64-linux
+  # locally and on the CI ubuntu leg, aarch64-darwin on the CI macos leg):
+  # an entry for the CURRENT system wins over vendorHash; entries for OTHER
+  # systems leave the fallback (and the vendor-hash check emission)
+  # untouched. Never hardcode a system string here — the darwin CI leg
+  # inverts the meaning and the suite goes red (it did, for weeks).
+  hostSystem = pkgs.stdenv.hostPlatform.system;
+  otherSystem = if hostSystem == "x86_64-linux" then "aarch64-darwin" else "x86_64-linux";
   vendorHashesCurrentCfg = mkPerSystemConfig {
     vendorHash = "sha256-FALLBACKHASHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
-    vendorHashes.x86_64-linux = "sha256-CURRENTHASHAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+    vendorHashes.${hostSystem} = "sha256-CURRENTHASHAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
   };
   vendorHashesOtherCfg = mkPerSystemConfig {
     vendorHash = "sha256-FALLBACKHASHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
-    vendorHashes.aarch64-darwin = "sha256-DARWINHASHAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+    vendorHashes.${otherSystem} = "sha256-OTHERHASHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
   };
   vendorHashesOnlyCurrentCfg = mkPerSystemConfig {
-    vendorHashes.x86_64-linux = "sha256-CURRENTHASHAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+    vendorHashes.${hostSystem} = "sha256-CURRENTHASHAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
   };
   vendorHashesOnlyOtherCfg = mkPerSystemConfig {
-    vendorHashes.aarch64-darwin = "sha256-DARWINHASHAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+    vendorHashes.${otherSystem} = "sha256-OTHERHASHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
   };
 
   # --- templ-committed check tests -------------------------------------------
