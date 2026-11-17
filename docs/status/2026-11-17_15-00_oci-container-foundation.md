@@ -70,11 +70,11 @@ in-session, plus two live blemishes:
 ## f) NEXT — ranked backlog
 
 **Foundation polish (go-nix-helpers):**
-1. Fix man page entrypoint text (mainProgram default)
-2. Fix AGENTS.md key count (17)
-3. Replace em dashes in container.nix comments
-4. `nix fmt` + full `nix flake check` + commit — confirm green at HEAD
-5. Decide em-dash policy vs. file voice once (AGENTS code-style vs. existing files)
+1. Fix man page entrypoint text (mainProgram default) — ✅ done 2026-11-17 (`29f978c`)
+2. Fix AGENTS.md key count (17) — ✅ done 2026-11-17 (`29f978c`; also corrected assertion counts: 218 checks / 43 container asserts)
+3. Replace em dashes in container.nix comments — ✅ decided against 2026-11-17: em dashes are the established comment voice across go-standard.nix; container.nix matches it (fleet-wide de-em-dash would be a separate owner decision)
+4. `nix fmt` + full `nix flake check` + commit — confirm green at HEAD — ✅ done 2026-11-17 (green at `40e939f`, incl. `--all-systems --no-build`)
+5. Decide em-dash policy vs. file voice once (AGENTS code-style vs. existing files) — ✅ resolved with f/3: match the file's existing voice
 6. docs/flake-patterns.md: container pattern + anti-patterns (Dockerfile, dockerTools for shipping)
 7. docs/architecture.d2 + svg: add container.nix component
 8. docs/consumer-audit-checklist.md: add container section
@@ -92,7 +92,7 @@ in-session, plus two live blemishes:
 18. GHCR push workflow template (CI) using image-push app
 
 **Fleet migration (after push):**
-19. PapDashboard migration (see c/1-3) + tag decision (latest vs content-hash)
+19. PapDashboard migration (see c/1-3) + tag decision (latest vs content-hash) — 🔄 2026-11-17: branch `oci-go-standard-pilot` ready (flake + 5 docs + changelog migrated; `tag = "latest"` keeps the compose contract; verified via `--override-input go-nix-helpers path:...`); merge + relock blocked on g/1 push
 20. KeyHolderAI migration
 21. standard-bug-tracking-schema migration
 22. bank-sync: adopt go-standard (bigger project: deps audit, mkPreparedSource already hand-wired)
@@ -108,7 +108,7 @@ in-session, plus two live blemishes:
 30. Post-push: `nix flake update` audit in consumers (nix2container lands transitively in their locks)
 
 **Hygiene:**
-31. Harvest this report's open items into TODO_LIST.md per docs-health
+31. Harvest this report's open items into TODO_LIST.md per docs-health — ✅ done 2026-11-17 (T35–T59)
 32. Consider `builtins.hashFile`-pinned nix2container doc note (lock rev 42d1df94, 2026-10-30)
 33. Proactively annotate this report when items resolve (docs-health ritual)
 
@@ -116,7 +116,7 @@ in-session, plus two live blemishes:
 
 1. **Push approval:** go-nix-helpers master has all container work local and unpushed; no consumer can use it until pushed. Push to origin now (CI becomes the oracle for aarch64), or hold?
 2. **Registry target:** the default `registry = "ghcr.io/larsartmann"` was assumed (bank-sync hand-rolled image has NO registry prefix; nothing in the fleet pushes to GHCR today that I found). Is GHCR the intended target (auth already set up?), or should the default be neutral/empty and each repo opt in?
-3. **PapDashboard sequencing + tag:** migrate now against `path:` override (unpushed module), or wait until go-nix-helpers is pushed and pilot against locked master? And keep `papdashboard:latest` (compose contract) or move to content-hash tags and let compose reference them explicitly?
+3. **PapDashboard sequencing + tag:** migrate now against `path:` override (unpushed module), or wait until go-nix-helpers is pushed and pilot against locked master? And keep `papdashboard:latest` (compose contract) or move to content-hash tags and let compose reference them explicitly? — 🔄 answered by action 2026-11-17: migrated NOW on branch `oci-go-standard-pilot` (master stays green; merge + relock after push). Tag: `latest` kept — the compose contract pins it; revisit content-hash when compose templating is on the table.
 
 ---
 
