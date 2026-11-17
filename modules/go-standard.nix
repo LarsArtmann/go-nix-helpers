@@ -702,6 +702,13 @@ in
               (`registry/packageName`). The registry is NOT contacted at
               build time — it is a string baked into the image name and
               only used by skopeo when you run `<package>-image-push`.
+              The default assumes GitHub is the project's main remote;
+              when the main remote is a Forgejo instance instead, do NOT
+              keep it: point `registry` at the Forgejo host
+              (`"<forgejo-host>/<owner>"`) or go registry-less with
+              `imageName` (local-only, nothing to push to). Nix cannot
+              detect the git remote at eval time, so this is always an
+              explicit consumer decision.
             '';
           };
 

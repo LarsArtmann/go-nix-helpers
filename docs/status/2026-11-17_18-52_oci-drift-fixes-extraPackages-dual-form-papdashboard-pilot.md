@@ -130,7 +130,7 @@ Nothing this session shipped broken or reverted. The honest near-misses, ranked:
 
 1. **Push approval for go-nix-helpers master?** 7 commits ahead (the whole container foundation + this session's fixes), nothing pushed. Every fleet migration (T47–T52, T57) and the CI-as-aarch64-oracle are gated on this one yes/no.
 2. **The daemon-swept templ modifications (PapDashboard `b4e2f99`, pushed to origin on the pilot branch):** they belong to another session's in-flight work. Should they (a) ride the pilot branch into master at merge, (b) be cherry-picked to master separately first, or (c) be left for that session to sort out? I can't know that session's intent.
-3. **Registry default `ghcr.io/larsartmann` — confirm?** Assumed during the build; nothing in the fleet demonstrably pushes to GHCR today (bank-sync's hand-rolled image has no registry prefix). If wrong, the default should be neutral/empty and repos opt in — a one-line change before any consumer bakes image names.
+3. **Registry default `ghcr.io/larsartmann` — confirm?** Assumed during the build; nothing in the fleet demonstrably pushes to GHCR today (bank-sync's hand-rolled image has no registry prefix). If wrong, the default should be neutral/empty and repos opt in — a one-line change before any consumer bakes image names. **ANSWERED 2026-11-17 (owner): default CONFIRMED, except when Forgejo is the project's main remote.** Carve-out encoded in the `container.registry` option description, man page, and README (override with the Forgejo host path or a registry-less `imageName`; the git remote is undetectable at eval time). T46 dependency resolved.
 
 ---
 

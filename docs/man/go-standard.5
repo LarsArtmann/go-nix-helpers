@@ -254,6 +254,11 @@ entrypoint follows the package's meta.mainProgram (see container.entrypoint).
 .BR container.registry " (str, default: \"ghcr.io/larsartmann\")"
 Registry prefix for the default image name (registry/packageName). Never
 contacted at build time — skopeo uses it only when you run image-push.
+The default assumes GitHub is the project's main remote; when the main
+remote is a Forgejo instance, do NOT keep it: point registry at the
+Forgejo host (host/owner) or go registry-less with container.imageName
+(local-only, nothing to push to). Nix cannot detect the git remote at
+eval time, so this is always an explicit consumer decision.
 .TP
 .BR container.imageName " (null|str, default: null)"
 Full image name. null derives registry/packageName; nix2container lowercases

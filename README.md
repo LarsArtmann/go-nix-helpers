@@ -99,6 +99,8 @@ nix run .#my-project-image-load    # into the local Docker daemon (skopeo)
 nix run .#my-project-image-push    # to ghcr.io (skopeo; docker login first)
 ```
 
+The default registry (`ghcr.io/larsartmann`) assumes GitHub is the project's main remote. Forgejo-remote projects must override: point `container.registry` at the Forgejo host, or set a registry-less `container.imageName` — the git remote is invisible to Nix eval, so the choice is always explicit.
+
 Why nix2container (bundled — still only 3 inputs):
 
 - **True OCI image spec** — image.json + skopeo `nix:` transport; works with any registry, cosign, etc.
