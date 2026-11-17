@@ -1561,8 +1561,7 @@ let
         roots = containerFnExtraPkgsCfg.packages.test-project-image.imageArgs.copyToRoot;
         imageRoot = builtins.head roots;
       in
-      builtins.length roots == 1
-      && builtins.any (p: p.pname or null == "hello") imageRoot.paths
+      builtins.length roots == 1 && builtins.any (p: p.pname or null == "hello") imageRoot.paths
     ) "hello inside the image-root buildEnv")
     (assertCheck "container default user is distroless nonroot" (
       containerCfg.packages.test-project-image.imageArgs.config.User == "65532:65532"

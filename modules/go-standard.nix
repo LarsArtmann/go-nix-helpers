@@ -797,7 +797,9 @@ in
           };
 
           extraPackages = lib.mkOption {
-            type = lib.types.either (lib.types.listOf lib.types.package) (lib.types.functionTo (lib.types.listOf lib.types.package));
+            type = lib.types.either (lib.types.listOf lib.types.package) (
+              lib.types.functionTo (lib.types.listOf lib.types.package)
+            );
             default = [ ];
             description = ''
               Extra packages copied into the image root (e.g. pkgs.busybox
