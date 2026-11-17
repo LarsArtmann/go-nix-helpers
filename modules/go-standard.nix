@@ -922,6 +922,10 @@ in
 
         usePreparedSource = cfg.deps != { };
 
+        # Pure-Nix repos (this library self-hosts the module) have no go.mod;
+        # Go-specific behavior keys off its presence.
+        goModExists = builtins.pathExists (self.outPath + "/go.mod");
+
         # Eval-time go.mod floor check: the `go` directive in the consumer's
         # ROOT go.mod must not exceed the resolved toolchain. GOTOOLCHAIN=local
         # (set in all devShells and enforced in the sandbox) forbids toolchain
@@ -1435,14 +1439,17 @@ in
           // extraPackages
           // lib.optionalAttrs containerEnabled { "${containerPackageName}-image" = containerImage; };
 
-        apps = {
-          # mkDefault: a consumer's own apps.<name> (e.g. a test app that
-          # runs templ generate first, or tests a second Go module) wins
-          # over these generic runners without mkForce gymnastics.
-          test = lib.mkDefault (
-            mkApp "run-test" [ goPkg ] "go test -race -v -coverprofile=coverage.out ./..."
-          );
-        }
+        apps =
+        # Go runners only make sense where a Go module exists; a pure-Nix
+        # consumer (library self-hosting) gets no misleading test app.
+        (lib.optionalAttrs goModExists {
+        # mkDefault: a consumer's own apps.<name> (e.g. a test app that
+        # runs templ generate first, or tests a second Go module) wins
+        # over these generic runners without mkForce gymnastics.
+        test = lib.mkDefault (
+        mkApp "run-test" [ goPkg ] "go test -race -v -coverprofile=coverage.out ./..."
+        );
+        })
         // lib.optionalAttrs cfg.enableDefaultPackage {
           # Rides the main package build (runs its binary) — library
           # workspaces without one declare their own runner.
@@ -1452,7 +1459,7 @@ in
             meta.description = "Run the ${cfg.pname} binary";
           };
         }
-        // lib.optionalAttrs cfg.enableGolangciLint {
+        // lib.optionalAttrs (cfg.enableGolangciLint && goModExists) {
           lint = lib.mkDefault (
             mkApp "run-lint" [
               goPkg
@@ -1719,7 +1726,10 @@ in
           );
 
         treefmt = {
-          projectRootFile = "go.mod";
+          # Anchor discovery at go.mod in Go repos; pure-Nix consumers
+          # (self-hosting library) fall back to the flake — treefmt only
+          # needs a root-anchoring file.
+          projectRootFile = if goModExists then "go.mod" else "flake.nix";
           programs = {
             gofumpt.enable = cfg.enableGofumpt;
             goimports.enable = cfg.enableGoimports;

@@ -34,15 +34,51 @@
       ...
     }:
     flake-parts.lib.mkFlake { inherit inputs; } {
-      # Match go-standard's default system set (nix-systems/default minus
-      # x86_64-darwin, which nixpkgs 26.11 dropped) — importing the full
-      # default set generated outputs for a system nothing can build.
-      systems = [
-        "x86_64-linux"
-        "aarch64-linux"
-        "aarch64-darwin"
+      # SELF-HOSTING: this repo consumes its own go-standard module exactly
+      # like a consumer would. `self.flakeModules.go-standard` cannot be
+      # imported here (evaluating an output of self while evaluating self
+      # recurses), so the imports replicate the composite's pieces —
+      # treefmt-nix + the module + the container backend wiring — which is
+      # what the composite assembles for consumers. The systems list comes
+      # from go-standard.systems (the module maps it onto flake-parts').
+      imports = [
+        inputs.treefmt-nix.flakeModule
+        ./modules/go-standard.nix
       ];
-      imports = [ inputs.treefmt-nix.flakeModule ];
+
+      go-standard = {
+        pname = "go-nix-helpers";
+        description = "Shared Nix helpers for LarsArtmann Go repositories";
+        # Pure Nix library — no Go package, no Go runners.
+        enableDefaultPackage = false;
+        enableGolangciLint = false;
+        enableGofumpt = false;
+        enableGoimports = false;
+        enableNixfmt = true;
+        enableShfmt = true;
+        devShellExtraPackages =
+          ps:
+          [
+            ps.git
+            ps.man
+            ps.nix
+            (ps.stdenv.mkDerivation {
+              name = "go-nix-helpers-manpages";
+              dontUnpack = true;
+              installPhase = ''
+                mkdir -p $out/share/man/man5
+                cp ${./docs/man/go-standard.5} $out/share/man/man5/
+                cp ${./docs/man/mkPreparedSource.5} $out/share/man/man5/
+              '';
+            })
+          ];
+        devShellHook = ''
+          echo "go-nix-helpers dev shell — nix $(nix --version)"
+          echo "Man pages: man go-standard / man mkPreparedSource"
+        '';
+        # Same closure-over-own-inputs wiring the composite performs.
+        container.nix2container = inputs.nix2container.packages;
+      };
 
       flake = {
         # Public library API — system-independent pure functions.
