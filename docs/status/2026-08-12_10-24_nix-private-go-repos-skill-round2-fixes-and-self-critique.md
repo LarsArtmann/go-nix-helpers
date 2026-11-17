@@ -212,13 +212,19 @@ This session was cleaner — I tested before fixing, validated after fixing, and
 
 The installed skills directory already uses symlinks for some skills (`architecture-review` → `../../../.agents/skills/architecture-review`). But nix-private-go-repos is a plain copy. Should I convert it to a symlink pointing at `/home/lars/projects/SKILLS/nix-private-go-repos/`? Or should the canonical source be `~/.agents/skills/`? I don't know which directory is the deployment standard.
 
+> **Resolved fleet-wide (2026-11):** `~/.config/crush/skills/<name>` symlinks into `/home/lars/projects/SKILLS/<name>` — the editable checkout is canonical; home-manager deploys; store-pinned links are refused by guards (crush-config AGENTS "Skill fan-out").
+
 ### Q2: Is the `GITHUB_TOKEN` with `insteadOf` CI auth strategy (Strategy 2) actually used anywhere?
 
 No LarsArtmann project I found uses this pattern — all use deploy keys + ssh-agent. Should I remove Strategy 2 entirely, or keep it as a documented alternative for non-LarsArtmann contexts? I can't tell if this is intended for broader audiences or only for LarsArtmann projects.
 
+> **Verdict 2026-11-17:** kept as a documented theoretical alternative — no fleet project uses it, and none needs to (deploy keys + ssh-agent cover the fleet). Not removed; not recommended.
+
 ### Q3: Is there a periodic skill re-verification process, or should we create one?
 
 Skills that reference specific API option names will drift as source projects evolve. The verification block now says "verified as of 2026-08-12" but there's no mechanism to trigger re-verification. Is there an existing process, or should I create one (e.g., a recurring calendar reminder, a CI check, or a skill audit checklist)?
+
+> **Routed 2026-11-17:** open owner question — ROADMAP "Open questions" (periodic skill re-verification).
 
 ---
 

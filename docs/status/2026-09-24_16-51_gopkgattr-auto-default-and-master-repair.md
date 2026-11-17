@@ -99,7 +99,7 @@
 1. ~~Smoke-eval 2–3 real consumers (erraudit, PMA, go-auto-upgrade) against new default: eval + `nix build` + vendorHash intact.~~ done — moved to TODO_LIST T1
 2. ~~Sweep consumers for now-redundant `goPkgAttr = "go_1_26"` pins; remove.~~ done — moved to TODO_LIST T2
 3. ~~Identify consumers whose go.mod floor > their nixpkgs newest branch — they need `goTarballVersion` guidance, not just the new default.~~ done — folded into TODO_LIST T1
-4. Re-run the consumer fleet audit (last: 2026-08-11) with the auto-default as a checklist item.
+~~4. Re-run the consumer fleet audit (last: 2026-08-11) with the auto-default as a checklist item.~~ routed — TODO_LIST T60 (fleet audit re-run with auto-default + container checklist items)
 5. ~~Notify consumers of the behavior change (CHANGELOG here is invisible to them).~~ done — moved to ROADMAP Theme 2
 
 **Close this session's gaps (P1)**
@@ -112,7 +112,7 @@
 10. ~~CI guard: forbid committed `*_templ.go` under `mock-templ-missing-generated/`.~~ done — moved to TODO_LIST T7
 11. ~~Old-nixpkgs pinned matrix job for moduleTest (proves graceful degradation).~~ done — moved to TODO_LIST T24
 12. ~~Trash `result`, `result-1..3`, `result-auto`, `result-verify`, `result-vv` symlinks from repo root; gitignore `result*`.~~ done — moved to TODO_LIST T17
-13. Root-cause the `x86_64-darwin` "incompatible system" warning in this repo's own flake check output.
+~~13. Root-cause the `x86_64-darwin` "incompatible system" warning in this repo's own flake check output.~~ done — the `systems` default drops x86_64-darwin (nixpkgs 26.11) and the option is WIRED through the composite (2026-09-25, F14); the warning is gone from check output
 14. ~~Silence or properly set `__intentionallyOverridingVersion` in the goPkgOverride test (nixpkgs warning noise in every check log).~~ done — moved to TODO_LIST T22
 15. ~~Generalize `nix-lint.sh` `go_1_26-outline` message patterns to `go_1_XX-outline`.~~ done — moved to TODO_LIST T23
 16. ~~Make `dashboard.sh` `GO_LATEST` derive from nixpkgs (kill the last manual-bump site — this exact default rotted twice before).~~ done — moved to TODO_LIST T25
@@ -122,33 +122,33 @@
 18. ~~Generate README option table from module options.~~ done — moved to ROADMAP Theme 6
 19. ~~Verify/derive the "39 options" count programmatically (options list in AGENTS.md is also hand-trimmed).~~ done — moved to ROADMAP Theme 6
 20. ~~Drop assertion counts from AGENTS.md or emit them from the test runner.~~ done — moved to ROADMAP Theme 6
-21. Update `templates/go-standard` README/comments to advertise zero-config Go toolchain.
+~~21. Update `templates/go-standard` README/comments to advertise zero-config Go toolchain.~~ Won't implement — dormant (template comments carry the auto-default already; README polish never picked up)
 22. ~~Delete `templates/go-flake-parts/` (deprecated, still pins `go_1_26`) — or bump if deletion is too aggressive pre-tag.~~ done — gated on the v0.1.0 tag decision (TODO_LIST Blocked)
 
 **Product hardening (P2/P3)**
 23. ~~Eval-time go.mod floor assertion (read `self/go.mod`, compare against resolved toolchain, actionable error).~~ done — moved to TODO_LIST T16
-24. Warn when `goPkgAttr` pins an OLDER branch than nixpkgs' newest (likely-forgotten pin).
+~~24. Warn when `goPkgAttr` pins an OLDER branch than nixpkgs' newest (likely-forgotten pin).~~ done — stale-pin warning shipped (`staleGoAttrName`, 6 pure tests + module eval-survival test, F16 2026-09-25)
 25. ~~`goTarballVersion`: document/script hash fetching (`nix-prefetch-url` recipe) — users hand-paste SRI hashes today.~~ done — documented in the man page SRI-hash recipe
-26. Accept attr-path in `goPkgAttr` (`lib.getAttrFromPath`) or document `goPkgOverride` as the only composition point.
-27. Expose resolved Go package as `passthru.go` on the default package for downstream introspection (partially exists — verify all outputs).
-28. `nix flake check --all-systems` investigation: are darwin checks consumers expect actually running?
+~~26. Accept attr-path in `goPkgAttr` (`lib.getAttrFromPath`) or document `goPkgOverride` as the only composition point.~~ done — `goPkgOverride` documented as the composition point (man page + README option table); attr-path form deliberately not added
+~~27. Expose resolved Go package as `passthru.go` on the default package for downstream introspection (partially exists — verify all outputs).~~ done — `passthru.go` shipped on module packages (F15, 2026-09-25; verified `nix eval .#default.go.version`)
+~~28. `nix flake check --all-systems` investigation: are darwin checks consumers expect actually running?~~ done — CI runs ubuntu + macos legs (darwin builds proven); Linux-side all-systems assert routed to TODO_LIST T56
 
 **Release hygiene (P3)**
 29. ~~Cut the first tagged release (v0.1.0) — makes the mkGoFlake removal promise enforceable.~~ done — moved to TODO_LIST Blocked
 30. ~~Then actually remove `mkGoFlake.nix` + its trace wrapper (legacy target: ZERO).~~ done — gated on the v0.1.0 tag (TODO_LIST Blocked)
-31. Drop the dead `goPkg` param from `mkPreparedSource` API at the same major boundary.
+~~31. Drop the dead `goPkg` param from `mkPreparedSource` API at the same major boundary.~~ routed — v0.1.0-gated (TODO_LIST Blocked: first tagged release unlocks the removal batch)
 32. ~~Register `maintainers.larsartmann` in nixpkgs (known gotcha, months old).~~ done — moved to TODO_LIST Blocked
 
 **Process (P3)**
 33. ~~HARVEST this report's section (f) into TODO_LIST.md (docs-health) — deferred per instructions.~~ done (docs-health pass 2026-09-24)
 34. ~~Check FEATURES.md reflects the auto default (not verified this session).~~ done — FEATURES.md updated with the auto default
-35. Consider a `CHANGELOG.md` "consumer-facing changes" section header convention so fleet-relevant flips are greppable.
+~~35. Consider a `CHANGELOG.md` "consumer-facing changes" section header convention so fleet-relevant flips are greppable.~~ Won't implement — dormant (convention never adopted)
 
 ## g) Questions I cannot answer myself
 
-1. **Consumer rollout:** Should I proactively eval/upgrade the 7+ consumer repos to the new default now (their `flake.lock` pins go-nix-helpers master — they get the toolchain jump on next update, possibly with a vendorHash mismatch), or do consumers update on their own schedule and I should only prepare a migration note?
-2. **Tagged release:** mkGoFlake's deprecation says "removed in the first tagged release" — no tag exists. Do you want v0.1.0 cut soon (unlocking mkGoFlake removal), or keep the training wheels indefinitely?
-3. **Daemon hygiene:** The auto-commit daemon committed my in-progress work 4 times mid-session (including a state where one of my own edits had a bug). Expected per AGENTS.md — but do you want a repo convention of a `WIP` guard file or explicit `DON'T-COMMIT` marker sessions can use when mid-refactor, or is broken-intermediate-state-in-master an accepted tradeoff?
+~~1. **Consumer rollout:** Should I proactively eval/upgrade the 7+ consumer repos to the new default now (their `flake.lock` pins go-nix-helpers master — they get the toolchain jump on next update, possibly with a vendorHash mismatch), or do consumers update on their own schedule and I should only prepare a migration note?~~ done — consumers converged via ADR-0003 A12 pin waves (2026-11); auto-resolution proven toolchain-neutral by the attr-probe, vendorHash intact
+~~2. **Tagged release:** mkGoFlake's deprecation says "removed in the first tagged release" — no tag exists. Do you want v0.1.0 cut soon (unlocking mkGoFlake removal), or keep the training wheels indefinitely?~~ routed — TODO_LIST Blocked (v0.1.0 owner decision; unlocks mkGoFlake + template removal)
+~~3. **Daemon hygiene:** The auto-commit daemon committed my in-progress work 4 times mid-session (including a state where one of my own edits had a bug). Expected per AGENTS.md — but do you want a repo convention of a `WIP` guard file or explicit `DON'T-COMMIT` marker sessions can use when mid-refactor, or is broken-intermediate-state-in-master an accepted tradeoff?~~ routed — ROADMAP Open questions (daemon WIP guard); the commit-race recipe is already an AGENTS gotcha
 
 ---
 
