@@ -99,8 +99,8 @@
 1. ~~Smoke-eval 2–3 real consumers (erraudit, PMA, go-auto-upgrade) against new default: eval + `nix build` + vendorHash intact.~~ done — moved to TODO_LIST T1
 2. ~~Sweep consumers for now-redundant `goPkgAttr = "go_1_26"` pins; remove.~~ done — moved to TODO_LIST T2
 3. ~~Identify consumers whose go.mod floor > their nixpkgs newest branch — they need `goTarballVersion` guidance, not just the new default.~~ done — folded into TODO_LIST T1
-~~4. Re-run the consumer fleet audit (last: 2026-08-11) with the auto-default as a checklist item.~~ routed — TODO_LIST T60 (fleet audit re-run with auto-default + container checklist items)
-5. ~~Notify consumers of the behavior change (CHANGELOG here is invisible to them).~~ done — moved to ROADMAP Theme 2
+   ~~4. Re-run the consumer fleet audit (last: 2026-08-11) with the auto-default as a checklist item.~~ routed — TODO_LIST T60 (fleet audit re-run with auto-default + container checklist items)
+4. ~~Notify consumers of the behavior change (CHANGELOG here is invisible to them).~~ done — moved to ROADMAP Theme 2
 
 **Close this session's gaps (P1)**
 6. ~~Run `nix run .#verifyValidation` (negative-path suite member).~~ done — run 2026-09-24 — PASS

@@ -14,7 +14,9 @@ sed bug, plan P2). My pre-push prediction of exactly this outcome held.
 ## a) FULLY DONE
 
 _Done-work record — intentionally bare; rows are history, not open items (docs-annotations exempt)._
+
 <!-- check-rows:ledger -->
+
 | Item                                                                                                | Evidence                                                                                                                                                                                                              |
 | --------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | CI failure diagnosis (3 causes, all reproduced locally)                                             | `gh run view 36108978307` + local repro: moduleTest trace → `test-module.nix:1136` context realisation under `--no-build`; `generate-flake.sh --private-deps` sed error char 136; SC2086 (already fixed in `499187f`) |
@@ -25,10 +27,10 @@ _Done-work record — intentionally bare; rows are history, not open items (docs
 
 ## b) PARTIALLY DONE
 
-| Item                              | What's missing                                                                                                                                                                |
-| --------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| ~~CI green~~ done — CI green run 44152413584 (2026-11-17) | ~~2 of 8 jobs red (P1, P2) — diagnosed and sized in the plan but NOT fixed; the fixes were deliberately deferred to plan execution, which this segment was not ordered to start~~ |
-| ~~moduleTest mechanism confirmation~~ done — the fix landed (clean-worktree CI evaluation); moduleTest green under --no-build since | ~~Traced to line 1136 but never READ the line — the plan's P1.3 fix-mechanism choice is inferred, not confirmed; 2 more minutes of reading would have de-risked a 60m task~~ |
+| Item                                                                                                                                | What's missing                                                                                                                                                                    |
+| ----------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ~~CI green~~ done — CI green run 44152413584 (2026-11-17)                                                                           | ~~2 of 8 jobs red (P1, P2) — diagnosed and sized in the plan but NOT fixed; the fixes were deliberately deferred to plan execution, which this segment was not ordered to start~~ |
+| ~~moduleTest mechanism confirmation~~ done — the fix landed (clean-worktree CI evaluation); moduleTest green under --no-build since | ~~Traced to line 1136 but never READ the line — the plan's P1.3 fix-mechanism choice is inferred, not confirmed; 2 more minutes of reading would have de-risked a 60m task~~      |
 
 ## c) NOT STARTED
 
@@ -86,10 +88,10 @@ this segment's new items:
 ~~8. P15: consumer option sweep (goExperiment/completionStyle)~~ routed — TODO_LIST T34
 ~~9. P16–P20: systems test, self-host, buildflow issue, lessons, consumer re-verify~~ routed — T33 / T64 / BuildFlow-repo / T63 / T57 respectively
 ~~10. **NEW — fix the plan's own defects:** split 15.2 into honest rows; consider~~ done — 15.2 split into an honest batch row with real effort (2026-11-17); HTML rendering follow-up dropped as dormant
-    the skill's HTML rendering as a follow-up artifact
+the skill's HTML rendering as a follow-up artifact
 ~~11. **NEW — triage the FlakeHub auth failure line** in the CI run summary~~ Won't implement — dormant (magic-nix-cache post-step warning; no observed cache-hit loss; revisit only if cache metrics degrade)
-    (magic-nix-cache post-step; likely harmless warning, confirm it's not
-    costing cache hits)
+(magic-nix-cache post-step; likely harmless warning, confirm it's not
+costing cache hits)
 ~~12. P21–P27 polish + owner batch~~ routed — T65 (P21-P26 polish batch) + TODO_LIST Blocked rows (P27 owner decisions)
 
 ## g) Up to 3 questions I CANNOT answer myself

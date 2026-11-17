@@ -7,7 +7,9 @@
 ## a) What got done
 
 _Done-work record — intentionally bare; rows are history, not open items (docs-annotations exempt)._
+
 <!-- check-rows:ledger -->
+
 | Area                              | Outcome                                                                                                                                                                                                                                                                                                                       |
 | --------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | E1–E4 docs-annotation gates       | `checks.docsAnnotations` (vendored check-rows.py + grep gate, attribution kept), guard-the-guard verified red on planted defects, exemption notes added, green in full check                                                                                                                                                  |

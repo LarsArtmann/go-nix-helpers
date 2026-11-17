@@ -178,14 +178,14 @@ status report `2026-09-25_09-45_*` §f (43 items), and the CI diagnosis above.
 
 ### P15 — T34 consumer option sweep (20%)
 
-| #    | Task                                                                       | Effort |
-| ---- | -------------------------------------------------------------------------- | ------ |
-| 15.1 | Enumerate consumers with GOEXPERIMENT/completion boilerplate (grep fleet)  | 10m    |
+| #    | Task                                                                                | Effort |
+| ---- | ----------------------------------------------------------------------------------- | ------ |
+| 15.1 | Enumerate consumers with GOEXPERIMENT/completion boilerplate (grep fleet)           | 10m    |
 | 15.2 | Per-repo swap: GOEXPERIMENT → `goExperiment` (incl. sbts) — batch row, honest total | ~80m   |
-| 15.3 | Cobra repos: `completionStyle = "subcommand"`                              | 10m    |
-| 15.4 | Lock bumps to ≥ pushed option rev; `nix flake check --no-build` per repo   | 12m    |
-| 15.5 | Build-verify the two heaviest; commit per repo                             | 12m    |
-| 15.6 | Update migration guide examples to typed options                           | 10m    |
+| 15.3 | Cobra repos: `completionStyle = "subcommand"`                                       | 10m    |
+| 15.4 | Lock bumps to ≥ pushed option rev; `nix flake check --no-build` per repo            | 12m    |
+| 15.5 | Build-verify the two heaviest; commit per repo                                      | 12m    |
+| 15.6 | Update migration guide examples to typed options                                    | 10m    |
 
 ### P16 — T33 systems module test (20%)
 

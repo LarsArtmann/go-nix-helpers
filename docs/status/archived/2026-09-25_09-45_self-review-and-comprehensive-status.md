@@ -17,7 +17,9 @@ shellcheck). A closing full sweep is queued as next-work #1.
 ## a) FULLY DONE (verified this session)
 
 _Done-work record — intentionally bare; rows are history, not open items (docs-annotations exempt)._
+
 <!-- check-rows:ledger -->
+
 | Item                                         | Evidence                                                                                                                                                                                                                                                                                                       |
 | -------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | E1–E4 docs-annotation gates                  | `checks.docsAnnotations` vendored checker + grep gate; guard-the-guard tripped BOTH gates on planted defects (named file/line/row) then green; built green in full check; exemption notes in 07-38 §B + 06-51                                                                                                  |
@@ -38,14 +40,14 @@ _Done-work record — intentionally bare; rows are history, not open items (docs
 
 ## b) PARTIALLY DONE
 
-| Item                         | What's missing                                                                                                                                                                                                                    |
-| ---------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| E2 derivation-level red test **→ routed — TODO_LIST T65 (derivation-level red proof)** | Guard-the-guard ran at SCRIPT level in /tmp; the runCommand derivation itself was only ever green. Wiring risk (python3 nativeBuildInputs, store-path root arg) is covered by the green build, but no derivation-red proof exists |
-| T27/F2 render-verify **→ routed — TODO_LIST T65 (pandoc strikethrough check)** | 5 tables render with intact shapes via glow, but glow echoes `~~` literally (no strikethrough ANSI) — the visual property the task cared about was NOT confirmed; pandoc→HTML would show `<del>` |
-| ~~F7 marker silencing~~ done — verified 2026-11-17: warning absent from the moduleTest log | ~~`__intentionallyOverridingVersion` set in both test configs; the actual warning noise it should silence was never observed/grep'd this session (claim inherited from prior session)~~ |
-| C8 GOEXPERIMENT swap **→ routed — TODO_LIST T34 (GOEXPERIMENT swap)** | modBuildPhase gone; GOEXPERIMENT remains in sbts extraBuildAttrs — the `goExperiment` option only exists in UNPUSHED master |
-| ~~Final full-check sweep~~ done — full check green runs since 2026-09-25 through 2026-11-17 | ~~Last complete `nix flake check` predates `passthru.go` + script fix + reports; individual rebuilds green, full sweep queued~~ |
-| ~~F13 (CV proof)~~ done — verified 2026-11-17: CV's lock carries go-nix-helpers (ADR-0003) and builds green | ~~DROPPED on a single probe (`~/projects/cv` has no go-nix-helpers input) — premise possibly stale, possibly wrong repo name; one grep is thin evidence for dropping a watchlist item~~ |
+| Item                                                                                                        | What's missing                                                                                                                                                                                                                    |
+| ----------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| E2 derivation-level red test **→ routed — TODO_LIST T65 (derivation-level red proof)**                      | Guard-the-guard ran at SCRIPT level in /tmp; the runCommand derivation itself was only ever green. Wiring risk (python3 nativeBuildInputs, store-path root arg) is covered by the green build, but no derivation-red proof exists |
+| T27/F2 render-verify **→ routed — TODO_LIST T65 (pandoc strikethrough check)**                              | 5 tables render with intact shapes via glow, but glow echoes `~~` literally (no strikethrough ANSI) — the visual property the task cared about was NOT confirmed; pandoc→HTML would show `<del>`                                  |
+| ~~F7 marker silencing~~ done — verified 2026-11-17: warning absent from the moduleTest log                  | ~~`__intentionallyOverridingVersion` set in both test configs; the actual warning noise it should silence was never observed/grep'd this session (claim inherited from prior session)~~                                           |
+| C8 GOEXPERIMENT swap **→ routed — TODO_LIST T34 (GOEXPERIMENT swap)**                                       | modBuildPhase gone; GOEXPERIMENT remains in sbts extraBuildAttrs — the `goExperiment` option only exists in UNPUSHED master                                                                                                       |
+| ~~Final full-check sweep~~ done — full check green runs since 2026-09-25 through 2026-11-17                 | ~~Last complete `nix flake check` predates `passthru.go` + script fix + reports; individual rebuilds green, full sweep queued~~                                                                                                   |
+| ~~F13 (CV proof)~~ done — verified 2026-11-17: CV's lock carries go-nix-helpers (ADR-0003) and builds green | ~~DROPPED on a single probe (`~/projects/cv` has no go-nix-helpers input) — premise possibly stale, possibly wrong repo name; one grep is thin evidence for dropping a watchlist item~~                                           |
 
 ## c) NOT STARTED (this session's remaining scope)
 

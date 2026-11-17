@@ -207,7 +207,7 @@ See the full option table below, or copy one of the [templates](#templates).
 | `enableLockGuards`          | `false`                      | Eval-time flake.lock guards (registry-tarball trap, fleet-pin drift, dropped `follows`) — nix-email pattern                                                                                    |
 | `lockGuards`                | `{ }`                        | Guard tunables: `expectedNixpkgsRev`, `expectedFollows` (see module docs)                                                                                                                      |
 | `enableOverlay`             | `true`                       | Generate `flake.overlays.default`                                                                                                                                                              |
-| `enableDefaultPackage`      | `true`                       | Generate `packages.default` (set `false` in monorepos that alias `default` themselves)                                                                                                          |
+| `enableDefaultPackage`      | `true`                       | Generate `packages.default` (set `false` in monorepos that alias `default` themselves)                                                                                                         |
 | `enableDevShells`           | `true`                       | Generate `devShells.default` and `devShells.ci`                                                                                                                                                |
 | `enableTempl`               | `false`                      | Include `templ` in devShells and treefmt                                                                                                                                                       |
 | `templGenerationPolicy`     | `"committed"`                | `"committed"` enforces committed `*_templ.go` siblings (templ-committed check); `"preBuild"` skips it for build-time generation                                                                |
@@ -225,7 +225,7 @@ See the full option table below, or copy one of the [templates](#templates).
 | `cgoEnabled`                | `null`                       | `CGO_ENABLED` for the package build AND devShells, as Go's canonical `0`/`1`; `null` = platform default                                                                                        |
 | `buildFlags`                | `[]`                         | Extra build flags for `go build` (e.g. build tags)                                                                                                                                             |
 | `packages`                  | `{}`                         | Additional packages for monorepo support                                                                                                                                                       |
-| `container`                 | `{ }` (disabled)             | OCI image shipping via nix2container (17-key submodule) — see [Ship OCI images, natively](#ship-oci-images-natively)                                                                             |
+| `container`                 | `{ }` (disabled)             | OCI image shipping via nix2container (17-key submodule) — see [Ship OCI images, natively](#ship-oci-images-natively)                                                                           |
 | `deps`                      | `{}`                         | Private Go deps for `mkPreparedSource`                                                                                                                                                         |
 | `subModules`                | `{}`                         | Explicit sub-modules (merged with auto-discovered)                                                                                                                                             |
 | `requireDeps`               | `{}`                         | Manually inject `require` lines (deduped against go.mod; for sub-modules not yet required)                                                                                                     |
@@ -289,22 +289,22 @@ preparedSrc = mkPreparedSource {
 };
 ```
 
-| Parameter             | Default                             | Description                                                                                                |
-| --------------------- | ----------------------------------- | ---------------------------------------------------------------------------------------------------------- |
-| `name`                | (required)                          | Derivation name prefix                                                                                     |
-| `src`                 | (required)                          | Source derivation or path                                                                                  |
-| `deps`                | (required)                          | Attrset of `{ "import/path" = flake-input; }`                                                              |
-| `version`             | `"dev"`                             | Version string                                                                                             |
-| `autoSubModules`      | `true`                              | Auto-discover sub-modules from dep source trees                                                            |
+| Parameter              | Default                             | Description                                                                                                |
+| ---------------------- | ----------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| `name`                 | (required)                          | Derivation name prefix                                                                                     |
+| `src`                  | (required)                          | Source derivation or path                                                                                  |
+| `deps`                 | (required)                          | Attrset of `{ "import/path" = flake-input; }`                                                              |
+| `version`              | `"dev"`                             | Version string                                                                                             |
+| `autoSubModules`       | `true`                              | Auto-discover sub-modules from dep source trees                                                            |
 | `excludeSubModuleDirs` | example/testdata/vendor/...         | Directory names skipped during recursive auto-discovery (validated: literal names only)                    |
-| `subModules`          | `{}`                                | Explicit sub-modules (merged with auto-discovered)                                                         |
-| `requireDeps`         | `{}`                                | Manually inject `require` lines                                                                            |
-| `subModuleVersion`    | `"v0.0.0"`                          | Version for pseudo-version normalization                                                                   |
-| `stripLocalReplaces`  | `true`                              | Strip stale `replace X => /home/...` directives                                                            |
-| `validatePrivateDeps` | `true`                              | Verify every private `require` has a `replace`                                                             |
-| `privateDepPattern`   | `"github\\.com/[Ll]ars[Aa]rtmann/"` | ERE regex matching private module paths to validate                                                        |
-| `publicDeps`          | `[]`                                | Module paths excluded from private validation (versioned-path aware: base path matches `/v2`, `/v3`, etc.) |
-| `postPatchExtra`      | `""`                                | Additional shell commands appended to `postPatch`                                                          |
+| `subModules`           | `{}`                                | Explicit sub-modules (merged with auto-discovered)                                                         |
+| `requireDeps`          | `{}`                                | Manually inject `require` lines                                                                            |
+| `subModuleVersion`     | `"v0.0.0"`                          | Version for pseudo-version normalization                                                                   |
+| `stripLocalReplaces`   | `true`                              | Strip stale `replace X => /home/...` directives                                                            |
+| `validatePrivateDeps`  | `true`                              | Verify every private `require` has a `replace`                                                             |
+| `privateDepPattern`    | `"github\\.com/[Ll]ars[Aa]rtmann/"` | ERE regex matching private module paths to validate                                                        |
+| `publicDeps`           | `[]`                                | Module paths excluded from private validation (versioned-path aware: base path matches `/v2`, `/v3`, etc.) |
+| `postPatchExtra`       | `""`                                | Additional shell commands appended to `postPatch`                                                          |
 
 ### `mkGoFlake.nix` (deprecated)
 

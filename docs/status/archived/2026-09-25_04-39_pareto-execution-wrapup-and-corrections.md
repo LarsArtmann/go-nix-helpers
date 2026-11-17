@@ -172,17 +172,17 @@ still accurate).
 ## g) Up to 3 questions
 
 ~~1. **Host repair:** Will you run the two root fixes (binfmt restart; nix.conf~~ done — binfmt restored ~05:00 same day (external); auto-GC part remains owner-open (ROADMAP Open questions carries the workaround question)
-   auto-GC thresholds + daemon restart), or should all remaining local
-   verification wait indefinitely? Without at least the binfmt fix, no
-   consumer migration (C-tier) can be honestly completed.
+auto-GC thresholds + daemon restart), or should all remaining local
+verification wait indefinitely? Without at least the binfmt fix, no
+consumer migration (C-tier) can be honestly completed.
 ~~2. **Push for CI validation:** Master now carries the entire D-tier suite,~~ done — pushed (master on origin, synced 2026-11-17); CI validated end-to-end incl. the old-nixpkgs job; the 2026-11-17 red-window fixes closed the chronic failures
-   eval-verified but never BUILD-verified (host broke first). May I push so
-   GitHub Actions becomes the build oracle? (You said don't push unless
-   asked — asking.)
+eval-verified but never BUILD-verified (host broke first). May I push so
+GitHub Actions becomes the build oracle? (You said don't push unless
+asked — asking.)
 ~~3. **D10 redesign:** Confirm closing T15 (templ generate in module builds)~~ routed — TODO_LIST Blocked (T15 owner verdict; proposal = won't-implement with reason)
-   as won't-implement — consumer-side vestigial-override removal in C8
-   instead — given the templ-committed contract makes build-time generation
-   dead weight and templ-version-dependent output a reproducibility risk.
+as won't-implement — consumer-side vestigial-override removal in C8
+instead — given the templ-committed contract makes build-time generation
+dead weight and templ-version-dependent output a reproducibility risk.
 
 ---
 

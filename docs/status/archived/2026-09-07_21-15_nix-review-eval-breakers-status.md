@@ -24,11 +24,11 @@ Evidence chain (bisect): eval green at `0817f80` → broken at `528488a` (lock b
 ## b) PARTIALLY DONE
 
 1. ~~**Push + consumer lock update** — everything is local; HEAD is NOT pushed, so CV's `flake.lock` still pins the eval-broken rev and CV's `nix flake check`/full go-change-gate stay red until: push here → `nix flake lock update go-nix-helpers` in CV → full gate re-run. Not mine to push without the owner's word.~~ done — master pushed and in sync (verified 2026-09-24)
-~~2. **CV `vendorHash` validity claim** — argued from byte-identical fixes (identical vendored output ⇒ identical FOD output hash) but NOT re-proven by building CV's FOD against this repo's HEAD; cheap to verify once the lock consumes HEAD.~~ done — later fleet work re-locked and rebuilt CV green (ADR-0003 A12 wave 1, CV 0a889d5dd, 2026-11); FOD consumes pushed revs
-3. ~~**templ-committed test hardness** — the negative-case assertion (`tryEval … !result.success`) passed for the WRONG reason before my fix (it caught the realization _error_ just as happily as the intended `throw`). It now exercises the intended path, but the test still cannot DISTINGUISH intended-throw from accidental-eval-error — it should assert the throw message ("without a committed *_templ.go"). Not done.~~ done — moved to TODO_LIST T11
-4. ~~**`test-module.nix` read coverage** — 945 lines; I read the mock/templ/overlay/assert sections by targeted views (~85%), not a full sequential pass. The skill says read everything; the un-read remainder is option-default assertions, but honest reporting: partial.~~ done — superseded — the 2026-09-24 session re-verified the full moduleTest suite
-~~5. **Flake-lock drift governance** — `528488a`'s lock bump broke eval for 40+ minutes unbeknownst to CI (local-only). No gate here forces "lock bump must pass `nix flake check` before landing" beyond the daemon's blind auto-commit. Not addressed this session.~~ done — mechanized as `enableLockGuards`/`lib.evalLockGuards` (eval-time registry-tarball trap, fleet-pin rev equality, follows checks; unit-tested with injected drift)
-~~6. **`0817f80` commit-message accuracy** — the parallel session's message describes a "single-quoted shell fragment" and "regex mismatch" mechanism; the real mechanism is Nix indented-string interpolation → eval error. The CODE is correct; the recorded RATIONALE is wrong and will mislead future debugging. Not corrected (rewriting others' commits is off-limits); a docs correction is a next-step.~~ done — docs/corrections/2026-09-07_0817f80-interpolation-mechanism.md (F11, 2026-09-25)
+   ~~2. **CV `vendorHash` validity claim** — argued from byte-identical fixes (identical vendored output ⇒ identical FOD output hash) but NOT re-proven by building CV's FOD against this repo's HEAD; cheap to verify once the lock consumes HEAD.~~ done — later fleet work re-locked and rebuilt CV green (ADR-0003 A12 wave 1, CV 0a889d5dd, 2026-11); FOD consumes pushed revs
+2. ~~**templ-committed test hardness** — the negative-case assertion (`tryEval … !result.success`) passed for the WRONG reason before my fix (it caught the realization _error_ just as happily as the intended `throw`). It now exercises the intended path, but the test still cannot DISTINGUISH intended-throw from accidental-eval-error — it should assert the throw message ("without a committed *_templ.go"). Not done.~~ done — moved to TODO_LIST T11
+3. ~~**`test-module.nix` read coverage** — 945 lines; I read the mock/templ/overlay/assert sections by targeted views (~85%), not a full sequential pass. The skill says read everything; the un-read remainder is option-default assertions, but honest reporting: partial.~~ done — superseded — the 2026-09-24 session re-verified the full moduleTest suite
+   ~~5. **Flake-lock drift governance** — `528488a`'s lock bump broke eval for 40+ minutes unbeknownst to CI (local-only). No gate here forces "lock bump must pass `nix flake check` before landing" beyond the daemon's blind auto-commit. Not addressed this session.~~ done — mechanized as `enableLockGuards`/`lib.evalLockGuards` (eval-time registry-tarball trap, fleet-pin rev equality, follows checks; unit-tested with injected drift)
+   ~~6. **`0817f80` commit-message accuracy** — the parallel session's message describes a "single-quoted shell fragment" and "regex mismatch" mechanism; the real mechanism is Nix indented-string interpolation → eval error. The CODE is correct; the recorded RATIONALE is wrong and will mislead future debugging. Not corrected (rewriting others' commits is off-limits); a docs correction is a next-step.~~ done — docs/corrections/2026-09-07_0817f80-interpolation-mechanism.md (F11, 2026-09-25)
 
 ## c) NOT STARTED (observed, deliberately untouched)
 
@@ -38,9 +38,9 @@ Evidence chain (bisect): eval green at `0817f80` → broken at `528488a` (lock b
 4. ~~`publicDeps` entries go into an ERE unescaped (`grep -vE "^${pub}…"` via `escapeShellArg` only) — dots are wildcards; harmless over-match today.~~ done — moved to TODO_LIST T12
 5. ~~`excludeSubModuleDirs` custom values are spliced into a `case` glob unquoted — metachar-containing custom excludes would break; defaults safe.~~ done — moved to TODO_LIST T20
 6. ~~`autoDiscoverScript` header comment says "ALL go.mod at any depth" but `find -mindepth 3` skips each dep's TOP-LEVEL go.mod (by design — main replace comes from the deps key). Comment nit only.~~ done — moved to TODO_LIST T19
-~~7. `nativeBuildInputs = [ goPkg ]` in `mkPreparedSource` — no script invokes `go`; possibly vestigial (needs verification before removal).~~ routed — removal gated on the v0.1.0 tag (TODO_LIST Blocked); documented as dead weight in AGENTS.md
-~~8. `scripts/dashboard.sh` / `scripts/nix-lint.sh` — referenced by apps, not reviewed (shell, not `.nix`; flagged for a follow-up).~~ done — scripts shellcheck-clean under the CI gate (2026-11-17); nix-lint patterns generalized 2026-09-25 (F8)
-~~9. `nix flake check --all-systems` — darwin/aarch64 legs omitted locally (no builders); CI question only.~~ routed — TODO_LIST T56 (all-systems assert + local ci-parity); CI macos leg already covers darwin builds
+   ~~7. `nativeBuildInputs = [ goPkg ]` in `mkPreparedSource` — no script invokes `go`; possibly vestigial (needs verification before removal).~~ routed — removal gated on the v0.1.0 tag (TODO_LIST Blocked); documented as dead weight in AGENTS.md
+   ~~8. `scripts/dashboard.sh` / `scripts/nix-lint.sh` — referenced by apps, not reviewed (shell, not `.nix`; flagged for a follow-up).~~ done — scripts shellcheck-clean under the CI gate (2026-11-17); nix-lint patterns generalized 2026-09-25 (F8)
+   ~~9. `nix flake check --all-systems` — darwin/aarch64 legs omitted locally (no builders); CI question only.~~ routed — TODO_LIST T56 (all-systems assert + local ci-parity); CI macos leg already covers darwin builds
 
 ## d) TOTALLY FUCKED UP (honest register)
 
@@ -66,11 +66,11 @@ Evidence chain (bisect): eval green at `0817f80` → broken at `528488a` (lock b
 **Unblock / urgent**
 
 1. ~~Push this repo's HEAD (`8188ad2` + in-flight parallel work) — unblocks the entire CV fleet.~~ done — master pushed and in sync (verified 2026-09-24)
-~~2. CV: `nix flake lock update go-nix-helpers` → `nix flake check` → full `bash scripts/go-change-gate.sh`.~~ done — CV's lock consumes go-nix-helpers at the ADR-0003 canon rev (A12 wave 1, CV 0a889d5dd, 2026-11); verified 2026-11-17
-~~3. Verify CV's `vendorHash` re-pin end-to-end (build the FOD against the consumed rev, not by reasoning).~~ done — CV rebuilt green after the relock (repo active through 2026-11; the FOD consumes pushed revs)
-~~4. Check this repo's CI ran/will run green on the pushed HEAD (the lock bump was never CI-proven).~~ done — first fully green master CI run 44152413584 (2026-11-17 18:51), after the three root-cause fixes; red-again shfmt drift fixed same evening
-~~5. Re-deploy chain: SystemNix cv flake.lock bump AFTER CV's lock lands (ordering matters — stale pins 410).~~ Won't implement — overtaken: the cv repo is frozen ("deployed lineage is capital CV", 2026-11); the ordering concern is moot
-6. ~~Land or discard the parallel session's in-flight fixture edits (`require github.com/a-h/templ …` lines) consciously — they change fixture content mid-verify.~~ done — fixture edits landed — test-assets committed and moduleTest green
+   ~~2. CV: `nix flake lock update go-nix-helpers` → `nix flake check` → full `bash scripts/go-change-gate.sh`.~~ done — CV's lock consumes go-nix-helpers at the ADR-0003 canon rev (A12 wave 1, CV 0a889d5dd, 2026-11); verified 2026-11-17
+   ~~3. Verify CV's `vendorHash` re-pin end-to-end (build the FOD against the consumed rev, not by reasoning).~~ done — CV rebuilt green after the relock (repo active through 2026-11; the FOD consumes pushed revs)
+   ~~4. Check this repo's CI ran/will run green on the pushed HEAD (the lock bump was never CI-proven).~~ done — first fully green master CI run 44152413584 (2026-11-17 18:51), after the three root-cause fixes; red-again shfmt drift fixed same evening
+   ~~5. Re-deploy chain: SystemNix cv flake.lock bump AFTER CV's lock lands (ordering matters — stale pins 410).~~ Won't implement — overtaken: the cv repo is frozen ("deployed lineage is capital CV", 2026-11); the ordering concern is moot
+2. ~~Land or discard the parallel session's in-flight fixture edits (`require github.com/a-h/templ …` lines) consciously — they change fixture content mid-verify.~~ done — fixture edits landed — test-assets committed and moduleTest green
 
 **Correctness / test hardness**
 7. ~~Harden the templ-committed negative test to assert the throw MESSAGE (intended-throw vs accidental-eval-error discrimination).~~ done — moved to TODO_LIST T11
@@ -92,7 +92,7 @@ Evidence chain (bisect): eval green at `0817f80` → broken at `528488a` (lock b
 ~~23. Confirm minimum-supported Nix version in README — context-realization-on-pathExists semantics changed underfoot today; consumers on older/newer Nix may see different failures.~~ Won't implement — dormant (no consumer hit a version boundary since)
 ~~24. Add the two `test-assets` fixture layouts to contributor docs (how to extend the templ-committed tests).~~ Won't implement — dormant
 25. ~~Template build-smoke: `templateEval` checks eval only; copy `templates/go-standard` into a scratch project and `nix build` it in CI.~~ done — moved to ROADMAP Theme 3
-~~26. `set -euo pipefail` audit across `scripts/*.sh`.~~ done — shellcheck CI gate green over scripts/*.sh (2026-11-17)
+~~26. `set -euo pipefail` audit across `scripts/*.sh`.~~ done — shellcheck CI gate green over scripts/_.sh (2026-11-17)
 ~~27. Single-package overlay eval test (only the monorepo overlay has one today).~~ Won't implement — dormant (moduleTestNoOverlay covers the conditional; monorepo overlay tested)
 ~~28. go-standard: document WHY `devShells.default` is `mkShell` (CC needed for cgo) at the definition.~~ Won't implement — dormant
 ~~29. go-standard: `checks.format`/`build` interplay with consumer-added checks — document merge expectations.~~ Won't implement — dormant
@@ -103,7 +103,7 @@ Evidence chain (bisect): eval green at `0817f80` → broken at `528488a` (lock b
 34. ~~CHANGELOG entry for today's eval fixes (repo has CHANGELOG.md; nothing added yet).~~ done — CHANGELOG entries added
 35. ~~FEATURES.md/TODO_LIST.md sync with the new test-assets fixture layout + walkTempl contract (docs-health pass on this repo).~~ done (docs-health pass 2026-09-24)
 ~~36. Weekly lock-drift report (mirror CV's flake-lock-drift workflow) so input staleness/breakage is scheduled, not discovered.~~ done — superseded by something stronger: `enableLockGuards` fires on every outputs-forcing command, not weekly
-37. ~~`manPages` derivation: verify the two man pages still match current options (goTarball*/templCheck additions).~~ done — goTarball entries added to the man page
+37. ~~`manPages` derivation: verify the two man pages still match current options (goTarball_/templCheck additions).~~ done — goTarball entries added to the man page
 ~~38. Auto-discovery: per-dep `excludeSubModuleDirs` override (current list is global).~~ Won't implement — dormant (global list sufficient for the fleet)
 ~~39. Consider surfacing the discovered-module list as a build log line ("auto-discovered N sub-modules") for debuggability.~~ Won't implement — dormant
 40. ~~`verifyValidation` app: also assert the ERROR TEXT names the missing module (currently matches the generic message only).~~ done — moved to TODO_LIST T21
@@ -122,7 +122,7 @@ Evidence chain (bisect): eval green at `0817f80` → broken at `528488a` (lock b
 
 1. ~~**Push authority & ordering**: shall I push this repo's HEAD now (it is the unblock for CV's red `nix flake check` and full gate), and should CV's `nix flake lock update go-nix-helpers` + full gate + SystemNix bump follow immediately in that order — or do you want to drive the push yourself given the parallel session is still landing commits?~~ done — master was pushed — origin in sync (verified 2026-09-24)
 2. ~~**Fixture ownership**: the parallel session is mid-edit on MY fixture dirs (adding `require github.com/a-h/templ` to `mock-templ-committed/go.mod`, simplifying the `generated` path expr, extending `.gitignore`). Should I stand down from this repo entirely until that session lands, or is concurrent work here expected and I should continue on non-overlapping items (7–16)?~~ done — fixture edits landed with the daemon commits — no stomp occurred
-~~3. **Templ check semantics**: is `walkTempl`/templ-committed intended to run for ALL consumers (current behavior), or gated behind `enableTempl`? And should the exclusion list (`test-assets`) become a public option (`templCheckExcludePaths`) — this decides items 16/17 and whether CV-class repos without templ pay the eval walk today.~~ done — superseded by design: `templGenerationPolicy` (default "committed", "preBuild" skips the walk) shipped 2026-10; exclusion list stays internal (zero consumer demand)
+   ~~3. **Templ check semantics**: is `walkTempl`/templ-committed intended to run for ALL consumers (current behavior), or gated behind `enableTempl`? And should the exclusion list (`test-assets`) become a public option (`templCheckExcludePaths`) — this decides items 16/17 and whether CV-class repos without templ pay the eval walk today.~~ done — superseded by design: `templGenerationPolicy` (default "committed", "preBuild" skips the walk) shipped 2026-10; exclusion list stays internal (zero consumer demand)
 
 ---
 

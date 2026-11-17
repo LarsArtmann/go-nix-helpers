@@ -21,7 +21,9 @@ Verified every API claim, option name, default value, and code example against t
 ### 2. Fixed 3 issues across 3 files
 
 _Done-work record — intentionally bare; rows are history, not open items (docs-annotations exempt)._
+
 <!-- check-rows:ledger -->
+
 | # | File                                                              | Issue                                                                                                                                                                                                                               | Fix                                                                                              |
 | - | ----------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
 | 1 | `SKILL.md` + `implementation-guide.md` + `migration-checklist.md` | `publicDeps` option completely missing from the skill — only suggested `validatePrivateDeps = false` (blunt instrument) for public LarsArtmann repos, ignoring the targeted `publicDeps` exclusion list that has existed for months | Added `publicDeps` as the **preferred** approach in gotcha tables, code examples, and checklists |

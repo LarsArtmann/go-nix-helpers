@@ -19,7 +19,9 @@
 ### 2. Verified the fix against 4 test scenarios
 
 _Done-work record — intentionally bare; rows are history, not open items (docs-annotations exempt)._
+
 <!-- check-rows:ledger -->
+
 | Scenario                     | Input                                        | Result                                               |
 | ---------------------------- | -------------------------------------------- | ---------------------------------------------------- |
 | Standard deps                | 3 private requires (mixed case)              | 3 correct flake inputs + 3 correct deps map entries  |

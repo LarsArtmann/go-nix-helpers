@@ -115,7 +115,9 @@ def check_file(path: Path) -> int:
                 problems.append(f"  line {no}: PARTIAL row: {line[:100]}")
             if mixed_table and not partial:
                 offenders = [
-                    (no, state) for no, _, state in classified if state not in ("STRUCK", "ROUTED")
+                    (no, state)
+                    for no, _, state in classified
+                    if state not in ("STRUCK", "ROUTED")
                 ]
                 for no, state in offenders:
                     problems.append(f"  line {no}: {state} row in a struck table")

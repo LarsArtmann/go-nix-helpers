@@ -99,73 +99,73 @@
 
 **This session's loose ends**
 
-| # | Task                                                                                                      | Why                                                              | Effort |
-| --- | --------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------- | ------ |
-| ~~1~~ | ~~Normalize `1.~~` → `1. ~~` list spacing across all annotated reports (regex pass + spot render)~~ done — F1 spacing pass, 28 files (2026-09-25) | ~~Markdown ordered-list rendering currently broken on struck items~~ | ~~15min~~ |
-| ~~2~~ | ~~Render-verify the 5 largest struck tables (16-50, 22-45, 02-51, 21-31, 23-04) in a preview~~ done — F2 glow render pass (2026-09-25); pandoc <del> leg rides TODO_LIST T65 | ~~Markers-inside-cells is a new shape; never visually checked~~ | ~~20min~~ |
-| ~~3~~ | ~~Groff-validate both man pages (`MANWIDTH=80 man --local-file`) after the goTarball additions~~ done — F3 man render clean (2026-09-25) | ~~`.BR` entries added without running man~~ | ~~5min~~ |
-| ~~4~~ | ~~Add in-file exemption notes to 07-38 §B and 06-51 "What went well" (why items stay bare)~~ done — E4 exemption notes added (2026-09-25; visible in archived 07-38/06-51) | ~~Future gates/sessions will re-flag them~~ | ~~10min~~ |
-| ~~5~~ | ~~Wire `check-rows.py` + archived grep-gate into a flake check (download scripts into repo or vendor logic)~~ done — checks.docsAnnotations shipped + guard-the-guard red/green (E1-E3, 2026-09-25) | ~~Annotation uniformity enforced by CI, not discipline~~ | ~~1h~~ |
-| 6 | Decide the Won't-implement policy: age threshold / cap / owner sign-off for "dormant — dropped" **→ routed — TODO_LIST Blocked (won't-implement policy, owner decision)** | ~120 unilateral verdicts this session                            | 15min  |
+| #     | Task                                                                                                                                                                                                | Why                                                                  | Effort    |
+| ----- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- | --------- |
+| ~~1~~ | ~~Normalize `1.~~` → `1. ~~` list spacing across all annotated reports (regex pass + spot render)~~ done — F1 spacing pass, 28 files (2026-09-25)                                                   | ~~Markdown ordered-list rendering currently broken on struck items~~ | ~~15min~~ |
+| ~~2~~ | ~~Render-verify the 5 largest struck tables (16-50, 22-45, 02-51, 21-31, 23-04) in a preview~~ done — F2 glow render pass (2026-09-25); pandoc <del> leg rides TODO_LIST T65                        | ~~Markers-inside-cells is a new shape; never visually checked~~      | ~~20min~~ |
+| ~~3~~ | ~~Groff-validate both man pages (`MANWIDTH=80 man --local-file`) after the goTarball additions~~ done — F3 man render clean (2026-09-25)                                                            | ~~`.BR` entries added without running man~~                          | ~~5min~~  |
+| ~~4~~ | ~~Add in-file exemption notes to 07-38 §B and 06-51 "What went well" (why items stay bare)~~ done — E4 exemption notes added (2026-09-25; visible in archived 07-38/06-51)                          | ~~Future gates/sessions will re-flag them~~                          | ~~10min~~ |
+| ~~5~~ | ~~Wire `check-rows.py` + archived grep-gate into a flake check (download scripts into repo or vendor logic)~~ done — checks.docsAnnotations shipped + guard-the-guard red/green (E1-E3, 2026-09-25) | ~~Annotation uniformity enforced by CI, not discipline~~             | ~~1h~~    |
+| 6     | Decide the Won't-implement policy: age threshold / cap / owner sign-off for "dormant — dropped" **→ routed — TODO_LIST Blocked (won't-implement policy, owner decision)**                           | ~120 unilateral verdicts this session                                | 15min     |
 
 **Routed this session (authoritative list = TODO_LIST.md T1–T25)**
 
-| #  | Task                                                                                        | Source                 |
-| --- | ------------------------------------------------------------------------------------------- | ---------------------- |
-| ~~7~~  | ~~T1: Smoke-eval 2–3 real consumers against the goPkgAttr auto default~~ done — A1-A6 consumer build-verification (2026-09-25) | ~~09-24 f.1~~ |
-| ~~8~~  | ~~T2: Sweep consumers for redundant `goPkgAttr` pins~~ done — A7-A10 pin sweep, 14 repos (2026-09-25) | ~~09-24 f.2~~ |
-| ~~9~~  | ~~T3: Build-verify the 10 eval-only Tier A migrations~~ done — Tier A 10/10 (2026-09-25) | ~~16-50 C~~ |
-| 10 | T4: Migrate Tier B (KeyCountdown, StopTube, branching-flow, bank-sync, overview, BuildFlow) **→ routed — TODO_LIST T4** | 11-02 Tier B           |
-| 11 | T5: Migrate Tier C off mkGoFlake (Standup-Killer, crush-daily) **→ routed — TODO_LIST T5** | 11-02 Tier C           |
-| ~~12~~ | ~~T6: requireDeps test assertion (option ships with zero coverage)~~ done — B1-B3 requireDeps coverage (2026-09-25) | ~~verified this session~~ |
-| ~~13~~ | ~~T7: CI guard for the templ fixture (daemon WILL re-add the file)~~ done — B4-B5 templFixtureGuard, red+green (2026-09-25) | ~~09-24 e.3~~ |
-| ~~14~~ | ~~T8: Extract shared goBase helper (kill the go-standard/mkGoFlake split brain)~~ done — B6-B9 goBaseFrom extraction + tests (2026-09-25) | ~~verified at :478/:98~~ |
-| ~~15~~ | ~~T9: pkgs.go fallback branch test~~ done — D11 pkgs.go fallback via goBaseFrom stubs (2026-09-25) | ~~09-24 f.7~~ |
-| ~~16~~ | ~~T10: mkGoFlake eval smoke check~~ done — D12 mkGoFlake eval smoke (2026-09-25) | ~~09-24 f.8~~ |
-| ~~17~~ | ~~T11: templ-committed negative test asserts throw MESSAGE~~ done — D5 throw-message assertion (2026-09-25) | ~~09-07 b.3~~ |
-| ~~18~~ | ~~T12: Escape ERE metachars in publicDeps grep~~ done — D7 ERE-escaping (2026-09-25) | ~~09-07 c.4~~ |
-| ~~19~~ | ~~T13: goExperiment / cgoEnabled / completionStyle options~~ done — D1-D4 options shipped (2026-09-25) | ~~16-50 E.9–E.11~~ |
-| ~~20~~ | ~~T14: proxyVendor forced-false trace warning~~ done — D9 proxyVendor trace warning (2026-09-25) | ~~16-50 E.8~~ |
-| 21 | T15: templ generate in modBuildPhase when enableTempl **→ routed — TODO_LIST Blocked (T15 owner verdict pending)** | 16-50 E.10             |
-| ~~22~~ | ~~T16: Eval-time go.mod floor check~~ done — D13-D15 floor check + docs (2026-09-25) | ~~09-24 e.5~~ |
-| ~~23~~ | ~~T17: Trash the 7 `result*` symlinks + gitignore `result*`~~ done — F4 symlinks trashed (2026-09-25) | ~~verified this session~~ |
-| ~~24~~ | ~~T18: Document `-mindepth 3` assumption~~ done — mkPreparedSource.nix documents the -mindepth 3 by-design skip (F5/F6) | ~~08-12 e.1~~ |
-| ~~25~~ | ~~T19: Fix "any depth" comment vs mindepth mismatch~~ done — F5/F6 comment fix (2026-09-25) | ~~09-07 c.6~~ |
-| ~~26~~ | ~~T20: Quote excludeSubModuleDirs in the case glob~~ done — D8 eval-time validation + adversarial test (2026-09-25) | ~~09-07 c.5~~ |
-| ~~27~~ | ~~T21: Template README advertises zero-config toolchain~~ **Won't implement — Won't implement — dormant (template README polish).** | ~~09-24 f.21~~ |
-| ~~28~~ | ~~T22: Silence `__intentionallyOverridingVersion` warning in tests~~ done — F7 override markers (2026-09-25); warning-absence re-verified 2026-11-17 | ~~09-24 f.14~~ |
-| ~~29~~ | ~~T23: Generalize nix-lint go_1_XX message pattern~~ done — F8 go_1_XX generalization (2026-09-25) | ~~09-24 f.15~~ |
-| ~~30~~ | ~~T24: Old-nixpkgs pinned CI matrix job~~ done — T24 old-nixpkgs CI job, green on both pins (2026-09-25) | ~~09-24 f.11~~ |
-| ~~31~~ | ~~T25: Derive dashboard GO_LATEST from nixpkgs (manual-bump default rotted twice)~~ done — F9 GO_LATEST from lib.newestGoAttr (2026-09-25) | ~~09-24 f.16 + 06-09 e.2~~ |
-| 32 | Blocked: register maintainers.larsartmann in nixpkgs (external PR) **→ routed — TODO_LIST Blocked (nixpkgs maintainer PR)** | TODO_LIST Blocked      |
-| 33 | Blocked: private-repo CI test (needs DEPLOY_SSH_KEY) **→ routed — TODO_LIST Blocked (SSH CI secret)** | TODO_LIST Blocked      |
-| 34 | Blocked: df9a5ff commit-message fix (rebase + force-push approval) **→ routed — TODO_LIST Blocked (df9a5ff rebase approval)** | TODO_LIST Blocked      |
-| 35 | Blocked: v0.1.0 tag (owner decision; unblocks mkGoFlake removal + template deletion) **→ routed — TODO_LIST Blocked (v0.1.0 tag)** | TODO_LIST Blocked      |
+| #      | Task                                                                                                                                                 | Source                     |
+| ------ | ---------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------- |
+| ~~7~~  | ~~T1: Smoke-eval 2–3 real consumers against the goPkgAttr auto default~~ done — A1-A6 consumer build-verification (2026-09-25)                       | ~~09-24 f.1~~              |
+| ~~8~~  | ~~T2: Sweep consumers for redundant `goPkgAttr` pins~~ done — A7-A10 pin sweep, 14 repos (2026-09-25)                                                | ~~09-24 f.2~~              |
+| ~~9~~  | ~~T3: Build-verify the 10 eval-only Tier A migrations~~ done — Tier A 10/10 (2026-09-25)                                                             | ~~16-50 C~~                |
+| 10     | T4: Migrate Tier B (KeyCountdown, StopTube, branching-flow, bank-sync, overview, BuildFlow) **→ routed — TODO_LIST T4**                              | 11-02 Tier B               |
+| 11     | T5: Migrate Tier C off mkGoFlake (Standup-Killer, crush-daily) **→ routed — TODO_LIST T5**                                                           | 11-02 Tier C               |
+| ~~12~~ | ~~T6: requireDeps test assertion (option ships with zero coverage)~~ done — B1-B3 requireDeps coverage (2026-09-25)                                  | ~~verified this session~~  |
+| ~~13~~ | ~~T7: CI guard for the templ fixture (daemon WILL re-add the file)~~ done — B4-B5 templFixtureGuard, red+green (2026-09-25)                          | ~~09-24 e.3~~              |
+| ~~14~~ | ~~T8: Extract shared goBase helper (kill the go-standard/mkGoFlake split brain)~~ done — B6-B9 goBaseFrom extraction + tests (2026-09-25)            | ~~verified at :478/:98~~   |
+| ~~15~~ | ~~T9: pkgs.go fallback branch test~~ done — D11 pkgs.go fallback via goBaseFrom stubs (2026-09-25)                                                   | ~~09-24 f.7~~              |
+| ~~16~~ | ~~T10: mkGoFlake eval smoke check~~ done — D12 mkGoFlake eval smoke (2026-09-25)                                                                     | ~~09-24 f.8~~              |
+| ~~17~~ | ~~T11: templ-committed negative test asserts throw MESSAGE~~ done — D5 throw-message assertion (2026-09-25)                                          | ~~09-07 b.3~~              |
+| ~~18~~ | ~~T12: Escape ERE metachars in publicDeps grep~~ done — D7 ERE-escaping (2026-09-25)                                                                 | ~~09-07 c.4~~              |
+| ~~19~~ | ~~T13: goExperiment / cgoEnabled / completionStyle options~~ done — D1-D4 options shipped (2026-09-25)                                               | ~~16-50 E.9–E.11~~         |
+| ~~20~~ | ~~T14: proxyVendor forced-false trace warning~~ done — D9 proxyVendor trace warning (2026-09-25)                                                     | ~~16-50 E.8~~              |
+| 21     | T15: templ generate in modBuildPhase when enableTempl **→ routed — TODO_LIST Blocked (T15 owner verdict pending)**                                   | 16-50 E.10                 |
+| ~~22~~ | ~~T16: Eval-time go.mod floor check~~ done — D13-D15 floor check + docs (2026-09-25)                                                                 | ~~09-24 e.5~~              |
+| ~~23~~ | ~~T17: Trash the 7 `result*` symlinks + gitignore `result*`~~ done — F4 symlinks trashed (2026-09-25)                                                | ~~verified this session~~  |
+| ~~24~~ | ~~T18: Document `-mindepth 3` assumption~~ done — mkPreparedSource.nix documents the -mindepth 3 by-design skip (F5/F6)                              | ~~08-12 e.1~~              |
+| ~~25~~ | ~~T19: Fix "any depth" comment vs mindepth mismatch~~ done — F5/F6 comment fix (2026-09-25)                                                          | ~~09-07 c.6~~              |
+| ~~26~~ | ~~T20: Quote excludeSubModuleDirs in the case glob~~ done — D8 eval-time validation + adversarial test (2026-09-25)                                  | ~~09-07 c.5~~              |
+| ~~27~~ | ~~T21: Template README advertises zero-config toolchain~~ **Won't implement — Won't implement — dormant (template README polish).**                  | ~~09-24 f.21~~             |
+| ~~28~~ | ~~T22: Silence `__intentionallyOverridingVersion` warning in tests~~ done — F7 override markers (2026-09-25); warning-absence re-verified 2026-11-17 | ~~09-24 f.14~~             |
+| ~~29~~ | ~~T23: Generalize nix-lint go_1_XX message pattern~~ done — F8 go_1_XX generalization (2026-09-25)                                                   | ~~09-24 f.15~~             |
+| ~~30~~ | ~~T24: Old-nixpkgs pinned CI matrix job~~ done — T24 old-nixpkgs CI job, green on both pins (2026-09-25)                                             | ~~09-24 f.11~~             |
+| ~~31~~ | ~~T25: Derive dashboard GO_LATEST from nixpkgs (manual-bump default rotted twice)~~ done — F9 GO_LATEST from lib.newestGoAttr (2026-09-25)           | ~~09-24 f.16 + 06-09 e.2~~ |
+| 32     | Blocked: register maintainers.larsartmann in nixpkgs (external PR) **→ routed — TODO_LIST Blocked (nixpkgs maintainer PR)**                          | TODO_LIST Blocked          |
+| 33     | Blocked: private-repo CI test (needs DEPLOY_SSH_KEY) **→ routed — TODO_LIST Blocked (SSH CI secret)**                                                | TODO_LIST Blocked          |
+| 34     | Blocked: df9a5ff commit-message fix (rebase + force-push approval) **→ routed — TODO_LIST Blocked (df9a5ff rebase approval)**                        | TODO_LIST Blocked          |
+| 35     | Blocked: v0.1.0 tag (owner decision; unblocks mkGoFlake removal + template deletion) **→ routed — TODO_LIST Blocked (v0.1.0 tag)**                   | TODO_LIST Blocked          |
 
 **Docs-generation theme (ROADMAP Theme 6, this session's evidence)**
 
-| #  | Task                                                                                 | Why                                      |
-| --- | ------------------------------------------------------------------------------------ | ---------------------------------------- |
-| 36 | Generate man page option sections from mkOption descriptions **→ routed — ROADMAP Theme 6** | 2 drift incidents + today's missing rows |
-| 37 | Generate README option table from the module **→ routed — ROADMAP Theme 6** | same class                               |
-| 38 | Emit assertion/option counts from the test runner (drop hand-typed numbers) **→ routed — ROADMAP Theme 6** | 14 drifts this session                   |
-| ~~39~~ | ~~Eval-time go.mod floor check (= T16, listed for the generation theme's completeness)~~ done — D13-D15 floor check shipped (2026-09-25) | ~~silent-breaker class~~ |
-| ~~40~~ | ~~Weekly lock-drift report (09-07 f.36 — lock bumps are eval changes)~~ done — superseded by enableLockGuards (fires every eval, not weekly) | ~~40-min red window precedent~~ |
+| #      | Task                                                                                                                                         | Why                                      |
+| ------ | -------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------- |
+| 36     | Generate man page option sections from mkOption descriptions **→ routed — ROADMAP Theme 6**                                                  | 2 drift incidents + today's missing rows |
+| 37     | Generate README option table from the module **→ routed — ROADMAP Theme 6**                                                                  | same class                               |
+| 38     | Emit assertion/option counts from the test runner (drop hand-typed numbers) **→ routed — ROADMAP Theme 6**                                   | 14 drifts this session                   |
+| ~~39~~ | ~~Eval-time go.mod floor check (= T16, listed for the generation theme's completeness)~~ done — D13-D15 floor check shipped (2026-09-25)     | ~~silent-breaker class~~                 |
+| ~~40~~ | ~~Weekly lock-drift report (09-07 f.36 — lock bumps are eval changes)~~ done — superseded by enableLockGuards (fires every eval, not weekly) | ~~40-min red window precedent~~          |
 
 **Left deliberately open (bare in live reports — honest open signal)**
 
-| #  | Task                                                                       | Where                  |
-| --- | -------------------------------------------------------------------------- | ---------------------- |
-| ~~41~~ | ~~CV-side lock update + vendorHash end-to-end proof~~ done — CV lock converged + rebuilt green (ADR-0003 A12, CV 0a889d5dd, 2026-11) | ~~09-07 b.1–b.2~~ |
-| ~~42~~ | ~~Flake-lock drift governance (lock bump must pass --no-build in-window)~~ done — mechanized as enableLockGuards/evalLockGuards | ~~09-07 b.5~~ |
-| ~~43~~ | ~~Correction note for `0817f80`'s wrong mechanism story~~ done — docs/corrections/2026-09-07_0817f80-interpolation-mechanism.md | ~~09-07 b.6~~ |
-| 44 | nativeBuildInputs `[ goPkg ]` vestigial check in mkPreparedSource **→ routed — v0.1.0-gated removal (TODO_LIST Blocked)** | 09-07 c.7              |
-| 45 | SKILLS-repo follow-ups (symlink conversion, shellcheck, fixtures) **→ routed — TODO_LIST T61/T62 (repo: SKILLS)** | 08-12 ×2 (LEAVE ALONE) |
-| ~~46~~ | ~~Root-cause x86_64-darwin "incompatible system" warning~~ done — systems default drops x86_64-darwin + option wired (F14, 2026-09-25) | ~~09-24 f.13~~ |
-| ~~47~~ | ~~warn when goPkgAttr pins OLDER than nixpkgs newest~~ done — staleGoAttrName warning + 6 tests (F16, 2026-09-25) | ~~09-24 f.24~~ |
-| ~~48~~ | ~~passthru.go exposure on the default package~~ done — passthru.go shipped (F15, 2026-09-25) | ~~09-24 f.27~~ |
-| ~~49~~ | ~~flake-standard.md + flake-patterns.md consolidation (dormant, low)~~ **Won't implement — Won't implement — dormant (consolidation, low value).** | ~~17-10 f.47~~ |
-| ~~50~~ | ~~Postmortem: lock bump → eval break → consumer-visible failure (09-07 f.50)~~ done — docs/postmortems/2026-09-25_lock-bump-and-silent-host-break.md | ~~case-study value~~ |
+| #      | Task                                                                                                                                                 | Where                  |
+| ------ | ---------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------- |
+| ~~41~~ | ~~CV-side lock update + vendorHash end-to-end proof~~ done — CV lock converged + rebuilt green (ADR-0003 A12, CV 0a889d5dd, 2026-11)                 | ~~09-07 b.1–b.2~~      |
+| ~~42~~ | ~~Flake-lock drift governance (lock bump must pass --no-build in-window)~~ done — mechanized as enableLockGuards/evalLockGuards                      | ~~09-07 b.5~~          |
+| ~~43~~ | ~~Correction note for `0817f80`'s wrong mechanism story~~ done — docs/corrections/2026-09-07_0817f80-interpolation-mechanism.md                      | ~~09-07 b.6~~          |
+| 44     | nativeBuildInputs `[ goPkg ]` vestigial check in mkPreparedSource **→ routed — v0.1.0-gated removal (TODO_LIST Blocked)**                            | 09-07 c.7              |
+| 45     | SKILLS-repo follow-ups (symlink conversion, shellcheck, fixtures) **→ routed — TODO_LIST T61/T62 (repo: SKILLS)**                                    | 08-12 ×2 (LEAVE ALONE) |
+| ~~46~~ | ~~Root-cause x86_64-darwin "incompatible system" warning~~ done — systems default drops x86_64-darwin + option wired (F14, 2026-09-25)               | ~~09-24 f.13~~         |
+| ~~47~~ | ~~warn when goPkgAttr pins OLDER than nixpkgs newest~~ done — staleGoAttrName warning + 6 tests (F16, 2026-09-25)                                    | ~~09-24 f.24~~         |
+| ~~48~~ | ~~passthru.go exposure on the default package~~ done — passthru.go shipped (F15, 2026-09-25)                                                         | ~~09-24 f.27~~         |
+| ~~49~~ | ~~flake-standard.md + flake-patterns.md consolidation (dormant, low)~~ **Won't implement — Won't implement — dormant (consolidation, low value).**   | ~~17-10 f.47~~         |
+| ~~50~~ | ~~Postmortem: lock bump → eval break → consumer-visible failure (09-07 f.50)~~ done — docs/postmortems/2026-09-25_lock-bump-and-silent-host-break.md | ~~case-study value~~   |
 
 ## g) Questions I cannot answer myself
 
