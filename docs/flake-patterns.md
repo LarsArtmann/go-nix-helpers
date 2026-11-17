@@ -12,6 +12,8 @@ All LarsArtmann Go projects use the **flake-parts** + **go-nix-helpers** (which 
 6. [treefmt Configuration Rules](#treefmt-configuration-rules)
 7. [extraBuildAttrs Merge Rules](#extrabuildattrs-merge-rules)
 8. [CI-friendly options](#ci-friendly-options)
+9. [OCI Container Pattern](#oci-container-pattern)
+10. [Nix 2.34 tryEval Assertion Pattern](#nix-234-tryeval-assertion-pattern)
 
 ---
 
@@ -294,3 +296,99 @@ go-standard = {
   enableTestCheck = true; # but still run tests in CI via nix flake check
 };
 ```
+
+---
+
+## OCI Container Pattern
+
+Ship images through the `container` option — never a hand-rolled `dockerTools`
+block, never a Dockerfile alongside the flake.
+
+**Right:**
+
+```nix
+go-standard = {
+  container = {
+    enable = true;
+    cmd = [ "run" "--addr" "0.0.0.0:8097" ];
+    exposedPorts = [ "8097/tcp" ];
+    volumes = [ "/data" ];
+    env.LOG_LEVEL = "info";
+  };
+};
+```
+
+This emits `packages.<pname>-image`, `apps.<pname>-image-load` / `.#<pname>-image-push`
+(skopeo, daemon-less), and `checks.container-structure` (a jq gate over the image
+asserting non-root user, entrypoint, labels, arch, and layers). Defaults you inherit
+without writing anything: user `65532:65532`, cacert + `SSL_CERT_FILE`,
+`org.opencontainers.image.*` labels, `/bin/<mainProgram>` entrypoint,
+volume dirs pre-created with the right ownership, `maxLayers = 20` for cross-image
+layer sharing.
+
+**Wrong — hand-rolled `pkgs.dockerTools` in the consumer flake:**
+
+drifts from the module defaults (no structure check, no layer-sharing profile,
+per-repo copy-paste), and duplicates the Go build. The option exists precisely so
+this block never appears in a consumer:
+
+```nix
+# DON'T: per-repo dockerTools assembly
+packages.image = pkgs.dockerTools.buildImage { /* ...50 lines... */ };
+```
+
+**Wrong — a Dockerfile next to the flake:** two build systems for one artifact;
+the Docker build cannot see `_local_deps/` (private deps) and silently rebuilds
+outside the sandbox. Keep a Dockerfile only for tooling that cannot consume OCI
+artifacts at all, and treat it as a portability shim, not the source of truth.
+
+### Registry
+
+`container.registry` defaults to `ghcr.io/larsartmann`, assuming GitHub is the
+main remote. Forgejo-remote projects must override — point `registry` at the
+Forgejo host, or set a registry-less `imageName`. Nix eval cannot see the git
+remote, so the choice is always explicit.
+
+### Tag strategy
+
+`container.tag = null` (default) uses nix2container's content-hash tag: the tag
+IS the image output hash, so identical closures produce identical tags and
+re-deploys are no-ops. Pin a `self.rev`-derived tag (e.g.
+`tag = "${self.shortRev or "dirty"}"`) only when an external system needs to
+correlate image tags with git revisions — you trade reproducible no-op pushes
+for git-readable tags. `created` follows the same logic: zero-epoch default is
+byte-reproducible; a real timestamp breaks bit-for-bit rebuilds.
+
+---
+
+## Nix 2.34 tryEval Assertion Pattern
+
+On Nix 2.34, `tryEval` cannot recover a thrown error's message: `toString` of
+the captured value is `""`. Any test that asserts on thrown message content
+through `tryEval` is vacuously false or silently green — it has never tested
+anything.
+
+**Wrong:**
+
+```nix
+assert (builtins.tryEval (bad "input")).value == null
+  || builtins.hasInfix "expected message" (toString (builtins.tryEval (bad "input")).value);
+# toString of the captured error is "" — the hasInfix can NEVER match
+```
+
+**Right — pick one of three anchors:**
+
+```nix
+# 1. Assert against the pure message-builder function, not the throw
+assert builtins.hasInfix "expected message" (goModFloorMessage "1.30" "1.26");
+
+# 2. Assert on flattened derivation attrs (mkDerivation flattens `env`)
+assert drv.CGO_ENABLED == "0";  # NOT `drv ? env` — that key does not survive
+
+# 3. Assert on the throw-site source text itself
+assert builtins.hasInfix "is not a generated package" (builtins.readFile ./modules/go-standard.nix);
+```
+
+Also mind `or` precedence in the same tests: `x.attr or default == y` parses as
+`x.attr or (default == y)` — parenthesize every defaulted comparison:
+`(x.program or "MISSING") == value`.
