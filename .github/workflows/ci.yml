@@ -79,6 +79,16 @@ jobs:
           nix build .#checks.$SYSTEM.pureFunctions
           nix build .#checks.$SYSTEM.structural
 
+      - name: Container smoke test (real nix2container backend)
+        # containerSmoke exercises the REAL n2c Go binary (image.json
+        # assembly + jq gates) — the module tests stub the backend. Linux
+        # only: one real-backend leg is enough, and nix2container image
+        # builds are pointless on macOS runners.
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          cd /tmp/clean-integration
+          nix build .#checks.x86_64-linux.containerSmoke
+
   old-nixpkgs-module-test:
     # Auto-default degradation: against an older nixpkgs (2026-06-22 rev —
     # go_1_26 era, no go_1_27), the moduleTest must stay green: the
