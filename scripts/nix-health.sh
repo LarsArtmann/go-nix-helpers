@@ -77,6 +77,23 @@ if free_kb=$(df -k --output=avail /nix/store 2>/dev/null | tail -1 | tr -d ' ');
   fi
 fi
 
+# --- 5. dirty worktree (daemon + GC hazard) ---------------------------------
+# A dirty tree under the auto-commit daemon races verification: the daemon
+# commits mid-check, nix re-fetches the flake source, and auto-GC can delete
+# the unrooted copy between eval and build ("path ...-source is not valid").
+# Prefer committing first or verifying from a clean worktree.
+if [ -n "${GIT_DIR:-}" ] || git rev-parse --git-dir >/dev/null 2>&1; then
+  if dirty=$(git status --porcelain 2>/dev/null) && [ -n "$dirty" ]; then
+    dirty_count=$(printf '%s\n' "$dirty" | wc -l | tr -d ' ')
+    echo "WARN dirty worktree ($dirty_count file(s)) — daemon may commit mid-check"
+    echo "     (auto-commit daemon + GC race); commit first or verify from a"
+    echo "     clean worktree: git worktree add /tmp/x HEAD"
+    warn=1
+  else
+    note "OK   worktree clean"
+  fi
+fi
+
 echo "---"
 if [ "$fail" -ne 0 ]; then
   echo "BLOCKED for local builds — eval-only verification still possible."

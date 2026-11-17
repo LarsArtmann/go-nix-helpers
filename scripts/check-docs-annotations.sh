@@ -7,11 +7,12 @@
 # Gate 1 (archived completeness): every file under docs/status/archived/
 #   carries at least one strikethrough resolution (`~~`). A file in
 #   archived/ with zero annotations was archived by mistake.
-# Gate 2 (row uniformity): check-rows.py over ALL of docs/status/ — no
-#   table may mix struck and unstruck rows (the planted-miss class from
-#   the 2026-09-16 F12.3 miss). Sections that are informational by
-#   design (retrospectives, metrics tables) carry an explicit
-#   "intentionally bare" note instead of annotations.
+# Gate 2 (row uniformity): check-rows.py over ALL of docs/status/ plus
+#   docs/planning/ and docs/reviews/ — no table may mix struck and
+#   unstruck rows (the planted-miss class from the 2026-09-16 F12.3
+#   miss). Sections that are informational by design (retrospectives,
+#   metrics tables) carry an explicit "intentionally bare" note instead
+#   of annotations.
 #
 # Usage: check-docs-annotations.sh [repo-root]
 #   repo-root defaults to two levels above this script (works against a
@@ -38,7 +39,14 @@ else
   echo "PASS (gate 1: archived completeness)"
 fi
 
-mapfile -d '' files < <(find "$status_dir" -name '*.md' -print0 | sort -z)
+mapfile -d '' files < <(
+  find "$status_dir" "$root/docs/planning" "$root/docs/reviews" \
+    -name '*.md' -print0 2>/dev/null | sort -z
+)
+if [ "${#files[@]}" -eq 0 ]; then
+  echo "FAIL: no markdown files found to check (wrong repo root?)" >&2
+  exit 1
+fi
 if python3 "$root/scripts/check-rows.py" "${files[@]}"; then
   echo "PASS (gate 2: row uniformity)"
 else

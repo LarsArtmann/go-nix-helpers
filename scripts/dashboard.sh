@@ -36,6 +36,7 @@ pass=0
 fail=0
 skip=0
 results=()
+rows=()
 
 # Heuristic container-state classifier (grep-based, no eval — fast enough for
 # a fleet sweep; authoritative state is each repo's nix flake show):
@@ -88,9 +89,9 @@ for f in $(find "$PROJECTS_DIR" -maxdepth 2 -name "flake.nix" -exec dirname {} \
   else
     cstate="$(container_state "$f")"
     case "$status" in
-    PASS | OK) printf "${GREEN}%-32s${NC} %-4s %s\n" "$project" "$status" "$cstate" ;;
-    FAIL) printf "${RED}%-32s${NC} %-4s %s %s\n" "$project" "$status" "$cstate" "${error:0:60}" ;;
-    WARN) printf "${YELLOW}%-32s${NC} %-4s %s\n" "$project" "$status" "$cstate" ;;
+    PASS | OK) rows+=("$(printf "${GREEN}%-32s${NC} %-4s %s\n" "$project" "$status" "$cstate")") ;;
+    FAIL) rows+=("$(printf "${RED}%-32s${NC} %-4s %s %s\n" "$project" "$status" "$cstate" "${error:0:60}")") ;;
+    WARN) rows+=("$(printf "${YELLOW}%-32s${NC} %-4s %s\n" "$project" "$status" "$cstate")") ;;
     esac
   fi
 done
@@ -101,6 +102,17 @@ if [ "$JSON" = true ]; then
     echo "${results[*]}"
   )"
 else
+  # Canary line first: `dashboard.sh | head -1` shows fleet health.
+  echo "CANARY  pass=$pass fail=$fail warn=$skip — $(
+    if [ "$fail" -gt 0 ]; then
+      echo "FLEET RED"
+    elif [ "$skip" -gt 0 ]; then
+      echo "fleet yellow"
+    else
+      echo "fleet green"
+    fi
+  )"
+  printf '%b\n' "${rows[@]}"
   echo ""
   echo "========================================="
   echo "Total: $((pass + fail + skip))  Pass: $pass  Fail: $fail  Warn: $skip"
