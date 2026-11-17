@@ -797,11 +797,16 @@ in
           };
 
           extraPackages = lib.mkOption {
-            type = lib.types.listOf lib.types.package;
+            type = lib.types.either (lib.types.listOf lib.types.package) (lib.types.functionTo (lib.types.listOf lib.types.package));
             default = [ ];
             description = ''
               Extra packages copied into the image root (e.g. pkgs.busybox
-              for healthcheck tools and interactive debugging, ~1 MB).
+              for healthcheck tools and interactive debugging, ~1 MB). May
+              be a static list or a function `pkgs: list` — the function
+              form is evaluated with the perSystem `pkgs` at render time,
+              so this top-level option (where `pkgs` is not in scope) can
+              still carry nixpkgs packages (same dual form as
+              extraBuildAttrs).
             '';
           };
 
@@ -1358,6 +1363,14 @@ in
                   name = cfg.pname;
                   inherit (cfg.container) volumes user;
                 };
+            # extraPackages may be a static list or `pkgs: list` (same dual
+            # form as extraBuildAttrs) — normalize with the perSystem pkgs
+            # before handing it to the image builder.
+            containerExtraPackages =
+              if lib.isFunction cfg.container.extraPackages then
+                cfg.container.extraPackages pkgs
+              else
+                cfg.container.extraPackages;
           in
           container.mkContainerImage {
             n2c = containerN2c;
@@ -1365,8 +1378,8 @@ in
             tag = cfg.container.tag;
             config = containerConfig;
             mainPackage = config.packages.${containerPackageName};
+            extraPackages = containerExtraPackages;
             inherit (cfg.container)
-              extraPackages
               pathsToLink
               maxLayers
               created

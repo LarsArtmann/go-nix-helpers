@@ -293,9 +293,11 @@ OCI labels merged over auto-generated
 org.opencontainers.image.{title,description,version,source}. Consumer
 labels win on key collisions.
 .TP
-.BR container.extraPackages " (list package, default: [])"
+.BR container.extraPackages " (list package | pkgs -> list package, default: [])"
 Extra packages copied into the image root (e.g. pkgs.busybox for
-healthchecks/debugging, ~1 MB).
+healthchecks/debugging, ~1 MB). The function form is evaluated with the
+perSystem pkgs, so the top-level container option can carry nixpkgs
+packages.
 .TP
 .BR container.pathsToLink " (list str, default: [\"/bin\" \"/etc\"])"
 Paths linked into the image root from the package closure. Extend when

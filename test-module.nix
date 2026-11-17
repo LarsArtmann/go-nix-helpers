@@ -472,6 +472,17 @@ let
     };
   };
 
+  # extraPackages dual form: the function `pkgs: list` must normalize to a
+  # package list at render time (top-level configs have no pkgs in scope —
+  # the function form is how they carry nixpkgs packages into the image).
+  containerFnExtraPkgsCfg = mkPerSystemConfig {
+    container = {
+      enable = true;
+      nix2container = containerBackendStub;
+      extraPackages = ps: [ ps.hello ];
+    };
+  };
+
   # --- GOPRIVATE behavioral test: deps triggers GOPRIVATE injection --------
   # When deps is non-empty, GOPRIVATE should be injected into the devShell.
   # We use a mock dep path — the devShell doesn't trigger mkPreparedSource
@@ -1545,6 +1556,14 @@ let
     (assertCheck "container entrypoint follows meta.mainProgram" (
       containerMainProgramCfg.packages.test-project-image.imageArgs.config.Entrypoint == [ "/bin/server" ]
     ) "[ /bin/server ]")
+    (assertCheck "container extraPackages function form carries nixpkgs packages" (
+      let
+        roots = containerFnExtraPkgsCfg.packages.test-project-image.imageArgs.copyToRoot;
+        imageRoot = builtins.head roots;
+      in
+      builtins.length roots == 1
+      && builtins.any (p: p.pname or null == "hello") imageRoot.paths
+    ) "hello inside the image-root buildEnv")
     (assertCheck "container default user is distroless nonroot" (
       containerCfg.packages.test-project-image.imageArgs.config.User == "65532:65532"
     ) "65532:65532")
