@@ -68,25 +68,25 @@ Not knowingly. One false claim was published as fact ("daemon pushes this repo")
 
 ## a) FULLY DONE
 
-| # | Item | Evidence |
-|---|------|----------|
-| 1 | Registry decision encoded: `container.registry` description (source of truth), man page, README, AGENTS.md gotcha, T46 note, report §g.3 ANSWERED verdict | commits `b5a2f42`+`214bbdb` (daemon split the batch); grep-verified on disk |
-| 2 | Fleet remote truth established: 16 Forgejo-remote repos on 2 hosts; carve-out wording kept generic in public docs, concrete hosts in AGENTS.md | remote scan of 250+ repos |
-| 3 | shfmt tab-drift fixed (5 scripts restored to treefmt format) | `nix fmt`, idempotence re-run; CI Format Check root cause closed |
-| 4 | shellcheck SC2016 fixed (disable directive + reason on nix-lint pattern 16) | `nix run nixpkgs#shellcheck -- scripts/*.sh` → clean (CI's exact command) |
-| 5 | Darwin vendorHashes test hardcode fixed: configs keyed by `hostSystem`/`otherSystem` from `pkgs.stdenv.hostPlatform.system`; DARWINHASH→OTHERHASH rename | moduleTest 218/218 locally |
-| 6 | TODO_LIST trued up: T48–T50, T52, T57 → TODO (origin carries the option); T47 note corrected (relock OK, still g/2-gated); T51 gained the Forgejo carve-out note | `2e8621d`, `1dc75df` |
-| 7 | Push-behavior record corrected to verified facts (daemon commits only; 18:55 pusher unknown) in AGENTS.md, T47 note, report §g.1 | `1dc75df` after 13-min watcher falsification |
-| 8 | Report §g.1 annotated (partially moot; narrowed to "push these 4 commits") | `2e8621d` + `1dc75df` |
+| # | Item                                                                                                                                                             | Evidence                                                                    |
+| - | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
+| 1 | Registry decision encoded: `container.registry` description (source of truth), man page, README, AGENTS.md gotcha, T46 note, report §g.3 ANSWERED verdict        | commits `b5a2f42`+`214bbdb` (daemon split the batch); grep-verified on disk |
+| 2 | Fleet remote truth established: 16 Forgejo-remote repos on 2 hosts; carve-out wording kept generic in public docs, concrete hosts in AGENTS.md                   | remote scan of 250+ repos                                                   |
+| 3 | shfmt tab-drift fixed (5 scripts restored to treefmt format)                                                                                                     | `nix fmt`, idempotence re-run; CI Format Check root cause closed            |
+| 4 | shellcheck SC2016 fixed (disable directive + reason on nix-lint pattern 16)                                                                                      | `nix run nixpkgs#shellcheck -- scripts/*.sh` → clean (CI's exact command)   |
+| 5 | Darwin vendorHashes test hardcode fixed: configs keyed by `hostSystem`/`otherSystem` from `pkgs.stdenv.hostPlatform.system`; DARWINHASH→OTHERHASH rename         | moduleTest 218/218 locally                                                  |
+| 6 | TODO_LIST trued up: T48–T50, T52, T57 → TODO (origin carries the option); T47 note corrected (relock OK, still g/2-gated); T51 gained the Forgejo carve-out note | `2e8621d`, `1dc75df`                                                        |
+| 7 | Push-behavior record corrected to verified facts (daemon commits only; 18:55 pusher unknown) in AGENTS.md, T47 note, report §g.1                                 | `1dc75df` after 13-min watcher falsification                                |
+| 8 | Report §g.1 annotated (partially moot; narrowed to "push these 4 commits")                                                                                       | `2e8621d` + `1dc75df`                                                       |
 
 ## b) PARTIALLY DONE
 
-| # | Item | Done | Missing |
-|---|------|------|---------|
-| 1 | Master CI recovery | 3 root causes fixed, ALL local gates green (218/218, --all-systems --no-build, shellcheck, fmt, docsAnnotations) | Not pushed → CI verdict on the fix chain unknown; origin remains red until owner approves push |
-| 2 | Registry decision shipped | Encoded + committed locally | Unpushed; no consumer has adopted the carve-out yet (first Forgejo-remote adopter pending) |
-| 3 | CI diagnosis completeness | 6 runs + per-job logs; 4 failing jobs explained (3 causes + 1 cancellation) | Run `44059828196` (09:54, ALL jobs failed) not decomposed — likely infra/flake-parts-tarball fetch, unproven |
-| 4 | Push-state investigation | Mechanism settled (daemon commits-only) | Pusher identity + stray-branch creator unknown (§g Q3) |
+| # | Item                      | Done                                                                                                             | Missing                                                                                                      |
+| - | ------------------------- | ---------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| 1 | Master CI recovery        | 3 root causes fixed, ALL local gates green (218/218, --all-systems --no-build, shellcheck, fmt, docsAnnotations) | Not pushed → CI verdict on the fix chain unknown; origin remains red until owner approves push               |
+| 2 | Registry decision shipped | Encoded + committed locally                                                                                      | Unpushed; no consumer has adopted the carve-out yet (first Forgejo-remote adopter pending)                   |
+| 3 | CI diagnosis completeness | 6 runs + per-job logs; 4 failing jobs explained (3 causes + 1 cancellation)                                      | Run `44059828196` (09:54, ALL jobs failed) not decomposed — likely infra/flake-parts-tarball fetch, unproven |
+| 4 | Push-state investigation  | Mechanism settled (daemon commits-only)                                                                          | Pusher identity + stray-branch creator unknown (§g Q3)                                                       |
 
 ## c) NOT STARTED
 
@@ -117,45 +117,45 @@ Not knowingly. One false claim was published as fact ("daemon pushes this repo")
 
 ## f) Next — up to 50 (NEW = harvest candidates; T-refs = already in TODO_LIST)
 
-| # | Item | Est | Ref/Status |
-|---|------|-----|-----------|
-| 1 | OWNER: push approval for the 4 local commits — origin CI red until landed | 1min | §g Q1 |
-| 2 | Watch CI on the pushed chain; expect first green master since <2026-10-30 | 15min | after NEW-1 |
-| 3 | Investigate `origin/systemnix-vn-version-fix` (contents, creator, delete?) | 15min | NEW |
-| 4 | Local CI-parity gate: wrap `shellcheck scripts/*.sh` + `--all-systems --no-build` into a script/check | 1h | NEW |
-| 5 | docs-health HARVEST this report's NEW items into TODO_LIST | 30min | NEW |
-| 6 | Annotate 15-00 report §g.2 (registry ANSWERED, cross-ref 18-52 §g.3) | 5min | NEW |
-| 7 | Full-build `nix flake check` (containerSmoke rebuild) at HEAD before push | 20min | NEW |
-| 8 | Determine whether the concurrent session is still active; if yes, coordinate | 10min | NEW |
-| 9 | Decompose CI run 44059828196 (all-jobs failure, 09:54) — infra vs real | 15min | NEW |
-| 10 | PapDashboard pilot merge + relock (T47) | 30min | T47, g/2-gated |
-| 11 | KeyHolderAI → `container` option | 2h | T48 unblocked |
-| 12 | standard-bug-tracking-schema → `container` option | 2h | T49 unblocked |
-| 13 | bank-sync → go-standard adoption | 4h | T50 unblocked |
-| 14 | Fleet sweep: delete remaining hand-rolled dockerTools blocks | 2h | T52 after T47–T49 |
-| 15 | Post-push consumer audit (`nix flake update` sweeps) | 1h | T57 unblocked |
-| 16 | GHCR push workflow template (consumer CI) | 1h | T46 unblocked |
-| 17 | README registry-auth section (docker login / skopeo) | 30min | T45 |
-| 18 | nix-private-go-repos skill: image push works with private deps | 15min | T53 |
-| 19 | CI: assert `--all-systems --no-build` (T56 — overlaps NEW-4; fold) | 30min | T56 |
-| 20 | Local aarch64-linux containerSmoke (emulation) | 1h | T54 |
-| 21 | GH Actions runtime delta review from containerSmoke | 30min | T55 |
-| 22 | AGENTS.md numeric counts: derive or drop | 30min | NEW (this session c/4) |
-| 23 | flake-patterns.md: container pattern + anti-patterns | 1h | T35 |
-| 24 | architecture.d2/svg: add container.nix component | 30min | T36 |
-| 25 | consumer-audit-checklist.md: container section | 30min | T37 |
-| 26 | dashboard.sh: container column across fleet | 1h | T38 |
-| 27 | Structure check: richer mismatch diff | 1h | T39 |
-| 28 | Test custom `created` round-trip (RFC3339Nano) | 30min | T40 |
-| 29 | Multi-arch manifest app (skopeo copy --all) | 3h | T41 |
-| 30 | `container.fromImage` (distroless base) | 3h | T42 |
-| 31 | `container.initializeNixDatabase` passthrough | 1h | T43 |
-| 32 | Tag strategy knob docs | 30min | T44 |
-| 33 | nix2container lock pin doc note | 15min | T58 |
-| 34 | tryEval message-free pattern → flake-patterns.md | 15min | T59 |
-| 35 | Code-Quality-Agent + artmann-technologies-website adopt-or-manual (Forgejo carve-out applies) | 15min | T51 owner-gated |
-| 36 | Add a Forgejo-remote fixture/consumer doc example to the migration guide | 30min | NEW |
-| 37 | Consider a gate that keeps man page + README in sync with option descriptions (drift fanout of the registry decision) | 1h | NEW |
+| #  | Item                                                                                                                  | Est   | Ref/Status             |
+| -- | --------------------------------------------------------------------------------------------------------------------- | ----- | ---------------------- |
+| 1  | OWNER: push approval for the 4 local commits — origin CI red until landed                                             | 1min  | §g Q1                  |
+| 2  | Watch CI on the pushed chain; expect first green master since <2026-10-30                                             | 15min | after NEW-1            |
+| 3  | Investigate `origin/systemnix-vn-version-fix` (contents, creator, delete?)                                            | 15min | NEW                    |
+| 4  | Local CI-parity gate: wrap `shellcheck scripts/*.sh` + `--all-systems --no-build` into a script/check                 | 1h    | NEW                    |
+| 5  | docs-health HARVEST this report's NEW items into TODO_LIST                                                            | 30min | NEW                    |
+| 6  | Annotate 15-00 report §g.2 (registry ANSWERED, cross-ref 18-52 §g.3)                                                  | 5min  | NEW                    |
+| 7  | Full-build `nix flake check` (containerSmoke rebuild) at HEAD before push                                             | 20min | NEW                    |
+| 8  | Determine whether the concurrent session is still active; if yes, coordinate                                          | 10min | NEW                    |
+| 9  | Decompose CI run 44059828196 (all-jobs failure, 09:54) — infra vs real                                                | 15min | NEW                    |
+| 10 | PapDashboard pilot merge + relock (T47)                                                                               | 30min | T47, g/2-gated         |
+| 11 | KeyHolderAI → `container` option                                                                                      | 2h    | T48 unblocked          |
+| 12 | standard-bug-tracking-schema → `container` option                                                                     | 2h    | T49 unblocked          |
+| 13 | bank-sync → go-standard adoption                                                                                      | 4h    | T50 unblocked          |
+| 14 | Fleet sweep: delete remaining hand-rolled dockerTools blocks                                                          | 2h    | T52 after T47–T49      |
+| 15 | Post-push consumer audit (`nix flake update` sweeps)                                                                  | 1h    | T57 unblocked          |
+| 16 | GHCR push workflow template (consumer CI)                                                                             | 1h    | T46 unblocked          |
+| 17 | README registry-auth section (docker login / skopeo)                                                                  | 30min | T45                    |
+| 18 | nix-private-go-repos skill: image push works with private deps                                                        | 15min | T53                    |
+| 19 | CI: assert `--all-systems --no-build` (T56 — overlaps NEW-4; fold)                                                    | 30min | T56                    |
+| 20 | Local aarch64-linux containerSmoke (emulation)                                                                        | 1h    | T54                    |
+| 21 | GH Actions runtime delta review from containerSmoke                                                                   | 30min | T55                    |
+| 22 | AGENTS.md numeric counts: derive or drop                                                                              | 30min | NEW (this session c/4) |
+| 23 | flake-patterns.md: container pattern + anti-patterns                                                                  | 1h    | T35                    |
+| 24 | architecture.d2/svg: add container.nix component                                                                      | 30min | T36                    |
+| 25 | consumer-audit-checklist.md: container section                                                                        | 30min | T37                    |
+| 26 | dashboard.sh: container column across fleet                                                                           | 1h    | T38                    |
+| 27 | Structure check: richer mismatch diff                                                                                 | 1h    | T39                    |
+| 28 | Test custom `created` round-trip (RFC3339Nano)                                                                        | 30min | T40                    |
+| 29 | Multi-arch manifest app (skopeo copy --all)                                                                           | 3h    | T41                    |
+| 30 | `container.fromImage` (distroless base)                                                                               | 3h    | T42                    |
+| 31 | `container.initializeNixDatabase` passthrough                                                                         | 1h    | T43                    |
+| 32 | Tag strategy knob docs                                                                                                | 30min | T44                    |
+| 33 | nix2container lock pin doc note                                                                                       | 15min | T58                    |
+| 34 | tryEval message-free pattern → flake-patterns.md                                                                      | 15min | T59                    |
+| 35 | Code-Quality-Agent + artmann-technologies-website adopt-or-manual (Forgejo carve-out applies)                         | 15min | T51 owner-gated        |
+| 36 | Add a Forgejo-remote fixture/consumer doc example to the migration guide                                              | 30min | NEW                    |
+| 37 | Consider a gate that keeps man page + README in sync with option descriptions (drift fanout of the registry decision) | 1h    | NEW                    |
 
 37 items (11 NEW, 24 existing T-refs, 2 owner-gated). No further items invented to pad the count — the remaining ~13 slots would be ROADMAP noise, not commitments.
 
