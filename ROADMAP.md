@@ -27,7 +27,7 @@ Move the whole LarsArtmann Go portfolio onto the `go-standard` module and retire
 Raw ideas:
 
 - Migrate the remaining consumer fleet to `flakeModules.go-standard` (10 Tier A
-  repos done 2026-08-10; Tier B + Tier C remain — see TODO_LIST M2/M4)
+  repos done 2026-08-10; Tier B + Tier C remain — see TODO_LIST T4/T5)
 - Add a migration script that rewrites a 5-input manual flake.nix to the 3-input module
 - Fully remove `mkGoFlake.nix` once all consumers have migrated (currently emits deprecation trace warning; removal target is the first tagged release)
 - Remove `templates/go-flake-parts/` once consumers no longer need it (currently marked deprecated with banner; still pins `go_1_26`)
@@ -40,18 +40,18 @@ Raw ideas:
 Make the module trustworthy enough that a consumer can adopt it without manual end-to-end verification.
 
 Shipped here: property tests for `repoName`/`stripVersionSuffix`/`newestGoAttrName`
-(`checks.pureFunctions`, 41 assertions), behavioral module tests proving option
-values reach `buildGoModule` (`checks.moduleTest`, 121 assertions), structural
-output checks, template eval check, and `generate-flake.sh` smoke tests in CI.
+(`checks.pureFunctions`, 72 checks), behavioral module tests proving option
+values reach `buildGoModule` (`checks.moduleTest`, 218 assertions), structural
+output checks, template eval check, `generate-flake.sh` smoke tests in CI, the
+old-nixpkgs pinned matrix job, and `checks.containerSmoke` exercising the real
+nix2container backend end-to-end.
 
 Raw ideas still open:
 
 - Real private-dependency integration test using an actual GitHub private repo or a local mock with SSH semantics
 - Template build-smoke in CI: copy `templates/go-standard` into a scratch project and `nix build` it (eval-only today)
-- Harden the templ-committed negative test to assert the throw MESSAGE (intended-throw vs accidental-eval-error)
-- Escape ERE metacharacters in `publicDeps` entries before the `grep -vE` filter (dots are wildcards today)
 - Dry-run mode for `mkPreparedSource` so consumers can inspect generated replaces without building
-- Test for the `pkgs.go` fallback branch of `newestGoAttrName` resolution (zero coverage today)
+- Re-run the consumer `go_1_XX` attr-probe after every nixpkgs bump (the 2026-09-25 fleet-wide pin removal was proven safe only because no consumer nixpkgs carried a newer branch)
 
 ### 4. Distribution and discoverability
 
@@ -94,11 +94,31 @@ Raw ideas:
   module's `mkOption` descriptions/defaults (single source of truth)
 - Derive assertion/option counts from test output instead of hand-typing them
   in AGENTS.md/README
+- A drift gate that keeps the man page + README in sync with option
+  descriptions (the registry decision fanned out to 5 places by hand)
 - Eval-time go.mod floor check: parse the consumer's `go.mod` (readable at
   eval, not IFD) and warn/throw when the resolved toolchain is below the
   floor — converts a silent build breaker into an actionable eval error
-- CI guard that fails when `*_templ.go` files are committed under
-  `test-assets/mock-templ-missing-generated/` (the auto-commit daemon WILL retry)
+
+## Open questions
+
+Unresolved owner decisions that gate process (not code). Each blocks a family
+of small work; none belongs in TODO_LIST until answered.
+
+- **Won't-implement policy** — age threshold / cap / owner sign-off for the
+  `dormant — dropped` annotation brush (~120 unilateral verdicts from the
+  2026-09-24 pass; see TODO_LIST Blocked).
+- **Skill `allowed-tools` enforcement** — is the frontmatter field advisory or
+  mandatory in Crush? Decides whether skill audits must keep flagging it
+  (2026-08-12 reports).
+- **Periodic skill re-verification** — should skills that cite live APIs
+  (nix-private-go-repos) carry a recurring re-verify cadence, and who runs it?
+- **Daemon WIP guard** — convention for sessions mid-refactor under the
+  auto-commit daemon (a `DON'T-COMMIT` marker file?), or is
+  broken-intermediate-state-in-master accepted?
+- **Second actor in this repo** — who pushed master at 18:55 on 2026-11-17 and
+  created `origin/systemnix-vn-version-fix`, and who re-tab-indented the
+  scripts twice? (T66 tracks the branch; coordination question remains.)
 
 ## Non-goals
 

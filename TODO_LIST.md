@@ -2,7 +2,7 @@
 
 > Short-term, actionable, bounded work for go-nix-helpers. For long-term vision,
 > see `ROADMAP.md`; for shipped changes, see `CHANGELOG.md`.
-> Last docs-health harvest: 2026-11-17 (container-foundation report harvested: 25 rows T35–T59; report items f/1–f/5, f/31, g/3 annotated resolved inline).
+> Last docs-health harvest: 2026-11-17 evening pass (2026-08/09 corpus: 11 reports annotated + archived; rows T60–T67 pulled forward; counts re-derived from tool output — 54 options, 218 moduleTest, 72 pureFunction checks).
 
 ## Status legend
 
@@ -16,8 +16,9 @@
 
 | #  | Task                                                                                                                               | Status | Effort | Evidence                                                                      |
 | -- | ---------------------------------------------------------------------------------------------------------------------------------- | ------ | ------ | ----------------------------------------------------------------------------- |
-| T4 | Migrate Tier B consumers to go-standard (KeyCountdown, StopTube, branching-flow, bank-sync, overview, BuildFlow) — G2 unblocks all | TODO   | 4h     | `docs/status/2026-08-10_11-02_*` Tier B table; G2 shipped `2f3b6b2`           |
-| T5 | Migrate Tier C consumers off deprecated `mkGoFlake` (Standup-Killer, crush-daily)                                                  | TODO   | 2h     | `mkGoFlake.nix` deprecation trace; only 2 repos remain on the deprecated path |
+| T4  | Migrate Tier B consumers to go-standard (KeyCountdown, StopTube, branching-flow, bank-sync, overview, BuildFlow) — G2 unblocks all | TODO   | 4h     | `docs/status/2026-08-10_11-02_*` Tier B table; G2 shipped `2f3b6b2`           |
+| T5  | Migrate Tier C consumers off deprecated `mkGoFlake` (Standup-Killer, crush-daily)                                                  | TODO   | 2h     | `mkGoFlake.nix` deprecation trace; only 2 repos remain on the deprecated path |
+| T64 | Self-host: import `flakeModules.go-standard` in this repo's own flake.nix (dogfood gap — the dead `systems` option and missing `passthru.go` survived because the flake hand-rolls its outputs) | TODO | 3h | `docs/status/2026-09-25_09-45_*` f.14; moduleTest proves the composite works for consumers |
 
 ## Medium impact
 
@@ -25,6 +26,23 @@
 | --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------ | ------ | ---------------------------------------------------------------------------------------------------------- |
 | T33 | Wire `go-standard.systems` mapping verification into `test-module.nix` (the composite mapping is verified by CI + the 2026-09-25 consumer probe, but not by a module test)                                                           | TODO   | 30min  | commit `105c981`+ — probe was manual; regression coverage missing                                          |
 | T34 | Sweep consumers: GOEXPERIMENT boilerplate → `goExperiment` option; cobra repos → `completionStyle = "subcommand"` (7/10 Tier A repeat it; sbts's extraBuildAttrs GOEXPERIMENT included — its modBuildPhase override is already gone) | TODO   | 2h     | `docs/status/2026-08-10_16-50_*` E.9–E.11; options shipped 2026-09-24; requires go-nix-helpers master push |
+| T60 | Re-run the consumer fleet audit with the auto-default + container option as checklist items (last full audit: 2026-08-11; also covers manual-GOPRIVATE cleanup)                                                                     | TODO   | 2h     | `docs/status/2026-09-24_16-51_*` f.4; TODO_LIST T4/T5 track the migrations themselves                        |
+| T65 | Polish batch P21–P26 from the 2026-09-25 CI-green plan: vendored-from revision marker in `check-rows.py`, docs-gates extension to `docs/planning`+`docs/reviews`, nix-health dirty-tree warning + dashboard canary line, E2 derivation-level red proof + pandoc strikethrough check, devShell `go` passthru parity, moduleTest assertion-count emission, goModFloorMessage malformed-input tests, `workflow_dispatch` flake-check target, old-nixpkgs pin refresh policy | TODO | 3h | `docs/planning/2026-09-25_09-54_*` P21–P26; F7 marker observation closed 2026-11-17 (warning absent from moduleTest log) |
+
+## Cross-repo (fix lands outside this repo)
+
+| #   | Task                                                                                                        | Status | Effort | Evidence                                                                     |
+| --- | ----------------------------------------------------------------------------------------------------------- | ------ | ------ | ---------------------------------------------------------------------------- |
+| T61 | (repo: SKILLS) nix-private-go-repos skill: monorepo + private deps interaction guidance (per-package `extraBuildAttrs` × `deps`) | TODO | 1h | `docs/status/2026-08-12_09-58_*` e.5/f.10 + `10-24_*` e.6/f.6 — open in both  |
+| T62 | (repo: SKILLS) shellcheck as a pre-commit check for shell scripts in skills (`list-private-deps.sh` class)  | TODO   | 30min  | `docs/status/2026-08-12_10-24_*` f.2/e.2                                      |
+| T63 | (repo: crush-config) export the generalized lessons to `references/lessons.md`: toString-bools, tryEval messages, `or` precedence, piped-exit-codes | TODO | 15min | `docs/status/2026-09-25_09-45_*` f.27; project AGENTS.md carries them today  |
+
+## Investigations (small, bounded)
+
+| #   | Task                                                                                                  | Status | Effort | Evidence                                                  |
+| --- | ----------------------------------------------------------------------------------------------------- | ------ | ------ | --------------------------------------------------------- |
+| T66 | Inspect `origin/systemnix-vn-version-fix` (contents, creator; delete if dead)                        | TODO   | 15min  | `docs/status/2026-11-17_19-43_*` c.1, f.3                 |
+| T67 | Decompose CI run 44059828196 (2026-11-17 09:54, ALL jobs failed — infra vs real)                     | TODO   | 15min  | `docs/status/2026-11-17_19-43_*` b.3, f.9                 |
 
 ## Container foundation (2026-11-17 harvest)
 
@@ -43,18 +61,18 @@
 | T43 | `container.initializeNixDatabase` passthrough (CI images)                                                                       | TODO    | 1h     | report f/15                                                                                                                                                     |
 | T44 | Tag strategy knob docs: content-hash vs `self.rev`-derived default                                                              | TODO    | 30min  | report f/16                                                                                                                                                     |
 | T45 | README section on registry auth (docker login / skopeo) for image-push                                                          | TODO    | 30min  | report f/17                                                                                                                                                     |
-| T46 | GHCR push workflow template (consumer CI) using the image-push app                                                              | TODO    | 1h     | report f/18; registry decided 2026-11-17 (g/3: ghcr default kept, Forgejo-remote carve-out); GHA workflow implies a GitHub remote by construction               |
+| T46 | GHCR push workflow template (consumer CI) using the image-push app; include a Forgejo-remote doc example in the migration guide     | TODO    | 1h     | report f/18; registry decided 2026-11-17 (g/3: ghcr default kept, Forgejo-remote carve-out); 19-43 f/36 Forgejo example folds here |
 | T47 | PapDashboard pilot: merge `oci-go-standard-pilot` branch + relock go-nix-helpers (branch verified via path override 2026-11-17) | BLOCKED | 30min  | report f/19, g/2 templ disposition; relock OK (origin carries the container option since the 18:55 push); PapDashboard CHANGELOG Unreleased has the branch note |
 | T48 | KeyHolderAI migration to `container` option                                                                                     | TODO    | 2h     | report f/20; g/1 moot (origin/master carries the container option)                                                                                              |
 | T49 | standard-bug-tracking-schema migration to `container` option                                                                    | TODO    | 2h     | report f/21; g/1 moot (origin/master carries the container option)                                                                                              |
 | T50 | bank-sync: adopt go-standard (deps audit; mkPreparedSource already hand-wired)                                                  | TODO    | 4h     | report f/22; g/1 moot (origin/master carries the container option)                                                                                              |
 | T51 | Code-Quality-Agent + artmann-technologies-website: adopt-or-manual decision                                                     | BLOCKED | 15min  | report f/23–24; owner decision; artmann-technologies-website is Forgejo-remote → registry default does NOT apply (2026-11-17 carve-out)                         |
-| T52 | Fleet sweep: delete every remaining hand-rolled dockerTools block                                                               | TODO    | 2h     | report f/25; after T47–T49; g/1 moot (daemon pushed master 2026-11-17)                                                                                          |
+| T52 | Fleet sweep: delete every remaining hand-rolled dockerTools block                                                               | TODO    | 2h     | report f/25; after T47–T49; origin/master has carried the container option since the 2026-11-17 push (actor unknown — the daemon commits only, never pushes)       |
 | T53 | nix-private-go-repos skill: note that image push works with private deps (deps live in layers)                                  | TODO    | 15min  | report f/26                                                                                                                                                     |
 | T54 | Local aarch64-linux containerSmoke build (emulation) before CI sees it                                                          | TODO    | 1h     | report f/27                                                                                                                                                     |
 | T55 | Review GH Actions runtime delta from containerSmoke (Go build per OS)                                                           | TODO    | 30min  | report f/28                                                                                                                                                     |
-| T56 | CI: assert `nix flake check --all-systems --no-build` (catches darwin eval gaps)                                                | TODO    | 30min  | report f/29; today's darwin gap was caught exactly this way                                                                                                     |
-| T57 | Post-push consumer audit: `nix flake update` sweeps (nix2container lands transitively in locks)                                 | TODO    | 1h     | report f/30; unblocked — push happened (daemon, 2026-11-17)                                                                                                     |
+| T56 | CI + local parity: assert `nix flake check --all-systems --no-build` and wrap `shellcheck scripts/*.sh` into one ci-parity script/check (catches darwin eval gaps + the two CI-only gates locally) | TODO    | 1h     | report f/29 18-52 + 19-43 NEW-4 (fold); today's darwin gap was caught exactly this way; the 2026-11-17 shfmt re-drift shipped because no local format/shellcheck gate exists |
+| T57 | Post-push consumer audit: `nix flake update` sweeps (nix2container lands transitively in locks)                                 | TODO    | 1h     | report f/30; unblocked — push happened 2026-11-17 (actor unknown; daemon-commits-only verified 19-43)                                                           |
 | T58 | Document the nix2container lock pin (rev `42d1df94`, 2026-10-30) in a doc note                                                  | TODO    | 15min  | report f/32                                                                                                                                                     |
 | T59 | Document the Nix 2.34 tryEval message-free assert helper pattern (never assert on thrown message text)                          | TODO    | 15min  | report f/12; AGENTS.md gotcha exists — promote to flake-patterns.md                                                                                             |
 
