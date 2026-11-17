@@ -483,6 +483,28 @@ let
     };
   };
 
+  # Custom `created` must survive the option → buildImage round-trip verbatim,
+  # including RFC3339 fractional seconds (RFC3339Nano): n2c relays the string
+  # into image.json's `created` — any re-formatting here (e.g. truncating the
+  # fraction or re-rendering through a time library) would break reproducible
+  # diffs against the recorded image config.
+  containerCreatedCfg = mkPerSystemConfig {
+    container = {
+      enable = true;
+      nix2container = containerBackendStub;
+      created = "2026-11-17T21:17:05.123456789Z";
+    };
+  };
+
+  # initializeNixDatabase (CI-runner images) must reach buildImage verbatim.
+  containerNixDbCfg = mkPerSystemConfig {
+    container = {
+      enable = true;
+      nix2container = containerBackendStub;
+      initializeNixDatabase = true;
+    };
+  };
+
   # --- GOPRIVATE behavioral test: deps triggers GOPRIVATE injection --------
   # When deps is non-empty, GOPRIVATE should be injected into the devShell.
   # We use a mock dep path — the devShell doesn't trigger mkPreparedSource
@@ -1598,6 +1620,14 @@ let
     (assertCheck "container created defaults to the zero epoch" (
       containerCfg.packages.test-project-image.imageArgs.created == "0001-01-01T00:00:00Z"
     ) "0001-01-01T00:00:00Z")
+    (assertCheck "container custom created round-trips verbatim (RFC3339Nano)" (
+      containerCreatedCfg.packages.test-project-image.imageArgs.created
+      == "2026-11-17T21:17:05.123456789Z"
+    ) "fractional seconds preserved")
+    (assertCheck "container initializeNixDatabase passthrough reaches buildImage" (
+      containerNixDbCfg.packages.test-project-image.imageArgs.initializeNixDatabase == true
+      && containerCfg.packages.test-project-image.imageArgs.initializeNixDatabase or false == false
+    ) "true when set, false default")
     (assertCheck "container copyToRoot is non-empty" (
       builtins.length containerCfg.packages.test-project-image.imageArgs.copyToRoot > 0
     ) "at least the image root env")

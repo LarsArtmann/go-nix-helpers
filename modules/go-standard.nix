@@ -854,6 +854,18 @@ in
             '';
           };
 
+          initializeNixDatabase = lib.mkOption {
+            type = lib.types.bool;
+            default = false;
+            description = ''
+              Initialize /nix/db with every store path added to the image,
+              so `nix` commands work INSIDE the container. Only useful for
+              CI-runner-style images that execute Nix builds; application
+              images never need it, and it enlarges the image with the
+              database closure graph.
+            '';
+          };
+
           nix2container = lib.mkOption {
             type = lib.types.attrsOf lib.types.attrs;
             default = { };
@@ -1392,6 +1404,7 @@ in
               pathsToLink
               maxLayers
               created
+              initializeNixDatabase
               ;
             volumeDirs = vols.dirs;
             volumePerms = vols.perms;

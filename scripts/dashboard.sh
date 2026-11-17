@@ -37,6 +37,26 @@ fail=0
 skip=0
 results=()
 
+# Heuristic container-state classifier (grep-based, no eval — fast enough for
+# a fleet sweep; authoritative state is each repo's nix flake show):
+#   std        go-standard container option (container.enable = true)
+#   hand       hand-rolled dockerTools block (migration debt)
+#   dockerfile Dockerfile only (no Nix container story)
+#   -          no container story at all
+container_state() {
+  local dir="$1"
+  if grep -A4 -E '^[[:space:]]*container[[:space:]]*=[[:space:]]*\{|container[[:space:]]*\.[[:space:]]*enable' \
+    "$dir/flake.nix" 2>/dev/null | grep -q 'enable[[:space:]]*=[[:space:]]*true'; then
+    echo "std"
+  elif grep -q 'dockerTools' "$dir/flake.nix" 2>/dev/null; then
+    echo "hand"
+  elif [ -f "$dir/Dockerfile" ]; then
+    echo "dockerfile"
+  else
+    echo "-"
+  fi
+}
+
 for f in $(find "$PROJECTS_DIR" -maxdepth 2 -name "flake.nix" -exec dirname {} \; | sort); do
   project=$(basename "$f")
 
@@ -64,12 +84,13 @@ for f in $(find "$PROJECTS_DIR" -maxdepth 2 -name "flake.nix" -exec dirname {} \
   if [ "$JSON" = true ]; then
     # Escape backslashes and double-quotes so the emitted JSON stays valid.
     esc_error=$(printf '%s' "${error:-}" | sed 's/\\/\\\\/g; s/"/\\"/g')
-    results+=("{\"project\":\"$project\",\"status\":\"$status\",\"error\":\"$esc_error\"}")
+    results+=("{\"project\":\"$project\",\"status\":\"$status\",\"container\":\"$(container_state "$f")\",\"error\":\"$esc_error\"}")
   else
+    cstate="$(container_state "$f")"
     case "$status" in
-    PASS | OK) printf "${GREEN}%-40s${NC} %s\n" "$project" "$status" ;;
-    FAIL) printf "${RED}%-40s${NC} %s %s\n" "$project" "$status" "${error:0:60}" ;;
-    WARN) printf "${YELLOW}%-40s${NC} %s\n" "$project" "$status" ;;
+    PASS | OK) printf "${GREEN}%-32s${NC} %-4s %s\n" "$project" "$status" "$cstate" ;;
+    FAIL) printf "${RED}%-32s${NC} %-4s %s %s\n" "$project" "$status" "$cstate" "${error:0:60}" ;;
+    WARN) printf "${YELLOW}%-32s${NC} %-4s %s\n" "$project" "$status" "$cstate" ;;
     esac
   fi
 done
@@ -83,5 +104,6 @@ else
   echo ""
   echo "========================================="
   echo "Total: $((pass + fail + skip))  Pass: $pass  Fail: $fail  Warn: $skip"
+  echo "Container: std=go-standard  hand=dockerTools  dockerfile=Dockerfile-only  -=none"
   echo "========================================="
 fi

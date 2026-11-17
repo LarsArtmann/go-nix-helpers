@@ -121,6 +121,7 @@ rec {
       volumePerms ? [ ],
       maxLayers ? 20,
       created ? "0001-01-01T00:00:00Z",
+      initializeNixDatabase ? false,
       meta ? { },
     }:
     let
@@ -132,6 +133,7 @@ rec {
         tag
         maxLayers
         created
+        initializeNixDatabase
         meta
         ;
       copyToRoot = [
@@ -176,6 +178,28 @@ rec {
           and ([(."image-config".Volumes // {}) | keys[]] | sort) == ([($want[0].Volumes // {}) | keys[]] | sort)
         )
       '';
+      # Localized mismatch lines (empty output = match): names the exact
+      # field(s) that drifted, with got/want values, instead of forcing a
+      # by-eye diff of two full config dumps.
+      configDiff = ''
+        ."image-config" as $g | $want[0] as $w |
+        (
+          (if ($g.User // "") != ($w.User // "")
+           then "  User: got \($g.User // "<unset>") want \($w.User // "<unset>")" else empty end),
+          (if ($g.Entrypoint // []) != ($w.Entrypoint // [])
+           then "  Entrypoint: got \($g.Entrypoint | tostring) want \($w.Entrypoint | tostring)" else empty end),
+          (if ($g.Cmd // []) != ($w.Cmd // [])
+           then "  Cmd: got \($g.Cmd | tostring) want \($w.Cmd | tostring)" else empty end),
+          (if ($g.Env // []) != ($w.Env // [])
+           then "  Env: got \($g.Env | tostring) want \($w.Env | tostring)" else empty end),
+          (if (($g.Labels // {}) * ($w.Labels // {})) != ($g.Labels // {})
+           then "  Labels: expected keys missing or changed: got \($g.Labels | tostring) want \($w.Labels | tostring)" else empty end),
+          (if (([($g.ExposedPorts // {}) | keys[]] | sort) != ([($w.ExposedPorts // {}) | keys[]] | sort))
+           then "  ExposedPorts: got \($g.ExposedPorts | keys | sort | tostring) want \($w.ExposedPorts | keys | sort | tostring)" else empty end),
+          (if (([($g.Volumes // {}) | keys[]] | sort) != ([($w.Volumes // {}) | keys[]] | sort))
+           then "  Volumes: got \($g.Volumes | keys | sort | tostring) want \($w.Volumes | keys | sort | tostring)" else empty end)
+        )
+      '';
     in
     pkgs.runCommand "${name}-container-structure"
       {
@@ -188,8 +212,6 @@ rec {
           echo "FAIL: $1" >&2
           echo "--- image.json summary:" >&2
           jq '{arch, created, "image-config": .["image-config"], layers: (.layers | length)}' "$imageJson" >&2
-          echo "--- expected image-config:" >&2
-          cat "${expectedConfig}" >&2
           exit 1
         }
 
@@ -204,7 +226,7 @@ rec {
           "$imageJson" >/dev/null \
           || fail "image runs as root — container.user default was overridden with a root user"
         jq -e --slurpfile want "${expectedConfig}" '${configMatch}' "$imageJson" >/dev/null \
-          || fail "image config does not match the module contract (see diff above)"
+          || fail "image config does not match the module contract:$(printf '\n%s' "$(jq -r --slurpfile want "${expectedConfig}" '${configDiff}' "$imageJson")")"
 
         echo "PASS: ${name} container image structure"
         touch $out
