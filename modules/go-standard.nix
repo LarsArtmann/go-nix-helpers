@@ -246,6 +246,30 @@ in
       description = "Whether to run `go test` during the Nix build (doCheck)";
     };
 
+    enableDefaultPackage = lib.mkOption {
+      type = lib.types.bool;
+      default = true;
+      description = ''
+        Generate `packages.default` + `packages.<pname>` (the main binary
+        build) and the outputs that ride it: `apps.default`, `checks.build`,
+        `checks.lint`, `checks.test`, and `checks.vendor-hash`. Disable for
+        LIBRARY workspaces with no main package — the repo declares its own
+        marker/meta packages, and a forced binary build would fail on an
+        empty bin dir. The eval-time guards (lock guards, go.mod floor,
+        vendorHash warnings) stay forced through `checks.format` either way.
+      '';
+    };
+
+    enableDevShells = lib.mkOption {
+      type = lib.types.bool;
+      default = true;
+      description = ''
+        Generate `devShells.default` and `devShells.ci`. Disable when the
+        repo maintains hand-tuned shells (extra tooling, wrapper hacks)
+        that the generated shells would otherwise collide with.
+      '';
+    };
+
     enableTestCheck = lib.mkOption {
       type = lib.types.bool;
       default = false;
@@ -983,10 +1007,6 @@ in
             })
           );
 
-        # Build the default package (always present)
-        # vendorHashWarning/proxyVendorWarning/goModFloorCheck/stalePinWarning
-        # are referenced here to force evaluation of their checks when
-        # packages are evaluated.
         # Lock guards (opt-in): forced whenever packages are evaluated —
         # checks.build / checks.vendor-hash / flake check all flow through
         # here, so a drifted lock fails loudly before anything builds.
@@ -999,15 +1019,22 @@ in
               inherit (cfg.lockGuards) expectedNixpkgsRev expectedFollows;
             };
 
-        package = builtins.seq lockGuardsValue (
-          builtins.seq goModFloorCheck (
-            builtins.seq proxyVendorWarning (
-              builtins.seq vendorHashWarning (
-                builtins.seq stalePinWarning (mkGoPackage cfg.pname cfg.subPackages cfg.description { })
+        # Force-evaluate every guard around ANY value that consumes them.
+        # Applied to both `package` and `checks.format`: consumers with
+        # enableDefaultPackage = false have no package build, and without
+        # this anchor on an always-emitted output the guards would
+        # silently stop running.
+        withGuards =
+          v:
+          builtins.seq lockGuardsValue (
+            builtins.seq goModFloorCheck (
+              builtins.seq proxyVendorWarning (
+                builtins.seq vendorHashWarning (builtins.seq stalePinWarning v)
               )
             )
-          )
-        );
+          );
+
+        package = withGuards (mkGoPackage cfg.pname cfg.subPackages cfg.description { });
 
         # Build extra packages when monorepo config is set
         extraPackages = lib.mapAttrs (
@@ -1031,24 +1058,29 @@ in
         finalShellExtraEnv = autoGoPrivateEnv // optionEnv // cfg.shellExtraEnv;
       in
       {
-        packages = {
-          default = package;
-          ${cfg.pname} = package;
-        }
-        // extraPackages;
+        packages =
+          (lib.optionalAttrs cfg.enableDefaultPackage {
+            default = package;
+            ${cfg.pname} = package;
+          })
+          // extraPackages;
 
         apps = {
           # mkDefault: a consumer's own apps.<name> (e.g. a test app that
           # runs templ generate first, or tests a second Go module) wins
           # over these generic runners without mkForce gymnastics.
+          test = lib.mkDefault (
+            mkApp "run-test" [ goPkg ] "go test -race -v -coverprofile=coverage.out ./..."
+          );
+        }
+        // lib.optionalAttrs cfg.enableDefaultPackage {
+          # Rides the main package build (runs its binary) — library
+          # workspaces without one declare their own runner.
           default = lib.mkDefault {
             type = "app";
             program = lib.getExe config.packages.default;
             meta.description = "Run the ${cfg.pname} binary";
           };
-          test = lib.mkDefault (
-            mkApp "run-test" [ goPkg ] "go test -race -v -coverprofile=coverage.out ./..."
-          );
         }
         // lib.optionalAttrs cfg.enableGolangciLint {
           lint = lib.mkDefault (
@@ -1082,7 +1114,7 @@ in
           }
         ) extraPackages;
 
-        devShells = {
+        devShells = lib.optionalAttrs cfg.enableDevShells {
           default = pkgs.mkShell (
             {
               packages = [
@@ -1127,11 +1159,16 @@ in
             });
           in
           {
-            format = hermeticTreefmtCheck;
+            # withGuards keeps the lock guards / floor check / warnings
+            # forced even when the package build is disabled (library
+            # workspaces) — this check is emitted for every consumer.
+            format = withGuards hermeticTreefmtCheck;
             treefmt = lib.mkForce hermeticTreefmtCheck;
+          }
+          // lib.optionalAttrs cfg.enableDefaultPackage {
             build = config.packages.default;
           }
-          // lib.optionalAttrs (cfg.lintAsCheck && cfg.enableGolangciLint) {
+          // lib.optionalAttrs (cfg.lintAsCheck && cfg.enableGolangciLint && cfg.enableDefaultPackage) {
             lint =
               let
                 pkg = config.packages.default.overrideAttrs (_old: {
@@ -1152,12 +1189,16 @@ in
               in
               pkg;
           }
-          // lib.optionalAttrs cfg.enableTestCheck {
+          // lib.optionalAttrs (cfg.enableTestCheck && cfg.enableDefaultPackage) {
             test = config.packages.default.overrideAttrs (_old: {
               doCheck = true;
             });
           }
-          // lib.optionalAttrs (cfg.enableVendorHashCheck && effectiveVendorHash != null) {
+          // lib.optionalAttrs (
+            cfg.enableVendorHashCheck
+            && effectiveVendorHash != null
+            && cfg.enableDefaultPackage
+          ) {
             # The interpolated goModules derivation rides the string
             # context into this script, forcing the FOD to build when the
             # check is built — a drifted vendorHash fails here FIRST, with
@@ -1302,9 +1343,9 @@ in
 
     flake.overlays.default = lib.mkIf cfg.enableOverlay (
       final: _prev:
-      {
+      (lib.optionalAttrs cfg.enableDefaultPackage {
         ${cfg.pname} = self.packages.${final.stdenv.system}.default;
-      }
+      })
       // (builtins.mapAttrs (name: _pkg: self.packages.${final.stdenv.system}.${name}) cfg.packages)
     );
   };
