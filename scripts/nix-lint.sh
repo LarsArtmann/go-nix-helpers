@@ -18,22 +18,22 @@ CHECK=false
 TARGETS=()
 
 for arg in "$@"; do
-  case "$arg" in
-  --fix) FIX=true ;;
-  --check) CHECK=true ;;
-  --help | -h)
-    echo "Usage: nix-lint.sh [--fix] [--check] [path...]"
-    echo "  --fix    Auto-fix issues where possible"
-    echo "  --check  Also run nix flake check"
-    echo "  path     Specific project dir(s), or omit for all under ~/projects"
-    exit 0
-    ;;
-  *) TARGETS+=("$arg") ;;
-  esac
+	case "$arg" in
+	--fix) FIX=true ;;
+	--check) CHECK=true ;;
+	--help | -h)
+		echo "Usage: nix-lint.sh [--fix] [--check] [path...]"
+		echo "  --fix    Auto-fix issues where possible"
+		echo "  --check  Also run nix flake check"
+		echo "  path     Specific project dir(s), or omit for all under ~/projects"
+		exit 0
+		;;
+	*) TARGETS+=("$arg") ;;
+	esac
 done
 
 if [ ${#TARGETS[@]} -eq 0 ]; then
-  mapfile -t TARGETS < <(find /home/lars/projects -maxdepth 2 -name "flake.nix" -exec dirname {} \; | sort)
+	mapfile -t TARGETS < <(find /home/lars/projects -maxdepth 2 -name "flake.nix" -exec dirname {} \; | sort)
 fi
 
 total_errors=0
@@ -42,177 +42,177 @@ total_projects=0
 failed_projects=()
 
 for target in "${TARGETS[@]}"; do
-  flake="$target/flake.nix"
-  [ -f "$flake" ] || continue
-  total_projects=$((total_projects + 1))
-  project=$(basename "$target")
-  errors=0
-  fixed=0
+	flake="$target/flake.nix"
+	[ -f "$flake" ] || continue
+	total_projects=$((total_projects + 1))
+	project=$(basename "$target")
+	errors=0
+	fixed=0
 
-  check() {
-    local pattern="$1"
-    local msg="$2"
-    if grep -qP "$pattern" "$flake"; then
-      errors=$((errors + 1))
-      echo -e "  ${RED}FAIL${NC} $msg"
-      return 0
-    fi
-  }
+	check() {
+		local pattern="$1"
+		local msg="$2"
+		if grep -qP "$pattern" "$flake"; then
+			errors=$((errors + 1))
+			echo -e "  ${RED}FAIL${NC} $msg"
+			return 0
+		fi
+	}
 
-  check_fix() {
-    local pattern="$1"
-    local msg="$2"
-    local fix_pattern="${3:-}"
-    local fix_replace="${4:-}"
-    if grep -qPn "$pattern" "$flake"; then
-      if [ "$FIX" = true ] && [ -n "$fix_pattern" ]; then
-        sed -i "s${fix_pattern}${fix_replace}g" "$flake"
-        fixed=$((fixed + 1))
-        echo -e "  ${YELLOW}FIXED${NC} $msg"
-      else
-        errors=$((errors + 1))
-        echo -e "  ${RED}FAIL${NC} $msg"
-      fi
-    fi
-  }
+	check_fix() {
+		local pattern="$1"
+		local msg="$2"
+		local fix_pattern="${3:-}"
+		local fix_replace="${4:-}"
+		if grep -qPn "$pattern" "$flake"; then
+			if [ "$FIX" = true ] && [ -n "$fix_pattern" ]; then
+				sed -i "s${fix_pattern}${fix_replace}g" "$flake"
+				fixed=$((fixed + 1))
+				echo -e "  ${YELLOW}FIXED${NC} $msg"
+			else
+				errors=$((errors + 1))
+				echo -e "  ${RED}FAIL${NC} $msg"
+			fi
+		fi
+	}
 
-  # Pattern 1: Checks inside treefmt block (between treefmt { ... } and its closing };)
-  # Detection: checks\.format|checks\.build appearing before treefmt block closes
-  # This is hard to detect with simple grep; we check for common misplaced patterns
+	# Pattern 1: Checks inside treefmt block (between treefmt { ... } and its closing };)
+	# Detection: checks\.format|checks\.build appearing before treefmt block closes
+	# This is hard to detect with simple grep; we check for common misplaced patterns
 
-  # Pattern 2: config/self used outside perSystem
-  # If lines like "checks.format = config.treefmt" appear at module level (not inside perSystem)
-  # We check for config.treefmt outside of perSystem context
+	# Pattern 2: config/self used outside perSystem
+	# If lines like "checks.format = config.treefmt" appear at module level (not inside perSystem)
+	# We check for config.treefmt outside of perSystem context
 
-  # Pattern 3: goPkg = goPkg self-reference
-  check_fix 'let\s+goPkg\s*=\s*goPkg\s*;' "goPkg = goPkg self-reference (should be pkgs.go_1_XX, e.g. pkgs.go_1_27)"
+	# Pattern 3: goPkg = goPkg self-reference
+	check_fix 'let\s+goPkg\s*=\s*goPkg\s*;' "goPkg = goPkg self-reference (should be pkgs.go_1_XX, e.g. pkgs.go_1_27)"
 
-  # Pattern 4: Duplicate checks attributes
-  # NOTE: `grep -c` exits 1 when count is 0; piping through `|| echo 0` appends a
-  # second "0", yielding "0\n0" which breaks `[ -gt ]`. Use `grep -c ... || true`
-  # and treat empty/0 together, or just test for >1 matches directly.
-  if checks_count=$(grep -cP '^\s*checks\s*[=\.{]' "$flake" 2>/dev/null); then
-    if [ "$checks_count" -gt 1 ]; then
-      errors=$((errors + 1))
-      echo -e "  ${RED}FAIL${NC} Duplicate checks definitions ($checks_count found)"
-    fi
-  fi
+	# Pattern 4: Duplicate checks attributes
+	# NOTE: `grep -c` exits 1 when count is 0; piping through `|| echo 0` appends a
+	# second "0", yielding "0\n0" which breaks `[ -gt ]`. Use `grep -c ... || true`
+	# and treat empty/0 together, or just test for >1 matches directly.
+	if checks_count=$(grep -cP '^\s*checks\s*[=\.{]' "$flake" 2>/dev/null); then
+		if [ "$checks_count" -gt 1 ]; then
+			errors=$((errors + 1))
+			echo -e "  ${RED}FAIL${NC} Duplicate checks definitions ($checks_count found)"
+		fi
+	fi
 
-  # Pattern 5: nixfmt/templ/gofumpt outside programs
-  check_fix 'treefmt\.\s*nixfmt\s*\.' "nixfmt outside programs block" '|treefmt\.\s*nixfmt\.|treefmt.programs.nixfmt.|'
-  check_fix 'treefmt\.\s*templ\s*\.' "templ outside programs block" '|treefmt\.\s*templ\.|treefmt.programs.templ.|'
-  check_fix 'treefmt\.\s*gofumpt\s*\.' "gofumpt outside programs block" '|treefmt\.\s*gofumpt\.|treefmt.programs.gofumpt.|'
-  check_fix 'treefmt\.\s*goimports\s*\.' "goimports outside programs block" '|treefmt\.\s*goimports\.|treefmt.programs.goimports.|'
+	# Pattern 5: nixfmt/templ/gofumpt outside programs
+	check_fix 'treefmt\.\s*nixfmt\s*\.' "nixfmt outside programs block" '|treefmt\.\s*nixfmt\.|treefmt.programs.nixfmt.|'
+	check_fix 'treefmt\.\s*templ\s*\.' "templ outside programs block" '|treefmt\.\s*templ\.|treefmt.programs.templ.|'
+	check_fix 'treefmt\.\s*gofumpt\s*\.' "gofumpt outside programs block" '|treefmt\.\s*gofumpt\.|treefmt.programs.gofumpt.|'
+	check_fix 'treefmt\.\s*goimports\s*\.' "goimports outside programs block" '|treefmt\.\s*goimports\.|treefmt.programs.goimports.|'
 
-  # Pattern 6: Missing pkgs. prefix on common tools
-  check_fix '\[\s*templ\s*\]' "bare 'templ' in list (needs pkgs.templ)" '|\[\s*templ\s*\]|[ pkgs.templ ]|'
-  check_fix '\[\s*gotools\s*\]' "bare 'gotools' in list (needs pkgs.gotools)" '|\[\s*gotools\s*\]|[ pkgs.gotools ]|'
+	# Pattern 6: Missing pkgs. prefix on common tools
+	check_fix '\[\s*templ\s*\]' "bare 'templ' in list (needs pkgs.templ)" '|\[\s*templ\s*\]|[ pkgs.templ ]|'
+	check_fix '\[\s*gotools\s*\]' "bare 'gotools' in list (needs pkgs.gotools)" '|\[\s*gotools\s*\]|[ pkgs.gotools ]|'
 
-  # Pattern 9: Non-existent package names (any go_1_XX branch, not just the
-  # one that was current when this check was written)
-  check 'go_1_[0-9]+-outline' "go_1_XX-outline doesn't exist (use go-outline)"
-  check 'pkgs\.go_1_[0-9]+-outline' "pkgs.go_1_XX-outline doesn't exist (use pkgs.go-outline)"
+	# Pattern 9: Non-existent package names (any go_1_XX branch, not just the
+	# one that was current when this check was written)
+	check 'go_1_[0-9]+-outline' "go_1_XX-outline doesn't exist (use go-outline)"
+	check 'pkgs\.go_1_[0-9]+-outline' "pkgs.go_1_XX-outline doesn't exist (use pkgs.go-outline)"
 
-  # Pattern 11: outputs = inputs: missing self
-  check '^\s*outputs\s*=\s*inputs\s*:' "outputs = inputs: missing self (use inputs@{ self, ... })"
+	# Pattern 11: outputs = inputs: missing self
+	check '^\s*outputs\s*=\s*inputs\s*:' "outputs = inputs: missing self (use inputs@{ self, ... })"
 
-  # Pattern 12: treefmtFlake schema errors
-  check 'treefmtFlake\.\w+\s*=\s*true' "treefmtFlake.X = true (wrong schema, use treefmtFlake.formatters.X.enable)"
+	# Pattern 12: treefmtFlake schema errors
+	check 'treefmtFlake\.\w+\s*=\s*true' "treefmtFlake.X = true (wrong schema, use treefmtFlake.formatters.X.enable)"
 
-  # Pattern 16 (fleet sweep 2026-10-01): apps.program must resolve to an
-  # executable path. A raw derivation evals fine and breaks `nix run`.
-  check 'program\s*=\s*(?!\(?\s*(?:lib|pkgs\.lib)\.getExe|"\$\{)' 'apps program must be lib.getExe drv (or "${drv}/bin/name"), not a raw derivation'
+	# Pattern 16 (fleet sweep 2026-10-01): apps.program must resolve to an
+	# executable path. A raw derivation evals fine and breaks `nix run`.
+	check 'program\s*=\s*(?!\(?\s*(?:lib|pkgs\.lib)\.getExe|"\$\{)' 'apps program must be lib.getExe drv (or "${drv}/bin/name"), not a raw derivation'
 
-  # Pattern 17: systems regression locks (nixpkgs 26.11 dropped x86_64-darwin)
-  check '"x86_64-darwin"' "x86_64-darwin unsupported since nixpkgs 26.11 — remove from systems (KanyuNix pending hardware decision is the known exception)"
-  check '(nix-)?systems\.url\s*=\s*"github:nix-systems/default' "github:nix-systems/default input re-adds dropped x86_64-darwin — inline the systems list"
+	# Pattern 17: systems regression locks (nixpkgs 26.11 dropped x86_64-darwin)
+	check '"x86_64-darwin"' "x86_64-darwin unsupported since nixpkgs 26.11 — remove from systems (KanyuNix pending hardware decision is the known exception)"
+	check '(nix-)?systems\.url\s*=\s*"github:nix-systems/default' "github:nix-systems/default input re-adds dropped x86_64-darwin — inline the systems list"
 
-  # Pattern 18: placeholder hashes on any *Hash attr (fakeHash repos stayed
-  # unbuildable for months because the old rule only matched vendorHash)
-  if grep -qE '(vendorHash|cargoHash|npmDepsHash|hash|outputHash)[^=]*=\s*(lib\.)?fake(Sha256|Hash)?\s*;|\b(vendorHash|cargoHash|hash)[^=]*=\s*""\s*;' "$flake"; then
-    echo -e "  ${CYAN}INFO${NC} placeholder hash present (compute the real hash: build once, read the got: value)"
-  fi
+	# Pattern 18: placeholder hashes on any *Hash attr (fakeHash repos stayed
+	# unbuildable for months because the old rule only matched vendorHash)
+	if grep -qE '(vendorHash|cargoHash|npmDepsHash|hash|outputHash)[^=]*=\s*(lib\.)?fake(Sha256|Hash)?\s*;|\b(vendorHash|cargoHash|hash)[^=]*=\s*""\s*;' "$flake"; then
+		echo -e "  ${CYAN}INFO${NC} placeholder hash present (compute the real hash: build once, read the got: value)"
+	fi
 
-  # Pattern 15: overlay using _prev but referencing prev
-  # (inconsistency between param name and usage)
+	# Pattern 15: overlay using _prev but referencing prev
+	# (inconsistency between param name and usage)
 
-  # --- Structural checks ---
+	# --- Structural checks ---
 
-  # Check: perSystem exists (flake-parts projects)
-  if grep -q 'flake-parts' "$flake"; then
-    if ! grep -q 'perSystem' "$flake"; then
-      errors=$((errors + 1))
-      echo -e "  ${RED}FAIL${NC} flake-parts project missing perSystem block"
-    fi
-  fi
+	# Check: perSystem exists (flake-parts projects)
+	if grep -q 'flake-parts' "$flake"; then
+		if ! grep -q 'perSystem' "$flake"; then
+			errors=$((errors + 1))
+			echo -e "  ${RED}FAIL${NC} flake-parts project missing perSystem block"
+		fi
+	fi
 
-  # Check: checks.format exists (treefmt flakeModule auto-exports checks,
-  # so importing it satisfies this without a literal checks.format)
-  if grep -q 'perSystem' "$flake" && ! grep -q 'flakeModule' "$flake" && ! grep -q 'checks.*format\|format.*checks' "$flake"; then
-    if [ "$FIX" = true ]; then
-      # Add checks.format if checks block exists but no format
-      if grep -q '^\s*checks\s*=' "$flake"; then
-        sed -i '/^\s*checks\s*=/a\            format = config.treefmt.build.check self;' "$flake"
-        fixed=$((fixed + 1))
-        echo -e "  ${YELLOW}FIXED${NC} Added checks.format"
-      fi
-    else
-      errors=$((errors + 1))
-      echo -e "  ${RED}FAIL${NC} Missing checks.format"
-    fi
-  fi
+	# Check: checks.format exists (treefmt flakeModule auto-exports checks,
+	# so importing it satisfies this without a literal checks.format)
+	if grep -q 'perSystem' "$flake" && ! grep -q 'flakeModule' "$flake" && ! grep -q 'checks.*format\|format.*checks' "$flake"; then
+		if [ "$FIX" = true ]; then
+			# Add checks.format if checks block exists but no format
+			if grep -q '^\s*checks\s*=' "$flake"; then
+				sed -i '/^\s*checks\s*=/a\            format = config.treefmt.build.check self;' "$flake"
+				fixed=$((fixed + 1))
+				echo -e "  ${YELLOW}FIXED${NC} Added checks.format"
+			fi
+		else
+			errors=$((errors + 1))
+			echo -e "  ${RED}FAIL${NC} Missing checks.format"
+		fi
+	fi
 
-  # Check: checks.build exists
-  if grep -q 'perSystem' "$flake" && grep -q 'packages\.' "$flake"; then
-    if ! grep -q 'checks.*build\|build.*checks' "$flake"; then
-      errors=$((errors + 1))
-      echo -e "  ${RED}FAIL${NC} Missing checks.build"
-    fi
-  fi
+	# Check: checks.build exists
+	if grep -q 'perSystem' "$flake" && grep -q 'packages\.' "$flake"; then
+		if ! grep -q 'checks.*build\|build.*checks' "$flake"; then
+			errors=$((errors + 1))
+			echo -e "  ${RED}FAIL${NC} Missing checks.build"
+		fi
+	fi
 
-  # Check: vendorHash is placeholder ( informational)
-  if grep -q 'vendorHash.*=.*""' "$flake"; then
-    echo -e "  ${CYAN}INFO${NC} vendorHash is empty string (first build needed)"
-  fi
-  if grep -q 'vendorHash.*=.*sha256-AAA' "$flake"; then
-    echo -e "  ${CYAN}INFO${NC} vendorHash is placeholder (needs real hash)"
-  fi
+	# Check: vendorHash is placeholder ( informational)
+	if grep -q 'vendorHash.*=.*""' "$flake"; then
+		echo -e "  ${CYAN}INFO${NC} vendorHash is empty string (first build needed)"
+	fi
+	if grep -q 'vendorHash.*=.*sha256-AAA' "$flake"; then
+		echo -e "  ${CYAN}INFO${NC} vendorHash is placeholder (needs real hash)"
+	fi
 
-  # Check: proxyVendor = true
-  if grep -q 'buildGoModule' "$flake" && ! grep -q 'proxyVendor' "$flake"; then
-    echo -e "  ${CYAN}INFO${NC} Missing proxyVendor = true (recommended for Go projects)"
-  fi
+	# Check: proxyVendor = true
+	if grep -q 'buildGoModule' "$flake" && ! grep -q 'proxyVendor' "$flake"; then
+		echo -e "  ${CYAN}INFO${NC} Missing proxyVendor = true (recommended for Go projects)"
+	fi
 
-  # Check: meta block
-  if grep -q 'buildGoModule' "$flake" && ! grep -q 'meta\s*=' "$flake"; then
-    errors=$((errors + 1))
-    echo -e "  ${RED}FAIL${NC} Missing meta attribute in package"
-  fi
+	# Check: meta block
+	if grep -q 'buildGoModule' "$flake" && ! grep -q 'meta\s*=' "$flake"; then
+		errors=$((errors + 1))
+		echo -e "  ${RED}FAIL${NC} Missing meta attribute in package"
+	fi
 
-  # Check: license in meta
-  if grep -q 'buildGoModule' "$flake" && ! grep -q 'license' "$flake"; then
-    errors=$((errors + 1))
-    echo -e "  ${RED}FAIL${NC} Missing license in meta"
-  fi
+	# Check: license in meta
+	if grep -q 'buildGoModule' "$flake" && ! grep -q 'license' "$flake"; then
+		errors=$((errors + 1))
+		echo -e "  ${RED}FAIL${NC} Missing license in meta"
+	fi
 
-  # Report
-  if [ "$errors" -eq 0 ]; then
-    echo -e "${GREEN}PASS${NC} $project"
-  else
-    echo -e "${RED}FAIL${NC} $project ($errors errors)"
-    total_errors=$((total_errors + errors))
-    failed_projects+=("$project")
-  fi
-  total_fixed=$((total_fixed + fixed))
+	# Report
+	if [ "$errors" -eq 0 ]; then
+		echo -e "${GREEN}PASS${NC} $project"
+	else
+		echo -e "${RED}FAIL${NC} $project ($errors errors)"
+		total_errors=$((total_errors + errors))
+		failed_projects+=("$project")
+	fi
+	total_fixed=$((total_fixed + fixed))
 
-  # Run nix flake check if requested
-  if [ "$CHECK" = true ] && [ "$errors" -eq 0 ]; then
-    if ! nix flake check "$target" --no-build 2>/dev/null; then
-      echo -e "  ${RED}NIX CHECK FAILED${NC}"
-      failed_projects+=("$project (nix check)")
-      total_errors=$((total_errors + 1))
-    fi
-  fi
+	# Run nix flake check if requested
+	if [ "$CHECK" = true ] && [ "$errors" -eq 0 ]; then
+		if ! nix flake check "$target" --no-build 2>/dev/null; then
+			echo -e "  ${RED}NIX CHECK FAILED${NC}"
+			failed_projects+=("$project (nix check)")
+			total_errors=$((total_errors + 1))
+		fi
+	fi
 done
 
 echo ""
@@ -220,11 +220,11 @@ echo "========================================="
 echo "Projects scanned: $total_projects"
 echo "Errors found:     $total_errors"
 if [ "$FIX" = true ]; then
-  echo "Auto-fixed:       $total_fixed"
+	echo "Auto-fixed:       $total_fixed"
 fi
 if [ ${#failed_projects[@]} -gt 0 ]; then
-  echo -e "\n${RED}Failed projects:${NC}"
-  printf '  - %s\n' "${failed_projects[@]}"
+	echo -e "\n${RED}Failed projects:${NC}"
+	printf '  - %s\n' "${failed_projects[@]}"
 fi
 echo "========================================="
 

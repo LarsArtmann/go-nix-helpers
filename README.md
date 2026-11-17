@@ -102,7 +102,7 @@ nix run .#my-project-image-push    # to ghcr.io (skopeo; docker login first)
 Why nix2container (bundled — still only 3 inputs):
 
 - **True OCI image spec** — image.json + skopeo `nix:` transport; works with any registry, cosign, etc.
-- **Shared layers across the fleet** — one layer per store-path group, so glibc/Go-runtime layers dedupe between *all* your images in the same registry
+- **Shared layers across the fleet** — one layer per store-path group, so glibc/Go-runtime layers dedupe between _all_ your images in the same registry
 - **Daemon-less** — skopeo assembles at load/push time; nothing runs docker
 - **Reproducible** — zero-epoch creation time and a content-hash tag by default: identical closures produce identical tags
 - **Superb defaults** — non-root user (`65532:65532`, distroless style), cacert + `SSL_CERT_FILE`, auto `org.opencontainers.image.*` labels, `/bin/<mainProgram>` entrypoint, volumes pre-created with the right ownership
