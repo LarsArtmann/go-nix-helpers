@@ -32,7 +32,8 @@ module: go-standard module {
     privateGlobPattern
     enableNixfmt
     enableShfmt
-    "+26 more"
+    container
+    "+43 more"
   }
 
   config: Config Pipeline {
@@ -60,13 +61,25 @@ pure_functions: pure-functions.nix {
   repoName: "Extracts repo name from module path"
 }
 
+container_asm: container.nix {
+  shape: package
+  style.fill: "#e3e9fd"
+  imageConfig: "OCI image config (user, env, labels, ports)"
+  volumes: "mkVolumeDirs (user-owned volume dirs)"
+  structureCheck: "jq gate over image.json"
+  backend: "nix2container (bundled)"
+}
+
 outputs: Flake Outputs {
   shape: package
   style.fill: "#edf0fd"
   packages.default
+  "packages.<pname>-image"
   apps.default/test/lint/fmt
+  "apps.<pname>-image-load/push"
   devShells.default/ci
   checks.format/build
+  "checks.container-structure"
   overlays.default
   treefmt
 }
@@ -74,6 +87,8 @@ outputs: Flake Outputs {
 consumer_flake -> module: "imports"
 module.options -> module.config
 module.config -> prepared_source: "when deps set"
+module.config -> container_asm: "when container.enable"
 pure_functions -> prepared_source: "imported by"
 prepared_source -> outputs: "prepared src"
+container_asm -> outputs: "OCI image outputs (Linux)"
 module.config -> outputs: "packages, apps, ..."

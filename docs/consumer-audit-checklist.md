@@ -78,6 +78,16 @@ nix fmt -- --ci          # formatting clean (0 changed)
 - [ ] NO manual treefmt-nix wiring
 - [ ] NO manual `systems` wiring
 
+## 9. Container (if the repo ships an image)
+
+- [ ] Image ships via `go-standard.container` (NOT a hand-rolled `dockerTools` block, NOT a Dockerfile as source of truth)
+- [ ] `container.enable = true` and only NON-default keys are set (user/labels/cacert/entrypoint/maxLayers all have superb defaults — setting them redundantly is noise)
+- [ ] `registry` matches the project's main remote (default `ghcr.io/larsartmann` assumes GitHub; Forgejo-remote repos override or use registry-less `imageName`)
+- [ ] `tag` is `null` (content-hash, reproducible) unless an external system needs git-readable tags
+- [ ] Ports/volumes/env declared once in `container` — NOT duplicated in a compose file that drifts
+- [ ] `checks.container-structure` passes (`nix flake check` covers it)
+- [ ] `nix build .#<pname>-image` succeeds and `nix run .#<pname>-image-load` works on the host
+
 ---
 
 ## Quick triage script
@@ -112,4 +122,12 @@ done
 
 echo "=== Follows chains ==="
 grep -q 'nixpkgs.follows' flake.nix || echo "NOTE: consider adding inputs.X.inputs.nixpkgs.follows"
+
+echo "=== Container hygiene ==="
+grep -q 'dockerTools' flake.nix && echo "WARN: hand-rolled dockerTools block (use go-standard.container)" || echo "OK: no hand-rolled dockerTools"
+if grep -q 'container' flake.nix; then
+  grep -q 'container.enable = true' flake.nix && echo "OK: container option enabled" || echo "NOTE: container referenced but not enabled"
+  grep -qE 'tag = "' flake.nix && echo "NOTE: pinned tag (content-hash default is reproducible — is a pinned tag wanted?)"
+fi
+[ -f Dockerfile ] && echo "WARN: Dockerfile present — portability shim only, or delete"
 ```

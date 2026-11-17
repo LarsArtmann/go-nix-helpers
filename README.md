@@ -99,6 +99,13 @@ nix run .#my-project-image-load    # into the local Docker daemon (skopeo)
 nix run .#my-project-image-push    # to ghcr.io (skopeo; docker login first)
 ```
 
+**Registry auth:** the push app shells out to skopeo, which reuses the standard
+Docker credential helpers and config — so `docker login ghcr.io` (with a GitHub
+PAT that has `write:packages`) once on the host is all it takes. No secrets live
+in the flake; CI gets the same via a `REGISTRY_AUTH_FILE`/`DOCKER_CONFIG`
+env pointing at a login written from a `GHCR_TOKEN`-style secret
+(see the push workflow template under `templates/`).
+
 The default registry (`ghcr.io/larsartmann`) assumes GitHub is the project's main remote. Forgejo-remote projects must override: point `container.registry` at the Forgejo host, or set a registry-less `container.imageName` — the git remote is invisible to Nix eval, so the choice is always explicit.
 
 Why nix2container (bundled — still only 3 inputs):

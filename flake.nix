@@ -16,6 +16,11 @@
 
     # OCI image building for the go-standard `container` option — bundled by
     # the composite module, so consumers do NOT declare it as an input.
+    # Lock pin policy (2026-10-30): pinned to nlewo/nix2container rev
+    # 42d1df94. Bumping it is a fleet-wide eval+build change (every consumer
+    # inherits it transitively through this flake), so it bumps ONLY together
+    # with a containerSmoke run here (the real-backend check) plus a green
+    # `nix flake check` — never as part of an unrelated `nix flake update`.
     nix2container = {
       url = "github:nlewo/nix2container";
       inputs.nixpkgs.follows = "nixpkgs";
