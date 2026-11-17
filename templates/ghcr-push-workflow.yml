@@ -1,0 +1,48 @@
+# GHCR push workflow template — ships the go-standard container image.
+#
+# Copy to .github/workflows/image-push.yml in a consumer repo and adjust:
+#   - PNAME: the go-standard `pname` (outputs are <pname>-image / image-push)
+#   - triggers: on release/tags is the usual cadence; master pushes optional
+#   - The PAT must have write:packages; the workflow env carries no secrets
+#     beyond GHCR_TOKEN.
+#
+# The image itself is built by nix (nix2container); this workflow only loads
+# and pushes it with skopeo — the same code path as `nix run .#PNAME-image-push`,
+# wrapped so CI owns the credentials instead of the developer machine.
+name: image-push
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  push-ghcr:
+    runs-on: ubuntu-latest
+    env:
+      PNAME: REPLACE_ME # go-standard pname; outputs: PNAME-image, PNAME-image-push
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: DeterminateSystems/nix-installer-action@v16
+
+      - name: Log in to GHCR
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" |
+            skopeo login ghcr.io -u "${{ github.actor }}" --password-stdin
+
+      - name: Build image (structure check runs inside the build)
+        run: nix build .#${PNAME}-image
+
+      - name: Push image
+        run: nix run .#${PNAME}-image-push
+
+# Forgejo-remote repos: do NOT use this template's ghcr.io login. Either point
+# container.registry at the Forgejo host and skopeo-login to it, or push with
+# a registry-less imageName:
+#   skopeo copy nix:./result docker://forgejo.example.com/owner/PNAME:tag
+# (see docs/migration-guide.md "Forgejo-remote registries" in go-nix-helpers)

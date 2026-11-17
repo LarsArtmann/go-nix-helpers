@@ -358,3 +358,34 @@ Before branching in any repo with an auto-commit daemon: `git stash push --
 repo's daemon pushes branches (go-nix-helpers' commits only; PapDashboard's
 pushes) — a daemon that pushes will publish your branch, the foreign files it
 swept into it, and all.
+
+---
+
+## Forgejo-remote registries
+
+The `container.registry` default (`ghcr.io/larsartmann`) assumes GitHub is the
+project's main remote. For a Forgejo-remote repo (e.g. `forgejo.home.lan`,
+`evo-x2.home.lan`), the default is wrong and nothing can auto-detect it — Nix
+eval never sees the git remote. Configure explicitly:
+
+```nix
+go-standard.container = {
+  enable = true;
+  # Either point at the Forgejo host ...
+  registry = "forgejo.home.lan/owner";   # your host + owner namespace
+  # ... or drop the registry entirely and push by full name:
+  # imageName = "my-service";  # then push to docker://host/owner/my-service:tag
+};
+```
+
+Pushing: the emitted `.#<pname>-image-push` app pushes to the image's full
+name; `skopeo login <forgejo-host>` first. Or copy manually:
+
+```bash
+nix build .#my-service-image
+skopeo copy nix:./result docker://forgejo.home.lan/owner/my-service:latest
+```
+
+The `templates/ghcr-push-workflow.yml` CI template is GHCR-specific; a
+Forgejo repo replaces the login step with its own registry (same skopeo
+flow, different host and credentials).

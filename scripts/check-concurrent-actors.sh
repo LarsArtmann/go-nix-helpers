@@ -49,7 +49,7 @@ is_allowed() {
   shift
   local allowed
   for allowed in "$@"; do
-    if [[ "$file" == "$allowed" || "$file" == "$allowed"/* ]]; then
+    if [[ $file == "$allowed" || $file == "$allowed"/* ]]; then
       return 0
     fi
   done
