@@ -941,7 +941,19 @@ let
     in
     assertCheck "systems override propagates to config.systems" (
       sysEval.config.systems == [ "x86_64-linux" ]
-    ) "systems = [x86_64-linux]";
+    ) "systems = [x86_64-linux]"
+    + "\n"
+    + assertCheck "module config block maps cfg.systems (source guard)" (
+      lib.hasInfix "inherit (cfg) systems;" (
+        builtins.readFile ./modules/go-standard.nix
+      )
+    ) "mapping present"
+    + "\n"
+    + assertCheck "composite does not duplicate the systems mapping (source guard)" (
+      !lib.hasInfix "config.systems = config.go-standard.systems;" (
+        builtins.readFile ./flake.nix
+      )
+    ) "no duplicate mapping";
 
   # --- Monorepo overlay test (verifies D1 fix) -----------------------------
   monorepoOverlayCheck =

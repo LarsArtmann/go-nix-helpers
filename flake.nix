@@ -77,12 +77,14 @@
               inputs.treefmt-nix.flakeModule
               ./modules/go-standard.nix
             ];
-            # go-standard.systems is the single systems knob: map it onto
-            # flake-parts' systems so outputs generate exactly for the
-            # configured set. (Previously the option was documented but never
-            # wired — flake-parts' own default silently won, and consumers
-            # with x86_64-darwin inherited a nixpkgs-dropped system.)
-            config.systems = config.go-standard.systems;
+            # NOTE: go-standard.systems is mapped onto flake-parts' systems
+            # INSIDE modules/go-standard.nix (`inherit (cfg) systems` in its
+            # config block — eval-tested by test-module.nix
+            # systemsOverrideCheck, plus a source-text guard). This composite
+            # must NOT repeat the mapping: flake-parts' systems option is
+            # listOf str (concat merge), so a second definition duplicates
+            # the list (2026-09-25 added exactly that redundant copy; removed
+            # 2026-11-17).
             # OCI image support: hand the per-system nix2container builders
             # to the module, the same closure-over-own-inputs trick as
             # treefmt-nix above. Consumers get container images without
