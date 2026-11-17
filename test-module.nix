@@ -248,6 +248,12 @@ let
     (assertCheck "apps.fmt exists" (psCfg.apps ? fmt) "apps.fmt")
     (assertCheck "devShells.default exists" (psCfg.devShells ? default) "devShells.default")
     (assertCheck "devShells.ci exists" (psCfg.devShells ? ci) "devShells.ci")
+    (assertCheck "devShells.default exposes passthru.go (toolchain parity with packages)" (
+      psCfg.devShells.default.passthru.go or null == psCfg.packages.default.passthru.go or "missing"
+    ) "same resolved goPkg")
+    (assertCheck "devShells.ci exposes passthru.go" (
+      psCfg.devShells.ci.passthru.go or null == psCfg.packages.default.passthru.go or "missing"
+    ) "same resolved goPkg")
     (assertCheck "checks.format exists" (psCfg.checks ? format) "checks.format")
     (assertCheck "checks.build exists" (psCfg.checks ? build) "checks.build")
     (assertCheck "treefmt.programs.gofumpt.enabled" (
@@ -1729,6 +1735,9 @@ in
 
     mkdir $out
     echo "all module tests passed" > $out/result.txt
+    # Programmatic drift detection: consumers can diff this count between
+    # go-nix-helpers revisions (e.g. "moduleTest assertions dropped from N").
+    printf '%s' "${toString (builtins.length allChecks)}" > $out/assertion-count
   '';
 
   # Build-behavioral templ-freshness test: the FRESH fixture's check must

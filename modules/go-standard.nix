@@ -1509,6 +1509,10 @@ in
               ++ (cfg.devShellExtraPackages pkgs);
               GOWORK = "off";
               GOTOOLCHAIN = "local";
+              # Parity with packages.default.passthru.go: the resolved
+              # toolchain is eval-visible on devShells too
+              # (`nix eval .#devShells.<system>.default.go.version`).
+              passthru.go = goPkg;
             }
             // finalShellExtraEnv
             // (lib.optionalAttrs (cfg.devShellHook != "") { shellHook = cfg.devShellHook; })
@@ -1519,6 +1523,7 @@ in
               packages = [ goPkg ] ++ golangciLintPkg ++ templPkg;
               GOWORK = "off";
               GOTOOLCHAIN = "local";
+              passthru.go = goPkg;
             }
             // finalShellExtraEnv
             // (lib.optionalAttrs (cfg.devShellHook != "") { shellHook = cfg.devShellHook; })

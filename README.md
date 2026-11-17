@@ -456,6 +456,17 @@ go-standard.systems = [ "x86_64-linux" ];  # Linux only
 # go-standard.systems = import inputs.systems;
 ```
 
+### What does "check omitted these incompatible systems" mean?
+
+`nix flake check` (without `--all-systems`) only evaluates derivations the
+CURRENT platform can build; the other configured systems (e.g. `aarch64-linux`
+while on `x86_64-linux`) are listed as omitted — that is informational, not a
+failure. To evaluate every configured system's outputs, run
+`nix flake check --all-systems` (evaluation only; cross-BUILDING still needs a
+remote builder or binfmt emulation). Note nixpkgs occasionally drops platforms
+entirely (e.g. `x86_64-darwin` in 26.11) — if a system in your list no longer
+exists in nixpkgs, remove it from `go-standard.systems`.
+
 ### How do I add build tags?
 
 ```nix

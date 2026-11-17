@@ -5,6 +5,9 @@ on:
     branches: [master]
   pull_request:
     branches: [master]
+  # Manual full-build oracle: run when the local host is broken and CI must
+  # be the verifier (AGENTS.md host-break canon), or to measure job timings.
+  workflow_dispatch:
 
 jobs:
   check:
@@ -109,6 +112,13 @@ jobs:
           use-flakehub: false
 
       - name: Module test against the pinned old nixpkgs
+        # PIN REFRESH POLICY: the pinned rev (2026-06-22, go_1_26 era) exists
+        # to prove the goPkgAttr auto-default DEGRADES correctly on nixpkgs
+        # that lack the newest go_1_XX branch. Refresh it only when today's
+        # nixpkgs drops a Go branch the pin still has — move it forward to a
+        # rev one Go-branch behind current, and re-record the expectation
+        # above. Bumping it in lockstep with nixpkgs would make this job
+        # test nothing.
         run: |
           SYSTEM=$(nix eval --raw --impure --expr 'builtins.currentSystem')
           nix build \
@@ -203,6 +213,32 @@ jobs:
 
       - name: Run shellcheck on all scripts
         run: nix run nixpkgs#shellcheck -- scripts/*.sh
+
+  full-flake-check:
+    # workflow_dispatch ONLY: the full-build oracle (containerSmoke included)
+    # for when the local host is broken or a timing baseline is needed. Too
+    # heavy for the per-push path.
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@3138316df39ed29be04236d7ffc686fa525866aa # v23
+
+      - name: Cache Nix Store
+        uses: DeterminateSystems/magic-nix-cache-action@84c0677f58dcedf3b91f8223ce36a9ea5b3c84b7 # v15
+        with:
+          use-flakehub: false
+
+      - name: Full flake check (eval all systems, build native)
+        run: |
+          git worktree add /tmp/clean-full HEAD
+          cd /tmp/clean-full
+          nix flake check --all-systems --no-build
+          nix flake check
 
   flake-lock-freshness:
     runs-on: ubuntu-latest

@@ -346,6 +346,26 @@ let
         toolchainVersion = "1.26.4";
       }) != null
     ) true)
+    # Malformed floor strings must not crash the builder (they ride into the
+    # message verbatim — the message itself is the diagnostic surface).
+    (assertEq "floorMsg: malformed floor '1.x' rides verbatim" (
+      builtins.match ".*requires go 1\.x but.*" (floorMsg {
+        floorStr = "1.x";
+        toolchainVersion = "1.26.4";
+      }) != null
+    ) true)
+    (assertEq "floorMsg: malformed floor 'v1.26' rides verbatim" (
+      builtins.match ".*requires go v1\.26 but.*" (floorMsg {
+        floorStr = "v1.26";
+        toolchainVersion = "1.25.0";
+      }) != null
+    ) true)
+    (assertEq "floorMsg: empty floor still renders a complete message" (
+      builtins.match ".*requires go  but.*GOTOOLCHAIN=local forbids.*" (floorMsg {
+        floorStr = "";
+        toolchainVersion = "1.26.4";
+      }) != null
+    ) true)
   ];
 
   # --- evalLockGuards tests (nix-email lock-guard extraction) ---
