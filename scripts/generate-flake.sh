@@ -128,6 +128,10 @@ if [ -z "$PROJECT" ]; then
   exit 1
 fi
 
+# Escape sed replacement metacharacters so project names containing /
+# (e.g. games/KeyCountdown) or & do not corrupt the substitution.
+PROJECT_SED=$(printf '%s' "$PROJECT" | sed -e 's/[&|]/\\&/g')
+
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
@@ -176,8 +180,8 @@ cp "$TEMPLATE_FILE" "$TARGET"
 CREATED_FILES+=("$TARGET")
 
 # Replace placeholders (works with both templates)
-sed -i "s/REPLACE_ME/$PROJECT/g" "$TARGET"
-sed -i "s/YOUR-PROJECT-NAME/$PROJECT/g" "$TARGET"
+sed -i "s|REPLACE_ME|$PROJECT_SED|g" "$TARGET"
+sed -i "s|YOUR-PROJECT-NAME|$PROJECT_SED|g" "$TARGET"
 
 # Add templ support if requested (only relevant for go-flake-parts template)
 if [ "$USE_TEMPL" = true ] && [ "$TEMPLATE" = "go-flake-parts" ]; then
