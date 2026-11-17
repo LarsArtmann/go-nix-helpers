@@ -100,7 +100,7 @@
 **This session's loose ends**
 
 | # | Task                                                                                                      | Why                                                              | Effort |
-| - | --------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------- | ------ |
+| --- | --------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------- | ------ |
 | ~~1~~ | ~~Normalize `1.~~` → `1. ~~` list spacing across all annotated reports (regex pass + spot render)~~ done — F1 spacing pass, 28 files (2026-09-25) | ~~Markdown ordered-list rendering currently broken on struck items~~ | ~~15min~~ |
 | ~~2~~ | ~~Render-verify the 5 largest struck tables (16-50, 22-45, 02-51, 21-31, 23-04) in a preview~~ done — F2 glow render pass (2026-09-25); pandoc <del> leg rides TODO_LIST T65 | ~~Markers-inside-cells is a new shape; never visually checked~~ | ~~20min~~ |
 | ~~3~~ | ~~Groff-validate both man pages (`MANWIDTH=80 man --local-file`) after the goTarball additions~~ done — F3 man render clean (2026-09-25) | ~~`.BR` entries added without running man~~ | ~~5min~~ |
@@ -111,7 +111,7 @@
 **Routed this session (authoritative list = TODO_LIST.md T1–T25)**
 
 | #  | Task                                                                                        | Source                 |
-| -- | ------------------------------------------------------------------------------------------- | ---------------------- |
+| --- | ------------------------------------------------------------------------------------------- | ---------------------- |
 | ~~7~~  | ~~T1: Smoke-eval 2–3 real consumers against the goPkgAttr auto default~~ done — A1-A6 consumer build-verification (2026-09-25) | ~~09-24 f.1~~ |
 | ~~8~~  | ~~T2: Sweep consumers for redundant `goPkgAttr` pins~~ done — A7-A10 pin sweep, 14 repos (2026-09-25) | ~~09-24 f.2~~ |
 | ~~9~~  | ~~T3: Build-verify the 10 eval-only Tier A migrations~~ done — Tier A 10/10 (2026-09-25) | ~~16-50 C~~ |
@@ -145,7 +145,7 @@
 **Docs-generation theme (ROADMAP Theme 6, this session's evidence)**
 
 | #  | Task                                                                                 | Why                                      |
-| -- | ------------------------------------------------------------------------------------ | ---------------------------------------- |
+| --- | ------------------------------------------------------------------------------------ | ---------------------------------------- |
 | 36 | Generate man page option sections from mkOption descriptions **→ routed — ROADMAP Theme 6** | 2 drift incidents + today's missing rows |
 | 37 | Generate README option table from the module **→ routed — ROADMAP Theme 6** | same class                               |
 | 38 | Emit assertion/option counts from the test runner (drop hand-typed numbers) **→ routed — ROADMAP Theme 6** | 14 drifts this session                   |
@@ -155,7 +155,7 @@
 **Left deliberately open (bare in live reports — honest open signal)**
 
 | #  | Task                                                                       | Where                  |
-| -- | -------------------------------------------------------------------------- | ---------------------- |
+| --- | -------------------------------------------------------------------------- | ---------------------- |
 | ~~41~~ | ~~CV-side lock update + vendorHash end-to-end proof~~ done — CV lock converged + rebuilt green (ADR-0003 A12, CV 0a889d5dd, 2026-11) | ~~09-07 b.1–b.2~~ |
 | ~~42~~ | ~~Flake-lock drift governance (lock bump must pass --no-build in-window)~~ done — mechanized as enableLockGuards/evalLockGuards | ~~09-07 b.5~~ |
 | ~~43~~ | ~~Correction note for `0817f80`'s wrong mechanism story~~ done — docs/corrections/2026-09-07_0817f80-interpolation-mechanism.md | ~~09-07 b.6~~ |

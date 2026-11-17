@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
-# Vendored verbatim from the docs-health skill
-# (~/.config/crush/skills/docs-health/assets/check-rows.py) so the
-# annotation gates run in CI without a skill checkout. Upstream is
-# canonical — when the skill version changes, re-vendor and note it
-# here. Wired into `nix flake check` via check-docs-annotations.sh.
+# Vendored from the docs-health skill (2026-09-25 vintage), then locally
+# extended 2026-11-17: rows carrying the ROUTED arrow marker
+# (`**→ routed — ...**`, the writer's `r` kind) now classify as resolved —
+# matching the upstream docs-gates rows scanner, which counts the arrow
+# form as ROUTED, not as a bare row. The skill remains canonical; fold
+# this into the next re-vendor. Wired into `nix flake check` via
+# check-docs-annotations.sh.
 """Per-row completeness checker for annotate passes.
 
 Usage: check-rows.py <markdown-file>...
@@ -45,14 +47,22 @@ def is_separator(line: str) -> bool:
     return bool(cells) and all(re.fullmatch(r":?-{3,}:?", c) for c in cells)
 
 
+def is_routed(line: str) -> bool:
+    """The writer's `r` kind renders `**→ routed — verdict**` (no strike);
+    upstream docs-gates classifies that arrow form as ROUTED."""
+    return bool(re.search(r"→ routed", outside_code_spans(line)))
+
+
 def classify_row(line: str) -> str:
-    """STRUCK / CLEAN / PARTIAL for one table data row.
+    """STRUCK / ROUTED / CLEAN / PARTIAL for one table data row.
 
     A cell counts as struck when it carries strikethrough outside code
     spans — the annotator's format wraps every cell and appends the marker
     INSIDE the first cell (`~~task~~ done at `hash``), so first cells don't
     end with ~~; requiring containment, not full wrapping, accepts both the
     marker format and plain `~~cell~~` wrapping."""
+    if is_routed(line):
+        return "ROUTED"
     cells = [c.strip() for c in line.strip().strip("|").split("|")]
     states = ["~~" in outside_code_spans(cell) for cell in cells]
 
@@ -89,7 +99,9 @@ def check_file(path: Path) -> int:
 
         header_no = data[0][0]
         classified = [(no, line, classify_row(line)) for no, line in data[1:]]
-        struck_rows = sum(1 for _, _, state in classified if state == "STRUCK")
+        struck_rows = sum(
+            1 for _, _, state in classified if state in ("STRUCK", "ROUTED")
+        )
 
         partial = [(no, line) for no, line, state in classified if state == "PARTIAL"]
         mixed_table = 0 < struck_rows < len(classified)
@@ -103,7 +115,7 @@ def check_file(path: Path) -> int:
                 problems.append(f"  line {no}: PARTIAL row: {line[:100]}")
             if mixed_table and not partial:
                 offenders = [
-                    (no, state) for no, _, state in classified if state != "STRUCK"
+                    (no, state) for no, _, state in classified if state not in ("STRUCK", "ROUTED")
                 ]
                 for no, state in offenders:
                     problems.append(f"  line {no}: {state} row in a struck table")
