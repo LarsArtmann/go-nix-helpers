@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
-# Vendored from the docs-health skill (2026-09-25 vintage), then locally
-# extended 2026-11-17: rows carrying the ROUTED arrow marker
-# (`**→ routed — ...**`, the writer's `r` kind) now classify as resolved —
-# matching the upstream docs-gates rows scanner, which counts the arrow
-# form as ROUTED, not as a bare row. The skill remains canonical; fold
-# this into the next re-vendor. Wired into `nix flake check` via
-# check-docs-annotations.sh.
+# Vendored from docs-gates internal/docsrows (github:Artmann-Technologies/
+# docs-gates, commit ad115e1, 2026-11-17) — the canonical Go rows scanner.
+# Aligned 2026-11-17: arrow rows classify as ROUTED, matching upstream
+# isRouted (BOTH the plain `→ routed` form and the writer's bold
+# `**→ verdict**` marker form). Upstream tests cover both forms
+# (internal/docsrows/rows_test.go "routed arrow" / "plain routed arrow").
+# Re-vendor on upstream docsrows changes; wired into `nix flake check`
+# via check-docs-annotations.sh.
 """Per-row completeness checker for annotate passes.
 
 Usage: check-rows.py <markdown-file>...
@@ -48,9 +49,13 @@ def is_separator(line: str) -> bool:
 
 
 def is_routed(line: str) -> bool:
-    """The writer's `r` kind renders `**→ routed — verdict**` (no strike);
-    upstream docs-gates classifies that arrow form as ROUTED."""
-    return bool(re.search(r"→ routed", outside_code_spans(line)))
+    """Mirrors upstream isRouted (internal/docsrows/scan.go): the writer's
+    `r` kind renders a bold arrow `**→ verdict**`, and hand-routed rows
+    carry a plain `→ routed` arrow. Either form resolves the row."""
+    stripped = outside_code_spans(line)
+    if "→ routed" in stripped:
+        return True
+    return bool(re.search(r"\*\*→[^*]+\*\*", stripped))
 
 
 def classify_row(line: str) -> str:
