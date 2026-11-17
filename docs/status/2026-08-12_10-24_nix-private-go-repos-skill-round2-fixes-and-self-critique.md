@@ -83,11 +83,11 @@ I identified this as a problem and answered Q2, but didn't convert it to a symli
 
 ## c) NOT STARTED
 
-1. **No shellcheck on the fixed script** — `bash -n` catches syntax errors but not shellcheck-style issues (unused variables, SC2004, etc.). Shellcheck is available in the devShell.
-2. **No test fixture in the skill** — The skill has no test go.mod fixture for users to try the script against. A `tests/` directory with sample go.mod files would let users verify the script works.
-3. **Didn't check if `allowed-tools` field is actually enforced** by Crush — may be cosmetic.
-4. **Didn't convert the installed copy to a symlink** — Identified the problem, noted the pattern exists for other skills, but didn't act.
-5. **Didn't review the auto-git commit message for accuracy** — The daemon committed with a different model attribution (`MiniMax-M3`) and wrote its own commit message. The message is accurate but I should verify daemon-committed content matches my changes.
+~~1. **No shellcheck on the fixed script** — `bash -n` catches syntax errors but not shellcheck-style issues (unused variables, SC2004, etc.). Shellcheck is available in the devShell.~~ routed — TODO_LIST T62 (repo: SKILLS): shellcheck pre-commit for skill scripts
+~~2. **No test fixture in the skill** — The skill has no test go.mod fixture for users to try the script against. A `tests/` directory with sample go.mod files would let users verify the script works.~~ Won't implement — dormant (script verified by 4-scenario execution; fixtures never built)
+~~3. **Didn't check if `allowed-tools` field is actually enforced** by Crush — may be cosmetic.~~ routed — ROADMAP Open questions (allowed-tools enforcement)
+~~4. **Didn't convert the installed copy to a symlink** — Identified the problem, noted the pattern exists for other skills, but didn't act.~~ done — the fleet fan-out switched to symlinks (topology verified 2026-11-15); conversion happened ecosystem-wide
+~~5. **Didn't review the auto-git commit message for accuracy** — The daemon committed with a different model attribution (`MiniMax-M3`) and wrote its own commit message. The message is accurate but I should verify daemon-committed content matches my changes.~~ Won't implement — dormant (daemon commit-verification discipline recorded in AGENTS gotchas instead)
 
 ---
 
@@ -116,21 +116,21 @@ This session was cleaner — I tested before fixing, validated after fixing, and
 
 ### Process improvements
 
-1. **Always reproduce bugs before diagnosing** — My #1 failure across both sessions. Reading code and reasoning about it is necessary but insufficient. A test run is worth a thousand lines of analysis.
-2. **Run `shellcheck` on all shell scripts** — `bash -n` only catches syntax errors. Shellcheck catches quoting issues, unused vars, unreachable code, and subtle scoping problems.
-3. **Convert installed skills to symlinks** — The two-copy sync problem is a ticking bomb. Other skills already use symlinks. This should be standardized.
-4. **Create test fixtures for skill scripts** — The `list-private-deps.sh` script should have a `tests/` directory with sample go.mod files and expected outputs, so anyone can verify the script works after edits.
-5. **Review auto-git commit messages** — The daemon writes good messages, but we should verify the committed content matches our changes, especially for multi-file edits.
+~~1. **Always reproduce bugs before diagnosing** — My #1 failure across both sessions. Reading code and reasoning about it is necessary but insufficient. A test run is worth a thousand lines of analysis.~~ done — lesson recorded in AGENTS.md gotchas (verify by commit SUBJECT; reproduce before diagnosing)
+~~2. **Run `shellcheck` on all shell scripts** — `bash -n` only catches syntax errors. Shellcheck catches quoting issues, unused vars, unreachable code, and subtle scoping problems.~~ routed — TODO_LIST T62 (repo: SKILLS)
+~~3. **Convert installed skills to symlinks** — The two-copy sync problem is a ticking bomb. Other skills already use symlinks. This should be standardized.~~ done — fleet fan-out symlinks (2026-11, crush-config AGENTS topology)
+~~4. **Create test fixtures for skill scripts** — The `list-private-deps.sh` script should have a `tests/` directory with sample go.mod files and expected outputs, so anyone can verify the script works after edits.~~ Won't implement — dormant
+~~5. **Review auto-git commit messages** — The daemon writes good messages, but we should verify the committed content matches our changes, especially for multi-file edits.~~ Won't implement — dormant (lesson lives in the commit-race AGENTS gotcha)
 
 ### Content improvements (not done this session)
 
-6. **Add monorepo + private deps guidance** — How do per-package `extraBuildAttrs` interact with `deps`? Not covered.
-7. **Add `lintAsCheck` guidance for CI** — Hermetic lint check with private deps. Not mentioned.
-8. **Add `vendorHash = null` documentation** — The signal for committed vendor/ in go-standard. The skill's migration path assumes moving AWAY from vendor/.
-9. **Add `subModules` explicit entries guidance** — When auto-discovery isn't enough.
-10. **Document `requireDeps` deduplication** — Already in AGENTS.md but not in skill.
-11. **Cross-reference `docs/migration-guide.md`** — Existing migration doc in go-nix-helpers not linked from the skill.
-12. **Strategy 2 CI auth needs rethinking** — The `GITHUB_TOKEN` with `insteadOf` pattern isn't used by any LarsArtmann project. Either document it as theoretical or remove it.
+~~6. **Add monorepo + private deps guidance** — How do per-package `extraBuildAttrs` interact with `deps`? Not covered.~~ routed — TODO_LIST T61 (repo: SKILLS)
+~~7. **Add `lintAsCheck` guidance for CI** — Hermetic lint check with private deps. Not mentioned.~~ Won't implement — dormant (SKILLS-repo scope)
+~~8. **Add `vendorHash = null` documentation** — The signal for committed vendor/ in go-standard. The skill's migration path assumes moving AWAY from vendor/.~~ Won't implement — dormant (documented in go-nix-helpers README FAQ; skill-level never picked up)
+~~9. **Add `subModules` explicit entries guidance** — When auto-discovery isn't enough.~~ Won't implement — dormant (build-time auto-discovery made explicit lists rare)
+~~10. **Document `requireDeps` deduplication** — Already in AGENTS.md but not in skill.~~ done — documented in go-nix-helpers migration guide (§ requireDeps for sub-module version pins) + AGENTS
+~~11. **Cross-reference `docs/migration-guide.md`** — Existing migration doc in go-nix-helpers not linked from the skill.~~ Won't implement — dormant (cross-link polish)
+~~12. **Strategy 2 CI auth needs rethinking** — The `GITHUB_TOKEN` with `insteadOf` pattern isn't used by any LarsArtmann project. Either document it as theoretical or remove it.~~ Won't implement — dormant (Strategy 1 = deploy keys + ssh-agent is the fleet pattern; Strategy 2 stays marked theoretical)
 
 ---
 
@@ -138,71 +138,71 @@ This session was cleaner — I tested before fixing, validated after fixing, and
 
 ### Immediate (this skill, unfinished work)
 
-1. **Convert installed copy to symlink** — Eliminate the two-copy sync problem permanently
-2. **Run `shellcheck` on `list-private-deps.sh`** — Catch quoting/style issues
-3. **Add test fixtures** — `tests/go.mod` with known deps + expected output for regression testing
-4. **Fix or remove Strategy 2 CI auth** — It's not used by any real project
-5. **Update `allowed-tools` to include `multiedit`** — If the field is enforced
-6. **Add monorepo + private deps interaction guidance**
-7. **Add `lintAsCheck` guidance for CI with private deps**
-8. **Document `vendorHash = null` for committed vendor/ path**
-9. **Add `subModules` explicit entries guidance**
-10. **Document `requireDeps` deduplication in the skill**
-11. **Cross-reference `docs/migration-guide.md` from the skill**
-12. **Add `postPatchExtra` ordering note** — Runs BEFORE replaces are injected
-13. **Document `excludeSubModuleDirs` defaults** — What gets skipped during auto-discovery
-14. **Document `stripLocalReplaces` behavior** — Dev-machine replaces being cleaned up
-15. **Add `GOTOOLCHAIN = "local"` explanation** — Why it's set and when to override
+~~1. **Convert installed copy to symlink** — Eliminate the two-copy sync problem permanently~~ done — fleet fan-out symlinks (2026-11)
+~~2. **Run `shellcheck` on `list-private-deps.sh`** — Catch quoting/style issues~~ routed — TODO_LIST T62 (repo: SKILLS)
+~~3. **Add test fixtures** — `tests/go.mod` with known deps + expected output for regression testing~~ Won't implement — dormant
+~~4. **Fix or remove Strategy 2 CI auth** — It's not used by any real project~~ Won't implement — dormant (kept as documented theoretical alternative)
+~~5. **Update `allowed-tools` to include `multiedit`** — If the field is enforced~~ routed — ROADMAP Open questions (allowed-tools enforcement)
+~~6. **Add monorepo + private deps interaction guidance**~~ routed — TODO_LIST T61 (repo: SKILLS)
+~~7. **Add `lintAsCheck` guidance for CI with private deps**~~ Won't implement — dormant
+~~8. **Document `vendorHash = null` for committed vendor/ path**~~ Won't implement — dormant (go-nix-helpers README covers it)
+~~9. **Add `subModules` explicit entries guidance**~~ Won't implement — dormant
+~~10. **Document `requireDeps` deduplication in the skill**~~ done — migration guide + AGENTS (go-nix-helpers side)
+~~11. **Cross-reference `docs/migration-guide.md` from the skill**~~ Won't implement — dormant
+~~12. **Add `postPatchExtra` ordering note** — Runs BEFORE replaces are injected~~ done — ordering documented in AGENTS.md gotchas + migration guide
+~~13. **Document `excludeSubModuleDirs` defaults** — What gets skipped during auto-discovery~~ done — docs/man/mkPreparedSource.5 documents defaults (2026-09-24 pass)
+~~14. **Document `stripLocalReplaces` behavior** — Dev-machine replaces being cleaned up~~ Won't implement — dormant (behavior documented in AGENTS)
+~~15. **Add `GOTOOLCHAIN = "local"` explanation** — Why it's set and when to override~~ done — round-2 auto-behaviors table (this report §a.3)
 
 ### Skill ecosystem
 
-16. **Standardize symlink deployment for all skills** — Investigate why some are symlinks and some are copies
-17. **Add "last verified" date to all skills that reference external APIs** — Makes staleness visible
-18. **Create a skill audit checklist** — Script execution, Nix parse, trigger keywords, API verification, shellcheck
-19. **Check if other skill scripts have the same grep-matching-module-line bug** — Pattern may recur
-20. **Add CI check for skill/source drift** — Automated detection when source APIs change
+~~16. **Standardize symlink deployment for all skills** — Investigate why some are symlinks and some are copies~~ done — fleet fan-out symlinks standardized (2026-11; enforcement: crush-config flake guards + session-start rc guard)
+~~17. **Add "last verified" date to all skills that reference external APIs** — Makes staleness visible~~ done for this skill (verification block, round-2); fleet-wide policy routed — ROADMAP Open questions (periodic re-verification)
+~~18. **Create a skill audit checklist** — Script execution, Nix parse, trigger keywords, API verification, shellcheck~~ Won't implement — dormant (SKILLS-repo scope)
+~~19. **Check if other skill scripts have the same grep-matching-module-line bug** — Pattern may recur~~ Won't implement — dormant (no other skill ships a go.mod-parsing script)
+~~20. **Add CI check for skill/source drift** — Automated detection when source APIs change~~ Won't implement — dormant (SKILLS-repo scope)
 
 ### go-nix-helpers (noticed during audit)
 
-21. **Man pages (`docs/man/go-standard.5`)** — Could be cross-referenced from the skill
-22. **`docs/consumer-audit-checklist.md`** — References `publicDeps`; skill could link to it
-23. **`templates/go-standard/flake.nix`** — Has `publicDeps` example; skill could reference
-24. **`docs/flake-patterns.md`** — Exists but skill doesn't link to it
+~~21. **Man pages (`docs/man/go-standard.5`)** — Could be cross-referenced from the skill~~ Won't implement — dormant (cross-link polish)
+~~22. **`docs/consumer-audit-checklist.md`** — References `publicDeps`; skill could link to it~~ Won't implement — dormant
+~~23. **`templates/go-standard/flake.nix`** — Has `publicDeps` example; skill could reference~~ Won't implement — dormant
+~~24. **`docs/flake-patterns.md`** — Exists but skill doesn't link to it~~ Won't implement — dormant
 
 ### Consumer fleet (from prior reports, still open)
 
-25. **`terraform-diagrams-aggregator`**: unused inputs + `publicDeps` expansion
-26. **`index`**: `enableCheck=true` removal + `deps`/`publicDeps` expansion
-27. **Several consumers have manual GOPRIVATE** that could be removed
-28. **Several consumers have unused `systems` + `treefmt-nix` inputs**
-29. **`file-and-image-renamer`**: 21 private requires, 13 dep mappings — gap
-30. **`projects-management-automation`**: 15 private requires, 4 dep mappings — gap
-31. **`project-dependency-graph`**: 13 private requires, 9 dep mappings — gap
+~~25. **`terraform-diagrams-aggregator`**: unused inputs + `publicDeps` expansion~~ done — 4 module adopters cleaned of dead inputs 2026-08 (CHANGELOG [Unreleased])
+~~26. **`index`**: `enableCheck=true` removal + `deps`/`publicDeps` expansion~~ routed — Tier B/C fleet state; TODO_LIST T4/T5 + T60
+~~27. **Several consumers have manual GOPRIVATE** that could be removed~~ routed — TODO_LIST T60 (fleet audit covers)
+~~28. **Several consumers have unused `systems` + `treefmt-nix` inputs**~~ done — 4 adopters cleaned 2026-08; the rest ride T4/T5
+~~29. **`file-and-image-renamer`**: 21 private requires, 13 dep mappings — gap~~ done — gap closed by later fleet work: 18 dep mappings + ADR-0003 A12 pin convergence (11d5c6c8, 2026-11); sub-modules auto-discovered
+~~30. **`projects-management-automation`**: 15 private requires, 4 dep mappings — gap~~ done — PMA on go-standard (Tier A 10/10, 2026-09-25); requireDeps resolves sub-modules
+~~31. **`project-dependency-graph`**: 13 private requires, 9 dep mappings — gap~~ done — Tier A 10/10 build-verified 2026-09-25
 
 ### Deeper skill improvements
 
-32. **Add "common errors" decision tree** — Error message → cause → fix flowchart
-33. **Add troubleshooting for `vendorHash` mismatch with deps**
-34. **Document the `modBuildPhase`/`modInstallPhase` auto-injection**
-35. **Add guidance for `postPatchExtra` with `tools/go.mod`**
-36. **Add a "new consumer onboarding" quickstart**
-37. **Review whether the skill should be split** — Growing large
-38. **Add GOPRIVATE override guidance** — When `privateGlobPattern` isn't enough
-39. **Document `proxyVendor = false` implications** — Why local deps require it
-40. **Add CI caching guidance** — `magic-nix-cache-action` + private deps interaction
+~~32. **Add "common errors" decision tree** — Error message → cause → fix flowchart~~ Won't implement — dormant
+~~33. **Add troubleshooting for `vendorHash` mismatch with deps**~~ Won't implement — dormant (covered in go-nix-helpers README FAQ)
+~~34. **Document the `modBuildPhase`/`modInstallPhase` auto-injection**~~ done — round-2 auto-behaviors table (§a.3)
+~~35. **Add guidance for `postPatchExtra` with `tools/go.mod`**~~ done — documented in the skill's implementation-guide.md §3 (tools/go.mod) + gotcha table; verified 2026-11-17
+~~36. **Add a "new consumer onboarding" quickstart**~~ Won't implement — dormant (README quickstart covers it)
+~~37. **Review whether the skill should be split** — Growing large~~ Won't implement — dormant
+~~38. **Add GOPRIVATE override guidance** — When `privateGlobPattern` isn't enough~~ Won't implement — dormant (privateGlobPattern + shellExtraEnv escapes documented)
+~~39. **Document `proxyVendor = false` implications** — Why local deps require it~~ done — round-2 auto-behaviors table (§a.3)
+~~40. **Add CI caching guidance** — `magic-nix-cache-action` + private deps interaction~~ done — ci-auth.md wires magic-nix-cache-action@v9 in the CI example (verified 2026-11-17)
 
 ### Meta / process
 
-41. **Investigate auto-git daemon model attribution** — Commit `d2f01f8` says `MiniMax-M3`, not the model this session used
-42. **Document the skill deployment model** — Source repo → installed copy flow
-43. **Create a recurring skill audit calendar** — Monthly or quarterly re-verification
-44. **Add skill versioning** — Track when skills were last verified
-45. **Review all skills for stale "could not be verified" blocks** — Update any that now CAN be verified
-46. **Create a skill test framework** — Standardized way to test skill scripts and snippets
-47. **Add `nix-instantiate --parse` as a pre-commit check** for Nix snippets in docs
-48. **Add `shellcheck` as a pre-commit check** for shell scripts in skills
-49. **Review frontmatter `allowed-tools` enforcement** — Is it advisory or mandatory?
-50. **Consider a `scripts/verify-skill.sh`** — Automated check: parse Nix, run scripts, validate links
+~~41. **Investigate auto-git daemon model attribution** — Commit `d2f01f8` says `MiniMax-M3`, not the model this session used~~ Won't implement — dormant (attribution is cosmetic; the commit-race lesson is in AGENTS)
+~~42. **Document the skill deployment model** — Source repo → installed copy flow~~ done — deployment model documented in crush-config AGENTS (authoring norm: skills live in their repo, fan-out is symlinks)
+~~43. **Create a recurring skill audit calendar** — Monthly or quarterly re-verification~~ routed — ROADMAP Open questions (periodic skill re-verification)
+~~44. **Add skill versioning** — Track when skills were last verified~~ Won't implement — dormant
+~~45. **Review all skills for stale "could not be verified" blocks** — Update any that now CAN be verified~~ done for this skill (round-2 rewrote the block with dates)
+~~46. **Create a skill test framework** — Standardized way to test skill scripts and snippets~~ Won't implement — dormant
+~~47. **Add `nix-instantiate --parse` as a pre-commit check** for Nix snippets in docs~~ Won't implement — dormant
+~~48. **Add `shellcheck` as a pre-commit check** for shell scripts in skills~~ routed — TODO_LIST T62 (repo: SKILLS)
+~~49. **Review frontmatter `allowed-tools` enforcement** — Is it advisory or mandatory?~~ routed — ROADMAP Open questions (allowed-tools enforcement)
+~~50. **Consider a `scripts/verify-skill.sh`** — Automated check: parse Nix, run scripts, validate links~~ Won't implement — dormant
 
 ---
 

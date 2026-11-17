@@ -215,13 +215,19 @@ For a documentation-only change this is lower risk, but the AGENTS.md mandate sa
 
 I made changes to files in `/home/lars/projects/SKILLS/nix-private-go-repos/` but don't know if this is a git-tracked repo, whether changes should be committed, or whether the installed copy at `~/.config/crush/skills/` is the canonical one. I need to know the deployment model (source → installed copy? symlink? package manager?).
 
+> **Answered 2026-08-12 (round-2 report §a.10):** yes — `git@github.com:LarsArtmann/SKILLS.git`; the auto-git daemon commits there (d2f01f8). Since 2026-11 the installed copies are symlinks into that checkout.
+
 ### Q2: Should the installed skill copy be a symlink to the source instead of a separate file?
 
 The two-copy sync problem will recur every time the skill is edited. If the installed copy were a symlink to the source (or vice versa), edits would automatically propagate. Is there a reason it's a copy? Is there a build/install step I'm unaware of?
 
+> **Resolved fleet-wide (2026-11):** the fan-out `~/.config/crush/skills/<name>` is now a symlink into `/home/lars/projects/SKILLS/<name>` (topology verified 2026-11-15) — sync drift is structurally gone.
+
 ### Q3: Is there a process for periodically re-verifying skills against their source projects?
 
 Skills that reference specific APIs (option names, function signatures, default values) will drift as the source projects evolve. The verification status block now says "verified as of 2026-08-12" but there's no mechanism to trigger re-verification. Is there (or should there be) a recurring audit process, or is this ad-hoc?
+
+> **Routed 2026-11-17:** open owner question — ROADMAP "Open questions" (periodic skill re-verification).
 
 ---
 
