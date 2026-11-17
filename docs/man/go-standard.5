@@ -248,8 +248,8 @@ checks.container-structure.
 .TP
 .BR container.packageName " (null|str, default: null)"
 Which generated package to containerize: the main package (null) or any
-go-standard.packages monorepo entry by name. Names the image and the default
-entrypoint (/bin/<package>).
+go-standard.packages monorepo entry by name. Names the image; the default
+entrypoint follows the package's meta.mainProgram (see container.entrypoint).
 .TP
 .BR container.registry " (str, default: \"ghcr.io/larsartmann\")"
 Registry prefix for the default image name (registry/packageName). Never
@@ -264,8 +264,9 @@ null uses nix2container's content-hash tag: identical closures produce
 identical tags (reproducible).
 .TP
 .BR container.entrypoint " (null|list str, default: null)"
-null uses [ "/bin/<package>" ] — the binary relocated to /bin via the
-image's buildEnv (symlink into /nix/store, never a duplicated closure).
+null uses [ "/bin/<mainProgram>" ] — the package's meta.mainProgram
+(package name when unset), relocated to /bin via the image's buildEnv
+(symlink into /nix/store, never a duplicated closure).
 .TP
 .BR container.cmd " (list str, default: [])"
 Default arguments passed to the entrypoint.

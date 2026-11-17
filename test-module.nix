@@ -1515,7 +1515,8 @@ let
     (assertCheck "consumer apps.test overrides the module mkDefault app" (
       (appsOverrideEval.config.apps.test.program or "MISSING") == "/consumer/override"
     ) "consumer program wins")
-  ] ++ lib.optionals pkgs.stdenv.hostPlatform.isLinux [
+  ]
+  ++ lib.optionals pkgs.stdenv.hostPlatform.isLinux [
     # --- Behavioral: container (OCI image, nix2container) ----------------------
     # Linux-only outputs: on darwin pkgs the image never materializes, so
     # the whole enabled-path block is gated (the option-default asserts in
@@ -1646,7 +1647,8 @@ let
     (assertCheck "container enabled without backend throws at eval" (
       !(builtins.tryEval containerNoBackendCfg.packages.test-project-image).success
     ) "eval error")
-  ] ++ [
+  ]
+  ++ [
     systemsOverrideCheck
     monorepoOverlayCheck
   ];

@@ -689,7 +689,8 @@ in
               (null, the default) or any `go-standard.packages` monorepo
               entry by name. The image is named after it
               (`registry/packageName` by default) and the default
-              entrypoint becomes `/bin/packageName`.
+              entrypoint becomes `/bin/mainProgram` (the package's
+              meta.mainProgram, falling back to the package name).
             '';
           };
 
