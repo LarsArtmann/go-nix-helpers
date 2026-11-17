@@ -32,15 +32,15 @@
 
 ## d) Not done (blocked on owner)
 
-1. **Push master** (28 commits: the D-tier suite + tonight) — CI would validate end-to-end and unblock the T34 option sweep (goExperiment/completionStyle across consumers) since options only exist pushed.
-2. **T15** (templ generate in module builds): propose won't-implement — confirm or reject.
-3. G-tier: v0.1.0 tag, mkGoFlake + old template deletion, nixpkgs maintainer PR, SSH CI job, df9a5ff rebase.
+~~1. **Push master** (28 commits: the D-tier suite + tonight) — CI would validate end-to-end and unblock the T34 option sweep (goExperiment/completionStyle across consumers) since options only exist pushed.~~ done — master pushed and synced; CI validated the suite (first fully green master run 44152413584, 2026-11-17, after three later root-cause fixes)
+~~2. **T15** (templ generate in module builds): propose won't-implement — confirm or reject.~~ routed — TODO_LIST Blocked (owner verdict pending; proposal = won't-implement with reason)
+~~3. G-tier: v0.1.0 tag, mkGoFlake + old template deletion, nixpkgs maintainer PR, SSH CI job, df9a5ff rebase.~~ routed — TODO_LIST Blocked rows (v0.1.0 unlocks the deletion batch; maintainers PR; SSH CI; df9a5ff)
 
 ## e) Next actions (unblocked, in order)
 
-1. T4: Tier B migrations (KeyCountdown, branching-flow, StopTube, overview, bank-sync, BuildFlow)
-2. T5: Tier C off mkGoFlake (Standup-Killer, crush-daily) → zero mkGoFlake consumers
-3. T33: module test for the systems mapping
-4. #46: re-run the consumer attr-probe after future nixpkgs bumps (the 10/10 proof relied on no-newer-go existing)
+~~1. T4: Tier B migrations (KeyCountdown, branching-flow, StopTube, overview, bank-sync, BuildFlow)~~ routed — TODO_LIST T4
+~~2. T5: Tier C off mkGoFlake (Standup-Killer, crush-daily) → zero mkGoFlake consumers~~ routed — TODO_LIST T5
+~~3. T33: module test for the systems mapping~~ routed — TODO_LIST T33
+~~4. #46: re-run the consumer attr-probe after future nixpkgs bumps (the 10/10 proof relied on no-newer-go existing)~~ routed — ROADMAP Theme 3 (raw idea added 2026-11-17)
 
 _Session ended clean: tree clean, nothing pushed, all claims above backed by tool output from this session._

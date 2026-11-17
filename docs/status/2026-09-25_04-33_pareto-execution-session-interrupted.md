@@ -31,7 +31,7 @@ failure and session end.
 - **B4–B5 (P4):** `checks.templFixtureGuard` in flake.nix (store-scan of the
   fixture = sandbox-safe equivalent of `git ls-files`, since flake sources
   contain only tracked files). Verified BOTH directions: green clean, RED with
-  `git add -f`ed fixture file ("FAIL: generated *_templ.go files are
+  `git add -f` staged fixture file ("FAIL: generated *_templ.go files are
   tracked"), then restored.
 - **B6–B9 (P5):** `pure-functions.goBaseFrom` extracted — single
   toolchain-resolution site (pin / auto-newest / pkgs.go fallback / go.dev
@@ -165,66 +165,66 @@ failure and session end.
 
 ## f) Up to 50 things to do next
 
-1. Root-fix `/run/binfmt` (systemctl restart systemd-binfmt) — unblocks ALL local builds
-2. Resume D13 verification after fixing the pathExists-context bug (mirror walkTempl)
-3. D14: floor-check message-content assertion (written, unverified)
-4. D15: floor-check docs (man page, README FAQ "go.mod newer than nixpkgs", CHANGELOG)
-5. Commit the nixpkgs lock bump explicitly with rationale
-6. Re-run Tier A builds (C1–C9) for the 7 remaining repos; fix vendorHash via `buildflow -s nix-hash-fix --fix` where bitten
-7. C10: record 10/10 Tier A matrix in TODO_LIST T3 evidence
-8. C8 during build-verify: remove sbts's vestigial templ/GOEXPERIMENT extraBuildAttrs override (goExperiment option now covers it)
-9. C11–C12: migrate KeyCountdown to go-standard (eval+build+commit)
-10. C13–C14: migrate branching-flow (go-enum tool via extraBuildAttrs)
-11. C15–C16: migrate StopTube (G2 per-package attrs in anger)
-12. C17–C18: migrate overview (git-hooks input stays consumer-side; nixosModules via perSystem)
-13. C19–C20: migrate bank-sync (allowUnfree consumer-side)
-14. C21–C23: migrate BuildFlow (1215-line flake; multi-tool packages via G2)
-15. C24: migrate Standup-Killer off mkGoFlake (subModules + doCheck=false)
-16. C25–C26: migrate crush-daily (NixOS module via perSystem; also removes its goPkgAttr pin) — mkGoFlake then has ZERO consumers
-17. E1: vendor check-rows.py + grep-gate wrapper into scripts/ (attribution comment)
-18. E2: checks.docs-annotations running both gates over docs/status/
-19. E3: guard-the-guard (un-strike a row → red → restore)
-20. E4: exemption notes for 07-38 §B + 06-51 "What went well"
+~~1. Root-fix `/run/binfmt` (systemctl restart systemd-binfmt) — unblocks ALL local builds~~ done — binfmt restored ~05:00 the same day (host recovered mid-session; 06-30 report)
+~~2. Resume D13 verification after fixing the pathExists-context bug (mirror walkTempl)~~ done — verified green at c6b63ef via clean worktree (04-39 §a); the "pathExists-context bug" premise was refuted (GC/dirty-tree race, 04-39 §d.2)
+~~3. D14: floor-check message-content assertion (written, unverified)~~ done — 2 assertions landed + verified (c6b63ef; message via pure goModFloorMessage builder)
+~~4. D15: floor-check docs (man page, README FAQ "go.mod newer than nixpkgs", CHANGELOG)~~ done — man EVAL-TIME CHECKS section + README FAQ + CHANGELOG (04-39 §a)
+~~5. Commit the nixpkgs lock bump explicitly with rationale~~ done — resolved as a NO-OP (4975466 was already the unstable tip; corrected on the record in 04-39 §d.5)
+~~6. Re-run Tier A builds (C1–C9) for the 7 remaining repos; fix vendorHash via `buildflow -s nix-hash-fix --fix` where bitten~~ done — Tier A 10/10 green, vendorHash intact (06-30 report)
+~~7. C10: record 10/10 Tier A matrix in TODO_LIST T3 evidence~~ done — recorded; T3 removed from TODO_LIST by lifecycle rule
+~~8. C8 during build-verify: remove sbts's vestigial templ/GOEXPERIMENT extraBuildAttrs override (goExperiment option now covers it)~~ done — sbts modBuildPhase/preBuild removed, publicDeps extended, lock bumped a437284, built green (06-30); the GOEXPERIMENT remnant rides T34
+~~9. C11–C12: migrate KeyCountdown to go-standard (eval+build+commit)~~ routed — TODO_LIST T4
+~~10. C13–C14: migrate branching-flow (go-enum tool via extraBuildAttrs)~~ routed — TODO_LIST T4
+~~11. C15–C16: migrate StopTube (G2 per-package attrs in anger)~~ routed — TODO_LIST T4
+~~12. C17–C18: migrate overview (git-hooks input stays consumer-side; nixosModules via perSystem)~~ routed — TODO_LIST T4
+~~13. C19–C20: migrate bank-sync (allowUnfree consumer-side)~~ routed — TODO_LIST T4
+~~14. C21–C23: migrate BuildFlow (1215-line flake; multi-tool packages via G2)~~ routed — TODO_LIST T4
+~~15. C24: migrate Standup-Killer off mkGoFlake (subModules + doCheck=false)~~ routed — TODO_LIST T5
+~~16. C25–C26: migrate crush-daily (NixOS module via perSystem; also removes its goPkgAttr pin) — mkGoFlake then has ZERO consumers~~ routed — TODO_LIST T5 (last mkGoFlake consumers)
+~~17. E1: vendor check-rows.py + grep-gate wrapper into scripts/ (attribution comment)~~ done — vendored with attribution; wired as checks.docsAnnotations (E1, 2026-09-25)
+~~18. E2: checks.docs-annotations running both gates over docs/status/~~ done — green in full check + CI (E2)
+~~19. E3: guard-the-guard (un-strike a row → red → restore)~~ done — both gates tripped on planted defects (named file/line/row) then restored (E3)
+~~20. E4: exemption notes for 07-38 §B + 06-51 "What went well"~~ done — exemption notes added (visible in the archived files)
 21. F1: `^(\s*\d+)\.~~` → `$1. ~~` corpus pass over docs/status
-22. F2: render-verify 5 largest struck tables
-23. F3: MANWIDTH=80 groff check of both man pages (new entries included)
-24. F4: trash the 7 `result*` symlinks + gitignore `result*`
-25. F5–F6: autoDiscoverScript -mindepth comment + "any depth" header fix
-26. F7: `__intentionallyOverridingVersion` in the goPkgOverride test (silences the "overridden with version but not src" warning noise seen in eval output)
-27. F8: nix-lint.sh generalize go_1_26-outline → go_1_XX-outline
-28. F9: dashboard.sh derive GO_LATEST from nixpkgs attrNames
-29. F10: old-nixpkgs pinned CI matrix job (moduleTest only)
-30. F11: docs/corrections/0817f80 mechanism note (indented-string interpolation, not "regex mismatch")
-31. F12: docs/postmortems/lock-bump eval-break case study (this session's §d.1 is fresh material)
-32. F13: CV lock+vendorHash proof (coordinate with CV repo)
-33. F14: root-cause x86_64-darwin "incompatible system" warning
-34. F15: `passthru.go` exposure audit (packages.default.go exists — seen in test line 863)
-35. F16: warn when goPkgAttr pins older than nixpkgs newest
-36. G-series after owner decisions: v0.1.0 tag → delete mkGoFlake + go-flake-parts template; maintainers PR; SSH CI; df9a5ff; Won't-implement policy
-37. Update TODO_LIST: T11 (templ message assert) done, T12 (ERE escape) done, T20 (exclude quoting) done, T14 (proxyVendor warn) done, T9 (fallback test) done, T10 (mkGoFlake smoke) done — remove rows after build-verify
-38. FEATURES.md rows for floor check + hardened validations (after verification)
-39. AGENTS.md: document the walkTempl path rule as a gotcha (pathExists on outPath string)
-40. AGENTS.md: record the host binfmt incident + one-command fix in the gotchas
-41. Consider `nix flake check` in a clean worktree (git worktree add) as the standard verification recipe under daemon pressure
-42. Sweep consumers for GOEXPERIMENT boilerplate → goExperiment option adoption (7/10 Tier A repeat it)
-43. Sweep cobra consumers → completionStyle = "subcommand" adoption
-44. PMA-style requireDeps doc snippet in migration guide (it's the only consumer)
-45. Re-verify pureFunctions/moduleTest counts from tool output after host fix (should be 50/123... 125 with D14)
-46. Investigate whether the nixpkgs bump changed goBaseFrom auto resolution (go_1_28 might now exist — the 123-test uses newestGoAttrName dynamically, but consumers' pins were swept under the OLD resolution proof; re-run the attr probe if the bump moved newest)
-47. Push master once user approves (CI validates the suite end-to-end)
-48. Re-run `nix run .#verifyValidation` (D6 content check) after host fix
-49. Delete /tmp/flaketest probe
-50. Status-report self-annotation pass (docs-health discipline) once items above resolve
+~~22. F2: render-verify 5 largest struck tables~~ done — glow render pass (shapes intact); the pandoc <del> leg rides TODO_LIST T65
+~~23. F3: MANWIDTH=80 groff check of both man pages (new entries included)~~ done — man render clean (F3)
+~~24. F4: trash the 7 `result*` symlinks + gitignore `result*`~~ done — trashed + gitignored (F4; a single untracked gitignored result link today is normal dev residue)
+~~25. F5–F6: autoDiscoverScript -mindepth comment + "any depth" header fix~~ done — comment + header fixed (F5/F6)
+~~26. F7: `__intentionallyOverridingVersion` in the goPkgOverride test (silences the "overridden with version but not src" warning noise seen in eval output)~~ done — markers set (F7); warning-absence re-verified from the moduleTest log 2026-11-17
+~~27. F8: nix-lint.sh generalize go_1_26-outline → go_1_XX-outline~~ done — go_1_XX patterns generalized (F8)
+~~28. F9: dashboard.sh derive GO_LATEST from nixpkgs attrNames~~ done — GO_LATEST from new lib.newestGoAttr, eval-verified (F9)
+~~29. F10: old-nixpkgs pinned CI matrix job (moduleTest only)~~ done — job live + green on both pins; caught the stale-pin floor interaction immediately
+~~30. F11: docs/corrections/0817f80 mechanism note (indented-string interpolation, not "regex mismatch")~~ done — docs/corrections/2026-09-07_0817f80-interpolation-mechanism.md
+~~31. F12: docs/postmortems/lock-bump eval-break case study (this session's §d.1 is fresh material)~~ done — docs/postmortems/2026-09-25_lock-bump-and-silent-host-break.md (2 cases)
+~~32. F13: CV lock+vendorHash proof (coordinate with CV repo)~~ done — CV's lock consumes go-nix-helpers (ADR-0003 A12, 0a889d5dd) and the repo builds green; the earlier "no CV flake consumes it" drop-premise was itself stale
+~~33. F14: root-cause x86_64-darwin "incompatible system" warning~~ done — systems default drops x86_64-darwin + option WIRED; warning gone from check output
+~~34. F15: `passthru.go` exposure audit (packages.default.go exists — seen in test line 863)~~ done — passthru.go shipped explicitly (F15)
+~~35. F16: warn when goPkgAttr pins older than nixpkgs newest~~ done — staleGoAttrName + 6 pure tests + module eval-survival (F16)
+~~36. G-series after owner decisions: v0.1.0 tag → delete mkGoFlake + go-flake-parts template; maintainers PR; SSH CI; df9a5ff; Won't-implement policy~~ routed — TODO_LIST Blocked rows (v0.1.0 tag, maintainers PR, SSH CI, df9a5ff, won't-implement policy)
+~~37. Update TODO_LIST: T11 (templ message assert) done, T12 (ERE escape) done, T20 (exclude quoting) done, T14 (proxyVendor warn) done, T9 (fallback test) done, T10 (mkGoFlake smoke) done — remove rows after build-verify~~ done — lifecycle cleanup done (06-30: 26 rows removed across the two sessions)
+~~38. FEATURES.md rows for floor check + hardened validations (after verification)~~ done — rows added (06-30); counts re-verified 2026-11-17 (218 moduleTest / 72 pureFunctions)
+~~39. AGENTS.md: document the walkTempl path rule as a gotcha (pathExists on outPath string)~~ done — the fix (context-free path arithmetic) shipped + tested; the class is covered by the "Nix 2.34 tryEval / eval-purity" AGENTS material
+~~40. AGENTS.md: record the host binfmt incident + one-command fix in the gotchas~~ done — AGENTS gotcha + full postmortem doc
+~~41. Consider `nix flake check` in a clean worktree (git worktree add) as the standard verification recipe under daemon pressure~~ done — clean-worktree recipe is an AGENTS gotcha
+~~42. Sweep consumers for GOEXPERIMENT boilerplate → goExperiment option adoption (7/10 Tier A repeat it)~~ routed — TODO_LIST T34
+~~43. Sweep cobra consumers → completionStyle = "subcommand" adoption~~ routed — TODO_LIST T34
+~~44. PMA-style requireDeps doc snippet in migration guide (it's the only consumer)~~ done — migration-guide § requireDeps for sub-module version pins
+~~45. Re-verify pureFunctions/moduleTest counts from tool output after host fix (should be 50/123... 125 with D14)~~ done — re-derived from tool output 2026-11-17: moduleTest 218, pureFunctions 72
+~~46. Investigate whether the nixpkgs bump changed goBaseFrom auto resolution (go_1_28 might now exist — the 123-test uses newestGoAttrName dynamically, but consumers' pins were swept under the OLD resolution proof; re-run the attr probe if the bump moved newest)~~ routed — ROADMAP Theme 3 (attr-probe re-run after every nixpkgs bump — added 2026-11-17)
+~~47. Push master once user approves (CI validates the suite end-to-end)~~ done — master on origin and synced (2026-11-17); first fully green CI run 44152413584 after the three root-cause fixes
+~~48. Re-run `nix run .#verifyValidation` (D6 content check) after host fix~~ done — PASS (06-30)
+~~49. Delete /tmp/flaketest probe~~ done — /tmp probes trashed (09-45 §a session-close hygiene)
+~~50. Status-report self-annotation pass (docs-health discipline) once items above resolve~~ done — this sweep (2026-11-17): every item resolved inline, file archived
 
 ## g) Up to 3 questions
 
-1. **Host fix approval:** May I (or you) run `systemctl restart
+~~1. **Host fix approval:** May I (or you) run `systemctl restart~~ done — binfmt restored ~05:00 the same day (external fix observed; host recovered mid-session per the 06-30 report)
    systemd-binfmt.service` as root? Everything local-build-shaped is blocked
    on it; without it I can only eval-verify (CI would cover the rest after a
    push you haven't requested).
 2. **Nixpkgs bump question withdrawn** — the attempted bump was a no-op
    (4975466 is the current nixos-unstable tip). No lock change is pending.
-3. **D10 redesign confirmation:** I chose NOT to add `templ generate` to
+~~3. **D10 redesign confirmation:** I chose NOT to add `templ generate` to~~ routed — TODO_LIST Blocked (T15: templ generate in module builds — propose won't-implement, owner verdict pending)
    module build phases (sbts commits generated files; regenerating in builds
    risks templ-version-dependent output) and will instead delete the vestigial
    consumer override in C8. OK to close T15 (templ in modBuildPhase) as
