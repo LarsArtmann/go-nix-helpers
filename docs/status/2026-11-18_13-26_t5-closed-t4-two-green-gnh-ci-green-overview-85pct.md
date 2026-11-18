@@ -1,0 +1,113 @@
+# Status Report — 2026-11-18 13:26 — Round 3 Execution: T5 Closed, T4 2/4 Green, go-nix-helpers CI Green ×3
+
+> Standing order: execute the ENTIRE TODO_LIST, do not stop until finished and
+> verified. This report is a mid-mission pause point ordered by the owner.
+> Session window: ~12:29–13:26 CET, resumed from the 12:29 round-3 report.
+
+## a) FULLY DONE this session (all verified green at the final tree)
+
+| # | Item | Evidence |
+|---|------|----------|
+| 1 | **T5a Standup-Killer mkGoFlake→go-standard migration CLOSED** | `nix build .#default` EXIT=0; full `nix flake check` EXIT=0. The migrated requestid-no-name-leak check caught a REAL third re-leak of `requestBrand.Name()` (requestid/requestid.go:17, prior strikes a35fa15 + 2026-11-08 documented in the file's own comment) — deleted, zero callers, `go build ./...` green. |
+| 2 | **T5b crush-daily migration CLOSED** | Full templ v0.3.1100 lockstep: go.mod (templ v0.3.1100, templ-components ×7 → v1.27.0, cqrs-htmx root v4.16.0 + dashboardui v4.16.0, go-sse v0.7.0, **catalog/v4 v4.12.0→v4.15.0** — the v4.12.0 proxy copy still calls the removed `ResolveAttributeValue`/`JoinURLErrs` helpers); 8 `_templ.go` regenerated; 6 goldens regenerated (UPDATE_GOLDENS=1); full `go test ./...` green; pin-gate script updated (EXPECTED_TEMPL → v0.3.1100); templCliFor → 0.3.1100 (hashes computed + build-verified); flake pins tightened (cqrs-htmx master→tag, go-sse master→tag, **go-datastar silent v0.5.0 drift → v0.6.2**: directory replaces ignore versions, so the sandbox had compiled v0.5.0 against a v0.6.2 go.mod for who knows how long); stale `subModules."storage/memory/v4"` entry REMOVED (physical /vN path → stripped replace target never existed → FOD "no such file"; auto-discovery now owns it); lock rebuilt from scratch (old lock was a mid-edit 5-node husk); vendorHash dance done (`sha256-8cZcu/…` into vendorHash.nix); `nix fmt` (8 files); **full `nix flake check` EXIT=0**. |
+| 3 | **T50 bank-sync residuals CLOSED** | `nix flake check --no-build` green; `--all-systems --no-build` red ONLY on erraudit aarch64-darwin (upstream go-finding `meta.platforms` — cross-repo note, see e). devShell verified (go 1.27.3). **Live downgrade trap found + fixed**: the sanctioned generator (`nix run .#generate`), treefmt templFmt, devShells.ci and the templ-pin check ALL used stock `pkgs.templ` (0.3.1020) while committed codegen is v0.3.1100 — one regen would have re-broken the build. Added `templCli` (0.3.1100 overrideAttrs, same verified hashes) wired into all four sites; templ-pin check rebuilds green. `check-dep-alignment.sh` green. AGENTS/05 line-10 stale tail (v4.14.1-era text) rewritten to the v4.16.0 lockstep state. Daemon push audited: master==origin even; the migration landed as a daemon-commit heap — collapsing would need a force-push (forbidden) → documented here instead (the owed "coherent-commit note"). |
+| 4 | **go-nix-helpers: T56 ci-parity + push + CI GREEN ×3** | Round-2's `scripts/ci-parity.sh` existed; extended: default gates now fmt + shellcheck + all-systems eval + **lock freshness** (caught nixpkgs 11-15→11-17 within a day of existing); `--ci-jobs` adds integration checks + template smoke + old-nixpkgs moduleTest; `--full` adds building check. All green locally incl. after the nixpkgs refresh. AGENTS.md gotchas added (subPackages default change, subModules /vN trap, ci-parity canon). TODO_LIST statuses updated (T49/T50/T56 DONE, T64 verified DONE — the flake already self-hosts). Collapsed 3 mine-only daemon commits per AGENTS/14 → **74611dd pushed, CI GREEN (44299677494)**. |
+| 5 | **go-nix-helpers: `excludeSubModuleDirs` option (54→55)** | Needed by overview's `.vendor-local`; mkPreparedSource pass-through, defaults identical to the helper's; moduleTest green; **6f79e47 pushed, CI GREEN**. |
+| 6 | **go-nix-helpers: treefmt enables → mkDefault** | Consumer treefmt blocks (overview's pinned-templ formatter) conflicted with hard enables; moduleTest green; **4f817b3 pushed, CI GREEN (44302986146)**. |
+| 7 | **T4 StopTube migration CLOSED** | go-standard migration; discovered the five `goexperiment.*` build tags gated ZERO source references (cargo cult) AND go.mod floor is 1.27.2 (the old `go_1_26` pin could never have built the current tree — the tags were the only thing holding the link together, via 1.26's runtime). Tags dropped, `goExperiment = "jsonv2"` set (the one experiment the source needs), vendorHash dance (cCJXyw→uGT8Ve). 34 files of accumulated prettier drift formatted — discovered the main repo's `nix fmt` ran a STALE cached treefmt wrapper while the check evaluated fresh (worktree fresh-eval fmt was the truth). BuildFlow pre-commit hook fails on its GOEXPERIMENT-less samber-linter leg (tidy is a no-op; disclosed `--no-verify` per AGENTS/14, battery green). One concurrent-actor bulk-revert defeated by redoing the format inside a worktree + ff-merge. **Full `nix flake check` EXIT=0.** |
+| 8 | **T4 branching-flow migration CLOSED** | Full migration (proxyVendor, `ldflags` option, checkFlags via extraBuildAttrs, subModules preserved — all version-free physical paths, gotools rebuilt on go_1_27). **go-enum placeholder hashes were a live landmine** (`nix develop` would fail on fetch; only eval ever ran) — real hashes computed (src sha256-fFMTnb…, vendorHash sha256-hGfwb0…). Own vendorHash unchanged (deps did not move). **Eval + build + full `nix flake check` EXIT=0.** |
+| 9 | **T66/T67/T69/T55 investigations CLOSED (subagent)** | T66: remote `systemnix-vn-version-fix` branch NO LONGER EXISTS on origin; a LOCAL branch + worktree at `~/worktrees/go-nix-helpers-vnfix` (8c87f26, 2026-09-13) carries a /vN normalizer superseded by master's (7b69382/a97742e/c42fd77 + current lines 176–220) — safe to delete after a one-line equivalence check. T67: run 44059828196 = tail of the known red window: real fmt-style + SC2016 + a moduleTest eval failure on BOTH OSes (not darwin-only as assumed); green later the same day (44168234743). T69: nothing to do — zero unannotated 2026-0* snapshots outside the archive; no `result` symlink. T55: containerSmoke costs ~2–3s warm (magic-nix-cache) — negligible; public repo = free minutes. |
+
+## b) PARTIALLY DONE
+
+| Item | State | What remains |
+|------|-------|--------------|
+| **T4 overview (~85%)** | Flake fully rewritten (templCliFor unified at 0.3.1100; cssPackageFor/ogImagePackageFor hoisted to the outer let; enableTempl=false with an OWN treefmt templ block per the pinned CLI; NixOS module-eval + css/og-image drift checks; git-hooks import kept; enableOverlay). **Eval GREEN** (after the two module-side fixes in a). | Build round 1 failed on a TRANSIENT proxy.golang.org stream error (`gonum@v0.17.0.zip INTERNAL_ERROR from peer`) — retry, vendorHash dance, full flake check, commit. |
+| **T4 BuildFlow (0% of it this session)** | Not started (deliberately last: biggest consumer, eval-bound pre-commit hook gotcha documented in AGENTS). | Full migration. |
+| **T4 KeyCountdown (N/A?)** | `/home/lars/projects/KeyCountdown` does not exist — T4's list is stale. | Verify actual repo name/existence (github), correct the TODO row. |
+| **Docs harvest** | TODO_LIST statuses updated mid-session; AGENTS gotchas added. | CHANGELOG, FEATURES, migration-guide case studies (bank-sync partial adoption; StopTube cargo-cult tags; crush-daily subModules /vN trap), man page (55 options), moduleTest count re-derive, final T4/T5 statuses. |
+| **/tmp cleanup** | New artifacts accumulated. | Trash list in f). |
+
+## c) NOT STARTED (from TODO_LIST, untouched this session)
+
+T33 (systems mapping test), T34 (GOEXPERIMENT/completionStyle sweep), T35–T46 (container foundation docs/tooling: flake-patterns, architecture.d2, audit checklist, dashboard column, richer structure diff, created round-trip, **T41 multi-arch manifest**, **T42 fromImage**, initializeNixDatabase, tag-strategy docs, registry-auth README, GHCR workflow + Forgejo example), T51 (BLOCKED, owner), T53–T54, T57–T60, T61–T63 (cross-repo: SKILLS ×2, crush-config lessons), T65 (P21–P26), T68 (docs-gates upstream), T70 (concurrent-actor detector — **this session's bulk-revert + stale-wrapper incidents are two more data points for it**), T71 (heading-mode canon), empty-bin hard-fail guard, mkGoFlake removal planning, v0.1.0 tag (BLOCKED, owner).
+
+## d) TOTALLY FUCKED UP (mistakes, own goals, and environment fights)
+
+1. **THE PHANTOM LOCK-FLIPPER (biggest self-own, ~15 min)**: contradictory `jq` readings (5 nodes vs 21 nodes on byte-identical files) sent me hunting a "concurrent actor rewriting flake.lock", inspecting `/tmp/bpro/daemon-bin` with `strings`, watching md5s. Ground truth: **the system `jq` binary is BROKEN** — `jq --version` fails with a jq-language error ("function not defined: version/0") and it silently misreads `.nodes`. Every lock verification this session was re-done in python3. Host-wide landmine for every future session (see e).
+2. **Placeholder-hash roulette**: hand-counted SRI placeholders wrong THREE times (33/30/24 chars — needs exactly 32) across crush-daily and branching-flow; should have scripted the length from the start.
+3. **ci-parity.sh collision**: wrote a "new" script over an existing round-2 file (mtime warning saved it) — should have checked existence before authoring.
+4. **Daemon/concurrent races all session**: multiedit blocked twice (mtime races — re-read+reapply each time); my StopTube commit message eaten once (collapsed later per protocol); the StopTube 34-file formatting BULK-REVERTED by a concurrent actor once (redone in a worktree + ff-merge); `/tmp/bpro` agent daemon observed live 12:43–12:46.
+5. **StopTube stale `nix fmt` wrapper**: fmt-mode (cached wrapper) and check-mode (fresh eval) disagreed — cost a full diagnose cycle. Root cause never fully pinned (eval cache); the worktree fresh-eval was the workaround. Candidate for T70's detector.
+6. **Overview build left on a transient proxy error** at pause: retry pending — do not treat overview as broken.
+7. **My own first crush-daily mkApp draft carried the store-path-in-description bug** (copied from the consumer's old flake). NOTE: go-nix-helpers' INTERNAL mkApp (modules/go-standard.nix:1286) has the same LATENT bug (`meta.description = "nix run .#${name}: ${text}"`) — harmless today only because its own apps never interpolate store paths into text. Hardening candidate (f).
+8. **erraudit aarch64-darwin**: bank-sync `--all-systems` cannot go green until the go-finding repo declares `meta.platforms` for erraudit (cross-repo fix, not bank-sync's).
+
+## e) WHAT WE SHOULD IMPROVE (systemic, from this session's evidence)
+
+1. **Fix or route around the broken system jq** (host config): symlink points at jq-1.8.2 store path but the binary misbehaves (`--version` = language error). Until fixed: **python3 json is the verification tool**; a crush-config lesson entry is warranted.
+2. **Kill the placeholder-hash class**: every "temporary hash" dance should use a scripted 32-char generator; better, a `scripts/sri-placeholder.sh` or just always copy the mismatch `got:` hash verbatim from nix.
+3. **The consumer-migration recipe is now proven 6× (bank-sync, Standup-Killer, crush-daily, StopTube, branching-flow, overview-draft)** — WRITE IT DOWN as the migration guide's canonical checklist (deps audit → option mapping table → lock rebuild → eval → build+hash → fmt → full check → daemon-aware commit). Three recurring traps to encode: devShells.ci + apps.* COLLIDE with module emissions (apps are mkDefault — override freely; devShells are HARD — drop yours), treefmt program enables are now mkDefault (own your formatters), subModules must have version-free physical paths.
+4. **GOEXPERIMENT-less BuildFlow pre-commit hooks** bit again (StopTube, after PapDashboard T47) — the hook env needs the repo's GOEXPERIMENT; third strike = fix the hook, not the workaround.
+5. **T70 concurrent-actor detector** now has three incident classes to detect: bulk-reverts (StopTube), stale wrapper/fmt-cache divergence, and mid-edit mtime races.
+
+## f) NEXT UP TO 50 (Pareto order, resumable from this exact state)
+
+1. overview: retry build (transient proxy error) → vendorHash dance → full flake check → commit
+2. BuildFlow migration (last T4 repo; mind the eval-bound pre-commit hook recipe in AGENTS)
+3. KeyCountdown: resolve repo existence; fix T4 row
+4. T48 KeyHolderAI → container option
+5. T52 fleet sweep: delete remaining hand-rolled dockerTools blocks
+6. T34 sweep: GOEXPERIMENT → goExperiment; cobra repos → completionStyle="subcommand"
+7. T57 post-push consumer audit: nix flake update sweeps (nix2container now lands transitively)
+8. T60 fleet audit re-run (auto-default + container checklist items)
+9. T35 flake-patterns container patterns + anti-patterns
+10. T36 architecture.d2 + svg: container.nix component
+11. T37 consumer-audit-checklist container section
+12. T38 dashboard.sh container column
+13. T39 container-structure richer jq diff
+14. T40 custom `created` RFC3339Nano round-trip test
+15. T41 multi-arch manifest app (skopeo copy --all)
+16. T42 container.fromImage (distroless base)
+17. T43 initializeNixDatabase passthrough
+18. T44 tag-strategy knob docs
+19. T45 README registry-auth section
+20. T46 GHCR push workflow template + Forgejo example
+21. T53 skill note: image push works with private deps
+22. T54 local aarch64 containerSmoke emulation leg
+23. T58 document nix2container lock pin (rev 42d1df94)
+24. T59 promote tryEval assert pattern to flake-patterns.md
+25. T33 systems-mapping verification into test-module.nix
+26. T61 SKILLS: monorepo + private deps guidance
+27. T62 SKILLS: shellcheck pre-commit for skill scripts
+28. T63 crush-config lessons: toString-bools, tryEval, or-precedence, piped-exit-codes (+ broken-jq ground-truth lesson)
+29. T65 polish batch P21–P26
+30. T68 upstream ROUTED-arrow to docs-gates; re-vendor check-rows.py
+31. T70 concurrent-actor detector (3 incident classes collected)
+32. T71 heading-mode canon (annotate.go `### 1.` mode)
+33. T66 cleanup: verify master /vN normalizer ≡ 8c87f26's test case → remove worktree + local branch
+34. Empty-bin hard-fail guard (zero auto-discovered mains → throw)
+35. mkApp description hardening module-side (no store paths in app meta)
+36. mkGoFlake removal planning (consumers now: BuildFlow only — verify, then schedule deletion)
+37. Docs harvest: TODO_LIST final statuses (T4/T5), CHANGELOG, FEATURES
+38. migration-guide: bank-sync partial-adoption + StopTube cargo-cult-tags + crush-daily subModules-trap case studies
+39. man page: 55 options; moduleTest count re-derive (218→?)
+40. A12 canon (adr/0003) update decision → then bank-sync/crush-daily comments + CI asserts alignment (Q2)
+41. erraudit aarch64-darwin `meta.platforms` fix in go-finding
+42. Push the 5 migrated consumer repos once approved (Q1) + verify CI on each
+43. Standup-Killer: full battery re-run at final tree + push (with crush-daily batch)
+44. monitor daemon pushes of migrated repos; re-run batteries at shipped trees
+45. /tmp cleanup: banksync-old, templ-components-v1260/v1270, gf-anc, cqrshtmx, fod.json, cd-*/st-*/bf-*/sk-*/gnh-*.log, cd-lock-snap.json, goenum-hash*.log, templ-hash*.log
+46. Fix the system jq (host, needs owner/root) or document the python3 fallback in AGENTS global lessons
+47. BuildFlow hook: inject GOEXPERIMENT into its pre-commit env (3rd strike)
+48. Consider: bank-sync templCli/crush-daily templCliFor → shared helper upstream (go-nix-helpers option `templCliVersion`?) — 4 repos now hand-roll the same overrideAttrs
+49. Final full battery: ci-parity --ci-jobs + --full + fleet dashboard sweep
+50. Deliver the owed inline TABLE VIEW report (Pareto + M/F summary) at mission end
+
+## g) QUESTIONS FOR THE OWNER (cannot be resolved from the repos themselves)
+
+1. **Push approvals (carried from round 3, now concrete)**: I pushed ONLY go-nix-helpers (74611dd, 6f79e47, 4f817b3 — all CI green; the daemon had already pushed 517db1c earlier). Which of the migrated consumers may I push: **Standup-Killer, crush-daily, branching-flow, StopTube, overview, bank-sync**? (bank-sync's daemon pushes master on its own; the others' daemons commit but do not push.)
+2. **A12 canon (carried)**: bank-sync AND crush-daily now both run templ-components v1.27.0 + cqrs-htmx v4.16.0 + go-sse v0.7.0 + go-finding-lint v1.15.1, past adr/0003's canon set. Update the canon fleet-wide to this set, or keep per-repo escape notes?
+3. **v0.1.0 tag**: still owner-blocked in TODO_LIST; it unlocks the mkGoFlake removal contract (BuildFlow is the last consumer, migrating next). Cut it after BuildFlow lands, or hold?
+
+— Session paused here per order. All in-flight builds finished or intentionally stopped; no background jobs left running.
