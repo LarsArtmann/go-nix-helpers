@@ -121,7 +121,7 @@ first FOD rebuilds since the 2026-11-13 "A12 wave 1" pin convergence
 2. devShell tidy (go.mod/go.sum parity for v1.27.0 bump)
 3. Full bank-sync battery green (lint, golangci-config, pinned-tree, catalog-drift, dep-alignment, cqrs-lint-vendor-witness — its marker may need updating to the v1.15.1-era const, image, image-oci, container-structure, format)
 4. `nix flake check --all-systems --no-build`; cleanup /tmp worktrees+clones
-5. Coherent commit(s) per AGENTS/14 daemon protocol
+~~5. Coherent commit(s) per AGENTS/14 daemon protocol~~ — DONE 2026-11-18 rounds 5-7: coherent commits landed; residual daemon races documented (round-7 §d.3)
 6. Stale go-cqrs-lite input comment fix ("frozen at 9673552" vs lock 6f8dd604)
 7. AGENTS/05 + go-nix-helpers migration-guide bank-sync case study (partial adoption IS a supported shape: enable-devshells=false + keep custom battery)
 

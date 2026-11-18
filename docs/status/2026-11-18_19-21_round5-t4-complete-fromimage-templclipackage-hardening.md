@@ -85,8 +85,8 @@ this session's work only.
 8. templCliPackage adoption in crush-daily, bank-sync, overview.
 9. T57 flake update sweeps.
 10. T60 fleet audit re-run.
-11. T33 systems-mapping module test.
-12. T65 P21–P26 (incl. assert-name apostrophe lint).
+~~11. T33 systems-mapping module test.~~ — DONE 2026-11-18: T33 shipped (moduleTest systems-mapping assertions; TODO_LIST T33 row)
+~~12. T65 P21–P26 (incl. assert-name apostrophe lint).~~ — DONE 2026-11-18: T65 P21-P26 complete (TODO_LIST T65 row)
 13. T68 docs-gates upstream + re-vendor.
 14. T70 concurrent-actor detector.
 15. T71 heading-mode canon.
