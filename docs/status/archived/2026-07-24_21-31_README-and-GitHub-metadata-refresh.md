@@ -154,56 +154,56 @@ Sorted by a rough Pareto mix of impact, effort, and urgency.
 
 | #      | Task                                                                   | Category         | Impact     | Effort                                                                     |
 | ------ | ---------------------------------------------------------------------- | ---------------- | ---------- | -------------------------------------------------------------------------- |
-| ~~1~~  | ~~Add a `LICENSE` file (MIT) and license badge~~                       | ~~Legal~~        | ~~High~~   | ~~5 min~~                                                                  |
-| ~~2~~  | ~~Set up GitHub Actions CI for `nix flake check`~~                     | ~~Trust/QA~~     | ~~High~~   | ~~30 min~~                                                                 |
-| ~~3~~  | ~~Replace static "nix flake check" badge with dynamic CI badge~~       | ~~Trust~~        | ~~High~~   | ~~5 min~~                                                                  |
-| ~~4~~  | ~~Add `.github/ISSUE_TEMPLATE/bug.yml` and `feature.yml`~~             | ~~Community~~    | ~~Medium~~ | ~~30 min~~                                                                 |
-| ~~5~~  | ~~Add `.github/pull_request_template.md`~~                             | ~~Community~~    | ~~Medium~~ | ~~15 min~~                                                                 |
-| ~~6~~  | ~~Write `CONTRIBUTING.md`~~                                            | ~~Community~~    | ~~Medium~~ | ~~30 min~~                                                                 |
-| ~~7~~  | ~~Create a repo social preview image (Open Graph)~~                    | ~~Presence~~     | ~~Medium~~ | ~~1 h~~                                                                    |
-| ~~8~~  | ~~Add `SECURITY.md`~~                                                  | ~~Governance~~   | ~~Medium~~ | ~~20 min~~                                                                 |
-| ~~9~~  | ~~Write a migration guide from `mkGoFlake.nix` to `go-standard`~~      | ~~Docs~~         | ~~High~~   | ~~1 h~~                                                                    |
-| ~~10~~ | ~~Add a troubleshooting/FAQ section to README~~                        | ~~Docs~~         | ~~High~~   | ~~45 min~~                                                                 |
-| ~~11~~ | ~~Add architecture diagram to README~~                                 | ~~Clarity~~      | ~~Medium~~ | ~~45 min~~                                                                 |
-| ~~12~~ | ~~Add unit/integration tests for the `go-standard` module~~            | ~~Quality~~      | ~~High~~   | ~~2 h~~                                                                    |
-| ~~13~~ | ~~Add CI test for `templates/go-standard/flake.nix`~~                  | ~~Quality~~      | ~~High~~   | ~~1 h~~                                                                    |
-| ~~14~~ | ~~Add CI test for `templates/go-flake-parts/flake.nix`~~               | ~~Quality~~      | ~~High~~   | ~~1 h~~                                                                    |
-| ~~15~~ | ~~Set up automated `flake.lock` updates (Dependabot or workflow)~~     | ~~Maintenance~~  | ~~High~~   | ~~1 h~~                                                                    |
-| ~~16~~ | ~~Publish a documentation site (GitHub Pages / Astro / Starlight)~~    | ~~Presence~~     | ~~High~~   | ~~4 h~~                                                                    |
+done at `ce35aa5`
+done at `7415763`
+done at `7415763`
+done — shipped as `.github/ISSUE_TEMPLATE/bug_report.md` + `feature_request.md` (`7415763`) — .md forms, not the requested .yml
+done at `7415763`
+done at `7415763`
+**Won't implement — social preview dropped (this report §c3/§e3).**
+**Won't implement — dormant — dropped (this report §c7).**
+done at `7415763`
+done at `7415763`
+done at `d8574df`
+done at `7415763`, `50fd2c3`
+done at `2f3b6b2`
+**Superseded — template `go-flake-parts` removed post-v0.1.0 (`9c8724b`, 2026-11-18); CI template coverage is now go-standard-only.**
+done — `.github/dependabot.yml` + CI `flake-lock-freshness` job (.github/workflows/ci.yml:244)
+**→ still open — noted in ROADMAP.md Theme 4 (docs-site idea; this report §c4)**
 | ~~17~~ | ~~Add release tags and `CHANGELOG.md`~~                                | ~~Process~~      | ~~Medium~~ | ~~1 h~~ done — done — CHANGELOG exists; tags in TODO_LIST Blocked (v0.1.0) |
-| ~~18~~ | ~~Add release automation (tag + notes)~~                               | ~~Process~~      | ~~Medium~~ | ~~1 h~~                                                                    |
-| ~~19~~ | ~~Add property-based tests for `mkPreparedSource`~~                    | ~~Quality~~      | ~~Medium~~ | ~~2 h~~                                                                    |
-| ~~20~~ | ~~Add real private-repo integration test in CI~~                       | ~~Quality~~      | ~~High~~   | ~~2 h~~                                                                    |
-| ~~21~~ | ~~Add `nix run .#docs` app to preview docs locally~~                   | ~~DX~~           | ~~Medium~~ | ~~30 min~~                                                                 |
+**Won't implement — dormant — dropped (this report §c16); v0.1.0 later cut manually at `ad06738` (2026-11-18).**
+done — checks.pureFunctions, 72 checks (pure-functions.nix + test-pure-functions.nix)
+**→ still open — routed TODO_LIST Blocked (real private-repo CI test; needs DEPLOY_SSH_KEY secret)**
+**→ still open — untracked (docs-site idea parked in ROADMAP.md Theme 4)**
 | ~~22~~ | ~~Add man pages for `mkPreparedSource` and `go-standard` options~~     | ~~Docs~~         | ~~Low~~    | ~~2 h~~ done — done — `d8574df`                                            |
 | ~~23~~ | ~~Add shell completions for generated apps~~                           | ~~DX~~           | ~~Low~~    | ~~1 h~~ done — done — enableCompletions option                             |
-| ~~24~~ | ~~Add cross-compilation example to README/docs~~                       | ~~Capability~~   | ~~Medium~~ | ~~1 h~~                                                                    |
-| ~~25~~ | ~~Add a "Recipes" page to docs (templ, govulncheck, gopls toggles)~~   | ~~Docs~~         | ~~Medium~~ | ~~1 h~~                                                                    |
-| ~~26~~ | ~~Audit all `docs/status/` reports for drift and annotate or archive~~ | ~~Maintenance~~  | ~~Medium~~ | ~~1 h~~                                                                    |
-| ~~27~~ | ~~Rename `mkGoFlake.nix` usage in old downstream repos~~               | ~~Migration~~    | ~~Medium~~ | ~~ongoing~~                                                                |
-| ~~28~~ | ~~Add support for Go workspace projects (`go.work`)~~                  | ~~Capability~~   | ~~Medium~~ | ~~2 h~~                                                                    |
-| ~~29~~ | ~~Add option for custom Go toolchain per package~~                     | ~~Capability~~   | ~~Low~~    | ~~1 h~~                                                                    |
+done — README FAQ documents the systems/multi-OS story (README.md:441,449); cross-compile helpers themselves won't-implement (2026-07-23 review #31)
+**→ still open — untracked (nearest shipped equivalents: README options table + docs/flake-patterns.md)**
+done — 2026-11-17 corpus sweep annotated + archived all reports; enforced by checks.docsAnnotations (flake.nix:228) and the .docs-gates.json ratchet
+done — mkGoFlake removed post-v0.1.0 (`9c8724b`); fleet fully on go-standard (TODO_LIST T4/T5 DONE 2026-11-18)
+**Won't implement — upstream nixpkgs scope (buildGoModule); the replace-directive pipeline is the shipped answer (2026-06-29 report verdict).**
+done — `goPkgOverride` + `goTarballVersion`/`goTarballHash` ship custom toolchains (README.md:206-209); repo-level granularity, not per-monorepo-package
 | ~~30~~ | ~~Add `enableGolangciLint` toggle (currently always on)~~              | ~~Config~~       | ~~Low~~    | ~~30 min~~ **Won't implement — dormant — dropped (reopen on demand).**     |
 | ~~31~~ | ~~Add `enableGofumpt` / `enableGoimports` toggles in treefmt~~         | ~~Config~~       | ~~Low~~    | ~~30 min~~ done — shipped                                                  |
 | ~~32~~ | ~~Add built-in `nix run .#fmt` alias app~~                             | ~~DX~~           | ~~Low~~    | ~~15 min~~ done — shipped — apps.fmt                                       |
-| ~~33~~ | ~~Add `meta.longDescription` and `meta.maintainers` fix~~              | ~~Quality~~      | ~~Low~~    | ~~30 min~~                                                                 |
-| ~~34~~ | ~~Run a full code review of `modules/go-standard.nix`~~                | ~~Quality~~      | ~~Medium~~ | ~~1 h~~                                                                    |
-| ~~35~~ | ~~Run a naming review across the public API~~                          | ~~Quality~~      | ~~Medium~~ | ~~1 h~~                                                                    |
-| ~~36~~ | ~~Run a duplication review after recent unification work~~             | ~~Quality~~      | ~~Medium~~ | ~~1 h~~                                                                    |
-| ~~37~~ | ~~Add telemetry-free usage stats via GitHub traffic only~~             | ~~Insights~~     | ~~Low~~    | ~~0 min~~                                                                  |
-| ~~38~~ | ~~Register `maintainers.larsartmann` in nixpkgs~~                      | ~~Correctness~~  | ~~Low~~    | ~~30 min~~                                                                 |
-| ~~39~~ | ~~Write a blog post announcing go-standard~~                           | ~~Marketing~~    | ~~Medium~~ | ~~2 h~~                                                                    |
-| ~~40~~ | ~~Create a 60-second demo video/GIF~~                                  | ~~Marketing~~    | ~~Medium~~ | ~~2 h~~                                                                    |
-| ~~41~~ | ~~Add repo to nixpkgs or nix-community~~                               | ~~Distribution~~ | ~~High~~   | ~~2 h~~                                                                    |
-| ~~42~~ | ~~Add `nix run .#ci` app that runs the same checks as CI~~             | ~~DX~~           | ~~Low~~    | ~~15 min~~                                                                 |
-| ~~43~~ | ~~Add pre-commit hook example in docs~~                                | ~~DX~~           | ~~Low~~    | ~~30 min~~                                                                 |
-| ~~44~~ | ~~Document how to override `treefmt` programs per consumer~~           | ~~Docs~~         | ~~Low~~    | ~~30 min~~                                                                 |
-| ~~45~~ | ~~Document how to pin `goPkg` to a different Go version~~              | ~~Docs~~         | ~~Low~~    | ~~20 min~~                                                                 |
-| ~~46~~ | ~~Add a "Comparison with other Go+Nix tools" section~~                 | ~~Docs~~         | ~~Medium~~ | ~~1 h~~                                                                    |
+done — meta.maintainers is an inline attrset (modules/go-standard.nix:1356) + `extraMeta` option (module :695) covers longDescription
+done — composite-module brutal review 2026-07-23 (adjacent archived report) + self-review passes 2026-08-10 / 2026-09-25
+done — public-API naming reviewed 2026-08-03: `publicDeps` rename rejected as breaking, owner-namespacing reverted at `2cbb37b` (archived/2026-08-03_03-28 + _04-44)
+done — helpers deduped into pure-functions.nix; postPatch-extraction (L10) empirically rejected 2026-08-10 (TODO_LIST Decided-against)
+**NOT-DO — GitHub traffic insights are read on github.com; there is nothing to implement in this repo.**
+**→ still open — routed TODO_LIST Blocked (external nixpkgs PR)**
+**→ still open — untracked (marketing; no TODO_LIST/ROADMAP row)**
+**→ still open — noted in ROADMAP.md Theme 4 (short demo video/GIF idea)**
+**→ still open — noted in ROADMAP.md Theme 4 (publish to nixpkgs / flake registry)**
+**→ resolved by scripts/ci-parity.sh (TODO_LIST T56 DONE 2026-11-18) — a script, not a `nix run` app**
+**→ still open — untracked (nearest coverage: docs/migration-guide.md:409 early-adopter pre-commit hook recipe)**
+done — treefmt program enables are mkDefault so consumer treefmt blocks merge cleanly (`4f817b3`) + treefmt Configuration Rules in docs/flake-patterns.md
+done — README.md:343-345 FAQ + docs/man/go-standard.5 document goPkgAttr/goTarballVersion pinning
+**→ still open — untracked (README ships a before/after table vs manual flakes; no vs-other-tools comparison exists)**
 | ~~47~~ | ~~Add a public roadmap file (`ROADMAP.md`)~~                           | ~~Planning~~     | ~~Low~~    | ~~30 min~~ done — done — exists                                            |
-| ~~48~~ | ~~Add issue labels and milestones in GitHub~~                          | ~~Process~~      | ~~Low~~    | ~~20 min~~                                                                 |
-| ~~49~~ | ~~Set up a Discord/Matrix channel for support~~                        | ~~Community~~    | ~~Low~~    | ~~30 min~~                                                                 |
-| ~~50~~ | ~~Record a longer tutorial video or livestream~~                       | ~~Marketing~~    | ~~Low~~    | ~~4 h~~                                                                    |
+**→ still open — untracked (owner-side GitHub settings; no repo artifact)**
+**Won't implement — dormant — dropped (this report §c20).**
+**→ still open — untracked (marketing; the short demo-video idea is parked in ROADMAP.md Theme 4)**
 
 ---
 
@@ -237,35 +237,35 @@ The next session (2026-07-24 22:45, `7415763`) executed 24/27 TODOs from TODO_LI
 
 | #      | Item                     | Status                                            | Evidence                                                    |
 | ------ | ------------------------ | ------------------------------------------------- | ----------------------------------------------------------- |
-| ~~1~~  | ~~LICENSE file + badge~~ | ~~done~~ `ce35aa5`                                | ~~MIT license in repo root, badge in README~~               |
-| ~~2~~  | ~~GitHub Actions CI~~    | ~~done~~ `7415763`                                | ~~`.github/workflows/ci.yml`~~                              |
-| ~~5~~  | ~~CONTRIBUTING.md~~      | ~~done~~ `7415763`                                | ~~Full dev setup, testing, PR guide~~                       |
-| ~~6~~  | ~~Issue/PR templates~~   | ~~done~~ `7415763`                                | ~~Bug report, feature request, PR checklist, CODEOWNERS~~   |
-| ~~8~~  | ~~Migration guide~~      | ~~done~~ `7415763`                                | ~~`docs/migration-guide.md`~~                               |
-| ~~9~~  | ~~FAQ/troubleshooting~~  | ~~done~~ `7415763`                                | ~~SSH errors, vendorHash, GOPRIVATE, validation errors~~    |
-| ~~18~~ | ~~Shell completions~~    | ~~done~~ `7415763`                                | ~~`enableCompletions` option~~                              |
-| ~~19~~ | ~~Man pages~~            | ~~done~~ `d8574df`, wired into devShell `ef2361f` | ~~`docs/man/go-standard.5`, `docs/man/mkPreparedSource.5`~~ |
+done at `ce35aa5`
+done at `7415763`
+done at `7415763`
+done at `7415763`
+done at `7415763`
+done at `7415763`
+done at `7415763`
+done at `d8574df`, `ef2361f`
 
 ### Top 50 next tasks — resolved since this report
 
 | #      | Task                                | Status                                 | Evidence                                             |
 | ------ | ----------------------------------- | -------------------------------------- | ---------------------------------------------------- |
-| ~~1~~  | ~~LICENSE file~~                    | ~~done~~ `ce35aa5`                     | ~~See above~~                                        |
-| ~~2~~  | ~~GitHub Actions CI~~               | ~~done~~ `7415763`                     | ~~See above~~                                        |
-| ~~3~~  | ~~Dynamic CI badge~~                | ~~done~~ `7415763`                     | ~~GitHub Actions badge in README~~                   |
-| ~~4~~  | ~~Issue templates~~                 | ~~done~~ `7415763`                     | ~~See above~~                                        |
-| ~~5~~  | ~~PR template~~                     | ~~done~~ `7415763`                     | ~~See above~~                                        |
-| ~~6~~  | ~~CONTRIBUTING.md~~                 | ~~done~~ `7415763`                     | ~~See above~~                                        |
-| ~~9~~  | ~~Migration guide~~                 | ~~done~~ `7415763`                     | ~~See above~~                                        |
-| ~~10~~ | ~~FAQ/troubleshooting~~             | ~~done~~ `7415763`                     | ~~See above~~                                        |
-| ~~11~~ | ~~Architecture diagram~~            | ~~done~~ `d8574df`                     | ~~`docs/architecture.svg` inlined in README~~        |
-| ~~12~~ | ~~Module tests~~                    | ~~done~~ `7415763`, deepened `50fd2c3` | ~~`test-module.nix` with 54 assertions~~             |
-| ~~17~~ | ~~CHANGELOG.md~~                    | ~~done~~ `7415763`                     | ~~Exists, consolidated `ef2361f`~~                   |
-| ~~22~~ | ~~Man pages~~                       | ~~done~~ `d8574df`                     | ~~See above~~                                        |
-| ~~23~~ | ~~Shell completions~~               | ~~done~~ `7415763`                     | ~~See above~~                                        |
-| ~~30~~ | ~~enableGolangciLint toggle~~       | ~~done~~ `7415763`                     | ~~Conditionally included in devShells and lint app~~ |
-| ~~31~~ | ~~enableGofumpt/Goimports toggles~~ | ~~done~~ `7415763`                     | ~~Conditionally enabled in treefmt~~                 |
-| ~~32~~ | ~~nix run .#fmt app~~               | ~~done~~ `7415763`                     | ~~`apps.fmt` wraps treefmt~~                         |
-| ~~47~~ | ~~ROADMAP.md~~                      | ~~done~~ `7415763`                     | ~~Exists, cleaned 2026-08-03~~                       |
+done at `ce35aa5`
+done at `7415763`
+done at `7415763`
+done at `7415763`
+done at `7415763`
+done at `7415763`
+done at `7415763`
+done at `7415763`
+done at `d8574df`
+done at `7415763`, `50fd2c3`
+done at `7415763`
+done at `d8574df`
+done at `7415763`
+done at `7415763`
+done at `7415763`
+done at `7415763`
+done at `7415763`
 
 Items not listed above remain open — see TODO_LIST.md and ROADMAP.md for current state.

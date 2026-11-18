@@ -185,17 +185,17 @@ The AGENTS.md says "An auto-git commit daemon runs continuously and commits chan
 | ------ | -------------------------------------------------------------------------------------------------- | -------- | --------- |
 | ~~20~~ | ~~Make `autoGoPrivateEnv` aware of `publicDeps`~~ ✓ decided against `052d92d` — broad glob safer   | ~~High~~ | ~~1h~~    |
 | ~~21~~ | ~~Improve `enableCompletions` UX~~ ✓ done `c510d7c` — warning + timeout                            | ~~High~~ | ~~1h~~    |
-| ~~22~~ | ~~Make `apps.fmt` conditional~~ ✓ done `9b376b3`                                                   | ~~Med~~  | ~~15min~~ |
-| ~~23~~ | ~~Add `userExtraBuildAttrs` merge protection~~ ✓ done `9b376b3` — `nativeBuildInputs` concatenates | ~~Med~~  | ~~30min~~ |
-| ~~24~~ | ~~Consider prefix matching for `publicDeps`~~ → ROADMAP (Theme 5)                                  | ~~Med~~  | ~~30min~~ |
-| ~~25~~ | ~~Add `generate-flake.sh` option to create `go.mod` skeleton~~ ✓ done `6e141ed` — `--go-mod` flag  | ~~Low~~  | ~~15min~~ |
-| ~~26~~ | ~~Add `generate-flake.sh` `--private-deps` support~~ ✓ done `6e141ed`                              | ~~Low~~  | ~~20min~~ |
-| ~~27~~ | ~~Namespace `repoName` by owner~~ ✓ decided against `2cbb37b` — reverted, YAGNI                    | ~~Med~~  | ~~30min~~ |
-| ~~28~~ | ~~Dedup `requireDeps` against existing `require` lines~~ ✓ done `96336e0`                          | ~~Med~~  | ~~30min~~ |
-
-### ~~Priority 4: CI improvements~~
-
-| #      | Task                                                                            | Impact  | Effort    |
+done at `a31fec9`
+done at `a31fec9`
+done at `a31fec9`
+done at `a31fec9`
+done at `a31fec9`
+done at `a31fec9`
+done at `a31fec9`
+done at `a31fec9`
+done at `a31fec9`
+done at `a31fec9`
+done at `a31fec9`
 | ------ | ------------------------------------------------------------------------------- | ------- | --------- |
 | ~~29~~ | ~~Add `generate-flake.sh` smoke test to CI~~ ✓ done `b10399f`                   | ~~Med~~ | ~~1h~~    |
 | ~~30~~ | ~~Add macOS CI runner~~ ✓ done `b10399f`                                        | ~~Med~~ | ~~30min~~ |
@@ -213,41 +213,41 @@ The AGENTS.md says "An auto-git commit daemon runs continuously and commits chan
 | ~~37~~ | ~~Test overlay application in a real nixpkgs context → BLOCKED~~                                              | ~~Med~~  | ~~1h~~ |
 | ~~38~~ | ~~Add `deps`/`mkPreparedSource` integration test → partially done (multi-deps test covers mkPreparedSource)~~ | ~~Med~~  | ~~2h~~ |
 
-### ~~Priority 6: Remaining module option tests~~
-
-| #      | Task                                                                     | Impact  | Effort    |
-| ------ | ------------------------------------------------------------------------ | ------- | --------- |
+done at `105c981`
+done at `105c981`
+done at `105c981`
+done at `105c981`
 | ~~39~~ | ~~Test `proxyVendor` toggle → TODO_LIST M7 (behavioral tests)~~          | ~~Low~~ | ~~15min~~ |
-| ~~40~~ | ~~Test `ldflags` custom override → TODO_LIST M7~~                        | ~~Low~~ | ~~15min~~ |
-| ~~41~~ | ~~Test `devShellExtraPackages`~~ ✓ done (eval assertion exists)          | ~~Low~~ | ~~15min~~ |
+done at `105c981`
+done at `2a8deeb`
 | ~~42~~ | ~~Test `shellExtraEnv` / `autoGoPrivate`~~ ✓ done (shellExtraEnv tested) | ~~Low~~ | ~~15min~~ |
 | ~~43~~ | ~~Test `enableTempl` adds `pkgs.templ`~~ ✓ done `12f2350`                | ~~Low~~ | ~~15min~~ |
-| ~~44~~ | ~~Test `enableGopls` / `enableGovulncheck` toggles → TODO_LIST (Low)~~   | ~~Low~~ | ~~15min~~ |
-| ~~45~~ | ~~Test `systems` override~~ ✓ done `ccf095e`                             | ~~Low~~ | ~~15min~~ |
-
-### ~~Priority 7: Long-term / ecosystem (BLOCKED or ROADMAP)~~
-
-| #      | Task                                                                              | Impact   | Effort    |
-| ------ | --------------------------------------------------------------------------------- | -------- | --------- |
-| ~~46~~ | ~~Register `maintainers.larsartmann` in nixpkgs → BLOCKED, tracked in TODO_LIST~~ | ~~Low~~  | ~~30min~~ |
-| ~~47~~ | ~~Audit all 7+ downstream consumers → BLOCKED, tracked in TODO_LIST~~             | ~~Med~~  | ~~2h~~    |
-| ~~48~~ | ~~Auto-detect public repos via `proxy.golang.org` query → ROADMAP (Theme 5)~~     | ~~High~~ | ~~3h~~    |
-| ~~49~~ | ~~Curate a default `publicDeps` list → ROADMAP (Theme 5)~~                        | ~~Med~~  | ~~30min~~ |
-| ~~50~~ | ~~Publish to nixpkgs or nix-community → ROADMAP (Theme 4)~~                       | ~~Low~~  | ~~2h~~    |
-
----
-
+done at `2e7547c`
+done at `2e7547c`
+done at `2e7547c`
+done at `2e7547c`
+done at `2e7547c`
+done at `2e7547c`
+done at `2e7547c`
+done at `2e7547c`
+done at `2e7547c`
+done at `2e7547c`
+done at `2e7547c`
+done at `2e7547c`
+done at `2e7547c`
+done at `2e7547c`
+done at `2e7547c`
 ## G) Questions I cannot figure out myself
-
+done at `2e7547c`
 ### ~~G1. Should `publicDeps` use exact match or prefix match?~~
-
+done at `2e7547c`
 ~~Current implementation uses `grep -vFx` (exact string match). If a user lists `"github.com/larsartmann/go-output"` but `go.mod` contains `"github.com/larsartmann/go-output/v2"`, the filter won't match. Prefix match would handle `/v2` automatically but could create surprise exclusions. I cannot resolve this without your preference for safety vs convenience.~~
-
+done at `2e7547c`
 **Resolution:** Exact match kept — safer (no surprise exclusions). Documented in README and man page at `274cb35`. Prefix matching is a ROADMAP item (Theme 5). Test for `/v2` paths tracked in TODO_LIST M9.
-
+done at `2e7547c`
 ### ~~G2. Should we maintain a built-in known-public list?~~
-
-~~I could hardcode the 5 known public LarsArtmann repos (`go-atomic-write`, `go-ndjson`, `go-sse`, `go-output`, `go-branded-id`) as a default `publicDeps`. This eliminates manual configuration but couples go-nix-helpers to specific repos and creates a maintenance burden when new repos are created or visibility changes. Should this be opt-in or always-on?~~
+done at `2e7547c`
+done at `2e7547c`
 
 **Resolution:** No — would couple go-nix-helpers to specific repos and create maintenance burden. → ROADMAP (Theme 5: auto-detect via proxy.golang.org query).
 

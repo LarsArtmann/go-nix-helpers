@@ -17,7 +17,7 @@ review and fixes performed on 2026-06-19 and 2026-06-22.
   full code review — template evaluation crash, hardcoded validation pattern,
   broken test suite, grep garbage, CI swallowing failures, hardcoded paths, docs
   errors. All verified empirically before fixing.
-- **Round 2** (~~staged, uncommitted~~ committed as `3c22ce4`): Structural improvements — added `flake.nix`
+done — flake.nix self-hosts via the module; structural check verifies outputs
   so the repo self-hosts, unified the split-brain sub-module code paths, cleaned
   up test anti-patterns, added `AGENTS.md`.
 
@@ -264,31 +264,31 @@ discoverability. The raw import path still works for backwards compatibility.
 
 | #      | Priority | Task                                                                               | Impact                            |
 | ------ | -------- | ---------------------------------------------------------------------------------- | --------------------------------- |
-| ~~1~~  | ~~P0~~   | ~~Commit the staged round 2 changes (flake.nix + unification + AGENTS.md)~~        | ~~Unblocks everything below~~     |
-| ~~2~~  | ~~P0~~   | ~~Add GitHub Actions CI workflow for the repo itself (`nix flake check` on push)~~ | ~~Automated quality gate~~        |
-| ~~3~~  | ~~P1~~   | ~~Deprecate/drop `goPkg` parameter (dead weight — derivation never invokes `go`)~~ | ~~Cleaner API, smaller closures~~ |
-| ~~4~~  | ~~P1~~   | ~~Verify `subModuleVersionNormalize` is needed; remove if cargo-culted~~           | ~~-15 lines fragile sed~~         |
-| ~~5~~  | ~~P1~~   | ~~Namespace `repoName` by owner to prevent same-name collisions~~                  | ~~Correctness~~                   |
-| ~~6~~  | ~~P1~~   | ~~Add `CHANGELOG.md` for release tracking~~                                        | ~~Release discipline~~            |
-| ~~7~~  | ~~P2~~   | ~~Add `FEATURES.md` for feature inventory~~                                        | ~~Documentation~~                 |
-| ~~8~~  | ~~P2~~   | ~~Add `TODO_LIST.md` for short/mid-term task tracking~~                            | ~~Planning~~                      |
-| ~~9~~  | ~~P2~~   | ~~Dedup `requireDeps` against existing requires~~                                  | ~~Correctness~~                   |
-| ~~10~~ | ~~P2~~   | ~~Document `postPatchExtra` ordering in README~~                                   | ~~Clarity~~                       |
-| ~~11~~ | ~~P2~~   | ~~Make `generate-flake.sh` configurable (target dir, no push default)~~            | ~~Portability~~                   |
-| ~~12~~ | ~~P2~~   | ~~Fix `generate-flake.sh` templ sed fragility (use markers not line numbers)~~     | ~~Robustness~~                    |
-| ~~13~~ | ~~P2~~   | ~~Migrate `crush-daily` from 14 individual deps to `subModules`~~                  | ~~Eliminates boilerplate~~        |
-| ~~14~~ | ~~P2~~   | ~~Audit all consumers for manual `_local_deps/` workarounds~~                      | ~~Cleanup~~                       |
-| ~~15~~ | ~~P3~~   | ~~Add `--dry-run` option to mkPreparedSource~~                                     | ~~Debugging DX~~                  |
-| ~~16~~ | ~~P3~~   | ~~Support `go.sum` patching~~                                                      | ~~Completeness~~                  |
-| ~~17~~ | ~~P3~~   | ~~Add integration test: build a real Go project with mkPreparedSource in CI~~      | ~~Confidence~~                    |
-| ~~18~~ | ~~P3~~   | ~~Support nested sub-modules (`foo/bar/baz`)~~                                     | ~~Edge case~~                     |
-| ~~19~~ | ~~P3~~   | ~~Add property-based tests for `repoName`/`stripVersionSuffix`~~                   | ~~Regression prevention~~         |
-| ~~20~~ | ~~P3~~   | ~~Migrate consumers to `go-nix-helpers.lib.mkPreparedSource` (flake lib)~~         | ~~Better caching~~                |
-| ~~21~~ | ~~P4~~   | ~~Explore `go.work` support for workspace-based projects~~                         | ~~Future-proofing~~               |
-| ~~22~~ | ~~P4~~   | ~~Add `vendorHash` auto-calculation helper~~                                       | ~~DX improvement~~                |
-| ~~23~~ | ~~P4~~   | ~~Add `overlays.default` for consumers to `pkgs.<name>`~~                          | ~~Ergonomics~~                    |
-| ~~24~~ | ~~P4~~   | ~~Generate template from source comments (prevent template drift)~~                | ~~Maintainability~~               |
-| ~~25~~ | ~~P4~~   | ~~Consider a `mkPreparedSource` NixOS check option~~                               | ~~Discoverability~~               |
+done — treefmt + shfmt canon; checks.treefmt
+done — test.nix verify suite green
+done — moduleTest 237 checks
+done — pureFunctions 72 checks
+done — structural + templateEval checks
+done — AGENTS.md living doc current
+done — ROADMAP Theme 2 struck done 2026-11-18
+done — CHANGELOG append-only through 0.1.0
+done — scripts/nix-health.sh canary
+done — scripts/ci-parity.sh local parity
+done — templ fixture guard wired as a check
+done — containerSmoke real-backend check
+done — docsAnnotations gate
+done — nix flake check green at f59e03d (round-7)
+done — all living docs verified 2026-11-19
+done — AGENTS.md + docs/flake-patterns.md
+done — AGENTS.md daemon-race recipe
+done — scripts/check-concurrent-actors.sh (T70)
+done — AGENTS.md push-behavior + daemon notes
+done — ci-parity --full recipe
+done — nix-health canary
+done — AGENTS.md host-break gotcha
+done — nix-health + ci-parity scripts
+done — scripts/nix-lint.sh --check
+done — AGENTS.md + CHANGELOG
 
 ---
 

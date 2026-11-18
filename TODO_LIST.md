@@ -2,7 +2,8 @@
 
 > Short-term, actionable, bounded work for go-nix-helpers. For long-term vision,
 > see `ROADMAP.md`; for shipped changes, see `CHANGELOG.md`.
-> Last docs-health harvest: 2026-11-18 round-5 pass (T4 done; container-foundation rows T35–T46/T53–T55/T58/T59 verified shipped; counts re-derived from tool output — 54 options, 226 moduleTest checks, 72 pureFunction checks).
+> Last docs-health harvest: 2026-11-19 corpus drain pass (57 options, 237 moduleTest
+> checks re-derived from tool output; v0.1.0 shipped 2026-11-18; mkGoFlake removed).
 
 ## Status legend
 

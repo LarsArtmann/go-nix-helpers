@@ -107,9 +107,9 @@ Since the first status report, the session focused on updating three Nix skills 
 
 ### Consumer Migrations
 
-15. ~~Migrate `library-policy` to go-standard (simplest consumer, good pilot)~~ done — still open — Tier A sweep did not cover library-policy; tracked with TODO_LIST T4 backlog
-16. ~~Migrate `mr-sync` to go-standard~~ done — still open — tracked with TODO_LIST T4 backlog
-17. ~~Migrate `go-structure-linter` to go-standard~~ done — still open — Tier C; tracked with TODO_LIST T4/T5 backlog
+15. ~~Migrate `library-policy` to go-standard (simplest consumer, good pilot)~~ done — library-policy is on go-standard (AGENTS.md consumer list); TODO_LIST T4/T5 DONE 2026-11-18
+16. ~~Migrate `mr-sync` to go-standard~~ done — mr-sync module-eval green on go-standard (round-7 wiring; TODO_LIST T4 backlog drained 2026-11-18)
+17. ~~Migrate `go-structure-linter` to go-standard~~ done — go-structure-linter on go-standard (AGENTS.md consumer list; TODO_LIST T4/T5 DONE 2026-11-18)
 18. ~~Migrate `BuildFlow` to go-standard~~ done — moved to TODO_LIST T4
 19. ~~Migrate `branching-flow` to go-standard~~ done — moved to TODO_LIST T4
 20. ~~Migrate `Standup-Killer` to go-standard~~ done — moved to TODO_LIST T5

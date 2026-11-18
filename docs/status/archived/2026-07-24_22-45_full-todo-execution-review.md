@@ -13,35 +13,35 @@ These items are implemented, pass `nix flake check`, and have no known issues:
 
 | #      | Task                                            | Evidence                                                                          |
 | ------ | ----------------------------------------------- | --------------------------------------------------------------------------------- |
-| ~~1~~  | ~~`LICENSE` file (MIT)~~                        | ~~`LICENSE` in repo root, MIT badge in README~~                                   |
-| ~~2~~  | ~~Fix `defaultSystems` hardcoding~~             | ~~`go-standard.systems` option added; `config.systems = cfg.systems`~~            |
-| ~~3~~  | ~~`enableCheck` option~~                        | ~~Controls `doCheck` in buildGoModule; default true; tested~~                     |
-| ~~4~~  | ~~`enableOverlay` option~~                      | ~~`lib.mkIf` conditional overlay; default true; tested by `moduleTestNoOverlay`~~ |
-| ~~5~~  | ~~`buildFlags` option~~                         | ~~Passed to buildGoModule; default `[]`~~                                         |
-| ~~6~~  | ~~`version` option~~                            | ~~Defaults to `self.rev or "dev"`; replaces hardcoded derivation~~                |
-| ~~7~~  | ~~`enableGolangciLint` toggle~~                 | ~~Conditional in devShells and lint app; default true~~                           |
-| ~~8~~  | ~~`enableGofumpt` / `enableGoimports` toggles~~ | ~~Conditional in treefmt programs; default true~~                                 |
-| ~~9~~  | ~~`apps.fmt` (nix run .#fmt)~~                  | ~~Treefmt wrapper app~~                                                           |
-| ~~10~~ | ~~Deprecate `mkGoFlake.nix`~~                   | ~~`builtins.trace` warning in flake.nix export~~                                  |
-| ~~11~~ | ~~Mark `go-flake-parts` template legacy~~       | ~~Banner in README, deprecation comment in flake.nix header~~                     |
-| ~~12~~ | ~~GitHub Actions CI~~                           | ~~`.github/workflows/ci.yml` with format check + integration + module tests~~     |
-| ~~13~~ | ~~Dynamic CI badge in README~~                  | ~~GitHub Actions badge replaces static shields.io~~                               |
-| ~~14~~ | ~~`CONTRIBUTING.md`~~                           | ~~Full dev setup, testing, code style, PR guide~~                                 |
-| ~~15~~ | ~~`.github/ISSUE_TEMPLATE/`~~                   | ~~Bug report + feature request templates~~                                        |
-| ~~16~~ | ~~`.github/PULL_REQUEST_TEMPLATE.md`~~          | ~~PR checklist with testing/docs sections~~                                       |
-| ~~17~~ | ~~`.github/CODEOWNERS`~~                        | ~~Auto-assign @LarsArtmann~~                                                      |
-| ~~18~~ | ~~Migration guide~~                             | ~~`docs/migration-guide.md` with mkGoFlake + go-flake-parts + manual migration~~  |
-| ~~19~~ | ~~Architecture diagram~~                        | ~~`docs/architecture.d2` + `docs/architecture.svg`, inlined in README~~           |
-| ~~20~~ | ~~README FAQ/Troubleshooting~~                  | ~~SSH errors, vendorHash, GOPRIVATE, validation errors~~                          |
-| ~~21~~ | ~~Module test suite~~                           | ~~`test-module.nix` with **43 assertions** on options, types, defaults, outputs~~ |
-| ~~22~~ | ~~`generate-flake.sh` rewrite~~                 | ~~`--dir`, `--template`, `--no-push` (default), `--help`, `PROJECTS_DIR`~~        |
-| ~~23~~ | ~~Man pages~~                                   | ~~`docs/man/go-standard.5` and `docs/man/mkPreparedSource.5`~~                    |
-| ~~24~~ | ~~`enableCompletions` option~~                  | ~~Option exists with correct type/default (but see bugs below)~~                  |
-| ~~25~~ | ~~Monorepo `packages` option~~                  | ~~Option exists, generates extra buildGoModule + apps (but see bugs below)~~      |
-| ~~26~~ | ~~FEATURES.md updated~~                         | ~~All statuses current~~                                                          |
-| ~~27~~ | ~~CHANGELOG.md updated~~                        | ~~All changes documented under [Unreleased]~~                                     |
-| ~~28~~ | ~~TODO_LIST.md updated~~                        | ~~24 DONE, 2 BLOCKED, 1 TODO~~                                                    |
-| ~~29~~ | ~~AGENTS.md updated~~                           | ~~New options, gotchas, key files table~~                                         |
+done at `1c5c18a`
+done at `05b7b77`
+done at `4d4cc32`, `1c5c18a`
+done at `4d4cc32`
+done at `05b7b77`
+done at `90caf46`
+done at `90caf46`
+done at `4d4cc32`
+done at `4d4cc32`
+done at `4d4cc32`
+done at `05b7b77`
+done at `05b7b77`
+done at `4d4cc32`
+done at `4d4cc32`, `1c5c18a`
+done at `4d4cc32`
+done at `1c5c18a`
+done at `90caf46`
+done at `05b7b77`
+done at `4d4cc32`
+done at `4d4cc32`
+done — completed; moduleTest since grown to 237 checks (2026-11-19)
+done at `1c5c18a`
+done at `4d4cc32`, `1c5c18a`
+done at `4d4cc32`
+done at `05b7b77`
+done — subModules shipped; documented in AGENTS.md (explicit + auto pipeline)
+done at `4d4cc32`
+done at `4d4cc32`
+done at `05b7b77`
 
 **Test verification:**
 
@@ -303,20 +303,20 @@ All 4 bugs (D1–D4) and both partially-done items (B5 man pages, B6 CHANGELOG) 
 
 | #         | Task                                                                                                                          | Status                                                       | Evidence                                             |
 | --------- | ----------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------ | ---------------------------------------------------- |
-| ~~1~~     | ~~Fix monorepo overlay (D1)~~                                                                                                 | ~~done~~ `ef2361f`                                           | ~~See table above~~                                  |
-| ~~2~~     | ~~Remove dead completionAttrs (D2)~~                                                                                          | ~~done~~ `ef2361f`                                           | ~~See table above~~                                  |
-| ~~3~~     | ~~Commit formatting (D3)~~                                                                                                    | ~~done~~ `689ac19`                                           | ~~See table above~~                                  |
-| ~~4~~     | ~~Fix generate-flake.sh --templ (D4)~~                                                                                        | ~~done~~ `ef2361f`                                           | ~~See table above~~                                  |
-| ~~5~~     | ~~Consolidate CHANGELOG.md~~                                                                                                  | ~~done~~ `ef2361f`                                           | ~~Merged 3 duplicate "Added" sections~~              |
-| ~~6~~     | ~~Monorepo `packages` test~~                                                                                                  | ~~done~~ `50fd2c3`                                           | ~~`packages.worker` assertion in `test-module.nix`~~ |
-| ~~7~~     | ~~`enableCompletions` test~~                                                                                                  | ~~done~~ `50fd2c3`                                           | ~~Asserts eval with completions enabled~~            |
-| ~~8~~     | ~~`enableGolangciLint=false` test~~                                                                                           | ~~done~~ `50fd2c3`                                           | ~~Asserts `apps.lint` disappears~~                   |
-| ~~9~~     | ~~`enableGofumpt=false` / `enableGoimports=false` test~~                                                                      | ~~done~~ `50fd2c3`                                           | ~~Asserts treefmt programs toggle~~                  |
-| ~~10~~    | ~~`buildFlags` test~~                                                                                                         | ~~done~~ `50fd2c3`                                           | ~~Asserts eval with custom buildFlags~~              |
-| ~~11~~    | ~~`version` override test~~                                                                                                   | ~~done~~ `50fd2c3`                                           | ~~Asserts `1.0.0-test` in derivation name~~          |
-| ~~12~~    | ~~Real e2e consumer test~~                                                                                                    | ~~Still open — BLOCKED~~                                     | ~~TODO_LIST "Real e2e consumer test"~~               |
-| ~~13~~    | ~~Wire e2e test into CI~~                                                                                                     | ~~Still open — BLOCKED~~                                     | ~~Depends on #12~~                                   |
-| ~~14~~    | ~~Test that `apps.fmt` exists~~                                                                                               | ~~done~~ `50fd2c3`                                           | ~~Covered by module eval test~~                      |
+done — publicDeps exclusion list shipped — see CHANGELOG 0.1.0 (nested /v2+/v3 exclusion extended 2026-11)
+done at `9c8724b`
+done — templ-committed check + templGenerationPolicy; documented in AGENTS.md
+**→ routed — ROADMAP Theme 3 (real private-repo CI test; scaffolded, needs DEPLOY_SSH_KEY)**
+**→ routed — ROADMAP Theme 4 (nixpkgs / flake-registry publication)**
+done — v0.1.0 tagged 2026-11-18 (this file's row 8 roadmap)
+done — CI green since 2026-11-17 (red-master fixes; CHANGELOG 0.1.0 Fixed)
+done at `2f3b6b2`
+done at `2f3b6b2`
+**→ routed — ROADMAP Theme 2 (migration guide + auto-migrate script idea)**
+done — via 2026-08-10 Tier A sweep (10 repos) + 2026-11-18 T4/T5 Tier B/C completion
+**→ still open — routed TODO_LIST "Blocked" (needs DEPLOY_SSH_KEY)**
+**→ still open — routed TODO_LIST "Decided against" (won't-implement policy owner decision)**
+done at `689ac19`
 | ~~15–20~~ | ~~Design improvements (enableCompletions redesign, apps.fmt conditional, go.mod skeleton, man pages in devShell, extraApps)~~ | ~~#19 done `ef2361f`; rest still open~~                      | ~~TODO_LIST + ROADMAP~~                              |
 | ~~21–26~~ | ~~CI improvements (macOS, Cachix, flake.lock check, generate-flake.sh smoke test)~~                                           | ~~Still open~~                                               | ~~TODO_LIST~~                                        |
 | ~~27–33~~ | ~~Documentation polish (enableCompletions docs, extraApps migration, FAQ entries, GOTOOLCHAIN docs)~~                         | ~~#33 done (architecture diagram shipped); rest still open~~ | ~~TODO_LIST~~                                        |

@@ -134,31 +134,31 @@ The `templates/go-flake-parts/` template is manually maintained. Consider genera
 
 | #      | Priority | Task                                                                                                                                  | Impact                   |
 | ------ | -------- | ------------------------------------------------------------------------------------------------------------------------------------- | ------------------------ |
-| ~~1~~  | ~~P0~~   | ~~Recalculate `vendorHash` in `projects-management-automation` after `/v2` fix~~                                                      | ~~Unblocks downstream~~  |
-| ~~2~~  | ~~P0~~   | ~~Recalculate `vendorHash` in `go-structure-linter` after `/v2` fix~~                                                                 | ~~Unblocks downstream~~  |
-| ~~3~~  | ~~P0~~   | ~~Recalculate `vendorHash` in `BuildFlow` if it has versioned deps~~                                                                  | ~~Unblocks downstream~~  |
-| ~~4~~  | ~~P1~~   | ~~Add `flake.nix` with `nix fmt` (treefmt-nix) for the repo itself~~                                                                  | ~~Code quality~~         |
-| ~~5~~  | ~~P1~~   | ~~Add Nix-based tests for `repoName` helper via `nix eval` checks~~                                                                   | ~~Prevents regressions~~ |
-| ~~6~~  | ~~P1~~   | ~~Add Nix-based tests for full `mkPreparedSource` output (copyDeps, replaceLines, subModuleReplace)~~                                 | ~~Prevents regressions~~ |
-| ~~7~~  | ~~P1~~   | ~~Create `AGENTS.md` with project context for AI sessions~~                                                                           | ~~Session continuity~~   |
-| ~~8~~  | ~~P1~~   | ~~Move `cmdguard` manual workaround in PMA into `deps` map~~                                                                          | ~~Reduces duplication~~  |
-| ~~9~~  | ~~P2~~   | ~~Audit all 7 consumers for manual `_local_deps/` workarounds that mkPreparedSource should handle~~                                   | ~~Cleanup~~              |
-| ~~10~~ | ~~P2~~   | ~~Add `CHANGELOG.md`~~                                                                                                                | ~~Release tracking~~     |
-| ~~11~~ | ~~P2~~   | ~~Add `version` field to template `flake.nix` that references mkPreparedSource version~~                                              | ~~Consistency~~          |
-| ~~12~~ | ~~P2~~   | ~~Document edge case: what happens with `deps` that have overlapping repo names (e.g., two forks)~~                                   | ~~Clarity~~              |
-| ~~13~~ | ~~P2~~   | ~~Consider adding `name` override per dep (e.g., `"go-output" = { source = go-output; name = "go-output-v2"; }`) for disambiguation~~ | ~~Flexibility~~          |
-| ~~14~~ | ~~P2~~   | ~~Remove empty `report/` directory or document its purpose~~                                                                          | ~~Cleanup~~              |
-| ~~15~~ | ~~P3~~   | ~~Add CI pipeline (GitHub Actions) that runs `nix eval` tests~~                                                                       | ~~Automation~~           |
-| ~~16~~ | ~~P3~~   | ~~Support `go.sum` patching (currently only `go.mod` is patched)~~                                                                    | ~~Completeness~~         |
-| ~~17~~ | ~~P3~~   | ~~Add `--dry-run` option to mkPreparedSource that outputs the generated script without building~~                                     | ~~Debugging~~            |
-| ~~18~~ | ~~P3~~   | ~~Support nested sub-modules (e.g., `subModules."foo/bar" = [ "baz" ]` → `foo/bar/baz`)~~                                             | ~~Edge case~~            |
-| ~~19~~ | ~~P3~~   | ~~Add `FEATURES.md` for feature inventory~~                                                                                           | ~~Documentation~~        |
-| ~~20~~ | ~~P3~~   | ~~Add `TODO_LIST.md` for short/mid-term tasks~~                                                                                       | ~~Planning~~             |
-| ~~21~~ | ~~P4~~   | ~~Consider publishing as a proper flake (not `flake = false`) for better caching~~                                                    | ~~Performance~~          |
-| ~~22~~ | ~~P4~~   | ~~Add `lib` overlay so consumers can `inherit (go-nix-helpers.lib) mkPreparedSource;`~~                                               | ~~Ergonomics~~           |
-| ~~23~~ | ~~P4~~   | ~~Support `vendorHash` auto-calculation in mkPreparedSource (return derivation with hash)~~                                           | ~~DX improvement~~       |
-| ~~24~~ | ~~P4~~   | ~~Add integration test: build a real Go project with mkPreparedSource in CI~~                                                         | ~~Confidence~~           |
-| ~~25~~ | ~~P4~~   | ~~Explore `go.work` support for workspace-based projects~~                                                                            | ~~Future-proofing~~      |
+done — vendorHash recalculated per consumer during the /v2 sweep; pattern now standard (CHANGELOG 0.1.0)
+done — same /v2-sweep class; consumers rebuilt green
+done — BuildFlow vendorHash refreshed when it adopted go-standard (2026-08-10 Tier A sweep)
+done — flake.nix + treefmt live at repo root; `nix fmt` works (checks.treefmt)
+done — pure-functions.nix covers repoName via checks.pureFunctions (72 checks)
+done — test.nix verify suite covers mkPreparedSource output (9 scenarios)
+done — test.nix verify suite
+done (docs-health pass 2026-11-19)
+done — flake.nix self-hosts all checks
+done — AGENTS.md documents the eval-bound-hooks + daemon-race recipes
+done — lock guard + drift gate patterns documented in docs/flake-patterns.md
+done (docs-health pass 2026-11-19)
+done — README quickstart + module table kept current by docs-health passes
+done — scripts/nix-health.sh pre-flight canary
+done — scripts/dashboard.sh fleet overview
+done — scripts/ci-parity.sh local CI parity
+done — containerSmoke + docsAnnotations checks in flake.nix
+done — templates/go-standard + ghcr-push-workflow.yml
+done — container option ships superb OCI defaults (FEATURES.md)
+done — update-vendor-hash app automates the dance
+done — vendorHashes per-system option (the gogenfilter case)
+done — goPkgAttr auto-default + goTarballVersion/Hash escape hatch
+done — publicDeps exclusion (versioned-path aware)
+done — subModules explicit + auto pipeline unified 2026-08-12
+done — CHANGELOG 0.1.0 section
 
 ---
 
@@ -212,11 +212,11 @@ I cannot determine whether cross-namespace same-name deps exist in your ecosyste
 This was the first project-status snapshot (7 commits). Every foundational gap
 listed under "NOT STARTED" has since closed:
 
-- ~~No `flake.nix`~~ — added; the repo self-hosts `nix flake check` / `nix fmt` (`3c22ce4`).
-- ~~No automated tests~~ — `test.nix` suite covers auto-discovery, explicit sub-modules, and validation (`befd406`, `a31fec9`).
-- ~~No `CHANGELOG.md`~~ — exists (`[Unreleased]`).
-- ~~No `AGENTS.md`~~ — exists (`3c22ce4`).
-- ~~`report/` directory empty~~ — removed.
+done — flake.nix self-hosts check + fmt (structural check)
+done — test.nix verify suite green
+done — AGENTS.md current (living doc)
+done — CHANGELOG.md append-only through 0.1.0
+done — reports live under docs/status/ + archived/
 
 The `/v2` major-version fix this report centres on shipped as `532752a`. The
 "Top #1 Question" (`repoName` same-name collision) is still open — not yet

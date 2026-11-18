@@ -178,31 +178,31 @@ The `templates/go-flake-parts/flake.nix` is manually maintained. When `mkPrepare
 
 | #      | Priority | Task                                                                                                  | Impact                                 |
 | ------ | -------- | ----------------------------------------------------------------------------------------------------- | -------------------------------------- |
-| ~~1~~  | ~~P0~~   | ~~Commit the subModules `/vN` fix~~                                                                   | ~~Unblocks go-cqrs-lite consumers~~    |
-| ~~2~~  | ~~P0~~   | ~~Migrate `crush-daily` from 14 individual deps to `subModules` with versioned paths~~                | ~~Eliminates 14 lines of boilerplate~~ |
-| ~~3~~  | ~~P0~~   | ~~Migrate `Standup-Killer` to use `memory/v2` in subModules~~                                         | ~~Correctness — memory module IS v2~~  |
-| ~~4~~  | ~~P0~~   | ~~Recalculate `vendorHash` in `projects-management-automation`~~                                      | ~~Unblocks downstream~~                |
-| ~~5~~  | ~~P0~~   | ~~Recalculate `vendorHash` in `go-structure-linter`~~                                                 | ~~Unblocks downstream~~                |
-| ~~6~~  | ~~P1~~   | ~~Add `flake.nix` with `nix fmt` (treefmt-nix) for the repo itself~~                                  | ~~Code quality~~                       |
-| ~~7~~  | ~~P1~~   | ~~Add Nix-based tests for `repoName` and `stripVersionSuffix` via `nix eval` checks~~                 | ~~Prevents regressions~~               |
-| ~~8~~  | ~~P1~~   | ~~Add Nix-based tests for full `mkPreparedSource` output (copyDeps, replaceLines, subModuleReplace)~~ | ~~Prevents regressions~~               |
-| ~~9~~  | ~~P1~~   | ~~Create `AGENTS.md` with project context for AI sessions~~                                           | ~~Session continuity~~                 |
-| ~~10~~ | ~~P1~~   | ~~Fix `dashboard.sh` to check for outdated Go versions generically (not hardcoded `go_1_25`)~~        | ~~Correctness~~                        |
-| ~~11~~ | ~~P1~~   | ~~Audit all go-cqrs-lite consumers (crush-daily, browser-history) for migration to subModules~~       | ~~Cleanup~~                            |
-| ~~12~~ | ~~P2~~   | ~~Add `CHANGELOG.md`~~                                                                                | ~~Release tracking~~                   |
-| ~~13~~ | ~~P2~~   | ~~Add `FEATURES.md` for feature inventory~~                                                           | ~~Documentation~~                      |
-| ~~14~~ | ~~P2~~   | ~~Add `TODO_LIST.md` for short/mid-term tasks~~                                                       | ~~Planning~~                           |
-| ~~15~~ | ~~P2~~   | ~~Remove empty `report/` directory or document its purpose~~                                          | ~~Cleanup~~                            |
-| ~~16~~ | ~~P2~~   | ~~Move `cmdguard` manual workaround in PMA into `deps` map~~                                          | ~~Reduces duplication~~                |
-| ~~17~~ | ~~P2~~   | ~~Audit all 7 consumers for manual `_local_deps/` workarounds~~                                       | ~~Cleanup~~                            |
-| ~~18~~ | ~~P2~~   | ~~Add validation that `subModules` entries exist in the source derivation~~                           | ~~Better error messages~~              |
-| ~~19~~ | ~~P3~~   | ~~Add CI pipeline (GitHub Actions) that runs `nix eval` tests~~                                       | ~~Automation~~                         |
-| ~~20~~ | ~~P3~~   | ~~Support `go.sum` patching (currently only `go.mod` is patched)~~                                    | ~~Completeness~~                       |
-| ~~21~~ | ~~P3~~   | ~~Add `--dry-run` option to mkPreparedSource~~                                                        | ~~Debugging~~                          |
-| ~~22~~ | ~~P3~~   | ~~Consider publishing as a proper flake (not `flake = false`) for better caching~~                    | ~~Performance~~                        |
-| ~~23~~ | ~~P4~~   | ~~Add `lib` overlay so consumers can `inherit (go-nix-helpers.lib) mkPreparedSource;`~~               | ~~Ergonomics~~                         |
-| ~~24~~ | ~~P4~~   | ~~Add integration test: build a real Go project with mkPreparedSource in CI~~                         | ~~Confidence~~                         |
-| ~~25~~ | ~~P4~~   | ~~Explore `go.work` support for workspace-based projects~~                                            | ~~Future-proofing~~                    |
+done at `7b69382`
+done — crush-daily on go-standard today (TODO_LIST T5 DONE 2026-11-18)
+done — Standup-Killer on go-standard (TODO_LIST T5 DONE 2026-11-18)
+done — PMA on go-standard (PMA 9b47684: "Migrate to go-standard module, remove 966 lines")
+done — go-structure-linter on go-standard (AGENTS.md consumer list)
+done at `3c22ce4`
+done — checks.pureFunctions (5b915f8 property suite, 72 checks)
+done — test.nix verify suite (9 scenarios)
+done at `3c22ce4`
+done — GO_LATEST auto-derived in scripts/dashboard.sh (this file §c "dashboard.sh hardcodes go_1_25" verdict)
+done — fleet audit done — all consumers on go-standard (T4/T5 DONE 2026-11-18)
+done — CHANGELOG.md exists (this file §c3)
+done — FEATURES.md exists (§c5)
+done — TODO_LIST.md exists (§c6)
+done — moot — directory gone (§c7)
+done — PMA on go-standard via deps (PMA 9b47684)
+done — 2026-06-29 postPatch sweep eliminated the workaround class
+**Won't implement — this file §c5 verdict: dormant — dropped.**
+done — .github/workflows/ci.yml runs integration + module tests
+done — go.sum handled via go mod tidy in FOD (b383d78)
+**→ still open — noted in ROADMAP Theme 3 (dry-run idea)**
+done — flakeModules.go-standard published since 2026-08 (3-input module)
+done — flake exposes lib.mkPreparedSource (verified by checks.structural)
+**→ still open — routed TODO_LIST Blocked (real private-repo CI test; needs DEPLOY_SSH_KEY)**
+**NOT-DO — buildGoModule has no go.work support; the replace-directive pipeline is the shipped answer (2026-06-29 verdict).**
 
 ---
 
