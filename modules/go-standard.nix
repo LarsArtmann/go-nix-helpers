@@ -437,7 +437,13 @@ in
     enableShfmt = lib.mkOption {
       type = lib.types.bool;
       default = false;
-      description = "Enable shfmt (shell script formatter) in treefmt programs";
+      description = ''
+        Enable shfmt (shell script formatter) in treefmt programs.
+        Indentation is pinned to 2 spaces with simplify enabled, matching the
+        pre-2026-11-18 treefmt-nix canon; this keeps formatting stable across
+        treefmt-nix bumps (upstream 0ba5d672 flipped to tab indent + no
+        simplify). Override via your own treefmt block if needed.
+      '';
     };
 
     enableCompletions = lib.mkOption {
@@ -1855,6 +1861,13 @@ in
             templ.enable = lib.mkDefault cfg.enableTempl;
             templ.package = lib.mkDefault templBin;
             shfmt.enable = lib.mkDefault cfg.enableShfmt;
+            # Pin the pre-2026-11-18 treefmt-nix shfmt canon: upstream rev
+            # 0ba5d672 flipped defaults from 2-space indent + simplify to
+            # tabs + no simplify, which would re-indent every consumer's
+            # scripts on a relock. Explicit settings make formatting
+            # lock-independent; consumers can still override.
+            shfmt.indent_size = lib.mkDefault 2;
+            shfmt.simplify = lib.mkDefault true;
           };
         };
       };

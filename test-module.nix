@@ -1217,6 +1217,15 @@ let
     (assertCheck "enableShfmt=true enables shfmt in treefmt" (
       shfmtCfg.treefmt.programs.shfmt.enable or false == true
     ) "shfmt.enable = true")
+    # shfmt canon pin: treefmt-nix 0ba5d672 (2026-11-18) flipped upstream
+    # defaults to tabs + no simplify; the module must keep 2-space indent
+    # + simplify so consumer formatting never depends on the lock pin.
+    (assertCheck "enableShfmt=true pins 2-space indent" (
+      shfmtCfg.treefmt.programs.shfmt.indent_size or null == 2
+    ) "shfmt.indent_size = 2")
+    (assertCheck "enableShfmt=true pins simplify" (
+      shfmtCfg.treefmt.programs.shfmt.simplify or false == true
+    ) "shfmt.simplify = true")
     # --- M10: Treefmt config inspection (all defaults) --------------------
     (assertCheck "treefmt.programs has 3 default programs" (
       let

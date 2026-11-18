@@ -18,43 +18,43 @@ set -euo pipefail
 AVAILABLE_TEMPLATES=("go-standard" "go-flake-parts")
 
 print_templates() {
-	echo "Available templates:"
-	for t in "${AVAILABLE_TEMPLATES[@]}"; do
-		echo "  $t"
-	done
+  echo "Available templates:"
+  for t in "${AVAILABLE_TEMPLATES[@]}"; do
+    echo "  $t"
+  done
 }
 
 if [ $# -eq 0 ] || [ "${1:-}" = "--help" ] || [ "${1:-}" = "-h" ]; then
-	echo "Usage: generate-flake.sh [options] <project-name>"
-	echo ""
-	echo "Options:"
-	echo "  --templ         Add templ support (treefmt + devShell)"
-	echo "  --private-deps  Include private deps section (adds deps attrset)"
-	echo "  --go-mod        Also create a go.mod + main.go skeleton"
-	echo "  --no-push       Don't push to GitHub (default)"
-	echo "  --push          Push to GitHub after generation"
-	# shellcheck disable=SC2016 # $PROJECTS_DIR is intentionally literal in help text
-	echo '  --dir <path>    Target directory (default: $PROJECTS_DIR/<project-name>)'
-	echo '  --template <t>  Template: "go-standard" (default) or "go-flake-parts"'
-	echo "  --dry-run       Print what would be created without writing any files"
-	echo "  --verbose       List created files after generation"
-	echo "  --list-templates  Print available templates and exit"
-	echo ""
-	echo "Environment:"
-	echo "  PROJECTS_DIR   Base directory for projects (default: $(cd "$(dirname "$0")/.." && pwd)/.."
-	echo ""
-	echo "Templates:"
-	print_templates
-	echo ""
-	echo "Example:"
-	echo "  generate-flake.sh my-project --templ --private-deps"
-	exit 0
+  echo "Usage: generate-flake.sh [options] <project-name>"
+  echo ""
+  echo "Options:"
+  echo "  --templ         Add templ support (treefmt + devShell)"
+  echo "  --private-deps  Include private deps section (adds deps attrset)"
+  echo "  --go-mod        Also create a go.mod + main.go skeleton"
+  echo "  --no-push       Don't push to GitHub (default)"
+  echo "  --push          Push to GitHub after generation"
+  # shellcheck disable=SC2016 # $PROJECTS_DIR is intentionally literal in help text
+  echo '  --dir <path>    Target directory (default: $PROJECTS_DIR/<project-name>)'
+  echo '  --template <t>  Template: "go-standard" (default) or "go-flake-parts"'
+  echo "  --dry-run       Print what would be created without writing any files"
+  echo "  --verbose       List created files after generation"
+  echo "  --list-templates  Print available templates and exit"
+  echo ""
+  echo "Environment:"
+  echo "  PROJECTS_DIR   Base directory for projects (default: $(cd "$(dirname "$0")/.." && pwd)/.."
+  echo ""
+  echo "Templates:"
+  print_templates
+  echo ""
+  echo "Example:"
+  echo "  generate-flake.sh my-project --templ --private-deps"
+  exit 0
 fi
 
 # Handle --list-templates early (no project name needed)
 if [ "${1:-}" = "--list-templates" ]; then
-	print_templates
-	exit 0
+  print_templates
+  exit 0
 fi
 
 PROJECT=""
@@ -69,63 +69,63 @@ VERBOSE=false
 
 # Parse arguments: flags can come before or after the project name
 while [ $# -gt 0 ]; do
-	case "$1" in
-	--templ)
-		USE_TEMPL=true
-		shift
-		;;
-	--private-deps)
-		USE_PRIVATE_DEPS=true
-		shift
-		;;
-	--go-mod)
-		CREATE_GO_MOD=true
-		shift
-		;;
-	--no-push)
-		PUSH=false
-		shift
-		;;
-	--push)
-		PUSH=true
-		shift
-		;;
-	--dir)
-		CUSTOM_DIR="$2"
-		shift 2
-		;;
-	--template)
-		TEMPLATE="$2"
-		shift 2
-		;;
-	--dry-run)
-		DRY_RUN=true
-		shift
-		;;
-	--verbose)
-		VERBOSE=true
-		shift
-		;;
-	--list-templates)
-		print_templates
-		exit 0
-		;;
-	--help | -h) exit 0 ;;
-	-*)
-		echo "ERROR: Unknown option: $1"
-		exit 1
-		;;
-	*)
-		PROJECT="$1"
-		shift
-		;;
-	esac
+  case "$1" in
+  --templ)
+    USE_TEMPL=true
+    shift
+    ;;
+  --private-deps)
+    USE_PRIVATE_DEPS=true
+    shift
+    ;;
+  --go-mod)
+    CREATE_GO_MOD=true
+    shift
+    ;;
+  --no-push)
+    PUSH=false
+    shift
+    ;;
+  --push)
+    PUSH=true
+    shift
+    ;;
+  --dir)
+    CUSTOM_DIR="$2"
+    shift 2
+    ;;
+  --template)
+    TEMPLATE="$2"
+    shift 2
+    ;;
+  --dry-run)
+    DRY_RUN=true
+    shift
+    ;;
+  --verbose)
+    VERBOSE=true
+    shift
+    ;;
+  --list-templates)
+    print_templates
+    exit 0
+    ;;
+  --help | -h) exit 0 ;;
+  -*)
+    echo "ERROR: Unknown option: $1"
+    exit 1
+    ;;
+  *)
+    PROJECT="$1"
+    shift
+    ;;
+  esac
 done
 
 if [ -z "$PROJECT" ]; then
-	echo "ERROR: Project name is required"
-	echo "Usage: generate-flake.sh [options] <project-name>"
-	exit 1
+  echo "ERROR: Project name is required"
+  echo "Usage: generate-flake.sh [options] <project-name>"
+  exit 1
 fi
 
 # Escape sed replacement metacharacters so project names containing /
@@ -139,17 +139,17 @@ REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 TEMPLATE_FILE="$REPO_ROOT/templates/$TEMPLATE/flake.nix"
 
 if [ ! -f "$TEMPLATE_FILE" ]; then
-	echo "ERROR: Template not found at $TEMPLATE_FILE"
-	print_templates
-	exit 1
+  echo "ERROR: Template not found at $TEMPLATE_FILE"
+  print_templates
+  exit 1
 fi
 
 # Resolve target directory
 if [ -n "$CUSTOM_DIR" ]; then
-	TARGET_DIR="$CUSTOM_DIR"
+  TARGET_DIR="$CUSTOM_DIR"
 else
-	PROJECTS_DIR="${PROJECTS_DIR:-$(cd "$REPO_ROOT/.." && pwd)}"
-	TARGET_DIR="$PROJECTS_DIR/$PROJECT"
+  PROJECTS_DIR="${PROJECTS_DIR:-$(cd "$REPO_ROOT/.." && pwd)}"
+  TARGET_DIR="$PROJECTS_DIR/$PROJECT"
 fi
 
 TARGET="$TARGET_DIR/flake.nix"
@@ -158,19 +158,19 @@ TARGET="$TARGET_DIR/flake.nix"
 CREATED_FILES=()
 
 if [ "$DRY_RUN" = true ]; then
-	echo "[dry-run] Would create: $TARGET"
-	if [ "$CREATE_GO_MOD" = true ]; then
-		[ -f "$TARGET_DIR/go.mod" ] || echo "[dry-run] Would create: $TARGET_DIR/go.mod"
-		[ -f "$TARGET_DIR/main.go" ] || echo "[dry-run] Would create: $TARGET_DIR/main.go"
-	fi
-	echo "[dry-run] Template: $TEMPLATE"
-	echo "[dry-run] Flags: templ=$USE_TEMPL private-deps=$USE_PRIVATE_DEPS go-mod=$CREATE_GO_MOD"
-	exit 0
+  echo "[dry-run] Would create: $TARGET"
+  if [ "$CREATE_GO_MOD" = true ]; then
+    [ -f "$TARGET_DIR/go.mod" ] || echo "[dry-run] Would create: $TARGET_DIR/go.mod"
+    [ -f "$TARGET_DIR/main.go" ] || echo "[dry-run] Would create: $TARGET_DIR/main.go"
+  fi
+  echo "[dry-run] Template: $TEMPLATE"
+  echo "[dry-run] Flags: templ=$USE_TEMPL private-deps=$USE_PRIVATE_DEPS go-mod=$CREATE_GO_MOD"
+  exit 0
 fi
 
 if [ -f "$TARGET" ]; then
-	echo "ERROR: $TARGET already exists"
-	exit 1
+  echo "ERROR: $TARGET already exists"
+  exit 1
 fi
 
 mkdir -p "$TARGET_DIR"
@@ -185,26 +185,26 @@ sed -i "s|YOUR-PROJECT-NAME|$PROJECT_SED|g" "$TARGET"
 
 # Add templ support if requested (only relevant for go-flake-parts template)
 if [ "$USE_TEMPL" = true ] && [ "$TEMPLATE" = "go-flake-parts" ]; then
-	sed -i '/programs = {/a\              templ.enable = true;' "$TARGET"
-	sed -i '/golangci-lint$/a\                templ,' "$TARGET"
+  sed -i '/programs = {/a\              templ.enable = true;' "$TARGET"
+  sed -i '/golangci-lint$/a\                templ,' "$TARGET"
 fi
 
 # For go-standard template, uncomment the enableTempl line
 if [ "$USE_TEMPL" = true ] && [ "$TEMPLATE" = "go-standard" ]; then
-	sed -i 's/# *enableTempl = true;/enableTempl = true;/' "$TARGET"
+  sed -i 's/# *enableTempl = true;/enableTempl = true;/' "$TARGET"
 fi
 
 # Remove private deps section if not requested (go-flake-parts template only)
 if [ "$USE_PRIVATE_DEPS" = false ] && [ "$TEMPLATE" = "go-flake-parts" ]; then
-	# Anchor on the input declaration line and its own closing brace so the
-	# range cannot spill into the header comment (which also mentions
-	# go-nix-helpers) or orphan the inputs closing brace.
-	sed -i '/^    go-nix-helpers = {/,/^    };/s/^/# /' "$TARGET"
+  # Anchor on the input declaration line and its own closing brace so the
+  # range cannot spill into the header comment (which also mentions
+  # go-nix-helpers) or orphan the inputs closing brace.
+  sed -i '/^    go-nix-helpers = {/,/^    };/s/^/# /' "$TARGET"
 fi
 
 # For go-standard template, add deps section when --private-deps is requested
 if [ "$USE_PRIVATE_DEPS" = true ] && [ "$TEMPLATE" = "go-standard" ]; then
-	sed -i '/description = "One-line description of the project";/a\
+  sed -i '/description = "One-line description of the project";/a\
 \
         # Private dependencies (add each as a flake = false input)\
         deps = {\
@@ -214,22 +214,22 @@ fi
 
 # Create go.mod + main.go skeleton if requested
 if [ "$CREATE_GO_MOD" = true ]; then
-	if [ ! -f "$TARGET_DIR/go.mod" ]; then
-		cat >"$TARGET_DIR/go.mod" <<EOF
+  if [ ! -f "$TARGET_DIR/go.mod" ]; then
+    cat >"$TARGET_DIR/go.mod" <<EOF
 module github.com/larsartmann/$PROJECT
 
 go 1.26
 EOF
-		CREATED_FILES+=("$TARGET_DIR/go.mod")
-	fi
-	if [ ! -f "$TARGET_DIR/main.go" ]; then
-		cat >"$TARGET_DIR/main.go" <<'EOF'
+    CREATED_FILES+=("$TARGET_DIR/go.mod")
+  fi
+  if [ ! -f "$TARGET_DIR/main.go" ]; then
+    cat >"$TARGET_DIR/main.go" <<'EOF'
 package main
 
 func main() {}
 EOF
-		CREATED_FILES+=("$TARGET_DIR/main.go")
-	fi
+    CREATED_FILES+=("$TARGET_DIR/main.go")
+  fi
 fi
 
 echo "Generated $TARGET"
@@ -242,19 +242,19 @@ echo "  4. Paste the got: hash as vendorHash"
 echo "  5. nix flake check"
 
 if [ "$VERBOSE" = true ]; then
-	echo ""
-	echo "Created files:"
-	for f in "${CREATED_FILES[@]}"; do
-		echo "  $f"
-	done
+  echo ""
+  echo "Created files:"
+  for f in "${CREATED_FILES[@]}"; do
+    echo "  $f"
+  done
 fi
 
 if [ "$PUSH" = true ]; then
-	read -rp "Push to GitHub? [y/N] " -n 1 -r
-	echo
-	if [[ $REPLY =~ ^[Yy]$ ]]; then
-		cd "$TARGET_DIR"
-		gh repo create "LarsArtmann/$PROJECT" --private --source=. --push
-		echo "Created and pushed to github.com:LarsArtmann/$PROJECT"
-	fi
+  read -rp "Push to GitHub? [y/N] " -n 1 -r
+  echo
+  if [[ $REPLY =~ ^[Yy]$ ]]; then
+    cd "$TARGET_DIR"
+    gh repo create "LarsArtmann/$PROJECT" --private --source=. --push
+    echo "Created and pushed to github.com:LarsArtmann/$PROJECT"
+  fi
 fi
