@@ -186,7 +186,10 @@ Enable goimports in treefmt programs.
 Enable nixfmt in treefmt programs.
 .TP
 .BR enableShfmt " (bool, default: false)"
-Enable shfmt (shell script formatter) in treefmt programs.
+Enable shfmt (shell script formatter) in treefmt programs. Indentation is
+pinned to 2 spaces with simplify enabled, keeping formatting stable across
+treefmt-nix bumps (upstream 0ba5d672 flipped to tab indent + no simplify).
+Override via your own treefmt block if needed.
 .TP
 .BR enableCompletions " (bool, default: false)"
 Install shell completions for the default binary.
