@@ -32,40 +32,40 @@ cd "$REPO_ROOT" || exit 1
 FULL=false
 CI_JOBS=false
 for arg in "$@"; do
-  case "$arg" in
-  --full) FULL=true ;;
-  --ci-jobs) CI_JOBS=true ;;
-  *) echo "ci-parity: unknown flag '$arg' (try --full or --ci-jobs)" >&2 && exit 2 ;;
-  esac
+	case "$arg" in
+	--full) FULL=true ;;
+	--ci-jobs) CI_JOBS=true ;;
+	*) echo "ci-parity: unknown flag '$arg' (try --full or --ci-jobs)" >&2 && exit 2 ;;
+	esac
 done
 
 SYSTEM=$(nix eval --raw --impure --expr 'builtins.currentSystem')
 fail=0
 
 step() {
-  echo ""
-  echo "=== $* ==="
+	echo ""
+	echo "=== $* ==="
 }
 
 gate() {
-  name=$1
-  shift
-  step "$name"
-  if "$@"; then
-    echo "$name: OK"
-  else
-    echo "$name: FAILED" >&2
-    fail=1
-  fi
+	name=$1
+	shift
+	step "$name"
+	if "$@"; then
+		echo "$name: OK"
+	else
+		echo "$name: FAILED" >&2
+		fail=1
+	fi
 }
 
 gate "Format Check (treefmt --fail-on-change)" nix fmt -- --fail-on-change
 
 gate "shellcheck (style severity, exactly as CI)" \
-  nix run nixpkgs#shellcheck -- scripts/*.sh
+	nix run nixpkgs#shellcheck -- scripts/*.sh
 
 gate "Eval check, ALL systems (darwin/aarch64 eval gaps)" \
-  nix flake check --all-systems --no-build
+	nix flake check --all-systems --no-build
 
 gate "flake.lock freshness (nix flake update must be a no-op)" bash -c '
 	cp flake.lock /tmp/ci-parity-lock-backup
@@ -80,14 +80,14 @@ gate "flake.lock freshness (nix flake update must be a no-op)" bash -c '
 '
 
 if [ "$CI_JOBS" = true ]; then
-  gate "Integration checks (verify moduleTest pureFunctions structural)" \
-    nix build --no-link \
-    ".#checks.$SYSTEM.verify" \
-    ".#checks.$SYSTEM.moduleTest" \
-    ".#checks.$SYSTEM.pureFunctions" \
-    ".#checks.$SYSTEM.structural"
+	gate "Integration checks (verify moduleTest pureFunctions structural)" \
+		nix build --no-link \
+		".#checks.$SYSTEM.verify" \
+		".#checks.$SYSTEM.moduleTest" \
+		".#checks.$SYSTEM.pureFunctions" \
+		".#checks.$SYSTEM.structural"
 
-  gate "Template smoke legs (generate-flake flags)" bash -c '
+	gate "Template smoke legs (generate-flake flags)" bash -c '
 		set -e
 		scripts/generate-flake.sh --dir /tmp/ci-parity-smoke-basic smoke-basic
 		nix-instantiate --parse /tmp/ci-parity-smoke-basic/flake.nix >/dev/null
@@ -106,21 +106,21 @@ if [ "$CI_JOBS" = true ]; then
 		test ! -d /tmp/ci-parity-smoke-dryrun
 	'
 
-  gate "old-nixpkgs moduleTest (auto-default degradation leg)" \
-    nix build --no-link \
-    --override-input nixpkgs github:NixOS/nixpkgs/567a49d1913ce81ac6e9582e3553dd90a955875f \
-    ".#checks.$SYSTEM.moduleTest"
+	gate "old-nixpkgs moduleTest (auto-default degradation leg)" \
+		nix build --no-link \
+		--override-input nixpkgs github:NixOS/nixpkgs/567a49d1913ce81ac6e9582e3553dd90a955875f \
+		".#checks.$SYSTEM.moduleTest"
 fi
 
 if [ "$FULL" = true ]; then
-  gate "FULL flake check (builds everything, incl. containerSmoke)" \
-    nix flake check --all-systems
+	gate "FULL flake check (builds everything, incl. containerSmoke)" \
+		nix flake check --all-systems
 fi
 
 echo ""
 if [ "$fail" -eq 0 ]; then
-  echo "CI-PARITY: ALL GATES GREEN"
+	echo "CI-PARITY: ALL GATES GREEN"
 else
-  echo "CI-PARITY: RED — fix above before pushing" >&2
+	echo "CI-PARITY: RED — fix above before pushing" >&2
 fi
 exit "$fail"

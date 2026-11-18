@@ -24,34 +24,34 @@ root="${1:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
 status_dir="$root/docs/status"
 
 if [ ! -d "$status_dir/archived" ]; then
-  echo "FAIL: $status_dir/archived does not exist (wrong repo root?)" >&2
-  exit 1
+	echo "FAIL: $status_dir/archived does not exist (wrong repo root?)" >&2
+	exit 1
 fi
 
 fail=0
 
 bare=$(grep -rLn '~~' "$status_dir/archived" || true)
 if [ -n "$bare" ]; then
-  echo "FAIL (gate 1: archived completeness) — no strikethrough resolution found in:" >&2
-  printf '  %s\n' "$bare" >&2
-  fail=1
+	echo "FAIL (gate 1: archived completeness) — no strikethrough resolution found in:" >&2
+	printf '  %s\n' "$bare" >&2
+	fail=1
 else
-  echo "PASS (gate 1: archived completeness)"
+	echo "PASS (gate 1: archived completeness)"
 fi
 
 mapfile -d '' files < <(
-  find "$status_dir" "$root/docs/planning" "$root/docs/reviews" \
-    -name '*.md' -print0 2>/dev/null | sort -z
+	find "$status_dir" "$root/docs/planning" "$root/docs/reviews" \
+		-name '*.md' -print0 2>/dev/null | sort -z
 )
 if [ "${#files[@]}" -eq 0 ]; then
-  echo "FAIL: no markdown files found to check (wrong repo root?)" >&2
-  exit 1
+	echo "FAIL: no markdown files found to check (wrong repo root?)" >&2
+	exit 1
 fi
 if python3 "$root/scripts/check-rows.py" "${files[@]}"; then
-  echo "PASS (gate 2: row uniformity)"
+	echo "PASS (gate 2: row uniformity)"
 else
-  echo "FAIL (gate 2): row uniformity — see offenders above" >&2
-  fail=1
+	echo "FAIL (gate 2): row uniformity — see offenders above" >&2
+	fail=1
 fi
 
 exit "$fail"
