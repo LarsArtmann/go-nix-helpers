@@ -319,6 +319,52 @@ the module's default `enableShfmt = false`.
 
 ---
 
+## Case studies (2026-11-18 fleet migration)
+
+### BuildFlow — bespoke machinery preserved, module for the package
+
+The largest consumer (25 private dep inputs, 9 sub-modules, a tools/
+go.mod island). What made it work:
+
+- `perSystem = { ... }: { _module.args.pkgs = <allowUnfree import>; }` —
+  one nixpkgs for the module AND every hand-rolled perSystem output.
+- `enableDevShells = false` + `enableOverlay = false` — BuildFlow's shells
+  need its own binary on PATH and a `go()` guard; its overlay exposes more
+  than the module's package. The module still builds the package + checks.
+- `validatePrivateDeps = false` — tools/go.mod carries PUBLIC deps resolved
+  via proxy; the module's LarsArtmann-pattern validation does not apply.
+- `version` set explicitly to the short rev (the default is the FULL rev).
+- The old sanitize wrapper (stray-symlink scrub) is DEAD WEIGHT since
+  go-nix-helpers afc057d — mkPreparedSource sanitizes dep copies itself.
+
+### KeyCountdown — the clean simple case
+
+Public deps only: no `deps` option at all, `src` via fileset unions,
+`enableTempl` + `templGenerationPolicy = "preBuild"` + an `extraBuildAttrs`
+preBuild running `sqlc generate` + `templ generate`. Gotcha worth copying:
+a flake.lock nixpkgs predating the repo's go.mod floor makes the module's
+eval-time floor check FIRE (`goModFloorMessage`) — refresh nixpkgs, not the
+check.
+
+### overview — proxyVendor vs the vendored FOD
+
+A migrated consumer that ALSO carried `extraBuildAttrs.proxyVendor = true`
+silently broke its main build: the option merges AFTER the module's forced
+false (consumer `//` wins), so the main build read proxy-layout `@v/…zip`
+caches against the module's vendored FOD hash. Rule: with `deps` set, NEVER
+re-add proxyVendor — the module's layout and vendorHash are a matched pair.
+
+### templ CLI pins — one option, three consumers
+
+`templCliPackage = pkgs: pkgs.templ.overrideAttrs (_: { … })` feeds the
+package build, devShells, AND treefmt's templ program. Take the function
+form — the flake-level block has no pkgs in scope. (bank-sync keeps its
+perSystem `templCli` binding instead: its treefmt templ formatter is a
+go-wrapping writeShellApplication the module cannot express, and its build
+never invokes templ — committed `*_templ.go`.)
+
+---
+
 ## Need help?
 
 Open an [issue](https://github.com/LarsArtmann/go-nix-helpers/issues) if you
