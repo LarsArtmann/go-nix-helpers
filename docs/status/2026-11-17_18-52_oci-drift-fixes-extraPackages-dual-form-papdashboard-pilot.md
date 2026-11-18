@@ -76,7 +76,7 @@ Nothing this session shipped broken or reverted. The honest near-misses, ranked:
 **New this session (small, local):**
 
 | #  | Task                                                                                                                                                               | Effort |
-| -- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------ |
+| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------ |
 | ~~5~~ done — migration-guide.md early-adopter recipe: --override-input verify + --no-verify commit + relock at merge (c/1 companion) | ~~go-nix-helpers AGENTS.md: add the eval-bound-hooks-vs-unpushed-module gotcha (c/1)~~ | ~~15min~~ |
 | ~~6~~ **Superseded — T47 merge landed the pilot docs on PapDashboard master; later daemon sweeps re-carried the tree.** | ~~Same gotcha into `docs/migration-guide.md` as the early-adopter recipe~~ | ~~15min~~ |
 | ~~7~~ **Superseded — T47 merge landed the pilot docs on PapDashboard master; later daemon sweeps re-carried the tree.** | ~~Run `buildflow format` over the pilot branch docs (dprint never saw them; c/2)~~ | ~~10min~~ |

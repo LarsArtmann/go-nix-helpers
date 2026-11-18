@@ -97,7 +97,7 @@ No code, builds, or tests were touched this session, so nothing is broken **in t
 ### P2 — implement tier 1 (vendorHash + deps auto-wire)
 
 | #  | Task                                                                                                                                                                                       | Impact | Effort | Category      |
-| -- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------ | ------ | ------------- |
+| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------ | ------ | ------------- |
 | 7  | `privateRequiresFromGoMod` pure function (parse go.mod requires matching privateDepPattern, minus publicDeps) **→ routed — ROADMAP Theme 1 (tier-1 vendorHash/deps auto-wire, unshipped)** | High   | M      | Feature       |
 | 8  | Property tests for #7 in `test-pure-functions.nix` (idempotence, /vN paths, publicDeps exclusion, malformed go.mod) **→ routed — ROADMAP Theme 1**                                         | High   | M      | Quality       |
 | 9  | Input-name→repo-name matching pure function + "add input X" error message generator **→ routed — ROADMAP Theme 1**                                                                         | High   | S      | Feature       |
@@ -112,7 +112,7 @@ No code, builds, or tests were touched this session, so nothing is broken **in t
 ### P3 — implement tier 2 (identity + tool defaults)
 
 | #  | Task                                                                                                                                                                                        | Impact | Effort | Category      |
-| -- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | ------ | ------------- |
+| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | ------ | ------------- |
 | 17 | `pname` default = `repoName self` (store-path base name); test dirty-tree case **→ routed — ROADMAP Theme 1 (pname default idea)**                                                          | Medium | S      | Feature       |
 | 18 | `description` default = first non-heading README line, with pathExists guard + fallback **→ routed — ROADMAP Theme 1 (README description idea)**                                            | Medium | S      | Feature       |
 | 19 | templ auto-detect: go.mod requires `github.com/a-h/templ` → enableTempl default true **→ routed — ROADMAP Theme 1 (templ auto-detect idea)**                                                | Medium | S      | Feature       |
@@ -123,7 +123,7 @@ No code, builds, or tests were touched this session, so nothing is broken **in t
 ### P4 — implement tier 3 (monorepo + observability)
 
 | #  | Task                                                                                                                                                               | Impact | Effort | Category |
-| -- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------ | ------ | -------- |
+| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------ | ------ | -------- |
 | 23 | Generalize `walkTempl` into a reusable source walker (files by predicate, excludes testdata/vendor/example) **→ routed — ROADMAP Theme 6 (walker generalization)** | Medium | M      | Refactor |
 | 24 | `cmd/*/main.go` discovery → default `packages` entries; define merge semantics with explicit `packages` **→ routed — ROADMAP Theme 1 (monorepo auto-discovery)**   | Medium | M      | Feature  |
 | 25 | `subPackages` smart default (root main.go vs single cmd/ vs multi) **→ routed — ROADMAP Theme 1 (subPackages auto-detect)**                                        | Medium | M      | Feature  |
