@@ -359,6 +359,36 @@ correlate image tags with git revisions — you trade reproducible no-op pushes
 for git-readable tags. `created` follows the same logic: zero-epoch default is
 byte-reproducible; a real timestamp breaks bit-for-bit rebuilds.
 
+### Multi-arch images (recipe, not an app)
+
+The module emits per-system images (`packages.<system>.<pname>-image`); a
+multi-arch manifest LIST is an assembly step over several of them, and
+nix2container at the pinned rev (42d1df94) has no manifest-list primitive.
+The honest recipe is CI-side, per GitHub's native arm64 runners:
+
+```yaml
+# .github/workflows: one job per arch, then a merge job
+strategy:
+  matrix:
+    runner: [ubuntu-latest, ubuntu-24.04-arm]
+steps:
+  - uses: actions/checkout@v4
+  - uses: cachix/install-nix-action@v31
+  - run: nix build .#<pname>-image
+  - run: nix run .#<pname>-image-load   # needs docker on the runner
+  - run: docker tag <image> ghcr.io/<owner>/<name>:${{ github.sha }}-${{ matrix.arch }}
+  - run: docker push ...
+# merge job:
+#   docker manifest create ghcr.io/<owner>/<name>:<tag> \
+#     ghcr.io/<owner>/<name>:<sha>-amd64 ghcr.io/<owner>/<name>:<sha>-arm64
+#   docker manifest push
+```
+
+Building the OTHER arch's image locally (`nix build .#checks.aarch64-linux...`)
+needs binfmt/QEMU emulation and a full emulated Go build — a footgun the module
+deliberately does not wire into an app. Revisit when nix2container ships a
+manifest-list builder.
+
 ---
 
 ## Nix 2.34 tryEval Assertion Pattern
