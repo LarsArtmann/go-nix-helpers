@@ -1758,11 +1758,13 @@ in
           # needs a root-anchoring file.
           projectRootFile = if goModExists then "go.mod" else "flake.nix";
           programs = {
-            gofumpt.enable = cfg.enableGofumpt;
-            goimports.enable = cfg.enableGoimports;
-            nixfmt.enable = cfg.enableNixfmt;
-            templ.enable = cfg.enableTempl;
-            shfmt.enable = cfg.enableShfmt;
+            # mkDefault: a consumer's own treefmt block (e.g. a pinned
+            # templ CLI overriding the stock one) merges without conflicts.
+            gofumpt.enable = lib.mkDefault cfg.enableGofumpt;
+            goimports.enable = lib.mkDefault cfg.enableGoimports;
+            nixfmt.enable = lib.mkDefault cfg.enableNixfmt;
+            templ.enable = lib.mkDefault cfg.enableTempl;
+            shfmt.enable = lib.mkDefault cfg.enableShfmt;
           };
         };
       };
