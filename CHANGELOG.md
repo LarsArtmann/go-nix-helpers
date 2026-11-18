@@ -5,10 +5,24 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
-This project has not made a tagged release yet; all changes below are in
-`[Unreleased]`.
+This project's first tagged release is **0.1.0** (2026-11-18); everything
+below through that section shipped before or with it.
 
 ## [Unreleased]
+
+### Added
+
+- Nothing yet.
+
+### Fixed
+
+- Nothing yet.
+
+## [0.1.0] - 2026-11-18
+
+First tagged release. Consumed as a Nix flake (git ref or tag), not a Go
+module — pin with `url = "git+ssh://git@github.com/LarsArtmann/go-nix-helpers?ref=v0.1.0"`
+or `github:LarsArtmann/go-nix-helpers/v0.1.0`.
 
 ### Added
 
