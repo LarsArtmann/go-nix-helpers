@@ -99,7 +99,7 @@
         # treefmt-nix, nix2container or systems as inputs.
         # Consumer needs only: nixpkgs, flake-parts, go-nix-helpers.
         flakeModules.go-standard =
-          { config, ... }:
+          { ... }:
           {
             imports = [
               inputs.treefmt-nix.flakeModule
