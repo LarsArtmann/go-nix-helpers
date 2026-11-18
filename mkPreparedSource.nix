@@ -376,6 +376,15 @@ pkgs.stdenv.mkDerivation {
     mkdir -p _local_deps
     ${copyDeps}
     chmod -R u+w _local_deps
+    # Stray `result`/`result-*` symlinks committed in dep repos poison the
+    # wholesale copy: the symlink targets a store path that only exists on
+    # the machine that ran the dep's build, so the prepared-source FOD's
+    # noBrokenSymlinks check dies everywhere else (linter-autoconfigure-sdk
+    # master, 2026-10-05). Build artifacts are never source — strip them
+    # here so every consumer gets sanitized dep trees for free (formerly
+    # each consumer hand-rolled a sanitize wrapper around this helper).
+    find _local_deps -type l -name 'result' -delete
+    find _local_deps -type l -name 'result-*' -delete
     # Strip exec bits from _local_deps regular files: stdenv's fixupPhase
     # auto-runs patchShebangs on every executable in the prepared tree,
     # rewriting shebangs to absolute store paths. `go mod vendor` then copies
