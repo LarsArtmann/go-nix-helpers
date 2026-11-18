@@ -1440,68 +1440,68 @@ in
           // lib.optionalAttrs containerEnabled { "${containerPackageName}-image" = containerImage; };
 
         apps =
-        # Go runners only make sense where a Go module exists; a pure-Nix
-        # consumer (library self-hosting) gets no misleading test app.
-        (lib.optionalAttrs goModExists {
-        # mkDefault: a consumer's own apps.<name> (e.g. a test app that
-        # runs templ generate first, or tests a second Go module) wins
-        # over these generic runners without mkForce gymnastics.
-        test = lib.mkDefault (
-        mkApp "run-test" [ goPkg ] "go test -race -v -coverprofile=coverage.out ./..."
-        );
-        })
-        // lib.optionalAttrs cfg.enableDefaultPackage {
-          # Rides the main package build (runs its binary) — library
-          # workspaces without one declare their own runner.
-          default = lib.mkDefault {
-            type = "app";
-            program = lib.getExe config.packages.default;
-            meta.description = "Run the ${cfg.pname} binary";
-          };
-        }
-        // lib.optionalAttrs (cfg.enableGolangciLint && goModExists) {
-          lint = lib.mkDefault (
-            mkApp "run-lint" [
-              goPkg
-              pkgs.golangci-lint
-            ] "golangci-lint run ./..."
-          );
-        }
-        //
-          lib.optionalAttrs (cfg.enableGofumpt || cfg.enableGoimports || cfg.enableNixfmt || cfg.enableTempl)
-            {
-              fmt = lib.mkDefault {
-                type = "app";
-                program = lib.getExe (
-                  pkgs.writeShellApplication {
-                    name = "run-fmt";
-                    runtimeInputs = [ config.treefmt.build.wrapper ];
-                    text = "treefmt";
-                  }
-                );
-                meta.description = "Format the repository tree with treefmt";
-              };
-            }
-        // lib.mapAttrs' (
-          name: pkg:
-          lib.nameValuePair name {
-            type = "app";
-            program = lib.getExe pkg;
-            meta.description = "Run the ${name} helper app";
+          # Go runners only make sense where a Go module exists; a pure-Nix
+          # consumer (library self-hosting) gets no misleading test app.
+          (lib.optionalAttrs goModExists {
+            # mkDefault: a consumer's own apps.<name> (e.g. a test app that
+            # runs templ generate first, or tests a second Go module) wins
+            # over these generic runners without mkForce gymnastics.
+            test = lib.mkDefault (
+              mkApp "run-test" [ goPkg ] "go test -race -v -coverprofile=coverage.out ./..."
+            );
+          })
+          // lib.optionalAttrs cfg.enableDefaultPackage {
+            # Rides the main package build (runs its binary) — library
+            # workspaces without one declare their own runner.
+            default = lib.mkDefault {
+              type = "app";
+              program = lib.getExe config.packages.default;
+              meta.description = "Run the ${cfg.pname} binary";
+            };
           }
-        ) extraPackages
-        // lib.optionalAttrs containerEnabled {
-          "${containerPackageName}-image-load" = lib.mkDefault {
-            type = "app";
-            program = lib.getExe containerImage.copyToDockerDaemon;
-            meta.description = "Load ${containerImageName} into the local Docker daemon (skopeo — no docker build)";
+          // lib.optionalAttrs (cfg.enableGolangciLint && goModExists) {
+            lint = lib.mkDefault (
+              mkApp "run-lint" [
+                goPkg
+                pkgs.golangci-lint
+              ] "golangci-lint run ./..."
+            );
+          }
+          //
+            lib.optionalAttrs (cfg.enableGofumpt || cfg.enableGoimports || cfg.enableNixfmt || cfg.enableTempl)
+              {
+                fmt = lib.mkDefault {
+                  type = "app";
+                  program = lib.getExe (
+                    pkgs.writeShellApplication {
+                      name = "run-fmt";
+                      runtimeInputs = [ config.treefmt.build.wrapper ];
+                      text = "treefmt";
+                    }
+                  );
+                  meta.description = "Format the repository tree with treefmt";
+                };
+              }
+          // lib.mapAttrs' (
+            name: pkg:
+            lib.nameValuePair name {
+              type = "app";
+              program = lib.getExe pkg;
+              meta.description = "Run the ${name} helper app";
+            }
+          ) extraPackages
+          // lib.optionalAttrs containerEnabled {
+            "${containerPackageName}-image-load" = lib.mkDefault {
+              type = "app";
+              program = lib.getExe containerImage.copyToDockerDaemon;
+              meta.description = "Load ${containerImageName} into the local Docker daemon (skopeo — no docker build)";
+            };
+            "${containerPackageName}-image-push" = lib.mkDefault {
+              type = "app";
+              program = lib.getExe containerImage.copyToRegistry;
+              meta.description = "Push ${containerImageName} to its registry (skopeo — authenticate with docker login first)";
+            };
           };
-          "${containerPackageName}-image-push" = lib.mkDefault {
-            type = "app";
-            program = lib.getExe containerImage.copyToRegistry;
-            meta.description = "Push ${containerImageName} to its registry (skopeo — authenticate with docker login first)";
-          };
-        };
 
         devShells = lib.optionalAttrs cfg.enableDevShells {
           default = pkgs.mkShell (

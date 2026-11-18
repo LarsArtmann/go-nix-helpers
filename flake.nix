@@ -56,22 +56,20 @@
         enableGoimports = false;
         enableNixfmt = true;
         enableShfmt = true;
-        devShellExtraPackages =
-          ps:
-          [
-            ps.git
-            ps.man
-            ps.nix
-            (ps.stdenv.mkDerivation {
-              name = "go-nix-helpers-manpages";
-              dontUnpack = true;
-              installPhase = ''
-                mkdir -p $out/share/man/man5
-                cp ${./docs/man/go-standard.5} $out/share/man/man5/
-                cp ${./docs/man/mkPreparedSource.5} $out/share/man/man5/
-              '';
-            })
-          ];
+        devShellExtraPackages = ps: [
+          ps.git
+          ps.man
+          ps.nix
+          (ps.stdenv.mkDerivation {
+            name = "go-nix-helpers-manpages";
+            dontUnpack = true;
+            installPhase = ''
+              mkdir -p $out/share/man/man5
+              cp ${./docs/man/go-standard.5} $out/share/man/man5/
+              cp ${./docs/man/mkPreparedSource.5} $out/share/man/man5/
+            '';
+          })
+        ];
         devShellHook = ''
           echo "go-nix-helpers dev shell — nix $(nix --version)"
           echo "Man pages: man go-standard / man mkPreparedSource"
@@ -194,16 +192,8 @@
               config = smokeConfig;
               arch = pkgs.go.GOARCH;
             };
-          # Man pages for go-standard and mkPreparedSource
-          manPages = pkgs.stdenv.mkDerivation {
-            name = "go-nix-helpers-manpages";
-            dontUnpack = true;
-            installPhase = ''
-              mkdir -p $out/share/man/man5
-              cp ${./docs/man/go-standard.5} $out/share/man/man5/
-              cp ${./docs/man/mkPreparedSource.5} $out/share/man/man5/
-            '';
-          };
+          # Man pages: kept only for the devShell — see
+          # go-standard.devShellExtraPackages, which builds them inline.
         in
         {
           # -- Checks (nix flake check) -------------------------------------------
@@ -364,28 +354,10 @@
             };
           };
 
-          # -- Dev Shell ----------------------------------------------------------
-          devShells.default = pkgs.mkShellNoCC {
-            packages = [
-              pkgs.nixfmt
-              pkgs.nix
-              pkgs.git
-              pkgs.man
-              manPages
-            ];
-            shellHook = ''
-              echo "go-nix-helpers dev shell — nix $(nix --version)"
-              echo "Man pages: man go-standard / man mkPreparedSource"
-            '';
-          };
-
-          # -- Formatter (nix fmt) ------------------------------------------------
-          # Pure Nix repo — only nixfmt; no gofumpt/goimports.
-          treefmt = {
-            projectRootFile = "flake.nix";
-            programs.nixfmt.enable = true;
-            programs.shfmt.enable = true;
-          };
+          # devShells.default/ci and the treefmt config come from the
+          # go-standard module (see imports above) — devShellExtraPackages,
+          # devShellHook, enableNixfmt/enableShfmt drive them. apps.fmt and
+          # checks.format/treefmt likewise.
         };
     };
 }
