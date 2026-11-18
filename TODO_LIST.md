@@ -100,6 +100,7 @@
 | T80 | (repo: project-meta / monitor365) billing canary: alert when GitHub Actions jobs report the payments-failed annotation                           | TODO    | M      | round-7 report §e.1 (single point of failure for fleet verification)                        |
 | T81 | mkIf-undefined-check lint rule candidate (statix/nix-checker class) — the attrset-omission idiom vs the flake-parts mkIf trap                    | TODO    | M      | bit crm + file-and-image-renamer + mr-sync (round-7 report §e.3); idiom now in 3 repos      |
 | T82 | (repo: index) templCliPackage adoption (overlay pin → module option) when its owning session touches it                                          | TODO    | S      | round-7 report §a (f.37 survey verdict)                                                     |
+| T83 | (repo: wise-go) dprint-format check fails in CI: remote plugin wasm fetch is unstable in the sandbox (exit 20; same drv pre-dates round 7). Recipe: local plugin paths via `nix build .#dprint-plugins` / BUILDFLOW_DPRINT_PLUGINS | TODO    | M      | CI runs 44403646095 + post-pin-fix run; BuildFlow preflight dprint-remote-plugins warning |
 
 ## Decided against / rejected
 
