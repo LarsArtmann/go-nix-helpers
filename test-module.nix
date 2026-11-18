@@ -158,7 +158,7 @@ let
     (assertCheck "vendorHash default is null" (cfg.vendorHash == null) "null")
     (assertCheck "src option exists" (cfg ? src) "src attr")
     (assertCheck "description option exists" (cfg ? description) "description attr")
-    (assertCheck "subPackages default is [\".\"]" (cfg.subPackages == [ "." ]) "[\".\"]")
+    (assertCheck "subPackages default is [] (auto-discovery)" (cfg.subPackages == [ ]) "[]")
     (assertCheck "goPkgAttr default is null (auto)" (cfg.goPkgAttr == null) "null")
     (assertCheck "goPkgOverride default is identity" (
       (cfg.goPkgOverride pkgs.go_1_26) == pkgs.go_1_26

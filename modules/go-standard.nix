@@ -98,8 +98,16 @@ in
 
     subPackages = lib.mkOption {
       type = lib.types.listOf lib.types.str;
-      default = [ "." ];
-      description = "Subpackages to build";
+      default = [ ];
+      description = ''
+        Go subPackages to build. Empty (default) means nixpkgs'
+        auto-discovery: every non-vendor directory containing Go files is
+        built, so repositories with a cmd/<name>/ main package work without
+        configuration. Setting [ "." ] would build ONLY the module root —
+        a silent no-binary build for cmd/-layout repos (found via
+        bank-sync's catalog-drift check 2026-11-18: the package built
+        green with an empty bin/).
+      '';
     };
 
     goPkgAttr = lib.mkOption {
@@ -457,8 +465,8 @@ in
           options = {
             subPackages = lib.mkOption {
               type = lib.types.listOf lib.types.str;
-              default = [ "." ];
-              description = "Go subPackages to build for this binary";
+              default = [ ];
+              description = "Go subPackages to build for this binary; empty means nixpkgs auto-discovery — pin explicitly (e.g. [ \"cmd/server\" ]) in monorepos so one entry cannot sweep in sibling binaries";
             };
             description = lib.mkOption {
               type = lib.types.str;

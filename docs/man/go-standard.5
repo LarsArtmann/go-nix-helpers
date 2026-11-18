@@ -53,8 +53,11 @@ Short description for package meta.
 .BR systems " (list str, default: [\"x86_64-linux\" \"aarch64-linux\" \"x86_64-darwin\" \"aarch64-darwin\"])"
 Systems to build for. Override to restrict or extend.
 .TP
-.BR subPackages " (list str, default: [\".\"])"
-Go subPackages to build.
+.BR subPackages " (list str, default: [])"
+Go subPackages to build. Empty means nixpkgs auto-discovery: every
+non-vendor directory containing Go files is built, so cmd/<name>/ main
+packages work without configuration. Setting ["."] builds ONLY the module
+root — a silent no-binary build for cmd/-layout repos.
 .TP
 .BR packages " (attrs, default: {})"
 Additional packages for monorepo support. Each entry generates a separate
