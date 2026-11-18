@@ -101,6 +101,7 @@
 | T81 | mkIf-undefined-check lint rule candidate (statix/nix-checker class) — the attrset-omission idiom vs the flake-parts mkIf trap                    | TODO    | M      | bit crm + file-and-image-renamer + mr-sync (round-7 report §e.3); idiom now in 3 repos      |
 | T82 | (repo: index) templCliPackage adoption (overlay pin → module option) when its owning session touches it                                          | TODO    | S      | round-7 report §a (f.37 survey verdict)                                                     |
 | T83 | (repo: wise-go) dprint-format check fails in CI: remote plugin wasm fetch is unstable in the sandbox (exit 20; same drv pre-dates round 7). Recipe: local plugin paths via `nix build .#dprint-plugins` / BUILDFLOW_DPRINT_PLUGINS | TODO    | M      | CI runs 44403646095 + post-pin-fix run; BuildFlow preflight dprint-remote-plugins warning |
+| T84 | (repo: samber-linter) restructure TestExitCodeContract: run the binary via exec with absolute paths (no t.Chdir) so subtests can take t.Parallel — ends the paralleltest/golines/nolintlint tug-of-war (lint red after 4 iterations) | TODO    | S      | CI runs 44403444230..2f189df; round-7 comprehensive report §d.3/§b                            |
 
 ## Decided against / rejected
 
