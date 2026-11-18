@@ -5,6 +5,9 @@
 # isRouted (BOTH the plain `→ routed` form and the writer's bold
 # `**→ verdict**` marker form). Upstream tests cover both forms
 # (internal/docsrows/rows_test.go "routed arrow" / "plain routed arrow").
+# Re-verified 2026-11-18 against upstream 7f06fbc: internal/docsrows
+# scanner (scan.go/rows.go/check.go) byte-identical to ad115e1 — only a
+# test-file formatter commit in between; no semantic re-vendor needed.
 # Re-vendor on upstream docsrows changes; wired into `nix flake check`
 # via check-docs-annotations.sh.
 """Per-row completeness checker for annotate passes.

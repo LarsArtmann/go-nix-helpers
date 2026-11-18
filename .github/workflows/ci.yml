@@ -99,6 +99,13 @@ jobs:
     # stale pin below the consumer's go.mod floor throws via the floor
     # check (asserted as the correct outcome). Catches hardcoded-version
     # regressions that only today's nixpkgs would hide.
+    # PIN REFRESH POLICY: bump the old pin ONLY when nixpkgs' newest
+    # go_1_XX branch rolls over (a NEW major Go lands in unstable) — the
+    # pin must always represent exactly one major-Go-older era, refreshed
+    # deliberately with a green run here, never as part of a routine
+    # lock sweep (a too-fresh pin silently degrades this job to a second
+    # current-nixpkgs test; a too-old one eventually fails on unrelated
+    # attr drift).
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
