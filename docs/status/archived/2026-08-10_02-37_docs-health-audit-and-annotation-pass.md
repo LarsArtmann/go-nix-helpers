@@ -218,86 +218,86 @@ name). This will rot less than line numbers but still couples to file structure.
 
 | #     | Task                                                                  | Impact  | Effort    |
 | ----- | --------------------------------------------------------------------- | ------- | --------- |
-| ~~1~~ | ~~Annotate report 02-51 section C (C1–C3) inline~~                    | ~~Med~~ | ~~10min~~ |
-| ~~2~~ | ~~Annotate report 07-38 section C table inline~~                      | ~~Med~~ | ~~10min~~ |
-| ~~3~~ | ~~Annotate report 02-51 section E items inline (or explicitly SKIP)~~ | ~~Low~~ | ~~15min~~ |
-| ~~4~~ | ~~Annotate feedback file problem sections §1–§4 inline~~              | ~~Low~~ | ~~10min~~ |
-| ~~5~~ | ~~Trash `verify-result` symlink~~                                     | ~~Low~~ | ~~1min~~  |
+| ~~1~~ | ~~Annotate report 02-51 section C (C1–C3) inline~~                    | ~~Med~~ | ~~10min~~ **→ still open — 02-51 §C1–C3 still carry no verdicts (2026-11-17 corpus sweep left bare prose unflagged; the §C facts are moot — docs/status/archived/ has existed since 2026-08-10)** |
+| ~~2~~ | ~~Annotate report 07-38 section C table inline~~                      | ~~Med~~ | ~~10min~~ done (docs-health pass 2026-09-24) |
+| ~~3~~ | ~~Annotate report 02-51 section E items inline (or explicitly SKIP)~~ | ~~Low~~ | ~~15min~~ done — 02-51 §E items 1–9 all carry verdicts (done / Won't implement) in the archived file today |
+| ~~4~~ | ~~Annotate feedback file problem sections §1–§4 inline~~              | ~~Low~~ | ~~10min~~ done — feedback doc banner "ALL THREE SHIPPED (A + B + C)" with fixes struck; filed under docs/feedback/processed/ |
+| ~~5~~ | ~~Trash `verify-result` symlink~~                                     | ~~Low~~ | ~~1min~~ done — no verify-result symlink exists in the repo root today; .gitignore covers result / result-* / test-result  |
 
 ### High impact (from TODO_LIST, carried forward)
 
 | #      | Task                                                                   | Impact   | Effort    |
 | ------ | ---------------------------------------------------------------------- | -------- | --------- |
-| ~~6~~  | ~~Add `--go-mod` and `--private-deps` variants to CI smoke-test job~~  | ~~High~~ | ~~30min~~ |
-| ~~7~~  | ~~Add behavioral test for GOPRIVATE with custom `privateGlobPattern`~~ | ~~High~~ | ~~1h~~    |
-| ~~8~~  | ~~Extend `extraBuildAttrs` merge protection to `buildInputs`, etc.~~   | ~~High~~ | ~~30min~~ |
-| ~~9~~  | ~~Add `shellcheck` to CI~~                                             | ~~High~~ | ~~20min~~ |
-| ~~10~~ | ~~Add `shfmt` to treefmt~~                                             | ~~High~~ | ~~20min~~ |
+| ~~6~~  | ~~Add `--go-mod` and `--private-deps` variants to CI smoke-test job~~  | ~~High~~ | ~~30min~~ done — CI smoke job runs --go-mod, --private-deps and combined variants (.github/workflows/ci.yml) |
+| ~~7~~  | ~~Add behavioral test for GOPRIVATE with custom `privateGlobPattern`~~ | ~~High~~ | ~~1h~~ done — GOPRIVATE devShell behavioral assertions incl. custom privateGlobPattern (test-module.nix)    |
+| ~~8~~  | ~~Extend `extraBuildAttrs` merge protection to `buildInputs`, etc.~~   | ~~High~~ | ~~30min~~ done — module concatenates buildInputs/checkInputs/configureFlags (modules/go-standard.nix:1281-1283) |
+| ~~9~~  | ~~Add `shellcheck` to CI~~                                             | ~~High~~ | ~~20min~~ done — shellcheck job in CI runs nix run nixpkgs#shellcheck -- scripts/*.sh (added by the 05-04 session) |
+| ~~10~~ | ~~Add `shfmt` to treefmt~~                                             | ~~High~~ | ~~20min~~ done — enableShfmt option + treefmt wiring (modules/go-standard.nix:442,1963) |
 
 ### Medium impact (from TODO_LIST)
 
 | #      | Task                                                                        | Impact  | Effort    |
 | ------ | --------------------------------------------------------------------------- | ------- | --------- |
-| ~~11~~ | ~~Property test for `stripVersionSuffix`~~                                  | ~~Med~~ | ~~30min~~ |
-| ~~12~~ | ~~Property test for `repoName`~~                                            | ~~Med~~ | ~~30min~~ |
-| ~~13~~ | ~~`vendorHash` placeholder detection~~                                      | ~~Med~~ | ~~30min~~ |
-| ~~14~~ | ~~`nix flake show` test~~                                                   | ~~Med~~ | ~~30min~~ |
-| ~~15~~ | ~~Update `docs/architecture.d2` for `privateGlobPattern` + `enableNixfmt`~~ | ~~Med~~ | ~~20min~~ |
-| ~~16~~ | ~~`--dry-run` flag for `generate-flake.sh`~~                                | ~~Med~~ | ~~20min~~ |
-| ~~17~~ | ~~Deepen behavioral tests (`buildFlags`, `ldflags`, `proxyVendor`)~~        | ~~Med~~ | ~~1h~~    |
-| ~~18~~ | ~~Negative test for `enableCompletions` warning~~                           | ~~Med~~ | ~~30min~~ |
-| ~~19~~ | ~~Test for `publicDeps` with `/v2` versioned paths~~                        | ~~Med~~ | ~~20min~~ |
-| ~~20~~ | ~~`treefmt.config` inspection test~~                                        | ~~Med~~ | ~~30min~~ |
+| ~~11~~ | ~~Property test for `stripVersionSuffix`~~                                  | ~~Med~~ | ~~30min~~ done — checks.pureFunctions property suite covers stripVersionSuffix (test-pure-functions.nix) |
+| ~~12~~ | ~~Property test for `repoName`~~                                            | ~~Med~~ | ~~30min~~ done — checks.pureFunctions property suite covers repoName (test-pure-functions.nix) |
+| ~~13~~ | ~~`vendorHash` placeholder detection~~                                      | ~~Med~~ | ~~30min~~ done — eval-time vendorHash placeholder warning (modules/go-standard.nix:1146) |
+| ~~14~~ | ~~`nix flake show` test~~                                                   | ~~Med~~ | ~~30min~~ done — shipped as checks.structural verifying flake outputs by name (flake.nix:238) — no separate flake-show CLI test |
+| ~~15~~ | ~~Update `docs/architecture.d2` for `privateGlobPattern` + `enableNixfmt`~~ | ~~Med~~ | ~~20min~~ done — docs/architecture.d2 lists privateGlobPattern / enableNixfmt / enableShfmt |
+| ~~16~~ | ~~`--dry-run` flag for `generate-flake.sh`~~                                | ~~Med~~ | ~~20min~~ done — --dry-run implemented + CI smoke step (scripts/generate-flake.sh; ci.yml) |
+| ~~17~~ | ~~Deepen behavioral tests (`buildFlags`, `ldflags`, `proxyVendor`)~~        | ~~Med~~ | ~~1h~~ done — derivation-level assertions for buildFlags / ldflags / proxyVendor (test-module.nix)    |
+| ~~18~~ | ~~Negative test for `enableCompletions` warning~~                           | ~~Med~~ | ~~30min~~ done — enableCompletions unsupported-warning negative assertions (test-module.nix) |
+| ~~19~~ | ~~Test for `publicDeps` with `/v2` versioned paths~~                        | ~~Med~~ | ~~20min~~ done — integration Test 7 covers publicDeps versioned paths (matching fixed `a199f6b`) |
+| ~~20~~ | ~~`treefmt.config` inspection test~~                                        | ~~Med~~ | ~~30min~~ done — treefmt-programs inspection assertions (test-module.nix) |
 
 ### Low impact / Polish
 
 | #      | Task                                                    | Impact  | Effort    |
 | ------ | ------------------------------------------------------- | ------- | --------- |
-| ~~21~~ | ~~`--verbose` flag for `generate-flake.sh`~~            | ~~Low~~ | ~~15min~~ |
-| ~~22~~ | ~~macOS CI badge in README~~                            | ~~Low~~ | ~~10min~~ |
-| ~~23~~ | ~~`--template` listing in help text~~                   | ~~Low~~ | ~~10min~~ |
-| ~~24~~ | ~~FAQ entry for mixed-owner deps~~                      | ~~Low~~ | ~~15min~~ |
-| ~~25~~ | ~~Clean up `collectMissingRequires` temp file in trap~~ | ~~Low~~ | ~~10min~~ |
-| ~~26~~ | ~~`stripVersionSuffix` edge case tests~~                | ~~Low~~ | ~~15min~~ |
-| ~~27~~ | ~~`nix flake check --all-systems` in CI~~               | ~~Low~~ | ~~15min~~ |
-| ~~28~~ | ~~Cache nix-store in CI smoke-test job~~                | ~~Low~~ | ~~15min~~ |
-| ~~29~~ | ~~Run integration tests on macOS~~                      | ~~Low~~ | ~~30min~~ |
-| ~~30~~ | ~~Extract `postPatch` script to separate `.sh` file~~   | ~~Low~~ | ~~30min~~ |
+| ~~21~~ | ~~`--verbose` flag for `generate-flake.sh`~~            | ~~Low~~ | ~~15min~~ done — --verbose implemented + CI smoke step (ci.yml) |
+| ~~22~~ | ~~macOS CI badge in README~~                            | ~~Low~~ | ~~10min~~ **Won't implement — the single CI badge already covers the macOS matrix leg (no change needed; README.md:3 today).** |
+| ~~23~~ | ~~`--template` listing in help text~~                   | ~~Low~~ | ~~10min~~ done — --list-templates flag + "Templates:" section in help text (scripts/generate-flake.sh) |
+| ~~24~~ | ~~FAQ entry for mixed-owner deps~~                      | ~~Low~~ | ~~15min~~ done — README FAQ "How do I use deps with non-LarsArtmann repos?" (README.md) |
+| ~~25~~ | ~~Clean up `collectMissingRequires` temp file in trap~~ | ~~Low~~ | ~~10min~~ done — trap 'rm -f go.mod.requires.tmp' EXIT in postPatch (mkPreparedSource.nix:409) |
+| ~~26~~ | ~~`stripVersionSuffix` edge case tests~~                | ~~Low~~ | ~~15min~~ done — edge cases (v1, v100, empty, non-version v-prefixes, single segment) covered in test-pure-functions.nix |
+| ~~27~~ | ~~`nix flake check --all-systems` in CI~~               | ~~Low~~ | ~~15min~~ done — shipped as all-systems eval in scripts/ci-parity.sh (T56 DONE 2026-11-18); CI keeps the ubuntu/macos matrix |
+| ~~28~~ | ~~Cache nix-store in CI smoke-test job~~                | ~~Low~~ | ~~15min~~ done — magic-nix-cache "Cache Nix Store" steps on every CI job incl. smoke-test (ci.yml) |
+| ~~29~~ | ~~Run integration tests on macOS~~                      | ~~Low~~ | ~~30min~~ done — integration-tests job runs an ubuntu-latest/macos-latest matrix (ci.yml:16) |
+| ~~30~~ | ~~Extract `postPatch` script to separate `.sh` file~~   | ~~Low~~ | ~~30min~~ **NOT-DO — empirically rejected 2026-08-10 — prototype passed tests but needs 11 env vars + 8 eval calls across 2 files, a Verschlimmbesserung (TODO_LIST "Decided against" row).** |
 
 ### Blocked
 
 | #      | Task                                              | Impact   | Effort    |
 | ------ | ------------------------------------------------- | -------- | --------- |
-| ~~31~~ | ~~Register `maintainers.larsartmann` in nixpkgs~~ | ~~Low~~  | ~~30min~~ |
-| ~~32~~ | ~~Real private-repo integration test in CI~~      | ~~High~~ | ~~2h~~    |
-| ~~33~~ | ~~Audit all downstream consumers~~                | ~~Med~~  | ~~2h~~    |
-| ~~34~~ | ~~Real e2e consumer test~~                        | ~~High~~ | ~~4h~~    |
-| ~~35~~ | ~~Fix empty commit message in `df9a5ff`~~         | ~~Low~~  | ~~15min~~ |
+| ~~31~~ | ~~Register `maintainers.larsartmann` in nixpkgs~~ | ~~Low~~  | ~~30min~~ **→ still open — routed TODO_LIST Blocked (external PR to nixpkgs required)** |
+| ~~32~~ | ~~Real private-repo integration test in CI~~      | ~~High~~ | ~~2h~~ **→ still open — routed TODO_LIST Blocked (needs DEPLOY_SSH_KEY secret; CI job scaffolded if:false)**    |
+| ~~33~~ | ~~Audit all downstream consumers~~                | ~~Med~~  | ~~2h~~ done — 34-repo fleet audit 2026-08-10 + checklist re-run 2026-11-18 (TODO_LIST T60 DONE)    |
+| ~~34~~ | ~~Real e2e consumer test~~                        | ~~High~~ | ~~4h~~ **→ still open — routed TODO_LIST Blocked (real-consumer CI job scaffolded if:false, needs DEPLOY_SSH_KEY); hermetic halves shipped as checks.templateEval + containerSmoke**    |
+| ~~35~~ | ~~Fix empty commit message in `df9a5ff`~~         | ~~Low~~  | ~~15min~~ **→ still open — routed TODO_LIST Blocked (interactive rebase + force-push; user approval needed)** |
 
 ### Long-term / ROADMAP
 
 | #      | Task                                                         | Impact   | Effort    |
 | ------ | ------------------------------------------------------------ | -------- | --------- |
-| ~~36~~ | ~~Auto-detect public repos via `proxy.golang.org` query~~    | ~~High~~ | ~~3h~~    |
-| ~~37~~ | ~~Curate default `publicDeps` list~~                         | ~~Med~~  | ~~30min~~ |
-| ~~38~~ | ~~Auto-detect `enableTempl` by scanning for `.templ` files~~ | ~~Med~~  | ~~1h~~    |
-| ~~39~~ | ~~Auto-calculate `vendorHash` on first build~~               | ~~Med~~  | ~~2h~~    |
-| ~~40~~ | ~~Publish to nixpkgs or nix-community~~                      | ~~Low~~  | ~~2h~~    |
-| ~~41~~ | ~~`goPkg` as `lib.types.package` (breaking v2)~~             | ~~Med~~  | ~~1h~~    |
-| ~~42~~ | ~~`lib.mkForce` support for list attr overrides~~            | ~~Med~~  | ~~30min~~ |
-| ~~43~~ | ~~Migration script: 5-input flake → 3-input module~~         | ~~Low~~  | ~~2h~~    |
-| ~~44~~ | ~~Public documentation site (Astro/Starlight)~~              | ~~Low~~  | ~~4h~~    |
-| ~~45~~ | ~~Semver-tagged releases with release notes~~                | ~~Med~~  | ~~1h~~    |
+| ~~36~~ | ~~Auto-detect public repos via `proxy.golang.org` query~~    | ~~High~~ | ~~3h~~ **→ still open — routed ROADMAP Theme 5 (smart private-dep detection raw idea)**    |
+| ~~37~~ | ~~Curate default `publicDeps` list~~                         | ~~Med~~  | ~~30min~~ **→ still open — routed ROADMAP Theme 5 (curated default publicDeps raw idea)** |
+| ~~38~~ | ~~Auto-detect `enableTempl` by scanning for `.templ` files~~ | ~~Med~~  | ~~1h~~ **→ still open — routed ROADMAP Theme 1 (enableTempl auto-detect raw idea)**    |
+| ~~39~~ | ~~Auto-calculate `vendorHash` on first build~~               | ~~Med~~  | ~~2h~~ done — helper half shipped: enableVendorHashCheck drift gate + apps.update-vendor-hash; eval-time auto-default remains a ROADMAP Theme 1 idea    |
+| ~~40~~ | ~~Publish to nixpkgs or nix-community~~                      | ~~Low~~  | ~~2h~~ **→ still open — routed ROADMAP Theme 4 (publish to nixpkgs / flake registry raw idea)**    |
+| ~~41~~ | ~~`goPkg` as `lib.types.package` (breaking v2)~~             | ~~Med~~  | ~~1h~~ **→ still open — routed ROADMAP Theme 1 (goPkg as lib.types.package — breaking, target v2)**    |
+| ~~42~~ | ~~`lib.mkForce` support for list attr overrides~~            | ~~Med~~  | ~~30min~~ done — mkForce recipe card shipped in docs/migration-guide.md (`e6860c5`) |
+| ~~43~~ | ~~Migration script: 5-input flake → 3-input module~~         | ~~Low~~  | ~~2h~~ **→ still open — routed ROADMAP Theme 2 (migration-script raw idea)**    |
+| ~~44~~ | ~~Public documentation site (Astro/Starlight)~~              | ~~Low~~  | ~~4h~~ **→ still open — routed ROADMAP Theme 4 (public documentation site raw idea)**    |
+| ~~45~~ | ~~Semver-tagged releases with release notes~~                | ~~Med~~  | ~~1h~~ done — v0.1.0 tagged `ad06738` 2026-11-18 + GitHub release published; CHANGELOG [0.1.0] section present    |
 
 ### Fill remaining slots (deduped ideas from all sessions)
 
 | #      | Task                                                                                 | Impact  | Effort    |
 | ------ | ------------------------------------------------------------------------------------ | ------- | --------- |
-| ~~46~~ | ~~Add `--impure` flag warning in `generate-flake.sh` for SSH deps~~                  | ~~Low~~ | ~~15min~~ |
-| ~~47~~ | ~~Consider `publicDepPattern` (regex exclusion) vs `publicDeps` (list)~~             | ~~Med~~ | ~~30min~~ |
-| ~~48~~ | ~~Consider GONOPROXY/GONOSUMDB as alternative to GOPRIVATE~~                         | ~~Low~~ | ~~30min~~ |
-| ~~49~~ | ~~Add `--list-public` script to check GitHub API for public repos~~                  | ~~Low~~ | ~~1h~~    |
-| ~~50~~ | ~~Add session-end checklist to AGENTS.md ("grep for stale comments after reverts")~~ | ~~Low~~ | ~~15min~~ |
+| ~~46~~ | ~~Add `--impure` flag warning in `generate-flake.sh` for SSH deps~~                  | ~~Low~~ | ~~15min~~ **→ still open — routed to ROADMAP low-priority by the 2026-08-03 04-44 pass (F49); no SSH/impure warning in generate-flake.sh today and no current ROADMAP row carries it** |
+| ~~47~~ | ~~Consider `publicDepPattern` (regex exclusion) vs `publicDeps` (list)~~             | ~~Med~~ | ~~30min~~ **NOT-DO — publicDeps list kept and made versioned-path aware (`a199f6b`); the regex alternative was never adopted.** |
+| ~~48~~ | ~~Consider GONOPROXY/GONOSUMDB as alternative to GOPRIVATE~~                         | ~~Low~~ | ~~30min~~ **NOT-DO — GOPRIVATE kept — it implies GONOSUMDB/GONOPROXY semantics; rationale documented at docs/flake-standard.md:171.** |
+| ~~49~~ | ~~Add `--list-public` script to check GitHub API for public repos~~                  | ~~Low~~ | ~~1h~~ **→ still open — routed ROADMAP Theme 5 (proxy.golang.org auto-detect idea)**    |
+| ~~50~~ | ~~Add session-end checklist to AGENTS.md ("grep for stale comments after reverts")~~ | ~~Low~~ | ~~15min~~ **Won't implement — dropped 2026-08-03 (07-38 F14 verdict "Won't implement — dropped"); AGENTS.md carries lessons/gotchas, no session-end checklist exists today.** |
 
 ---
 

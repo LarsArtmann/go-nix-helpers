@@ -44,7 +44,7 @@ Plus guardrails (self-only reads → no IFD; explicit values always win; new log
 
 - Open: does flake-parts pass `inputs` as a module argument to imported modules? (Asserted in the proposal, NOT verified in flake-parts source. If false, proposal #2 needs a different wiring channel, e.g. an explicit `inputs` passthrough option.) Effort to verify: S.
 - Open: does an update-vendor-hash-style app already exist in the module's `apps` output? I never enumerated the current `apps` section — the proposal may duplicate an existing helper. Effort: S.
-- Blocker for starting implementation: user decision (see questions) + the two verifications above.
+- Blocker for starting implementation: user decision (see questions) + the two verifications above. **→ routed ROADMAP Theme 1 — both verifications resolved 2026-11-17 (inputs DO reach imported modules; no duplicate app — enableVendorHashCheck + update-vendor-hash shipped instead); only the owner go-ahead remains**
   ~~2. **Tier-2/3 proposals (pname/description/templ/monorepo)** — designed at sketch level only; no data-shape decisions made (e.g. how monorepo auto-discovery merges with explicit `packages`, whether `preBuild templ generate` ordering vs `mkPreparedSource` postPatch needs care — flagged in session, unresolved).~~ routed — ROADMAP Theme 1 (sketch-level; data-shape decisions deferred to implementation)
 
 ## c) NOT STARTED
