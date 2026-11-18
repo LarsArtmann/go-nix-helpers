@@ -605,6 +605,14 @@ let
     templCliPackage = pkgs.hello;
   };
 
+  # Function form (pkgs: package) — the RECOMMENDED shape: flake-level
+  # options have no pkgs in scope, and the function keeps the pin
+  # per-system correct. Must resolve to the same three wirings.
+  templCliFnCfg = mkPerSystemConfig {
+    enableTempl = true;
+    templCliPackage = ps: ps.hello;
+  };
+
   # --- goPkgAttr explicit pin test -------------------------------------------
   goPkgAttrCfg = mkPerSystemConfig { goPkgAttr = "go_1_26"; };
 
@@ -1259,6 +1267,15 @@ let
       (builtins.elem pkgs.hello templCliCfg.packages.test-project.nativeBuildInputs)
       "pinned CLI generates in-build"
     )
+    (assertCheck "templCliPackage function form overrides treefmt templ program" (
+      templCliFnCfg.treefmt.programs.templ.package or null == pkgs.hello
+    ) "pkgs-function pin resolved for treefmt")
+    (assertCheck "templCliPackage function form reaches devShell and build" (
+      builtins.elem pkgs.hello (
+        templCliFnCfg.devShells.default.nativeBuildInputs or templCliFnCfg.devShells.default.buildInputs or [ ]
+      )
+      && builtins.elem pkgs.hello templCliFnCfg.packages.test-project.nativeBuildInputs
+    ) "pkgs-function pin resolved everywhere")
     # --- enableTempl=false alone (other formatters still on) -----------------
     (assertCheck "enableTempl=false disables templ in treefmt" (
       noTemplCfg.treefmt.programs.templ.enable or true == false

@@ -1000,11 +1000,14 @@ in
         # Single templ CLI resolution: the option override (pinned
         # overrideAttrs derivation, package or pkgs:function form) or
         # nixpkgs' templ — consumed by the package build, devShells, and
-        # treefmt alike so all three agree.
+        # treefmt alike so all three agree. The function form is checked
+        # functor-aware: types.functionTo MERGES into a { __functor = ... }
+        # attrset (not a lambda), so builtins.isFunction alone would miss
+        # it and leak the wrapper into mkShell inputs.
         templBin =
           if cfg.templCliPackage == null then
             pkgs.templ
-          else if builtins.isFunction cfg.templCliPackage then
+          else if builtins.isFunction cfg.templCliPackage || cfg.templCliPackage ? __functor then
             cfg.templCliPackage pkgs
           else
             cfg.templCliPackage;
