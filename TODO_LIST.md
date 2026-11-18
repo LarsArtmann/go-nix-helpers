@@ -85,6 +85,22 @@
 | T58 | Document the nix2container lock pin (rev `42d1df94`, 2026-10-30) in a doc note                                                                                                                     | DONE       | 15min  | DONE: n2c pin policy documented at the flake input (flake.nix: bump only with containerSmoke + full check) |
 | T59 | Document the Nix 2.34 tryEval message-free assert helper pattern (never assert on thrown message text)                                                                                             | DONE       | 15min  | DONE: tryEval message-free pattern documented in docs/flake-patterns.md |
 
+## Round-7 backlog (2026-11-18 harvest — docs/status/2026-11-18_23-05_*)
+
+| #   | Task                                                                                                                                           | Status  | Effort | Evidence                                                                                   |
+| --- | ---------------------------------------------------------------------------------------------------------------------------------------------- | ------- | ------ | ------------------------------------------------------------------------------------------ |
+| T72 | GitHub billing fix → rerun the 13 never-started CI workflows (billing signature: failed jobs with EMPTY steps arrays)                          | BLOCKED | 15min  | Owner-side: Settings → Billing; round-7 report §c.1 — every pushed commit is local-green   |
+| T73 | gogenfilter: confirm the website.yml re-run green after the A11y guard path fix (51cf3ea)                                                       | TODO    | 10min  | round-7 report §a                                                                          |
+| T74 | Recorded convergence sweep: 1a553ce7-cluster (34 top-level + long-tail repos) → go-nix-helpers v0.1.0 tag pin (ADR-0003 canon row)             | TODO    | 3h     | docs/adr/0003 canon-advance table (fleet repo); drift gate marks staleness                  |
+| T75 | templ-components v1.27.0 convergence sweep (~20 repos; regenerate *_templ.go with templ >= 0.3.1100 in-change or pin via templCliPackage)      | TODO    | 4h     | ADR-0003 templ-components canon row; bank-sync + crush-daily proven green at 97c49407       |
+| T76 | bank-sync: adopt the module update-vendor-hash app; retire or document the private --fod map                                                    | TODO    | 30min  | module enableUpdateVendorHashApp shipped v0.1.0+ (round-7 report §a)                        |
+| T77 | (repo: overview) corpus workstream: file-size 27 oversize files, docs-gates red corpus, art-dupl 97                                             | ROUTED  | L      | overview's owning session; round-6 report §a (own debt, not migration damage)               |
+| T78 | (repo: branching-flow) art-dupl 59 detect-only dedup pass                                                                                      | TODO    | M      | round-6 report §f.17                                                                       |
+| T79 | (repo: docs-gates) surface check-rows.py provenance drift automatically (compare headers on flake check)                                        | TODO    | M      | round-7 report §b; upstream repo work                                                      |
+| T80 | (repo: project-meta / monitor365) billing canary: alert when GitHub Actions jobs report the payments-failed annotation                           | TODO    | M      | round-7 report §e.1 (single point of failure for fleet verification)                        |
+| T81 | mkIf-undefined-check lint rule candidate (statix/nix-checker class) — the attrset-omission idiom vs the flake-parts mkIf trap                    | TODO    | M      | bit crm + file-and-image-renamer + mr-sync (round-7 report §e.3); idiom now in 3 repos      |
+| T82 | (repo: index) templCliPackage adoption (overlay pin → module option) when its owning session touches it                                          | TODO    | S      | round-7 report §a (f.37 survey verdict)                                                     |
+
 ## Decided against / rejected
 
 | Task                                              | Reason                                                                                                                                                                                               |

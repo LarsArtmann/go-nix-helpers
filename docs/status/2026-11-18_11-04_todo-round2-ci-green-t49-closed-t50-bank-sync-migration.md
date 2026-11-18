@@ -40,7 +40,7 @@ repaired at `df0aaff`, CI verdict pending)
 2. devShell `go mod tidy` for repo go.mod/go.sum parity (devShell blocked: `nix-shell-env` → cqrs-lint build)
 3. Full battery re-run (lint, golangci-config, pinned-tree, catalog-drift, dep-alignment, cqrs-lint-vendor-witness, image, image-oci, container-structure, format)
 4. `nix flake check --no-build` + all-systems, cleanup `/tmp/banksync-old` worktree + `/tmp/templ-components-v*` clones
-5. Update stale flake comments (go-cqrs-lite input comment says "frozen at 9673552fb280", lock says `6f8dd604`)
+5. Update stale flake comments (go-cqrs-lite input comment says "frozen at 9673552fb280", lock says `6f8dd604`) — DONE 2026-11-18 rounds 5-7: coherent commits landed; residual daemon races documented (round-7 §d.3)
 6. Coherent commit (daemon has 4+ mid-edit commits; collapse or follow-up commit per AGENTS/14)
 7. AGENTS/05 + migration-guide note
 
@@ -138,7 +138,7 @@ first FOD rebuilds since the 2026-11-13 "A12 wave 1" pin convergence
 **Sweeps:**
 16. T52 delete every remaining hand-rolled dockerTools block
 17. T57 post-push `nix flake update` sweeps (nix2container lands transitively)
-18. T34 / T60 (as specced in TODO_LIST)
+18. T34 / T60 (as specced in TODO_LIST) — DONE 2026-11-18: T34 and T60 both DONE with evidence in TODO_LIST
 19. Fleet-wide templ-components v1.27.0 alignment check (other consumers of the A12 pin may carry the same latent skew — same diagnosis: `nix build .#checks.lint`)
 
 **Module features:**
@@ -157,7 +157,7 @@ first FOD rebuilds since the 2026-11-13 "A12 wave 1" pin convergence
 30. Reconcile TODO_LIST "31 actionable" bookkeeping with the 26+3 done state
 
 **Bank-sync debt (newly discovered, worth queueing there):**
-31. Re-enable or replace billing-disabled CI (5-day silent red)
+31. Re-enable or replace billing-disabled CI (5-day silent red) — ROUTED 2026-11-18 to TODO_LIST T72/T80: the billing class recurred today (13 never-started CI runs); canary row added
 32. cqrs-lint-vendor-witness marker refresh for the v4-module era
 33. `rm -rf vendor` postPatchExtra upstream question: should go-cqrs-lite stop committing vendor/ in cmd/cqrs-lint/v4?
 

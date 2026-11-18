@@ -93,7 +93,7 @@ T33 (systems mapping test), T34 (GOEXPERIMENT/completionStyle sweep), T35–T46 
 38. migration-guide: bank-sync partial-adoption + StopTube cargo-cult-tags + crush-daily subModules-trap case studies
 39. man page: 55 options; moduleTest count re-derive (218→?)
 40. A12 canon (adr/0003) update decision → then bank-sync/crush-daily comments + CI asserts alignment (Q2)
-41. erraudit aarch64-darwin `meta.platforms` fix in go-finding
+41. erraudit aarch64-darwin `meta.platforms` fix in go-finding — ROUTED 2026-11-18: bank-sync own erraudit/cqrs-lint platforms.unix fixed (round 6); the go-finding repo copy belongs to its owning session
 42. Push the 5 migrated consumer repos once approved (Q1) + verify CI on each
 43. Standup-Killer: full battery re-run at final tree + push (with crush-daily batch)
 44. monitor daemon pushes of migrated repos; re-run batteries at shipped trees

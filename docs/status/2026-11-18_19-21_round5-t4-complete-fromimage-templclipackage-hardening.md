@@ -44,8 +44,8 @@ this session's work only.
 8. TODO_LIST row updates (T4 done; T35–T46/T53/T55/T58/T59 verified done; T61–T63 done; T66 done; T48/T52 status; T34 partial).
 9. CHANGELOG entry (sanitize fix, fromImage/fromImageEnv, templCliPackage, hardening).
 10. FEATURES.md + AGENTS.md updates (58 top-level options + container 19-key submodule; moduleTest 226; new gotchas: apps subpath-annotation trap, env.GOEXPERIMENT sweep result).
-11. Migration-guide case studies: BuildFlow (allowUnfree via _module.args.pkgs, enableDevShells=false rationale, sanitize wrapper death), KeyCountdown (simple public-deps adoption + floor-driven lock refresh), overview (proxyVendor-vs-vendored-FOD trap).
-12. Cross-repo: erraudit/go-finding `meta.platforms` aarch64-darwin fix (bank-sync's only red).
+11. Migration-guide case studies: BuildFlow (allowUnfree via _module.args.pkgs, enableDevShells=false rationale, sanitize wrapper death), KeyCountdown (simple public-deps adoption + floor-driven lock refresh), overview (proxyVendor-vs-vendored-FOD trap). — DONE 2026-11-18: T33 shipped (moduleTest systems-mapping assertions)
+12. Cross-repo: erraudit/go-finding `meta.platforms` aarch64-darwin fix (bank-sync's only red). — DONE 2026-11-18: T65 P21-P26 complete (TODO_LIST T65 row)
 13. A12 canon update (templ lockstep set fleet-wide vs per-repo escapes — needs owner answer).
 14. BuildFlow hook GOEXPERIMENT injection (pre-commit misreporting tidy drift).
 15. Consumer pushes + CI watches (overview, BuildFlow, KeyCountdown, StopTube, branching-flow, Standup-Killer, crush-daily all unpushed; needs owner answer).
