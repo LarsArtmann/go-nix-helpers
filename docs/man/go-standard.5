@@ -147,6 +147,13 @@ committed *_templ.go sibling (enforced by checks.templ-committed).
 "preBuild": the package build regenerates them (repos that gitignore
 generated files).
 .TP
+.BR templCliPackage " (null|package, default: null)"
+Override the templ CLI everywhere the module wires it: the package build,
+devShells, and treefmt's templ program. nixpkgs' templ can trail the
+repo's go.mod requirement — set a pinned overrideAttrs derivation (BOTH
+src hash and vendorHash) so generate/format/shell CLI versions cannot
+drift. Null uses nixpkgs' templ.
+.TP
 .BR enableLockGuards " (bool, default: false)"
 Eval-time flake.lock guards, forced through checks.format so they run even
 without a package build.

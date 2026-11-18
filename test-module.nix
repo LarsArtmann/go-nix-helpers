@@ -1239,14 +1239,13 @@ let
     (assertCheck "enableTempl=true enables templ in treefmt" (
       templCfg.treefmt.programs.templ.enable or false == true
     ) "templ.enable = true")
-    (assertCheck "templCliPackage overrides treefmt's templ program" (
+    (assertCheck "templCliPackage overrides treefmt templ program" (
       templCliCfg.treefmt.programs.templ.package or null == pkgs.hello
       && templCfg.treefmt.programs.templ.package or null == pkgs.templ
     ) "hello when set, nixpkgs templ default")
-    (assertCheck "templCliPackage lands in the default devShell"
-      (builtins.elem pkgs.hello templCliCfg.devShells.default.packages)
-      "pinned CLI on PATH"
-    )
+    (assertCheck "templCliPackage lands in the default devShell" (builtins.elem pkgs.hello (
+      templCliCfg.devShells.default.nativeBuildInputs or templCliCfg.devShells.default.buildInputs or [ ]
+    )) "pinned CLI on PATH")
     (assertCheck "templCliPackage reaches the package build"
       (builtins.elem pkgs.hello templCliCfg.packages.test-project.nativeBuildInputs)
       "pinned CLI generates in-build"
