@@ -56,6 +56,13 @@ let
     # Add a non-module directory (no go.mod) to verify it's skipped
     mkdir -p $out/docs
     echo "documentation" > $out/docs/README.md
+    # Stray build-output symlinks (the 2026-10-05 linter-autoconfigure-sdk
+    # class): committed `result`/`result-*` symlinks must be stripped from
+    # the wholesale dep copy — they are never source. Dangling targets
+    # (store paths that only exist on the machine that built) previously
+    # poisoned every consumer's prepared-source FOD.
+    ln -s /nix/store/00000000000000000000000000000000-never-built $out/result
+    ln -s /nix/store/00000000000000000000000000000000-never-built $out/result-2
   '';
 
   # Mock consumer go.mod that requires two of the three sub-modules
@@ -414,6 +421,14 @@ in
     else
       echo "FAIL: main dep missing replace"
       exit 1
+    fi
+
+    # Stray result/result-* symlinks must be stripped from the dep copy
+    if [ -e ${autoDiscovery}/_local_deps/mock-dep/result ] || [ -L ${autoDiscovery}/_local_deps/mock-dep/result ]; then
+      echo "FAIL: stray 'result' symlink survived in _local_deps (sanitize regression)"
+      exit 1
+    else
+      echo "PASS: stray result/result-* symlinks stripped from dep copy"
     fi
 
     # Check depth-2 nested module with mid-path /vN: event/v3/eventtest
