@@ -68,15 +68,15 @@ gate "Eval check, ALL systems (darwin/aarch64 eval gaps)" \
   nix flake check --all-systems --no-build
 
 gate "flake.lock freshness (nix flake update must be a no-op)" bash -c '
-	cp flake.lock /tmp/ci-parity-lock-backup
-	nix flake update
-	if diff -q flake.lock /tmp/ci-parity-lock-backup >/dev/null; then
-		exit 0
-	fi
-	echo "flake.lock is stale — nix flake update changed it:" >&2
-	diff flake.lock /tmp/ci-parity-lock-backup | head -20 >&2 || true
-	git restore -- flake.lock
-	exit 1
+  cp flake.lock /tmp/ci-parity-lock-backup
+  nix flake update
+  if diff -q flake.lock /tmp/ci-parity-lock-backup >/dev/null; then
+    exit 0
+  fi
+  echo "flake.lock is stale — nix flake update changed it:" >&2
+  diff flake.lock /tmp/ci-parity-lock-backup | head -20 >&2 || true
+  git restore -- flake.lock
+  exit 1
 '
 
 if [ "$CI_JOBS" = true ]; then
@@ -88,23 +88,23 @@ if [ "$CI_JOBS" = true ]; then
     ".#checks.$SYSTEM.structural"
 
   gate "Template smoke legs (generate-flake flags)" bash -c '
-		set -e
-		scripts/generate-flake.sh --dir /tmp/ci-parity-smoke-basic smoke-basic
-		nix-instantiate --parse /tmp/ci-parity-smoke-basic/flake.nix >/dev/null
-		scripts/generate-flake.sh --dir /tmp/ci-parity-smoke-templ --templ smoke-templ
-		nix-instantiate --parse /tmp/ci-parity-smoke-templ/flake.nix >/dev/null
-		scripts/generate-flake.sh --dir /tmp/ci-parity-smoke-gomod --go-mod smoke-gomod
-		test -f /tmp/ci-parity-smoke-gomod/go.mod
-		nix-instantiate --parse /tmp/ci-parity-smoke-gomod/flake.nix >/dev/null
-		scripts/generate-flake.sh --dir /tmp/ci-parity-smoke-deps --private-deps smoke-deps
-		grep -q "deps = {" /tmp/ci-parity-smoke-deps/flake.nix
-		nix-instantiate --parse /tmp/ci-parity-smoke-deps/flake.nix >/dev/null
-		scripts/generate-flake.sh --dir /tmp/ci-parity-smoke-combined --go-mod --private-deps --templ smoke-combined
-		grep -q "enableTempl = true" /tmp/ci-parity-smoke-combined/flake.nix
-		nix-instantiate --parse /tmp/ci-parity-smoke-combined/flake.nix >/dev/null
-		scripts/generate-flake.sh --dir /tmp/ci-parity-smoke-dryrun --dry-run smoke-dryrun >/dev/null 2>&1
-		test ! -d /tmp/ci-parity-smoke-dryrun
-	'
+    set -e
+    scripts/generate-flake.sh --dir /tmp/ci-parity-smoke-basic smoke-basic
+    nix-instantiate --parse /tmp/ci-parity-smoke-basic/flake.nix >/dev/null
+    scripts/generate-flake.sh --dir /tmp/ci-parity-smoke-templ --templ smoke-templ
+    nix-instantiate --parse /tmp/ci-parity-smoke-templ/flake.nix >/dev/null
+    scripts/generate-flake.sh --dir /tmp/ci-parity-smoke-gomod --go-mod smoke-gomod
+    test -f /tmp/ci-parity-smoke-gomod/go.mod
+    nix-instantiate --parse /tmp/ci-parity-smoke-gomod/flake.nix >/dev/null
+    scripts/generate-flake.sh --dir /tmp/ci-parity-smoke-deps --private-deps smoke-deps
+    grep -q "deps = {" /tmp/ci-parity-smoke-deps/flake.nix
+    nix-instantiate --parse /tmp/ci-parity-smoke-deps/flake.nix >/dev/null
+    scripts/generate-flake.sh --dir /tmp/ci-parity-smoke-combined --go-mod --private-deps --templ smoke-combined
+    grep -q "enableTempl = true" /tmp/ci-parity-smoke-combined/flake.nix
+    nix-instantiate --parse /tmp/ci-parity-smoke-combined/flake.nix >/dev/null
+    scripts/generate-flake.sh --dir /tmp/ci-parity-smoke-dryrun --dry-run smoke-dryrun >/dev/null 2>&1
+    test ! -d /tmp/ci-parity-smoke-dryrun
+  '
 
   gate "old-nixpkgs moduleTest (auto-default degradation leg)" \
     nix build --no-link \
