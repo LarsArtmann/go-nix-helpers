@@ -201,6 +201,14 @@ How the binary exposes completions (used with enableCompletions): "flag"
 invokes \fB<binary> --completion <shell>\fR (urfave/cli style); "subcommand"
 invokes \fB<binary> completion <shell>\fR (cobra style).
 .TP
+.BR enableUpdateVendorHashApp " (bool, default: true)"
+Emit an \fBapps.update-vendor-hash\fR helper performing the vendorHash
+dance end-to-end: build the main package, parse the \fBgot:\fR sha256
+from the fixed-output mismatch, substitute it into flake.nix, re-verify.
+The substitution targets the currently configured hash VALUE (baked in at
+eval time), so sibling FOD lines are never corrupted; shared values are
+refused. Only emitted when a flat vendorHash is set and a Go module exists.
+.TP
 .BR goExperiment " (nullOr str, default: null)"
 GOEXPERIMENT setting for the package build AND devShells (e.g. "jsonv2").
 null leaves the variable unset so the Go toolchain's default experiment set

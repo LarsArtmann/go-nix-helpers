@@ -319,6 +319,22 @@ the module's default `enableShfmt = false`.
 
 ---
 
+## Intentional non-module builds stay hand-rolled
+
+Migrating a repo to go-standard does NOT mean every `buildGoModule` call
+in its flake.nix disappears. Some derivations are deliberately outside the
+module — a tool built from a tagged upstream input at a different Go
+version (wise-go's line-289 `buildGoModule` pinning an older Go than the
+main package, gogenfilter's `mkMdgo` building md-go-validator with Go
+1.27 from its own input). Those keep their explicit `buildGoModule` /
+`buildGo127Module` call with their own vendorHash; go-standard governs the
+MAIN package, devShells, treefmt, checks, and the container. When a repo
+mixes both, keep each FOD's hash on its own assignment line — the module's
+`update-vendor-hash` app targets the main `vendorHash` by value and
+refuses shared/duplicated values rather than guessing.
+
+---
+
 ## Case studies (2026-11-18 fleet migration)
 
 ### BuildFlow — bespoke machinery preserved, module for the package

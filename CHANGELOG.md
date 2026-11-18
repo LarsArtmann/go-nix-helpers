@@ -12,6 +12,11 @@ This project has not made a tagged release yet; all changes below are in
 
 ### Added
 
+- `go-standard.enableUpdateVendorHashApp` (bool, default true) — emits
+  `apps.update-vendor-hash`: one command for the vendorHash dance (build,
+  parse `got:`, substitute into flake.nix, re-verify). Substitution targets
+  the OLD hash value, so sibling FOD lines are never corrupted; only for
+  flat `vendorHash` + a Go module. Promotes bank-sync's private pattern.
 - `go-standard.templCliPackage` (nullOr package) — ONE templ CLI pin
   consumed by the package build, devShells, AND treefmt (`templ.package`),
   replacing per-consumer `pkgs.templ` overrides at three call sites. When

@@ -646,6 +646,15 @@ let
     templCliPackage = ps: ps.hello;
   };
 
+  # --- update-vendor-hash app configs ----------------------------------------
+  vendorHashAppCfg = mkPerSystemConfig {
+    vendorHash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+  };
+  vendorHashAppOffCfg = mkPerSystemConfig {
+    vendorHash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+    enableUpdateVendorHashApp = false;
+  };
+
   # --- goPkgAttr explicit pin test -------------------------------------------
   goPkgAttrCfg = mkPerSystemConfig { goPkgAttr = "go_1_26"; };
 
@@ -1310,6 +1319,31 @@ let
       )
       && builtins.elem pkgs.hello templCliFnCfg.packages.test-project.nativeBuildInputs
     ) "pkgs-function pin resolved everywhere")
+    # --- update-vendor-hash app (flat vendorHash present) ---------------------
+    (assertCheck "apps.update-vendor-hash emitted when flat vendorHash set" (
+      vendorHashAppCfg.apps ? update-vendor-hash
+    ) "app present")
+    (assertCheck "apps.update-vendor-hash description names the dance" (
+      builtins.isString (vendorHashAppCfg.apps.update-vendor-hash.meta.description or "")
+      &&
+        builtins.match ".*vendorHash dance.*" vendorHashAppCfg.apps.update-vendor-hash.meta.description
+        != null
+    ) "description mentions vendorHash dance")
+    (assertCheck "apps.update-vendor-hash absent when vendorHash is null" (
+      !(psCfg.apps ? update-vendor-hash)
+    ) "no app for null vendorHash")
+    (assertCheck "enableUpdateVendorHashApp=false removes the app" (
+      !(vendorHashAppOffCfg.apps ? update-vendor-hash)
+    ) "option off removes app")
+    (assertCheck "apps.test description is the mkApp preview (scrubbed, prefixed)" (
+      builtins.match "nix run .#[a-z-]+: go test -race.*" (psCfg.apps.test.meta.description or "MISSING")
+      != null
+    ) "preview format")
+    (assertCheck "app descriptions carry no store paths (scrub contract)" (
+      !lib.hasInfix "/nix/store/" (
+        psCfg.apps.test.meta.description or psCfg.apps.lint.meta.description or ""
+      )
+    ) "no store path in descriptions")
     # --- enableTempl=false alone (other formatters still on) -----------------
     (assertCheck "enableTempl=false disables templ in treefmt" (
       noTemplCfg.treefmt.programs.templ.enable or true == false
