@@ -69,6 +69,5 @@ restart the daemon.
 
 *Evidence: `docs/status/2026-09-25_04-33_pareto-execution-session-interrupted.md`
 (theory 1, later retracted), `docs/status/2026-09-25_04-39_pareto-execution-wrapup-and-corrections.md`
-(corrected root-cause analysis), commit `105c981` (the 8-assertion repair
-
-- `cgoEnabled` fix).*
+(corrected root-cause analysis), commit `105c981` (the 8-assertion repair +
+`cgoEnabled` fix).*

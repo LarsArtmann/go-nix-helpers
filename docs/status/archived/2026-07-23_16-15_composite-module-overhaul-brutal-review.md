@@ -62,7 +62,7 @@ The session achieved its primary goal: consumer flake.nix dropped from **5 requi
 | ~~1~~ | ~~**Commits were auto-created without explicit user request**~~                   | ~~HIGH~~   | ~~4 commits (`927c924`, `0a3bf8b`, `9471741`, `bb3d782`) appeared at 15:25-15:34 during the session. I never ran `git commit`. The commit messages are AI-generated verbose garbage ("Modernize flake.nix to use latest Nix flake best practices..."). Unclear what mechanism created them (no git hooks, no Crush hooks visible). **The user's rule says "NEVER COMMIT unless user explicitly says commit."**~~ done — identified — buildflow file-watcher (2026-07-24 session) |
 | ~~2~~ | ~~**Hardcoded `defaultSystems` is architecturally worse than `inputs.systems`**~~ | ~~MEDIUM~~ | ~~go-nix-helpers already has `systems.url = "github:nix-systems/default"` in its own flake inputs. Instead of hardcoding the list, I should have used `import inputs.systems` from go-nix-helpers's own inputs in the composite module. This would preserve override-ability while eliminating the consumer's need for a `systems` input.~~ done — shipped — configurable `systems` option (2026-07-24; default now nix-systems/default minus x86_64-darwin)                     |
 | ~~3~~ | ~~**The `flakeModules.go-standard` change is technically a breaking change**~~    | ~~MEDIUM~~ | ~~Before: `flake.flakeModules.go-standard = import ./modules/go-standard.nix;` (a bare module). After: `flake.flakeModules.go-standard = { imports = [...]; };` (a composite). Any consumer who was importing the module AND separately importing treefmt-nix.flakeModule would now get a double-import. Flake-parts MAY deduplicate this (same store path if nixpkgs follows match), but this was NEVER tested.~~ done — moot — 10 consumers migrated, no conflicts             |
-| ~~4~~ | ~~**`test-result` symlink is committed to git**~~                                 | ~~LOW~~    | ~~`91fa823` (pre-session) committed a symlink to `/nix/store/...`. This is a build artifact. `.gitignore` doesn't cover it. Not my commit, but I should have flagged it. **Resolved (2026-07-24):** removed from git tracking and `.gitignore`d.~~ done — resolved 2026-07-24                                                                                                                                                                                                    |
+| ~~4~~ | ~~**`test-result` symlink is committed to git**~~                                 | ~~LOW~~    | ~~`91fa823` (pre-session) committed a symlink to `/nix/store/...`. This is a build artifact. `.gitignore` doesn't cover it. Not my commit, but I should have flagged it. **Resolved (2026-07-24):** removed from git tracking and added to `.gitignore`.~~ done — resolved 2026-07-24                                                                                                                                                                                                    |
 
 ---
 
@@ -217,7 +217,7 @@ Of the four "FUCKED UP" items above:
 - **#3 composite module is a breaking change / double-import** — never independently
   tested; folded into the still-open real-consumer end-to-end test gap
   (`TODO_LIST.md`).
-- **#4 `test-result` symlink** — RESOLVED: removed from git and `.gitignore`d.
+- **#4 `test-result` symlink** — RESOLVED: removed from git and added to `.gitignore`.
 
 The "Honest Assessment" still holds as of this writing: the composite module has
 **zero real consumers** — migrating a downstream project remains the highest-value
