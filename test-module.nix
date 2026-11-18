@@ -211,6 +211,39 @@ let
     (assertCheck "systems excludes dropped x86_64-darwin" (
       !builtins.elem "x86_64-darwin" cfg.systems
     ) "no x86_64-darwin")
+    # T33: the option does not just EXIST — it maps onto flake-parts'
+    # systems knob (the output gate). Default and override both verified.
+    (assertCheck "systems maps onto flake-parts config.systems (default)" (
+      moduleEval.config.systems == cfg.systems
+    ) "config.systems = go-standard.systems")
+    (assertCheck "systems override propagates to flake-parts config.systems" (
+      let
+        overrideEval = lib.evalModules {
+          modules = [
+            flakePartsStub
+            ./modules/go-standard.nix
+            {
+              go-standard = {
+                pname = "test-project";
+                vendorHash = null;
+                systems = [
+                  "x86_64-linux"
+                  "aarch64-linux"
+                ];
+              };
+            }
+          ];
+          specialArgs = {
+            inputs = gnhInputs;
+            self = mockSelf;
+          };
+        };
+      in
+      overrideEval.config.systems == [
+        "x86_64-linux"
+        "aarch64-linux"
+      ]
+    ) "override wins")
     (assertCheck "ldflags default is null" (cfg.ldflags == null) "null")
     (assertCheck "extraMeta default is empty" (cfg.extraMeta == { }) "{}")
     (assertCheck "extraBuildAttrs default is empty" (cfg.extraBuildAttrs == { }) "{}")
