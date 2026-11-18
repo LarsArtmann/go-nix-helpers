@@ -1463,6 +1463,8 @@ in
               maxLayers
               created
               initializeNixDatabase
+              fromImage
+              fromImageEnv
               ;
             volumeDirs = vols.dirs;
             volumePerms = vols.perms;

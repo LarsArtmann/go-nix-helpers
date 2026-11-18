@@ -511,6 +511,17 @@ let
     };
   };
 
+  # fromImage (base image layering) must reach buildImage verbatim, with
+  # fromImageEnv riding along; unset stays null/false.
+  containerFromImageCfg = mkPerSystemConfig {
+    container = {
+      enable = true;
+      nix2container = containerBackendStub;
+      fromImage = mockSrc;
+      fromImageEnv = true;
+    };
+  };
+
   # --- GOPRIVATE behavioral test: deps triggers GOPRIVATE injection --------
   # When deps is non-empty, GOPRIVATE should be injected into the devShell.
   # We use a mock dep path — the devShell doesn't trigger mkPreparedSource
@@ -1634,6 +1645,12 @@ let
       containerNixDbCfg.packages.test-project-image.imageArgs.initializeNixDatabase == true
       && containerCfg.packages.test-project-image.imageArgs.initializeNixDatabase or false == false
     ) "true when set, false default")
+    (assertCheck "container fromImage/fromImageEnv passthrough reaches buildImage" (
+      containerFromImageCfg.packages.test-project-image.imageArgs.fromImage == mockSrc
+      && containerFromImageCfg.packages.test-project-image.imageArgs.fromImageEnv == true
+      && containerCfg.packages.test-project-image.imageArgs.fromImage or "unset" == null
+      && containerCfg.packages.test-project-image.imageArgs.fromImageEnv or true == false
+    ) "set when configured, null/false defaults")
     (assertCheck "container copyToRoot is non-empty" (
       builtins.length containerCfg.packages.test-project-image.imageArgs.copyToRoot > 0
     ) "at least the image root env")
