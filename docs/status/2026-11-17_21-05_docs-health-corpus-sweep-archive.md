@@ -51,29 +51,29 @@
 
 ## a) FULLY DONE
 
-| # | Item | Evidence |
-| - | --- | --- |
-| 1 | Baseline battery + full diagnosis: 3 red gates (audit-all 22 unharvested items, annotate 358 findings, cadence 14 unarchived/oldest 97d) | `docs-gates run` at session start |
-| 2 | **Master CI rescued mid-session**: daemon re-swept tab-indented scripts 25 min after yesterday's fix → treefmt canon restored, stray 1.9MB `mock-go-project` binary evicted + gitignored | commit `8f88653`; shellcheck clean; Format-check root cause closed |
-| 3 | Corpus read: 11 live 2026-08/09 status reports in full + 3 November reports; every unharvested item verified against live state (skill frontmatter, CV lock A12 `0a889d5dd`, file-and-image-renamer 13→18 mappings + `11d5c6c8`, flake-parts `inputs` proven from the composite module) | verification commands in transcript |
-| 4 | ~500 inline verdicts across 13 reports — every spec `--verify`-resolved from emit-keys before writing; §g questions answered/routed inline | `f45e752`, `305b4b1` |
-| 5 | **11 reports archived** (check-rows --strict + bare-rows green pre-move; completeness grep clean; 6 done-work tables ledger-marked) — `docs/status/` now 3 fresh reports, cadence ARCHIVE-HEALTHY | `4559547` |
-| 6 | Living docs repaired: CHANGELOG gained the missing container family + CI fixes; FEATURES gained the OCI section (8 rows) + 10 option rows + real counts; ROADMAP counts/dead-refs fixed, 4 shipped ideas removed, Open-questions section added; TODO_LIST harvested T60–T67 (+ push-truth wording fixed); AGENTS 54-options + 3 new gotchas; README fully audited (OCI ✅, stale check-list, missing rows); migration-guide early-adopter recipe | `17fed51` |
-| 7 | Counts re-derived from tool output: **54 top-level options, 17 container keys, 218 moduleTest, 72 pureFunctions** (docs said 44/61/139) | build logs + structural greps |
-| 8 | Vendored `check-rows.py` taught the ROUTED-arrow form (upstream docs-gates canon); stray single-dash separators normalized | `4c6c8b9` |
-| 9 | `.docs-gates.json` seeded: `annotate_max = 358` ratchet pin (pre-canon archived strikes; never raise; documented in AGENTS) | `6f5a76f` |
-| 10 | 15-00 §g.2 (registry) ANSWERED-annotated; 18-52 f/9 (README OCI audit) executed and struck; plan 15.2 honesty-fixed | `305b4b1` |
-| 11 | Daemon-committed formatter damage repaired from last-good commits; battery re-green | `ad0f44a` |
-| 12 | Final state: battery 5/5 PASS, repo docs gate green, `--all-systems --no-build` all-passed, fmt idempotent | verification snapshot below |
+| #  | Item                                                                                                                                                                                                                                                                                                                                                                                                                                             | Evidence                                                           |
+| -- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------ |
+| 1  | Baseline battery + full diagnosis: 3 red gates (audit-all 22 unharvested items, annotate 358 findings, cadence 14 unarchived/oldest 97d)                                                                                                                                                                                                                                                                                                         | `docs-gates run` at session start                                  |
+| 2  | **Master CI rescued mid-session**: daemon re-swept tab-indented scripts 25 min after yesterday's fix → treefmt canon restored, stray 1.9MB `mock-go-project` binary evicted + gitignored                                                                                                                                                                                                                                                         | commit `8f88653`; shellcheck clean; Format-check root cause closed |
+| 3  | Corpus read: 11 live 2026-08/09 status reports in full + 3 November reports; every unharvested item verified against live state (skill frontmatter, CV lock A12 `0a889d5dd`, file-and-image-renamer 13→18 mappings + `11d5c6c8`, flake-parts `inputs` proven from the composite module)                                                                                                                                                          | verification commands in transcript                                |
+| 4  | ~500 inline verdicts across 13 reports — every spec `--verify`-resolved from emit-keys before writing; §g questions answered/routed inline                                                                                                                                                                                                                                                                                                       | `f45e752`, `305b4b1`                                               |
+| 5  | **11 reports archived** (check-rows --strict + bare-rows green pre-move; completeness grep clean; 6 done-work tables ledger-marked) — `docs/status/` now 3 fresh reports, cadence ARCHIVE-HEALTHY                                                                                                                                                                                                                                                | `4559547`                                                          |
+| 6  | Living docs repaired: CHANGELOG gained the missing container family + CI fixes; FEATURES gained the OCI section (8 rows) + 10 option rows + real counts; ROADMAP counts/dead-refs fixed, 4 shipped ideas removed, Open-questions section added; TODO_LIST harvested T60–T67 (+ push-truth wording fixed); AGENTS 54-options + 3 new gotchas; README fully audited (OCI ✅, stale check-list, missing rows); migration-guide early-adopter recipe | `17fed51`                                                          |
+| 7  | Counts re-derived from tool output: **54 top-level options, 17 container keys, 218 moduleTest, 72 pureFunctions** (docs said 44/61/139)                                                                                                                                                                                                                                                                                                          | build logs + structural greps                                      |
+| 8  | Vendored `check-rows.py` taught the ROUTED-arrow form (upstream docs-gates canon); stray single-dash separators normalized                                                                                                                                                                                                                                                                                                                       | `4c6c8b9`                                                          |
+| 9  | `.docs-gates.json` seeded: `annotate_max = 358` ratchet pin (pre-canon archived strikes; never raise; documented in AGENTS)                                                                                                                                                                                                                                                                                                                      | `6f5a76f`                                                          |
+| 10 | 15-00 §g.2 (registry) ANSWERED-annotated; 18-52 f/9 (README OCI audit) executed and struck; plan 15.2 honesty-fixed                                                                                                                                                                                                                                                                                                                              | `305b4b1`                                                          |
+| 11 | Daemon-committed formatter damage repaired from last-good commits; battery re-green                                                                                                                                                                                                                                                                                                                                                              | `ad0f44a`                                                          |
+| 12 | Final state: battery 5/5 PASS, repo docs gate green, `--all-systems --no-build` all-passed, fmt idempotent                                                                                                                                                                                                                                                                                                                                       | verification snapshot below                                        |
 
 ## b) PARTIALLY DONE
 
-| # | Item | What remains |
-| - | --- | --- |
-| 1 | "View ALL 2026-0*" | review HTML + feedback file never opened; postmortem header-only; planning files skimmed structurally, not line-by-line |
-| 2 | Render verification of ~500 new strikes | structural gates pass; glow/pandoc `<del>` never run (rides T65) |
-| 3 | annotate_max | pinned (358), not drained; ratchets down on future touches |
-| 4 | Push state | 9 session commits local-only; origin master CI red until pushed (owner-gated) |
+| # | Item                                    | What remains                                                                                                            |
+| - | --------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| 1 | "View ALL 2026-0*"                      | review HTML + feedback file never opened; postmortem header-only; planning files skimmed structurally, not line-by-line |
+| 2 | Render verification of ~500 new strikes | structural gates pass; glow/pandoc `<del>` never run (rides T65)                                                        |
+| 3 | annotate_max                            | pinned (358), not drained; ratchets down on future touches                                                              |
+| 4 | Push state                              | 9 session commits local-only; origin master CI red until pushed (owner-gated)                                           |
 
 ## c) NOT STARTED
 
@@ -103,34 +103,34 @@
 
 **Unblock / owner-gated:**
 
-| # | Task | Effort |
-| - | --- | ------ |
-| 1 | Push the 9 local commits (CI-fix chain + corpus sweep); origin master CI is red until they land | 1min + CI |
-| 2 | Watch CI on the pushed chain (expect green; the format fix is the last root cause) | 15min |
-| 3 | Won't-implement policy verdict (this session reused the dormant brush ~90× under the open policy question) | 15min |
-| 4 | T15 verdict (templ generate in module builds — propose won't-implement, 3rd session carrying it) | 15min |
+| # | Task                                                                                                       | Effort    |
+| - | ---------------------------------------------------------------------------------------------------------- | --------- |
+| 1 | Push the 9 local commits (CI-fix chain + corpus sweep); origin master CI is red until they land            | 1min + CI |
+| 2 | Watch CI on the pushed chain (expect green; the format fix is the last root cause)                         | 15min     |
+| 3 | Won't-implement policy verdict (this session reused the dormant brush ~90× under the open policy question) | 15min     |
+| 4 | T15 verdict (templ generate in module builds — propose won't-implement, 3rd session carrying it)           | 15min     |
 
 **This session's loose ends:**
 
-| # | Task | Effort |
-| - | --- | ------ |
-| 5 | Render-verify the strike corpus (glow + pandoc `<del>`); folds into T65's P23 | 30min |
-| 6 | Trash the `result` symlink (repo root, gitignored residue) | 1min |
-| 7 | Actually view the 3 unopened 2026-0* files (review HTML, feedback, postmortem) for completeness | 15min |
-| 8 | Ratchet drill: next archived-file touch should drop `annotate_max` below 358 | episodic |
-| 9 | Add `check-rows --strict` + `bare-rows` (writer gates) to the REPO gate — today they run only in-session; the flake check runs the weaker vendored pair | 1h |
-| 10 | Upstream the ROUTED-arrow classification to the docs-gates repo; then re-vendor cleanly | 1h |
-| 11 | Concurrent-actor detector: cheap pre-report check (mtimes younger than session start outside my edit set) — this session needed it twice | 30min |
-| 12 | Teach annotate.go a heading-item mode (or codify "§b headings stay bare" in the skill) so the 08-12 shape doesn't need a silent judgment call | 1h |
+| #  | Task                                                                                                                                                    | Effort   |
+| -- | ------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
+| 5  | Render-verify the strike corpus (glow + pandoc `<del>`); folds into T65's P23                                                                           | 30min    |
+| 6  | Trash the `result` symlink (repo root, gitignored residue)                                                                                              | 1min     |
+| 7  | Actually view the 3 unopened 2026-0* files (review HTML, feedback, postmortem) for completeness                                                         | 15min    |
+| 8  | Ratchet drill: next archived-file touch should drop `annotate_max` below 358                                                                            | episodic |
+| 9  | Add `check-rows --strict` + `bare-rows` (writer gates) to the REPO gate — today they run only in-session; the flake check runs the weaker vendored pair | 1h       |
+| 10 | Upstream the ROUTED-arrow classification to the docs-gates repo; then re-vendor cleanly                                                                 | 1h       |
+| 11 | Concurrent-actor detector: cheap pre-report check (mtimes younger than session start outside my edit set) — this session needed it twice                | 30min    |
+| 12 | Teach annotate.go a heading-item mode (or codify "§b headings stay bare" in the skill) so the 08-12 shape doesn't need a silent judgment call           | 1h       |
 
 **Register (already in TODO_LIST — by reference):**
 
-| # | Rows |
-| - | --- |
+| #  | Rows                                                                                                                                                                                       |
+| -- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | 13 | T4/T5 fleet migrations; T34 option sweep; T60 fleet audit; T61–T63 cross-repo (SKILLS ×2, crush-config lessons); T64 self-host; T65 P21–P26 polish; T66 stray branch; T67 CI-run decompose |
-| 14 | T35–T59 container backlog (docs, shipping capability, fleet migrations, verification/CI, hygiene) |
-| 15 | Blocked register: v0.1.0 tag, nixpkgs maintainer PR, SSH CI secret, df9a5ff rebase, won't-implement policy, T15 |
-| 16 | ROADMAP Open questions ×5 (policy, allowed-tools enforcement, skill re-verification cadence, daemon WIP guard, second actor identity) |
+| 14 | T35–T59 container backlog (docs, shipping capability, fleet migrations, verification/CI, hygiene)                                                                                          |
+| 15 | Blocked register: v0.1.0 tag, nixpkgs maintainer PR, SSH CI secret, df9a5ff rebase, won't-implement policy, T15                                                                            |
+| 16 | ROADMAP Open questions ×5 (policy, allowed-tools enforcement, skill re-verification cadence, daemon WIP guard, second actor identity)                                                      |
 
 ## g) Questions I cannot figure out myself
 

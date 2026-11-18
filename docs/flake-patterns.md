@@ -375,7 +375,7 @@ steps:
   - uses: actions/checkout@v4
   - uses: cachix/install-nix-action@v31
   - run: nix build .#<pname>-image
-  - run: nix run .#<pname>-image-load   # needs docker on the runner
+  - run: nix run .#<pname>-image-load # needs docker on the runner
   - run: docker tag <image> ghcr.io/<owner>/<name>:${{ github.sha }}-${{ matrix.arch }}
   - run: docker push ...
 # merge job:

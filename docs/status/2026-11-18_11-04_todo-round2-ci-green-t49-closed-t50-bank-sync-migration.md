@@ -9,14 +9,14 @@ repaired at `df0aaff`, CI verdict pending)
 
 ## a) FULLY DONE (this session, verified)
 
-| # | Item | Evidence |
-|---|------|----------|
-| 1 | **CI verdict on repair push `df0aaff`** (run 44246957215) | All jobs green EXCEPT `flake-lock-freshness` (nixpkgs pin 2 days stale: `d5cc683` → `1a08097`) |
-| 2 | **Flake.lock freshness fixed** | Full `nix flake update` (only nixpkgs moved), `nix flake check --all-systems --no-build` green locally, daemon committed as `a393e23`, pushed, **CI run 44248401045 ALL GREEN** (smoke, shellcheck, old-nixpkgs, integration x2, check x2, flake-lock-freshness) |
+| # | Item                                                           | Evidence                                                                                                                                                                                                                                                                                                                                                                               |
+| - | -------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1 | **CI verdict on repair push `df0aaff`** (run 44246957215)      | All jobs green EXCEPT `flake-lock-freshness` (nixpkgs pin 2 days stale: `d5cc683` → `1a08097`)                                                                                                                                                                                                                                                                                         |
+| 2 | **Flake.lock freshness fixed**                                 | Full `nix flake update` (only nixpkgs moved), `nix flake check --all-systems --no-build` green locally, daemon committed as `a393e23`, pushed, **CI run 44248401045 ALL GREEN** (smoke, shellcheck, old-nixpkgs, integration x2, check x2, flake-lock-freshness)                                                                                                                       |
 | 3 | **T49 tail — standard-bug-tracking-schema container verified** | Real image attr confirmed: **`issue-shield-image`** (NOT `standard-bug-tracking-schema-image`). Stale vendorHash fixed (`sha256-gh8Ng…`), `nix build .#issue-shield-image` GREEN, `checks.container-structure` GREEN, eval green. Dockerfile removal was already daemon-committed (`227300fa`); vendorHash fix committed as `91289661`. Repo ahead 3, unpushed (push approval pending) |
-| 4 | **T50 deps audit — ZERO drift** | Every LarsArtmann require in bank-sync go.mod resolves via the 16-entry `deps` map (nested modules via mkPreparedSource auto-discovery) or `publicDeps`. The three suspicious extras (go-flightrecorder, go-idempotency, go-sse root) are all real requires. Nothing to fix |
-| 5 | **T50 module swap — implemented and eval-green** (see b) | `nix flake check --no-build` green on x86_64-linux; all-systems fails ONLY on pre-existing `erraudit` linux-only meta (identical before migration — proven) |
-| 6 | **T50 main package builds GREEN through the module** | `nix build .#default` exit 0; `checks.test` (hermetic Go tests), `checks.vendor-witness` (content markers — proves the module's prepared source vendors the exact pinned trees), `checks.vendor-hash` all build green |
+| 4 | **T50 deps audit — ZERO drift**                                | Every LarsArtmann require in bank-sync go.mod resolves via the 16-entry `deps` map (nested modules via mkPreparedSource auto-discovery) or `publicDeps`. The three suspicious extras (go-flightrecorder, go-idempotency, go-sse root) are all real requires. Nothing to fix                                                                                                            |
+| 5 | **T50 module swap — implemented and eval-green** (see b)       | `nix flake check --no-build` green on x86_64-linux; all-systems fails ONLY on pre-existing `erraudit` linux-only meta (identical before migration — proven)                                                                                                                                                                                                                            |
+| 6 | **T50 main package builds GREEN through the module**           | `nix build .#default` exit 0; `checks.test` (hermetic Go tests), `checks.vendor-witness` (content markers — proves the module's prepared source vendors the exact pinned trees), `checks.vendor-hash` all build green                                                                                                                                                                  |
 
 ## b) PARTIALLY DONE
 
@@ -63,14 +63,14 @@ it fails with the IDENTICAL hash mismatch. The migration merely forced the
 first FOD rebuilds since the 2026-11-13 "A12 wave 1" pin convergence
 (bank-sync CI is billing-disabled → nobody had rebuilt).
 
-| Breakage (all pre-existing, all since ~2026-11-13 A2) | Root cause | Status |
-|---|---|---|
+| Breakage (all pre-existing, all since ~2026-11-13 A2)                                                               | Root cause                                                                                                                                                                                                                                                     | Status                                                                                                                                             |
+| ------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `checks.lint` broken: `templ.ResolveAttributeValue` undefined in vendored `templ-components/utils/svg/svg_templ.go` | cqrs-htmx v4.15.0 requires templ-components **v1.27.0**; A12 pinned the input at the **v1.26.0 tag** → replace maps v1.27.0 requirement onto the v1.26.0 tree, whose generated code calls an API **removed** in a-h/templ v0.3.1100 (which the graph resolves) | **FIXED**: input + go.mod (root/htmx/icons/utils) bumped to v1.27.0; lock updated; vendorHash re-danced (`sha256-wmjPuA…`); main build green again |
-| cqrs-lint FOD: `sed: can't read go.mod` | go-cqrs-lite restructured `cmd/cqrs-lint` → `cmd/cqrs-lint/v4` (module root moved one level down); bank-sync copies `cmd/cqrs-lint/*` and got only a `v4/` dir | **FIXED**: copy from `cmd/cqrs-lint/v4/*`; added `cmdguard/v5` to commonPublicDeps (v4 requires /v5 now) |
-| cqrs-lint FOD: tidy vs committed vendor/ | the v4 module ships a COMMITTED `vendor/` whose modules.txt pins proxy versions; after local replaces rewrite go.mod, tidy refuses | **FIXED**: `postPatchExtra = "rm -rf vendor"` on preparedCqrsLintSrc |
-| cqrs-lint package: `go: inconsistent vendoring` | see b — OLD modules.txt markers vs NEW go.mod graph | **OPEN** — mid-diagnosis |
-| devShell unbuildable | `nix-shell-env` → packages.cqrs-lint → the FOD above | Blocked on the same fix |
-| erraudit FOD | same class (stale since A12) | **FIXED** — builds green |
+| cqrs-lint FOD: `sed: can't read go.mod`                                                                             | go-cqrs-lite restructured `cmd/cqrs-lint` → `cmd/cqrs-lint/v4` (module root moved one level down); bank-sync copies `cmd/cqrs-lint/*` and got only a `v4/` dir                                                                                                 | **FIXED**: copy from `cmd/cqrs-lint/v4/*`; added `cmdguard/v5` to commonPublicDeps (v4 requires /v5 now)                                           |
+| cqrs-lint FOD: tidy vs committed vendor/                                                                            | the v4 module ships a COMMITTED `vendor/` whose modules.txt pins proxy versions; after local replaces rewrite go.mod, tidy refuses                                                                                                                             | **FIXED**: `postPatchExtra = "rm -rf vendor"` on preparedCqrsLintSrc                                                                               |
+| cqrs-lint package: `go: inconsistent vendoring`                                                                     | see b — OLD modules.txt markers vs NEW go.mod graph                                                                                                                                                                                                            | **OPEN** — mid-diagnosis                                                                                                                           |
+| devShell unbuildable                                                                                                | `nix-shell-env` → packages.cqrs-lint → the FOD above                                                                                                                                                                                                           | Blocked on the same fix                                                                                                                            |
+| erraudit FOD                                                                                                        | same class (stale since A12)                                                                                                                                                                                                                                   | **FIXED** — builds green                                                                                                                           |
 
 **My own process mistakes this session (honest list):**
 
@@ -117,13 +117,14 @@ first FOD rebuilds since the 2026-11-13 "A12 wave 1" pin convergence
 ## f) NEXT UP TO 50 (priority order)
 
 **T50 finish (immediate):**
+
 1. Diagnose+fix cqrs-lint `inconsistent vendoring` (stale-FOD pairing vs go.sum-pinned old graph — one experiment distinguishes)
 2. devShell tidy (go.mod/go.sum parity for v1.27.0 bump)
 3. Full bank-sync battery green (lint, golangci-config, pinned-tree, catalog-drift, dep-alignment, cqrs-lint-vendor-witness — its marker may need updating to the v1.15.1-era const, image, image-oci, container-structure, format)
 4. `nix flake check --all-systems --no-build`; cleanup /tmp worktrees+clones
-~~5. Coherent commit(s) per AGENTS/14 daemon protocol~~ — DONE 2026-11-18 rounds 5-7: coherent commits landed; residual daemon races documented (round-7 §d.3)
-6. Stale go-cqrs-lite input comment fix ("frozen at 9673552" vs lock 6f8dd604)
-7. AGENTS/05 + go-nix-helpers migration-guide bank-sync case study (partial adoption IS a supported shape: enable-devshells=false + keep custom battery)
+   ~~5. Coherent commit(s) per AGENTS/14 daemon protocol~~ — DONE 2026-11-18 rounds 5-7: coherent commits landed; residual daemon races documented (round-7 §d.3)
+5. Stale go-cqrs-lite input comment fix ("frozen at 9673552" vs lock 6f8dd604)
+6. AGENTS/05 + go-nix-helpers migration-guide bank-sync case study (partial adoption IS a supported shape: enable-devshells=false + keep custom battery)
 
 **Fleet migrations:**
 8. T5 Standup-Killer / crush-daily off mkGoFlake

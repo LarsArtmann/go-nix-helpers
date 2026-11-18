@@ -315,9 +315,9 @@ preparedSrc = mkPreparedSource {
 
 ## Templates
 
-| Template                                                                   | Use when...                                                             |
-| -------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
-| [`templates/go-standard/flake.nix`](templates/go-standard/flake.nix)       | Starting a new project — recommended, minimal setup                     |
+| Template                                                             | Use when...                                         |
+| -------------------------------------------------------------------- | --------------------------------------------------- |
+| [`templates/go-standard/flake.nix`](templates/go-standard/flake.nix) | Starting a new project — recommended, minimal setup |
 
 ---
 

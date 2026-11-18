@@ -22,16 +22,18 @@ All items below are research/verification work completed and verifiable in this 
 5. **Delivered the 5-tier "smart defaults" proposal** (the session's main deliverable):
 
 _Done-work record — intentionally bare; rows are history, not open items (docs-annotations exempt)._
-<!-- check-rows:ledger -->
-   | # | Removes from consumer flake   | Mechanism                                                                                                                                                     |
-   | - | ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-   | 1 | `vendorHash` chore            | eval-time `null` default when go.mod/go.sum has no external requires + `nix run .#update-vendor-hash` app (build → parse `got: sha256-…` → rewrite flake.nix) |
-   | 2 | `deps = { … }` mirror attrset | auto-wire: parse private requires from go.mod, match repo name → flake input name; missing input → error naming the exact input line to add                   |
-   | 3 | `pname` + `description`       | `pname = repoName self`; description = first non-heading line of README.md                                                                                    |
-   | 4 | `enableTempl = true`          | detect `github.com/a-h/templ` in go.mod                                                                                                                       |
-   | 5 | monorepo `packages = { … }`   | auto-discover `cmd/*/main.go` → one package per binary                                                                                                        |
 
-   Plus guardrails (self-only reads → no IFD; explicit values always win; new logic → pure-functions + property tests) and the endgame sketch: a consumer flake reduced to inputs + `imports` + one `vendorHash` line.
+<!-- check-rows:ledger -->
+
+| # | Removes from consumer flake   | Mechanism                                                                                                                                                     |
+| - | ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1 | `vendorHash` chore            | eval-time `null` default when go.mod/go.sum has no external requires + `nix run .#update-vendor-hash` app (build → parse `got: sha256-…` → rewrite flake.nix) |
+| 2 | `deps = { … }` mirror attrset | auto-wire: parse private requires from go.mod, match repo name → flake input name; missing input → error naming the exact input line to add                   |
+| 3 | `pname` + `description`       | `pname = repoName self`; description = first non-heading line of README.md                                                                                    |
+| 4 | `enableTempl = true`          | detect `github.com/a-h/templ` in go.mod                                                                                                                       |
+| 5 | monorepo `packages = { … }`   | auto-discover `cmd/*/main.go` → one package per binary                                                                                                        |
+
+Plus guardrails (self-only reads → no IFD; explicit values always win; new logic → pure-functions + property tests) and the endgame sketch: a consumer flake reduced to inputs + `imports` + one `vendorHash` line.
 6. **Recommendation given:** ship #1 + #2 together (Pareto: ~80% of recurring friction), #3/#4 quick follow-up, #5 last.
 
 **Evidence:** all reads done via `view`/`rg` this session (files and line numbers cited above). No commits — zero code changes.
@@ -39,10 +41,11 @@ _Done-work record — intentionally bare; rows are history, not open items (docs
 ## b) PARTIALLY DONE
 
 ~~1. **Tier-1 proposal feasibility (vendorHash + deps auto-wire)** — designed and sketched, but **two load-bearing assumptions remain unverified**:~~ done — load-bearing assumption verified TRUE 2026-11-17 (this repo's composite module receives `inputs`); no vendor-hash updater app existed; remaining blocker is the owner go-ahead, which rides ROADMAP Theme 1
-   - Open: does flake-parts pass `inputs` as a module argument to imported modules? (Asserted in the proposal, NOT verified in flake-parts source. If false, proposal #2 needs a different wiring channel, e.g. an explicit `inputs` passthrough option.) Effort to verify: S.
-   - Open: does an update-vendor-hash-style app already exist in the module's `apps` output? I never enumerated the current `apps` section — the proposal may duplicate an existing helper. Effort: S.
-   - Blocker for starting implementation: user decision (see questions) + the two verifications above.
-~~2. **Tier-2/3 proposals (pname/description/templ/monorepo)** — designed at sketch level only; no data-shape decisions made (e.g. how monorepo auto-discovery merges with explicit `packages`, whether `preBuild templ generate` ordering vs `mkPreparedSource` postPatch needs care — flagged in session, unresolved).~~ routed — ROADMAP Theme 1 (sketch-level; data-shape decisions deferred to implementation)
+
+- Open: does flake-parts pass `inputs` as a module argument to imported modules? (Asserted in the proposal, NOT verified in flake-parts source. If false, proposal #2 needs a different wiring channel, e.g. an explicit `inputs` passthrough option.) Effort to verify: S.
+- Open: does an update-vendor-hash-style app already exist in the module's `apps` output? I never enumerated the current `apps` section — the proposal may duplicate an existing helper. Effort: S.
+- Blocker for starting implementation: user decision (see questions) + the two verifications above.
+  ~~2. **Tier-2/3 proposals (pname/description/templ/monorepo)** — designed at sketch level only; no data-shape decisions made (e.g. how monorepo auto-discovery merges with explicit `packages`, whether `preBuild templ generate` ordering vs `mkPreparedSource` postPatch needs care — flagged in session, unresolved).~~ routed — ROADMAP Theme 1 (sketch-level; data-shape decisions deferred to implementation)
 
 ## c) NOT STARTED
 
@@ -82,61 +85,61 @@ No code, builds, or tests were touched this session, so nothing is broken **in t
 
 ### P1 — unblock tier 1 (verifications + decisions)
 
-| # | Task                                                                                               | Impact   | Effort | Category |
-| --- | -------------------------------------------------------------------------------------------------- | -------- | ------ | -------- |
-| ~~1~~ | ~~Verify flake-parts passes `inputs` to imported modules (read flake-parts lib or a consumer module)~~ done — verified TRUE 2026-11-17: this repo's own composite module receives `inputs` as a module argument (flake.nix flakeModules.go-standard) | ~~Critical~~ | ~~S~~ | ~~Research~~ |
-| ~~2~~ | ~~Enumerate current `apps` output of go-standard; confirm no existing vendor-hash updater~~ done — enumerated: no vendor-hash updater app exists; `enableVendorHashCheck` shipped instead (catches drift hermetically) | ~~Critical~~ | ~~S~~ | ~~Research~~ |
-| ~~3~~ | ~~User decision: BuildFlow overlap policy for vendorHash app (question g1)~~ done — resolved by coexistence — enableVendorHashCheck (module gate) + buildflow nix-hash-fix (skill fixer) cover drift without competing writers | ~~Critical~~ | ~~S~~ | ~~Decision~~ |
-| 4 | User decision: inference default-on vs opt-in gate (question g3) **→ routed — owner decision rides the ROADMAP Theme 1 inference ideas (none shipped)** | Critical | S      | Decision |
-| 5 | Audit 7+ consumer repos' go-standard blocks; quantify lines removable per proposal **→ routed — TODO_LIST T60 (fleet audit quantifies per-repo removable lines)** | High     | M      | Research |
-| 6 | Design: how auto-wired deps report themselves (trace/doctor) so failures are debuggable **→ routed — ROADMAP Theme 1 (doctor/trace observability idea)** | High     | S      | Design   |
+| #     | Task                                                                                                                                                                                                                                                 | Impact       | Effort | Category     |
+| ----- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------ | ------ | ------------ |
+| ~~1~~ | ~~Verify flake-parts passes `inputs` to imported modules (read flake-parts lib or a consumer module)~~ done — verified TRUE 2026-11-17: this repo's own composite module receives `inputs` as a module argument (flake.nix flakeModules.go-standard) | ~~Critical~~ | ~~S~~  | ~~Research~~ |
+| ~~2~~ | ~~Enumerate current `apps` output of go-standard; confirm no existing vendor-hash updater~~ done — enumerated: no vendor-hash updater app exists; `enableVendorHashCheck` shipped instead (catches drift hermetically)                               | ~~Critical~~ | ~~S~~  | ~~Research~~ |
+| ~~3~~ | ~~User decision: BuildFlow overlap policy for vendorHash app (question g1)~~ done — resolved by coexistence — enableVendorHashCheck (module gate) + buildflow nix-hash-fix (skill fixer) cover drift without competing writers                       | ~~Critical~~ | ~~S~~  | ~~Decision~~ |
+| 4     | User decision: inference default-on vs opt-in gate (question g3) **→ routed — owner decision rides the ROADMAP Theme 1 inference ideas (none shipped)**                                                                                              | Critical     | S      | Decision     |
+| 5     | Audit 7+ consumer repos' go-standard blocks; quantify lines removable per proposal **→ routed — TODO_LIST T60 (fleet audit quantifies per-repo removable lines)**                                                                                    | High         | M      | Research     |
+| 6     | Design: how auto-wired deps report themselves (trace/doctor) so failures are debuggable **→ routed — ROADMAP Theme 1 (doctor/trace observability idea)**                                                                                             | High         | S      | Design       |
 
 ### P2 — implement tier 1 (vendorHash + deps auto-wire)
 
-| #  | Task                                                                                                                | Impact | Effort | Category      |
-| --- | ------------------------------------------------------------------------------------------------------------------- | ------ | ------ | ------------- |
+| #  | Task                                                                                                                                                                                       | Impact | Effort | Category      |
+| -- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------ | ------ | ------------- |
 | 7  | `privateRequiresFromGoMod` pure function (parse go.mod requires matching privateDepPattern, minus publicDeps) **→ routed — ROADMAP Theme 1 (tier-1 vendorHash/deps auto-wire, unshipped)** | High   | M      | Feature       |
-| 8  | Property tests for #7 in `test-pure-functions.nix` (idempotence, /vN paths, publicDeps exclusion, malformed go.mod) **→ routed — ROADMAP Theme 1** | High   | M      | Quality       |
-| 9  | Input-name→repo-name matching pure function + "add input X" error message generator **→ routed — ROADMAP Theme 1** | High   | S      | Feature       |
-| 10 | Wire auto-deps into module: `deps` defaults derive from inputs × go.mod; explicit `deps` wins entirely **→ routed — ROADMAP Theme 1** | High   | M      | Feature       |
-| 11 | Eval-time go.mod/go.sum read → `vendorHash` default `null` when no external requires **→ routed — ROADMAP Theme 1** | High   | S      | Feature       |
-| 12 | `apps.update-vendor-hash`: hermetic build→parse→rewrite script (writeShellScriptBin, no @latest/network tricks) **→ routed — ROADMAP Theme 1** | High   | M      | Feature       |
-| 13 | Test: moduleTest assertions for auto-deps (wired, missing-input error, explicit-override wins) **→ routed — ROADMAP Theme 1** | High   | M      | Quality       |
-| 14 | Test: integration scenario in `test.nix` for auto-wired deps + null vendorHash path **→ routed — ROADMAP Theme 1** | High   | M      | Quality       |
-| 15 | Docs: README + man page + migration guide for both features **→ routed — ROADMAP Theme 1** | High   | S      | Documentation |
-| 16 | Roll out to 1 pilot consumer; measure flake.nix line delta; then remaining consumers **→ routed — ROADMAP Theme 1** | High   | M      | Feature       |
+| 8  | Property tests for #7 in `test-pure-functions.nix` (idempotence, /vN paths, publicDeps exclusion, malformed go.mod) **→ routed — ROADMAP Theme 1**                                         | High   | M      | Quality       |
+| 9  | Input-name→repo-name matching pure function + "add input X" error message generator **→ routed — ROADMAP Theme 1**                                                                         | High   | S      | Feature       |
+| 10 | Wire auto-deps into module: `deps` defaults derive from inputs × go.mod; explicit `deps` wins entirely **→ routed — ROADMAP Theme 1**                                                      | High   | M      | Feature       |
+| 11 | Eval-time go.mod/go.sum read → `vendorHash` default `null` when no external requires **→ routed — ROADMAP Theme 1**                                                                        | High   | S      | Feature       |
+| 12 | `apps.update-vendor-hash`: hermetic build→parse→rewrite script (writeShellScriptBin, no @latest/network tricks) **→ routed — ROADMAP Theme 1**                                             | High   | M      | Feature       |
+| 13 | Test: moduleTest assertions for auto-deps (wired, missing-input error, explicit-override wins) **→ routed — ROADMAP Theme 1**                                                              | High   | M      | Quality       |
+| 14 | Test: integration scenario in `test.nix` for auto-wired deps + null vendorHash path **→ routed — ROADMAP Theme 1**                                                                         | High   | M      | Quality       |
+| 15 | Docs: README + man page + migration guide for both features **→ routed — ROADMAP Theme 1**                                                                                                 | High   | S      | Documentation |
+| 16 | Roll out to 1 pilot consumer; measure flake.nix line delta; then remaining consumers **→ routed — ROADMAP Theme 1**                                                                        | High   | M      | Feature       |
 
 ### P3 — implement tier 2 (identity + tool defaults)
 
-| #  | Task                                                                                                                   | Impact | Effort | Category      |
-| --- | ---------------------------------------------------------------------------------------------------------------------- | ------ | ------ | ------------- |
-| 17 | `pname` default = `repoName self` (store-path base name); test dirty-tree case **→ routed — ROADMAP Theme 1 (pname default idea)** | Medium | S      | Feature       |
-| 18 | `description` default = first non-heading README line, with pathExists guard + fallback **→ routed — ROADMAP Theme 1 (README description idea)** | Medium | S      | Feature       |
-| 19 | templ auto-detect: go.mod requires `github.com/a-h/templ` → enableTempl default true **→ routed — ROADMAP Theme 1 (templ auto-detect idea)** | Medium | S      | Feature       |
+| #  | Task                                                                                                                                                                                        | Impact | Effort | Category      |
+| -- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | ------ | ------------- |
+| 17 | `pname` default = `repoName self` (store-path base name); test dirty-tree case **→ routed — ROADMAP Theme 1 (pname default idea)**                                                          | Medium | S      | Feature       |
+| 18 | `description` default = first non-heading README line, with pathExists guard + fallback **→ routed — ROADMAP Theme 1 (README description idea)**                                            | Medium | S      | Feature       |
+| 19 | templ auto-detect: go.mod requires `github.com/a-h/templ` → enableTempl default true **→ routed — ROADMAP Theme 1 (templ auto-detect idea)**                                                | Medium | S      | Feature       |
 | 20 | Verify/spec `preBuild templ generate` ordering vs mkPreparedSource `postPatch` before any templ magic beyond detection **→ routed — ROADMAP Theme 1 (ordering design note rides the idea)** | Medium | S      | Design        |
-| 21 | Tests + docs for #17–#19 **→ routed — ROADMAP Theme 1** | Medium | M      | Quality       |
-| 22 | Extend template `templates/go-standard/flake.nix` to the endgame 3-line form once tiers land **→ routed — ROADMAP Theme 1 (endgame template form)** | Medium | S      | Documentation |
+| 21 | Tests + docs for #17–#19 **→ routed — ROADMAP Theme 1**                                                                                                                                     | Medium | M      | Quality       |
+| 22 | Extend template `templates/go-standard/flake.nix` to the endgame 3-line form once tiers land **→ routed — ROADMAP Theme 1 (endgame template form)**                                         | Medium | S      | Documentation |
 
 ### P4 — implement tier 3 (monorepo + observability)
 
-| #  | Task                                                                                                        | Impact | Effort | Category |
-| --- | ----------------------------------------------------------------------------------------------------------- | ------ | ------ | -------- |
+| #  | Task                                                                                                                                                               | Impact | Effort | Category |
+| -- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------ | ------ | -------- |
 | 23 | Generalize `walkTempl` into a reusable source walker (files by predicate, excludes testdata/vendor/example) **→ routed — ROADMAP Theme 6 (walker generalization)** | Medium | M      | Refactor |
-| 24 | `cmd/*/main.go` discovery → default `packages` entries; define merge semantics with explicit `packages` **→ routed — ROADMAP Theme 1 (monorepo auto-discovery)** | Medium | M      | Feature  |
-| 25 | `subPackages` smart default (root main.go vs single cmd/ vs multi) **→ routed — ROADMAP Theme 1 (subPackages auto-detect)** | Medium | M      | Feature  |
-| 26 | `nix run .#doctor` app or `go-standard.traceInferences` option summarizing every inference **→ routed — ROADMAP Theme 1 (doctor app)** | Medium | M      | Feature  |
-| 27 | Tests for monorepo discovery (mock fixtures exist under test-assets/) **→ routed — ROADMAP Theme 1** | Medium | M      | Quality  |
+| 24 | `cmd/*/main.go` discovery → default `packages` entries; define merge semantics with explicit `packages` **→ routed — ROADMAP Theme 1 (monorepo auto-discovery)**   | Medium | M      | Feature  |
+| 25 | `subPackages` smart default (root main.go vs single cmd/ vs multi) **→ routed — ROADMAP Theme 1 (subPackages auto-detect)**                                        | Medium | M      | Feature  |
+| 26 | `nix run .#doctor` app or `go-standard.traceInferences` option summarizing every inference **→ routed — ROADMAP Theme 1 (doctor app)**                             | Medium | M      | Feature  |
+| 27 | Tests for monorepo discovery (mock fixtures exist under test-assets/) **→ routed — ROADMAP Theme 1**                                                               | Medium | M      | Quality  |
 
 ### P5 — hygiene noticed this session (from git snapshot + AGENTS.md, no new research)
 
-| #  | Task                                                                                                                                                                       | Impact | Effort | Category      |
-| --- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | ------ | ------------- |
-| ~~28~~ | ~~`.github/dependabot.yml` was untracked at session start — confirm it's committed and CI sees it~~ done — dependabot.yml committed (CHANGELOG entry) | ~~Medium~~ | ~~S~~ | ~~Cleanup~~ |
-| ~~29~~ | ~~Working tree had 6 modified files at session start (AGENTS.md, README.md, 2 status docs, flake.lock, mock-project asset) — confirm auto-commit daemon captured them sanely~~ done — daemon captured the batch sanely (history clean through 2026-11) | ~~Medium~~ | ~~S~~ | ~~Cleanup~~ |
-| 30 | Register `maintainers.larsartmann` in nixpkgs (long-standing AGENTS.md gotcha) **→ routed — TODO_LIST Blocked (nixpkgs maintainer PR)** | Low    | M      | Quality       |
-| 31 | Remove deprecated `mkGoFlake.nix` + its trace warning after last consumer migrates **→ routed — TODO_LIST Blocked (v0.1.0 tag unlocks mkGoFlake removal)** | Low    | M      | Cleanup       |
-| 32 | Remove deprecated `templates/go-flake-parts/` (same condition) **→ routed — TODO_LIST Blocked (v0.1.0 tag unlocks template deletion)** | Low    | S      | Cleanup       |
-| ~~33~~ | ~~Run HARVEST of section (f) into TODO_LIST.md / ROADMAP.md once user approves~~ done — harvested (2026-09-24 docs pass + 2026-11-17 corpus sweep) | ~~Medium~~ | ~~S~~ | ~~Documentation~~ |
+| #      | Task                                                                                                                                                                                                                                                   | Impact     | Effort | Category          |
+| ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------- | ------ | ----------------- |
+| ~~28~~ | ~~`.github/dependabot.yml` was untracked at session start — confirm it's committed and CI sees it~~ done — dependabot.yml committed (CHANGELOG entry)                                                                                                  | ~~Medium~~ | ~~S~~  | ~~Cleanup~~       |
+| ~~29~~ | ~~Working tree had 6 modified files at session start (AGENTS.md, README.md, 2 status docs, flake.lock, mock-project asset) — confirm auto-commit daemon captured them sanely~~ done — daemon captured the batch sanely (history clean through 2026-11) | ~~Medium~~ | ~~S~~  | ~~Cleanup~~       |
+| 30     | Register `maintainers.larsartmann` in nixpkgs (long-standing AGENTS.md gotcha) **→ routed — TODO_LIST Blocked (nixpkgs maintainer PR)**                                                                                                                | Low        | M      | Quality           |
+| 31     | Remove deprecated `mkGoFlake.nix` + its trace warning after last consumer migrates **→ routed — TODO_LIST Blocked (v0.1.0 tag unlocks mkGoFlake removal)**                                                                                             | Low        | M      | Cleanup           |
+| 32     | Remove deprecated `templates/go-flake-parts/` (same condition) **→ routed — TODO_LIST Blocked (v0.1.0 tag unlocks template deletion)**                                                                                                                 | Low        | S      | Cleanup           |
+| ~~33~~ | ~~Run HARVEST of section (f) into TODO_LIST.md / ROADMAP.md once user approves~~ done — harvested (2026-09-24 docs pass + 2026-11-17 corpus sweep)                                                                                                     | ~~Medium~~ | ~~S~~  | ~~Documentation~~ |
 
 ## g) Questions I cannot answer myself
 
