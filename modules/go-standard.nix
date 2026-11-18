@@ -1031,7 +1031,7 @@ in
 
         # Single declaration site for toolchain resolution — attr pin, auto
         # newest branch, go.dev source tarball, override hook — lives in
-        # pure-functions.goBaseFrom (shared with mkGoFlake).
+        # pure-functions.goBaseFrom.
         goPkg = pure.goBaseFrom {
           inherit pkgs;
           inherit (cfg)

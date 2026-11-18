@@ -134,7 +134,7 @@ outputs = inputs@{ self, ... }: flake-parts.lib.mkFlake { inherit inputs; } {
 
 ## Correct Template Structure
 
-See `templates/go-flake-parts/flake.nix` for the gold standard. Key sections in order:
+See `templates/go-standard/flake.nix` for the gold standard. Key sections in order:
 
 1. `inputs` — nixpkgs, flake-parts, go-nix-helpers (treefmt-nix + systems bundled)
 2. `outputs` with `inputs@{ self, ... }`

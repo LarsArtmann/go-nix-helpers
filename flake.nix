@@ -94,12 +94,6 @@
             pure = import ./pure-functions.nix { lib = inputs.nixpkgs.lib; };
           in
           pure.newestGoAttrName (builtins.attrNames inputs.nixpkgs.legacyPackages.x86_64-linux);
-        lib.mkGoFlake =
-          args:
-          builtins.trace "WARNING: mkGoFlake.nix is deprecated and will be removed in the first tagged release (v1.0.0). Migrate to flakeModules.go-standard — see docs/migration-guide.md" (
-            import ./mkGoFlake.nix args
-          );
-
         # go-standard is a composite module that bundles treefmt-nix and
         # nix2container internally, so consumers do NOT need to declare
         # treefmt-nix, nix2container or systems as inputs.
@@ -258,10 +252,6 @@
                     {
                       name = "lib.mkPreparedSource";
                       value = toString (self.lib ? mkPreparedSource);
-                    }
-                    {
-                      name = "lib.mkGoFlake";
-                      value = toString (self.lib ? mkGoFlake);
                     }
                   ]
               )}

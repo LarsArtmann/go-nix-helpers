@@ -20,7 +20,12 @@ recommended `flakeModules.go-standard` module.
 
 ---
 
-## From mkGoFlake.nix
+## From mkGoFlake.nix (removed post-v0.1.0)
+
+> `mkGoFlake.nix`, its `lib.mkGoFlake` export, and the `go-flake-parts`
+> template were REMOVED from master after the v0.1.0 tag (2026-11-18).
+> A flake still importing them must pin `go-nix-helpers/v0.1.0` — or
+> migrate using this section, which is kept for exactly that.
 
 ### Before (mkGoFlake.nix)
 

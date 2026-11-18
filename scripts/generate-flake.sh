@@ -8,14 +8,14 @@
 #   --no-push       Don't push to GitHub (default)
 #   --push          Push to GitHub after generation
 #   --dir <path>    Target directory (default: $PROJECTS_DIR/<project-name>)
-#   --template <t>  Template to use: "go-standard" (default) or "go-flake-parts"
+#   --template <t>  Template to use: "go-standard" (default)
 #   --dry-run       Print what would be created without writing any files
 #   --verbose       List created files after generation
 #   --list-templates  Print available templates and exit
 #   --help          Show this help message
 set -euo pipefail
 
-AVAILABLE_TEMPLATES=("go-standard" "go-flake-parts")
+AVAILABLE_TEMPLATES=("go-standard")
 
 print_templates() {
   echo "Available templates:"
@@ -35,7 +35,7 @@ if [ $# -eq 0 ] || [ "${1:-}" = "--help" ] || [ "${1:-}" = "-h" ]; then
   echo "  --push          Push to GitHub after generation"
   # shellcheck disable=SC2016 # $PROJECTS_DIR is intentionally literal in help text
   echo '  --dir <path>    Target directory (default: $PROJECTS_DIR/<project-name>)'
-  echo '  --template <t>  Template: "go-standard" (default) or "go-flake-parts"'
+  echo '  --template <t>  Template: "go-standard" (default)'
   echo "  --dry-run       Print what would be created without writing any files"
   echo "  --verbose       List created files after generation"
   echo "  --list-templates  Print available templates and exit"
@@ -183,23 +183,9 @@ CREATED_FILES+=("$TARGET")
 sed -i "s|REPLACE_ME|$PROJECT_SED|g" "$TARGET"
 sed -i "s|YOUR-PROJECT-NAME|$PROJECT_SED|g" "$TARGET"
 
-# Add templ support if requested (only relevant for go-flake-parts template)
-if [ "$USE_TEMPL" = true ] && [ "$TEMPLATE" = "go-flake-parts" ]; then
-  sed -i '/programs = {/a\              templ.enable = true;' "$TARGET"
-  sed -i '/golangci-lint$/a\                templ,' "$TARGET"
-fi
-
 # For go-standard template, uncomment the enableTempl line
 if [ "$USE_TEMPL" = true ] && [ "$TEMPLATE" = "go-standard" ]; then
   sed -i 's/# *enableTempl = true;/enableTempl = true;/' "$TARGET"
-fi
-
-# Remove private deps section if not requested (go-flake-parts template only)
-if [ "$USE_PRIVATE_DEPS" = false ] && [ "$TEMPLATE" = "go-flake-parts" ]; then
-  # Anchor on the input declaration line and its own closing brace so the
-  # range cannot spill into the header comment (which also mentions
-  # go-nix-helpers) or orphan the inputs closing brace.
-  sed -i '/^    go-nix-helpers = {/,/^    };/s/^/# /' "$TARGET"
 fi
 
 # For go-standard template, add deps section when --private-deps is requested

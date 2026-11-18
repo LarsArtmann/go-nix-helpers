@@ -78,7 +78,7 @@ let
     '';
 
   # Resolve the Go toolchain package from consumer options — the single
-  # declaration site shared by the go-standard module and mkGoFlake.
+  # declaration site for the go-standard module.
   #   goPkgAttr:          explicit nixpkgs attr ("go_1_27") wins; null picks
   #                       the newest packaged go_1_XX branch (newestGoAttrName)
   #                       and falls back to pkgs.go when no branch attr exists.

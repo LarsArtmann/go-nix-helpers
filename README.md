@@ -313,21 +313,11 @@ preparedSrc = mkPreparedSource {
 | `publicDeps`           | `[]`                                | Module paths excluded from private validation (versioned-path aware: base path matches `/v2`, `/v3`, etc.) |
 | `postPatchExtra`       | `""`                                | Additional shell commands appended to `postPatch`                                                          |
 
-### `mkGoFlake.nix` (deprecated)
-
-> **⚠️ Deprecated.** Use `flakeModules.go-standard` instead. See the
-> [migration guide](docs/migration-guide.md) for step-by-step instructions.
-
-The function-based predecessor to `flakeModules.go-standard`. Kept for backwards compatibility; emits a deprecation warning on use.
-
----
-
 ## Templates
 
 | Template                                                                   | Use when...                                                             |
 | -------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
 | [`templates/go-standard/flake.nix`](templates/go-standard/flake.nix)       | Starting a new project — recommended, minimal setup                     |
-| [`templates/go-flake-parts/flake.nix`](templates/go-flake-parts/flake.nix) | ⚠️ **Deprecated.** Old 5-input manual pattern. Migrate to `go-standard`. |
 
 ---
 

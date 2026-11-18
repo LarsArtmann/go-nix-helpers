@@ -14,6 +14,14 @@ below through that section shipped before or with it.
 
 - Nothing yet.
 
+### Removed
+
+- `mkGoFlake.nix`, the `lib.mkGoFlake` export, and the deprecated
+  `go-flake-parts` template — the v0.1.0 removal contract. Last live
+  consumer (ucr-archive) migrated to `flakeModules.go-standard` pinned at
+  the tag; flake-check structural output no longer asserts `lib.mkGoFlake`
+  (moduleTest 237 checks).
+
 ### Fixed
 
 - Nothing yet.

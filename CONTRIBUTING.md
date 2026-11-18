@@ -46,7 +46,6 @@ nix run .#verifyValidation    # negative-case test (run outside sandbox)
 | ------------------------- | ---------------------------------------------------- |
 | `modules/go-standard.nix` | The main flake-parts module                          |
 | `mkPreparedSource.nix`    | Core private-dep injection helper                    |
-| `mkGoFlake.nix`           | Deprecated function-based predecessor                |
 | `flake.nix`               | Self-hosting flake: checks, formatter, devShell, lib |
 | `test.nix`                | Integration tests for mkPreparedSource               |
 | `test-module.nix`         | Module-level tests for go-standard options/outputs   |

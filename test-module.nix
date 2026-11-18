@@ -902,51 +902,6 @@ let
         excludeSubModuleDirs = [ "test*dir" ];
       }).outPath;
 
-  # --- mkGoFlake (deprecated) eval smoke ------------------------------------
-  # Two consumers still ship the deprecated path; a minimal config must keep
-  # evaluating (module + perSystem outputs) until it is deleted post-v0.1.0.
-  # The auto-default logic inside is shared with go-standard via
-  # pure-functions.goBaseFrom, so this also guards that wiring.
-  mkGoFlakeModule = import ./mkGoFlake.nix {
-    inputs = gnhInputs // {
-      systems = ./test-assets/systems.nix;
-      # Stub the treefmt flakeModule: evaluating the REAL one pulls
-      # treefmt-nix's own locked inputs into the closure, none of which
-      # are inputs of this flake (store-invalid under --no-build). The
-      # smoke covers mkGoFlake's own wiring (goBaseFrom resolution,
-      # packages/devShells), not treefmt integration.
-      treefmt-nix.flakeModule = { };
-    };
-    self = mockSelf;
-    pname = "smoke";
-    version = "0.0.0";
-    vendorHash = null;
-    description = "smoke";
-    src = mockSelf;
-  };
-  mkGoFlakeEval = lib.evalModules {
-    modules = [
-      flakePartsStub
-      mkGoFlakeModule
-    ];
-  };
-  mkGoFlakePerSystemEval = lib.evalModules {
-    modules = [
-      perSystemStubOptions
-      (
-        let
-          fn = mkGoFlakeEval.config.perSystem;
-        in
-        if builtins.isFunction fn then fn else _: fn
-      )
-    ];
-    specialArgs = {
-      inherit pkgs lib;
-      config = mkGoFlakePerSystemEval.config or { };
-    };
-  };
-  mkGoFlakeSmoke = builtins.tryEval (mkGoFlakePerSystemEval.config.packages ? default);
-
   # --- go.mod floor check test ----------------------------------------------
   # mockSelf's go.mod declares `go 1.26`; a toolchain overridden BELOW that
   # floor must throw at eval with an actionable message (GOTOOLCHAIN=local
@@ -1567,9 +1522,6 @@ let
       !badExcludeEval.success
       && lib.hasInfix "literal directory names" (builtins.readFile ./mkPreparedSource.nix)
     ) "eval throw naming the contract")
-    (assertCheck "mkGoFlake (deprecated) still evaluates a minimal config" (
-      mkGoFlakeSmoke.success && mkGoFlakeSmoke.value
-    ) "packages.default evaluates")
     # --- Behavioral: eval-time go.mod floor check ---
     (assertCheck "go.mod floor above toolchain throws at eval" (!lowFloorEval.success) "eval throw")
     (assertCheck "floor-check message names the requirement and both versions" (

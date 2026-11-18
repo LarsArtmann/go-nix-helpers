@@ -29,8 +29,8 @@ Raw ideas:
 - Migrate the remaining consumer fleet to `flakeModules.go-standard` (10 Tier A
   repos done 2026-08-10; Tier B + Tier C remain — see TODO_LIST T4/T5)
 - Add a migration script that rewrites a 5-input manual flake.nix to the 3-input module
-- Fully remove `mkGoFlake.nix` once all consumers have migrated (currently emits deprecation trace warning; removal target is the first tagged release)
-- Remove `templates/go-flake-parts/` once consumers no longer need it (currently marked deprecated with banner; still pins `go_1_26`)
+- ~~Fully remove `mkGoFlake.nix`~~ DONE 2026-11-18 (post-v0.1.0; last consumer ucr-archive migrated to go-standard at the tag)
+- ~~Remove `templates/go-flake-parts/`~~ DONE 2026-11-18 (same batch; CI template smoke now go-standard only)
 - Provide a shared overlay surface so projects can compose each other's packages cleanly
 - Make "eval one real consumer" part of the definition of done for changes to shared
   defaults (the `goPkgAttr` auto-default flip shipped without any consumer smoke-eval)

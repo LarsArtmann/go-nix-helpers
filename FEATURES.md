@@ -25,7 +25,7 @@
 | Dep-copy sanitization (stray `result` symlinks)   | 🟢 `FULLY_FUNCTIONAL` | Stray `result`/`result-*` symlinks deleted from `_local_deps/` after `chmod -R u+w`; regression-tested in `test.nix` (mockDep plants dangling links) |
 | Pseudo-version normalization                      | 🟢 `FULLY_FUNCTIONAL` | `mkPreparedSource.nix:247-251`                                                                                                 |
 | Build-time validation of private `require`        | 🟢 `FULLY_FUNCTIONAL` | `mkPreparedSource.nix:269-301`; tested by `nix run .#verifyValidation`; `publicDeps` exclusion list available for public repos |
-| `publicDeps` exclusion list                       | 🟢 `FULLY_FUNCTIONAL` | List of module paths excluded from private validation; forwarded through go-standard and mkGoFlake                             |
+| `publicDeps` exclusion list                       | 🟢 `FULLY_FUNCTIONAL` | List of module paths excluded from private validation; forwarded through go-standard                             |
 | Manual `requireDeps` injection                    | 🟢 `FULLY_FUNCTIONAL` | `mkPreparedSource.nix:239-242`                                                                                                 |
 
 ## Flake-parts module: `go-standard`
@@ -94,7 +94,6 @@ daemon. Bundled into the composite module (still 3 consumer inputs).
 | Feature                                             | Status                    | Notes                                                          |
 | --------------------------------------------------- | ------------------------- | -------------------------------------------------------------- |
 | `templates/go-standard/flake.nix` (3-input minimal) | 🟢 `FULLY_FUNCTIONAL`     | Copy-paste quickstart, recommended                             |
-| `templates/go-flake-parts/flake.nix` (manual full)  | 🟡 `PARTIALLY_FUNCTIONAL` | ⚠️ **Deprecated.** Marked with banner; migrate to `go-standard` |
 
 ## Developer scripts
 
@@ -115,7 +114,7 @@ daemon. Bundled into the composite module (still 3 consumer inputs).
 | Module test suite (`test-module.nix`)                    | 🟢 `FULLY_FUNCTIONAL`     | 238 assertions; behavioral tests for buildFlags/ldflags/proxyVendor/GOPRIVATE/requireDeps forwarding/extraBuildAttrs (6 attrs + dual form)/enableCompletions negative/treefmt config/shfmt toggle/enableTempl=false/monorepo version/goPkgAttr auto/goExperiment+cgoEnabled/completionStyle/go.mod floor/stale pin/container (43) |
 | Pure function property tests (`test-pure-functions.nix`) | 🟢 `FULLY_FUNCTIONAL`     | 72 checks: idempotence, no-`/vN`-in-output, determinism, no-slash, edge cases, `newestGoAttrName` numeric compare, `staleGoAttrName`, `goModFloorMessage` content, `goBaseFrom` resolution (pin/auto/fallback/override/tarball), `mkSecretTokens`, `evalLockGuards` drift injection — wired as `checks.pureFunctions`             |
 | Docs-annotation gates (`checks.docsAnnotations`)         | 🟢 `FULLY_FUNCTIONAL`     | Gate 1: every archived status report carries a strikethrough resolution; gate 2: no table mixes struck/unstruck rows (vendored `check-rows.py`). Guard-the-guard verified red on planted defects                                                                                                                                  |
-| Structural output verification (`checks.structural`)     | 🟢 `FULLY_FUNCTIONAL`     | Verifies `flakeModules.go-standard`, `lib.mkPreparedSource`, `lib.mkGoFlake` exist in flake outputs                                                                                                                                                                                                                               |
+| Structural output verification (`checks.structural`)     | 🟢 `FULLY_FUNCTIONAL`     | Verifies `flakeModules.go-standard` and `lib.mkPreparedSource` exist in flake outputs                                                                                                                                                                                                                               |
 | Template eval check (`checks.templateEval`)              | 🟢 `FULLY_FUNCTIONAL`     | Evaluates the go-standard template's `outputs` fn with mock inputs; catches unbound-variable bugs                                                                                                                                                                                                                                 |
 | Templ fixture guard (`checks.templFixtureGuard`)         | 🟢 `FULLY_FUNCTIONAL`     | Fails the flake check when generated `*_templ.go` files become tracked under the missing-generated fixture; turns the daemon's re-add failure mode into a named error. Verified red+green                                                                                                                                         |
 | Negative-case validation runner (`verifyValidation`)     | 🟢 `FULLY_FUNCTIONAL`     | Run outside sandbox via `nix run .#verifyValidation`                                                                                                                                                                                                                                                                              |
@@ -128,7 +127,7 @@ daemon. Bundled into the composite module (still 3 consumer inputs).
 | ---------------------------------- | --------------------- | ---------------------------------------------------------------- |
 | `LICENSE` file (MIT)               | 🟢 `FULLY_FUNCTIONAL` | Added MIT license with copyright Lars Artmann                    |
 | `CONTRIBUTING.md`                  | 🟢 `FULLY_FUNCTIONAL` | Dev setup, testing, code style, PR checklist                     |
-| `docs/migration-guide.md`          | 🟢 `FULLY_FUNCTIONAL` | mkGoFlake, go-flake-parts, manual mkPreparedSource → go-standard |
+| `docs/migration-guide.md`          | 🟢 `FULLY_FUNCTIONAL` | legacy mkGoFlake / go-flake-parts / manual mkPreparedSource → go-standard |
 | Architecture diagram               | 🟢 `FULLY_FUNCTIONAL` | `docs/architecture.svg` rendered from D2                         |
 | README FAQ / Troubleshooting       | 🟢 `FULLY_FUNCTIONAL` | SSH errors, vendorHash, GOPRIVATE, validation errors             |
 | `.github/ISSUE_TEMPLATE/`          | 🟢 `FULLY_FUNCTIONAL` | Bug report + feature request templates                           |
@@ -140,5 +139,3 @@ daemon. Bundled into the composite module (still 3 consumer inputs).
 
 | Feature                                     | Status                    | Notes                                                                 |
 | ------------------------------------------- | ------------------------- | --------------------------------------------------------------------- |
-| `mkGoFlake.nix` function-based predecessor  | 🟡 `PARTIALLY_FUNCTIONAL` | Emits `builtins.trace` deprecation warning; migration guide available |
-| `templates/go-flake-parts/` manual template | 🟡 `PARTIALLY_FUNCTIONAL` | Marked deprecated with banner in README and flake.nix header          |
