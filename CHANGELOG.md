@@ -12,6 +12,21 @@ This project has not made a tagged release yet; all changes below are in
 
 ### Added
 
+- `go-standard.templCliPackage` (nullOr package) — ONE templ CLI pin
+  consumed by the package build, devShells, AND treefmt (`templ.package`),
+  replacing per-consumer `pkgs.templ` overrides at three call sites. When
+  null, `pkgs.templ` is used as before.
+- `go-standard.container.fromImage` (nullOr path) + `container.fromImageEnv`
+  (bool) — layered images over a base (e.g. a distroless base with extra
+  data), passed through to nix2container `buildImage`; only the base
+  config.Env carries over (n2c limitation at the pinned rev 42d1df94).
+- **shfmt canon pin** — the module now sets `shfmt.indent_size = 2` and
+  `shfmt.simplify = true` explicitly. treefmt-nix 0ba5d672 (2026-11-18)
+  flipped its own defaults to tab indent + no simplify; without the pin, a
+  plain `nix flake update` would have re-indented every consumer's shell
+  scripts fleet-wide. Formatting is now lock-independent (moduleTest
+  asserts both settings).
+
 - **OCI container image support** — `go-standard.container` (17-key submodule:
   enable, packageName, registry, imageName, tag, entrypoint, cmd, user,
   exposedPorts, volumes, env, labels, extraPackages, pathsToLink, maxLayers,
@@ -40,6 +55,21 @@ This project has not made a tagged release yet; all changes below are in
   could never eval there.
 
 ### Fixed
+
+- `mkPreparedSource`: dep copies are sanitized after `chmod -R u+w` — stray
+  `result` / `result-*` symlinks (nix build links inside a dependency
+  checkout) are deleted from `_local_deps/` before the tree is imported.
+  Left in place they poison the prepared source with store paths and can
+  break the sandboxed build (2026-10-05 incident class). Regression-tested
+  in `test.nix` (mockDep plants dangling `result`/`result-2` links).
+- **Empty-bin guard** — when `subPackages` matches a non-main package,
+  `go install` silently installs nothing; the build now fails up front
+  with a fix recipe instead of tripping cryptically later.
+- **Scrubbed `apps.<name>` descriptions** — `mkApp` previously interpolated
+  a raw `meta.description` into an app; multi-line or store-path-bearing
+  descriptions produced broken/garbage app metadata (the bank-sync crash
+  class). Descriptions are now newline-flattened, store-path-free, and
+  truncated at 100 chars, falling back to `"nix run .#<name>"`.
 
 - Red master CI (every push since ≥2026-10-30): chronic shellcheck SC2016 in
   `nix-lint.sh`, a darwin-leg-only `vendorHashes` test hardcoding
