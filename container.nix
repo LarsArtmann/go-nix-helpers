@@ -122,6 +122,12 @@ rec {
       maxLayers ? 20,
       created ? "0001-01-01T00:00:00Z",
       initializeNixDatabase ? false,
+      # Base image (an OCI tarball path, e.g. dockerTools.pullImage or
+      # nix2container's pullImageFromManifest result). Only config.Env
+      # entries carry over (with fromImageEnv), nothing else of the base
+      # config; layers stack under the image's own.
+      fromImage ? null,
+      fromImageEnv ? false,
       meta ? { },
     }:
     let
@@ -134,6 +140,8 @@ rec {
         maxLayers
         created
         initializeNixDatabase
+        fromImage
+        fromImageEnv
         meta
         ;
       copyToRoot = [

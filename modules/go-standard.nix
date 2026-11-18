@@ -892,6 +892,33 @@ in
             '';
           };
 
+          fromImage = lib.mkOption {
+            type = lib.types.nullOr lib.types.path;
+            default = null;
+            description = ''
+              Base image layered under this one (an OCI tarball path —
+              e.g. `pkgs.dockerTools.pullImage` output, or nix2container's
+              own `pullImageFromManifest` result for a hermetic,
+              digest-pinned pull). The base image's layers stack beneath
+              the image's own; of the base config ONLY `Env` entries can
+              carry over, and only when `fromImageEnv = true` — user,
+              entrypoint, labels, and every other field come from this
+              module's options as usual. Use it to inherit a runtime the
+              Nix closure cannot provide (a JVM, a distro's CA setup,
+              vendor binaries), not to inherit container behavior.
+            '';
+          };
+
+          fromImageEnv = lib.mkOption {
+            type = lib.types.bool;
+            default = false;
+            description = ''
+              Keep the base image's config.Env entries that this image's
+              `env` does not set (PATH extensions, locale vars baked into
+              the base). No effect without `fromImage`.
+            '';
+          };
+
           nix2container = lib.mkOption {
             type = lib.types.attrsOf lib.types.attrs;
             default = { };
