@@ -112,6 +112,16 @@ against the package source (with FOD vendor/ when deps are set).
 .BR enableCheck " (bool, default: true)"
 Run go test during the Nix build (doCheck).
 .TP
+.BR enableDefaultPackage " (bool, default: true)"
+Generate packages.default + packages.\fIpname\fR and the outputs that
+ride them (apps.default/test, checks.build/test/vendor-hash). Disable for
+library workspaces.
+.TP
+.BR enableDevShells " (bool, default: true)"
+Generate devShells.default and devShells.ci. Disable when the consumer
+shells carry needs the stock shells cannot express (e.g. the flake's own
+binary on PATH); the consumer then owns both shells.
+.TP
 .BR enableTestCheck " (bool, default: false)"
 Generate checks.test — a hermetic derivation that forces go test regardless
 of enableCheck. Use when skipping tests during normal builds but running
@@ -130,6 +140,25 @@ the committed one. templ-committed only proves sibling existence; this
 gate proves content freshness against the nixpkgs-pinned templ. Requires
 templGenerationPolicy = "committed" (enabling it under preBuild throws
 at eval).
+.TP
+.BR templGenerationPolicy " (str, default: \"committed\")"
+How *_templ.go files reach the build. "committed": every .templ ships a
+committed *_templ.go sibling (enforced by checks.templ-committed).
+"preBuild": the package build regenerates them (repos that gitignore
+generated files).
+.TP
+.BR enableLockGuards " (bool, default: false)"
+Eval-time flake.lock guards, forced through checks.format so they run even
+without a package build.
+.TP
+.BR lockGuards " (attrs, default: {})"
+Guard expectations: expectedNixpkgsRev (exact nixpkgs pin) and
+expectedFollows (attrset of input-name to followed input name).
+.TP
+.BR enableVendorHashCheck " (bool, default: true)"
+Generate checks.vendor-hash — a cheap derivation that forces the go-modules
+FOD, surfacing vendorHash drift as a plain hash-mismatch instead of a
+mid-compile surprise.
 .TP
 .BR enableGovulncheck " (bool, default: true)"
 Include govulncheck in the default devShell.
@@ -187,6 +216,11 @@ require entries not in go.mod.
 .BR postPatchExtra " (str, default: \"\")"
 Extra postPatch commands for mkPreparedSource (rarely needed). Runs before
 replace directives are injected.
+.TP
+.BR excludeSubModuleDirs " (list str, default: [example, examples, testdata, .git, vendor, node_modules])"
+Directory names skipped during recursive sub-module auto-discovery in dep
+sources. Extend when a dep tree carries tool-specific directories with
+go.mod files that must not become replace targets (e.g. .vendor-local).
 .TP
 .BR autoGoPrivate " (bool, default: true)"
 Auto-inject GOPRIVATE when deps are set.
@@ -318,6 +352,22 @@ glibc/Go layers stable and shared across images.
 .BR container.created " (str, default: \"0001-01-01T00:00:00Z\")"
 Image creation timestamp (RFC3339). The zero-time default keeps builds
 byte-reproducible.
+.TP
+.BR container.initializeNixDatabase " (bool, default: false)"
+Initialize /nix/db with every store path in the image so nix commands work
+inside the container. Only useful for CI-runner-style images; application
+images never need it.
+.TP
+.BR container.fromImage " (null|path, default: null)"
+Base image layered under this one (an OCI tarball path — e.g.
+dockerTools.pullImage output, or nix2container's pullImageFromManifest
+result for a hermetic digest-pinned pull). Only config.Env entries of the
+base can carry over (see fromImageEnv); user, entrypoint, labels, and
+every other field come from this module's options.
+.TP
+.BR container.fromImageEnv " (bool, default: false)"
+Keep the base image's config.Env entries this image's env does not set.
+No effect without fromImage.
 .TP
 .BR container.nix2container " (attrs, default: {})"
 Per-system nix2container builders (the nix2container flake's packages set).
