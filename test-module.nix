@@ -1272,7 +1272,8 @@ let
     ) "pkgs-function pin resolved for treefmt")
     (assertCheck "templCliPackage function form reaches devShell and build" (
       builtins.elem pkgs.hello (
-        templCliFnCfg.devShells.default.nativeBuildInputs or templCliFnCfg.devShells.default.buildInputs or [ ]
+        templCliFnCfg.devShells.default.nativeBuildInputs or templCliFnCfg.devShells.default.buildInputs
+          or [ ]
       )
       && builtins.elem pkgs.hello templCliFnCfg.packages.test-project.nativeBuildInputs
     ) "pkgs-function pin resolved everywhere")
