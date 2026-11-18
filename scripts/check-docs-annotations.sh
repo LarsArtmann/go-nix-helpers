@@ -18,6 +18,12 @@
 #   repo-root defaults to two levels above this script (works against a
 #   read-only store checkout, which is how the flake check invokes it).
 # Exit 0 = both gates green; exit 1 lists offenders.
+#
+# SCOPE (deliberate): docs/status/, docs/planning/, docs/reviews/ ONLY.
+# TODO_LIST.md, FEATURES.md, CHANGELOG.md and other living docs are NOT
+# gated — they are continuously rewritten, so strike-through residue
+# there is meaningless. Planting a broken table outside the scoped dirs
+# proves nothing; the gate is green there BY DESIGN.
 set -euo pipefail
 
 root="${1:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"

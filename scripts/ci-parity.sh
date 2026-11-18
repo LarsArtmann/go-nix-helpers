@@ -64,6 +64,15 @@ gate "Format Check (treefmt --fail-on-change)" nix fmt -- --fail-on-change
 gate "shellcheck (style severity, exactly as CI)" \
   nix run nixpkgs#shellcheck -- scripts/*.sh
 
+gate "templ-committed fixture guard (web/home_templ.go must stay untracked)" bash -c '
+  if git ls-files --error-unmatch test-assets/mock-templ-missing-generated/web/home_templ.go >/dev/null 2>&1; then
+    echo "test-assets/mock-templ-missing-generated/web/home_templ.go is TRACKED:" >&2
+    echo "the templ-committed fixture needs that file absent; the auto-commit" >&2
+    echo "daemon re-adding it turns moduleTest red (attribute templ-committed missing)." >&2
+    exit 1
+  fi
+'
+
 gate "Eval check, ALL systems (darwin/aarch64 eval gaps)" \
   nix flake check --all-systems --no-build
 

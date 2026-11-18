@@ -477,6 +477,23 @@ in
       '';
     };
 
+    enableUpdateVendorHashApp = lib.mkOption {
+      type = lib.types.bool;
+      default = true;
+      description = ''
+        Emit an `apps.update-vendor-hash` helper that performs the
+        vendorHash dance end-to-end: build the main package, parse the
+        `got:` sha256 from the fixed-output mismatch, substitute it into
+        flake.nix, and re-verify with a second build. The substitution
+        targets the CURRENTLY configured hash value (baked in at eval
+        time), so sibling FODs with different hashes are never touched;
+        a value shared by multiple lines is refused rather than guessed.
+        Only emitted when a flat `vendorHash` is set (null vendorHash =
+        committed vendor/, and per-system `vendorHashes` maps are not
+        line-targetable) and a Go module exists.
+      '';
+    };
+
     goExperiment = lib.mkOption {
       type = lib.types.nullOr lib.types.str;
       default = null;
@@ -1418,6 +1435,57 @@ in
 
         finalShellExtraEnv = autoGoPrivateEnv // optionEnv // cfg.shellExtraEnv;
 
+        # The vendorHash dance, generated with the currently-configured hash
+        # baked in: the substitution targets the OLD value, so sibling FODs
+        # with different hashes are never collateral damage (the bank-sync
+        # incident class). Only line-targetable for the flat vendorHash
+        # option; per-system vendorHashes maps are refused by omission.
+        updateVendorHashScript =
+          let
+            attr = ".#" + cfg.pname;
+            oldHash = cfg.vendorHash;
+          in
+          ''
+            set -euo pipefail
+            cd "$(git rev-parse --show-toplevel)"
+            OLD='${oldHash}'
+            ATTR='${attr}'
+            LOG="$(mktemp)"
+            trap 'rm -f "$LOG"' EXIT
+
+            if nix build "$ATTR" --no-link >"$LOG" 2>&1; then
+              echo "update-vendor-hash: $ATTR already builds green — nothing to do."
+              exit 0
+            fi
+
+            GOT="$(grep -oE 'got: +sha256-[A-Za-z0-9+/=]+' "$LOG" | head -n1 | cut -d' ' -f2)"
+            if [ -z "$GOT" ]; then
+              echo "update-vendor-hash: build failed for a reason OTHER than a vendorHash mismatch — refusing to touch flake.nix. Tail:"
+              tail -n 30 "$LOG"
+              exit 1
+            fi
+            if [ "$GOT" = "$OLD" ]; then
+              echo "update-vendor-hash: reported got: equals the configured hash — the failing FOD is not this vendorHash line. Tail:"
+              tail -n 30 "$LOG"
+              exit 1
+            fi
+
+            COUNT="$(grep -cF "vendorHash = \"$OLD\";" flake.nix || true)"
+            if [ "$COUNT" != "1" ]; then
+              echo "update-vendor-hash: expected exactly one 'vendorHash = \"$OLD\";' line in flake.nix, found $COUNT — a shared value cannot be auto-targeted. Resolve manually."
+              exit 1
+            fi
+
+            sed -i "s|vendorHash = \"$OLD\";|vendorHash = \"$GOT\";|" flake.nix
+            echo "update-vendor-hash: wrote $GOT — re-building to verify…"
+            nix build "$ATTR" --no-link >"$LOG" 2>&1 || {
+              echo "update-vendor-hash: verification build still failing:"
+              tail -n 30 "$LOG"
+              exit 1
+            }
+            echo "update-vendor-hash: green ($GOT)."
+          '';
+
         # ---- OCI container image (nix2container backend) ---------------------
         # Assembly helpers live in ../container.nix (also used by the
         # self-hosted containerSmoke check, which exercises the real
@@ -1619,6 +1687,23 @@ in
                   meta.description = "Format the repository tree with treefmt";
                 };
               }
+          // lib.optionalAttrs (cfg.enableUpdateVendorHashApp && goModExists && cfg.vendorHash != null) {
+            update-vendor-hash = lib.mkDefault {
+              type = "app";
+              program = lib.getExe (
+                pkgs.writeShellApplication {
+                  name = "update-vendor-hash";
+                  runtimeInputs = [
+                    pkgs.nix
+                    pkgs.gnused
+                    pkgs.git
+                  ];
+                  text = updateVendorHashScript;
+                }
+              );
+              meta.description = "One-command vendorHash dance: build, parse got:, substitute into flake.nix, re-verify";
+            };
+          }
           // lib.mapAttrs' (
             name: pkg:
             lib.nameValuePair name {

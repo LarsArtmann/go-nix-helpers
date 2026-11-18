@@ -422,3 +422,28 @@ assert builtins.hasInfix "is not a generated package" (builtins.readFile ./modul
 Also mind `or` precedence in the same tests: `x.attr or default == y` parses as
 `x.attr or (default == y)` — parenthesize every defaulted comparison:
 `(x.program or "MISSING") == value`.
+
+## Tag-pinned Inputs Need Paired Relocks
+
+An input URL carrying a tag (`github:owner/repo/vX.Y.Z`) is FROZEN —
+`nix flake update <input>` can never move it. Bump by editing the URL tag
+itself. And a tag bump frequently drags siblings: the terraform-diagrams-
+aggregator incident (2026-11-18) bumped `samber-do-auditlog` v0.10.0 →
+v0.12.3 and the new cmdguard v5 API surface immediately demanded a fresh
+vendorHash. The recipe that avoids two failed builds:
+
+```nix
+# 1. edit the tag in the input URL
+samber-do-auditlog.url = "github:LarsArtmann/samber-do-auditlog/v0.12.3";
+```
+
+```bash
+# 2. relock, then run the vendorHash dance (or nix run .#update-vendor-hash)
+nix flake update samber-do-auditlog
+nix run .#update-vendor-hash                        # module app: got: -> flake.nix -> verify
+```
+
+The `update-vendor-hash` app (go-standard, `enableUpdateVendorHashApp`)
+automates the dummy-hash → build → parse `got:` → substitute → re-verify
+sequence and targets the substitution by the OLD hash value, so sibling FOD
+lines are never corrupted.
