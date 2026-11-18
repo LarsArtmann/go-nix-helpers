@@ -202,16 +202,21 @@ in
     };
 
     templCliPackage = lib.mkOption {
-      type = lib.types.nullOr lib.types.package;
+      type = lib.types.nullOr (
+        lib.types.either lib.types.package (lib.types.functionTo lib.types.package)
+      );
       default = null;
       description = ''
         Override the templ CLI everywhere the module wires it: the
         package build's nativeBuildInputs, devShells, and treefmt's
-        templ program. nixpkgs' templ trails go.mod requirements in
+        templ program. Accepts a package OR a `pkgs: package` function
+        (recommended — mirrors extraBuildAttrs; the flake-level options
+        block has no pkgs in scope, and the function form keeps the pin
+        per-system correct). nixpkgs' templ trails go.mod requirements in
         templ-heavy repos — set this to a pinned overrideAttrs derivation
         (BOTH src and vendorHash) when the repo needs a newer CLI:
 
-            templCliPackage = pkgs.templ.overrideAttrs (_: {
+            templCliPackage = pkgs: pkgs.templ.overrideAttrs (_: {
               version = "0.3.1100";
               src = pkgs.fetchFromGitHub {
                 owner = "a-h"; repo = "templ"; rev = "v0.3.1100";
@@ -993,9 +998,16 @@ in
         pure = import ../pure-functions.nix { inherit lib; };
 
         # Single templ CLI resolution: the option override (pinned
-        # overrideAttrs derivation) or nixpkgs' templ — consumed by the
-        # package build, devShells, and treefmt alike so all three agree.
-        templBin = if cfg.templCliPackage != null then cfg.templCliPackage else pkgs.templ;
+        # overrideAttrs derivation, package or pkgs:function form) or
+        # nixpkgs' templ — consumed by the package build, devShells, and
+        # treefmt alike so all three agree.
+        templBin =
+          if cfg.templCliPackage == null then
+            pkgs.templ
+          else if builtins.isFunction cfg.templCliPackage then
+            cfg.templCliPackage pkgs
+          else
+            cfg.templCliPackage;
 
         # Single declaration site for toolchain resolution — attr pin, auto
         # newest branch, go.dev source tarball, override hook — lives in
