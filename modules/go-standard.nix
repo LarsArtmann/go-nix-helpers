@@ -201,6 +201,32 @@ in
       '';
     };
 
+    templCliPackage = lib.mkOption {
+      type = lib.types.nullOr lib.types.package;
+      default = null;
+      description = ''
+        Override the templ CLI everywhere the module wires it: the
+        package build's nativeBuildInputs, devShells, and treefmt's
+        templ program. nixpkgs' templ trails go.mod requirements in
+        templ-heavy repos — set this to a pinned overrideAttrs derivation
+        (BOTH src and vendorHash) when the repo needs a newer CLI:
+
+            templCliPackage = pkgs.templ.overrideAttrs (_: {
+              version = "0.3.1100";
+              src = pkgs.fetchFromGitHub {
+                owner = "a-h"; repo = "templ"; rev = "v0.3.1100";
+                hash = "sha256-QViQ...";
+              };
+              vendorHash = "sha256-MMAo...";
+            });
+
+        Compute the hashes once via
+        `nix build --impure --expr 'let pkgs = import <nixpkgs> {}; in
+        pkgs.templ.overrideAttrs ...'` placeholder-then-`got:` rounds.
+        Without this the module uses nixpkgs' templ everywhere.
+      '';
+    };
+
     enableTemplFreshnessCheck = lib.mkOption {
       type = lib.types.bool;
       default = false;
@@ -960,6 +986,11 @@ in
 
         pure = import ../pure-functions.nix { inherit lib; };
 
+        # Single templ CLI resolution: the option override (pinned
+        # overrideAttrs derivation) or nixpkgs' templ — consumed by the
+        # package build, devShells, and treefmt alike so all three agree.
+        templBin = if cfg.templCliPackage != null then cfg.templCliPackage else pkgs.templ;
+
         # Single declaration site for toolchain resolution — attr pin, auto
         # newest branch, go.dev source tarball, override hook — lives in
         # pure-functions.goBaseFrom (shared with mkGoFlake).
@@ -1239,7 +1270,21 @@ in
                   --fish <(timeout 10 $out/bin/${pkgName} ${completionWord} fish 2>/dev/null || true)
               fi
             '';
-            mergedPostInstall = completionPostInstall + combinedConcat.postInstall;
+            # A binary package that installed NO Go binaries is always a
+            # config bug — subPackages pointed at a non-main package (go
+            # install silently succeeds installing nothing) — never a valid
+            # build. Fail before the completion block trips over the missing
+            # binary, naming the fix.
+            emptyBinGuard = ''
+              if [ ! -d "$out/bin" ] || [ -z "$(ls -A "$out/bin" 2>/dev/null)" ]; then
+                echo "go-standard: ${pkgName} installed NO binaries." >&2
+                echo "  subPackages is: ${toString subPkgs}" >&2
+                echo "  A subPackages entry that matches a non-main package builds and installs nothing." >&2
+                echo "  Find main packages: grep -rl '^func main' --include='*.go' . | xargs -n1 dirname | sort -u" >&2
+                exit 1
+              fi
+            '';
+            mergedPostInstall = emptyBinGuard + completionPostInstall + combinedConcat.postInstall;
           in
           buildGoModule (
             {
@@ -1255,7 +1300,7 @@ in
               preBuild = autoDepSyncPreBuild + combinedConcat.preBuild;
               postInstall = mergedPostInstall;
               nativeBuildInputs =
-                lib.optionals cfg.enableTempl [ pkgs.templ ]
+                lib.optionals cfg.enableTempl [ templBin ]
                 ++ lib.optionals cfg.enableCompletions [ pkgs.installShellFiles ]
                 ++ combinedConcat.nativeBuildInputs;
               inherit (combinedConcat) buildInputs;
@@ -1321,16 +1366,31 @@ in
           name: pcfg: mkGoPackage name pcfg.subPackages pcfg.description (pcfg.extraBuildAttrs or { })
         ) cfg.packages;
 
-        templPkg = lib.optionals cfg.enableTempl [ pkgs.templ ];
+        templPkg = lib.optionals cfg.enableTempl [ templBin ];
         goplsPkg = lib.optionals cfg.enableGopls [ pkgs.gopls ];
         vulncheckPkg = lib.optionals cfg.enableGovulncheck [ pkgs.govulncheck ];
         golangciLintPkg = lib.optionals cfg.enableGolangciLint [ pkgs.golangci-lint ];
 
-        mkApp = name: runtimeInputs: text: {
-          type = "app";
-          program = lib.getExe (pkgs.writeShellApplication { inherit name runtimeInputs text; });
-          meta.description = "nix run .#${name}: ${text}";
-        };
+        mkApp =
+          name: runtimeInputs: text:
+          let
+            # meta.description must not embed store paths (they drag string
+            # context into registry/nix UI surfaces) or raw newlines. Preview
+            # only clean, short, path-free scripts.
+            flat = lib.concatStringsSep " " (lib.filter (l: l != "") (lib.splitString "\n" text));
+            preview =
+              if lib.hasInfix "/nix/store/" flat then
+                ""
+              else if lib.stringLength flat > 100 then
+                lib.substring 0 97 flat + "..."
+              else
+                flat;
+          in
+          {
+            type = "app";
+            program = lib.getExe (pkgs.writeShellApplication { inherit name runtimeInputs text; });
+            meta.description = if preview == "" then "nix run .#${name}" else "nix run .#${name}: ${preview}";
+          };
 
         autoGoPrivateEnv =
           if cfg.deps != { } && cfg.autoGoPrivate then { GOPRIVATE = cfg.privateGlobPattern; } else { };
@@ -1793,6 +1853,7 @@ in
             goimports.enable = lib.mkDefault cfg.enableGoimports;
             nixfmt.enable = lib.mkDefault cfg.enableNixfmt;
             templ.enable = lib.mkDefault cfg.enableTempl;
+            templ.package = lib.mkDefault templBin;
             shfmt.enable = lib.mkDefault cfg.enableShfmt;
           };
         };

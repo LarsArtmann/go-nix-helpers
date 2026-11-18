@@ -597,6 +597,14 @@ let
   # --- enableTempl test -----------------------------------------------------
   templCfg = mkPerSystemConfig { enableTempl = true; };
 
+  # templCliPackage must flow to EVERY templ consumer: the package build,
+  # devShells, and treefmt's templ program — one pin, no drift between
+  # generate/format/shell CLI versions.
+  templCliCfg = mkPerSystemConfig {
+    enableTempl = true;
+    templCliPackage = pkgs.hello;
+  };
+
   # --- goPkgAttr explicit pin test -------------------------------------------
   goPkgAttrCfg = mkPerSystemConfig { goPkgAttr = "go_1_26"; };
 
@@ -1231,6 +1239,18 @@ let
     (assertCheck "enableTempl=true enables templ in treefmt" (
       templCfg.treefmt.programs.templ.enable or false == true
     ) "templ.enable = true")
+    (assertCheck "templCliPackage overrides treefmt's templ program" (
+      templCliCfg.treefmt.programs.templ.package or null == pkgs.hello
+      && templCfg.treefmt.programs.templ.package or null == pkgs.templ
+    ) "hello when set, nixpkgs templ default")
+    (assertCheck "templCliPackage lands in the default devShell"
+      (builtins.elem pkgs.hello templCliCfg.devShells.default.packages)
+      "pinned CLI on PATH"
+    )
+    (assertCheck "templCliPackage reaches the package build"
+      (builtins.elem pkgs.hello templCliCfg.packages.test-project.nativeBuildInputs)
+      "pinned CLI generates in-build"
+    )
     # --- enableTempl=false alone (other formatters still on) -----------------
     (assertCheck "enableTempl=false disables templ in treefmt" (
       noTemplCfg.treefmt.programs.templ.enable or true == false
