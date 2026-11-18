@@ -26,8 +26,10 @@ Move the whole LarsArtmann Go portfolio onto the `go-standard` module and retire
 
 Raw ideas:
 
-- Migrate the remaining consumer fleet to `flakeModules.go-standard` (10 Tier A
-  repos done 2026-08-10; Tier B + Tier C remain — see TODO_LIST T4/T5)
+- ~~Migrate the remaining consumer fleet to `flakeModules.go-standard` (10 Tier A
+  repos done 2026-08-10; Tier B + Tier C remain — see TODO_LIST T4/T5)~~ DONE
+  2026-11-18 — Tier B (T4) and Tier C (T5) migrated; ucr-archive (last mkGoFlake
+  consumer) moved to go-standard at the v0.1.0 tag
 - Add a migration script that rewrites a 5-input manual flake.nix to the 3-input module
 - ~~Fully remove `mkGoFlake.nix`~~ DONE 2026-11-18 (post-v0.1.0; last consumer ucr-archive migrated to go-standard at the tag)
 - ~~Remove `templates/go-flake-parts/`~~ DONE 2026-11-18 (same batch; CI template smoke now go-standard only)
@@ -41,7 +43,7 @@ Make the module trustworthy enough that a consumer can adopt it without manual e
 
 Shipped here: property tests for `repoName`/`stripVersionSuffix`/`newestGoAttrName`
 (`checks.pureFunctions`, 72 checks), behavioral module tests proving option
-values reach `buildGoModule` (`checks.moduleTest`, 218 assertions), structural
+values reach `buildGoModule` (`checks.moduleTest`, 237 assertions), structural
 output checks, template eval check, `generate-flake.sh` smoke tests in CI, the
 old-nixpkgs pinned matrix job, and `checks.containerSmoke` exercising the real
 nix2container backend end-to-end.
@@ -60,7 +62,8 @@ Make go-nix-helpers easy to find, understand, and depend on outside the immediat
 Raw ideas:
 
 - Publish to nixpkgs or the Nix flake registry
-- Semver-tagged releases with release notes
+- ~~Semver-tagged releases with release notes~~ DONE 2026-11-18 — v0.1.0 tagged
+  (0.x prerelease rule), CHANGELOG section cut, consumer-verified at the tag
 - Public documentation site (GitHub Pages / Astro / Starlight) generated from the repo
 - Short demo video or animated GIF for the README
 - Register `maintainers.larsartmann` in nixpkgs
