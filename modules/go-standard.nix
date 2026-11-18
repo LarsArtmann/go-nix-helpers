@@ -547,6 +547,24 @@ in
       description = "Extra postPatch commands for mkPreparedSource (rarely needed)";
     };
 
+    excludeSubModuleDirs = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      default = [
+        "example"
+        "examples"
+        "testdata"
+        ".git"
+        "vendor"
+        "node_modules"
+      ];
+      description = ''
+        Directory names to skip during recursive sub-module auto-discovery
+        in dep sources (passed to mkPreparedSource). Extend when a dep tree
+        carries tool-specific directories with go.mod files that must not
+        become replace targets (e.g. ".vendor-local").
+      '';
+    };
+
     autoGoPrivate = lib.mkOption {
       type = lib.types.bool;
       default = true;
@@ -1009,6 +1027,7 @@ in
                   validatePrivateDeps
                   privateDepPattern
                   publicDeps
+                  excludeSubModuleDirs
                   ;
               }
           else
