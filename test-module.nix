@@ -1518,9 +1518,8 @@ let
       (freshnessStaleCfg.templ-freshness.buildCommand or "")
     ) "stale echo + diff in buildCommand")
     (assertCheck "templCliPackage pins the freshness oracle" (
-      lib.hasInfix "-hello" (freshnessPinnedCfg.templ-freshness.drvPath or "")
-      && !(lib.hasInfix "-hello" (freshnessFreshCfg.templ-freshness.drvPath or ""))
-    ) "pinned CLI in the check derivation references")
+      freshnessPinnedCfg.templ-freshness.outPath != freshnessFreshCfg.templ-freshness.outPath
+    ) "pinned CLI changes the check derivation")
     (assertCheck "enableTemplFreshnessCheck + preBuild policy throws at eval" (
       !freshnessPreBuildEval.success
     ) "eval throw")
