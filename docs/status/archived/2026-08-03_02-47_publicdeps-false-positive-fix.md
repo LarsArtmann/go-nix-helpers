@@ -123,28 +123,28 @@ Nothing is broken. All tests pass, the feature works as designed. The gaps are o
 
 8. ~~Document the path-exact matching behavior of `publicDeps` more prominently~~ done at `274cb35`
 9. ~~Add `publicDeps` usage example to docs/flake-patterns.md ← still open~~ **Won't implement — covered by README + template examples.**
-10. ~~Consider prefix matching for `publicDeps` instead of exact match~~ → ROADMAP (Theme 5)
+10. ~~Consider prefix matching for `publicDeps` instead of exact match~~ **→ decided: defer — routed ROADMAP Theme 5 (smart private-dep detection; publicDeps matching semantics)** → ROADMAP (Theme 5)
 11. ~~Update README.md GOPRIVATE section to mention interaction with publicDeps~~ done — `publicDeps` scope clarified in README options table at `274cb35`
 12. ~~Add integration test that exercises the full go-standard module with `publicDeps` set~~ done at `12f2350` (multi-deps test covers this)
-13. ~~Consider a `knownPublicRepos` default list built into go-nix-helpers~~ → ROADMAP (Theme 5)
+13. ~~Consider a `knownPublicRepos` default list built into go-nix-helpers~~ **→ decided: defer — routed ROADMAP Theme 5 (curated default list of known-public repos)** → ROADMAP (Theme 5)
 14. ~~Update docs/migration-guide.md if mkGoFlake→go-standard migration mentions validation~~ done at `b10399f`
 
 ### Lower Priority
 
-15. ~~Add a `--list-public` script that checks GitHub API for public repos~~ → ROADMAP (Theme 5: auto-detect via proxy.golang.org)
+15. ~~Add a `--list-public` script that checks GitHub API for public repos~~ **→ decided: defer — routed ROADMAP Theme 5 (auto-detect via proxy.golang.org)** → ROADMAP (Theme 5: auto-detect via proxy.golang.org)
 16. ~~Consider deprecation path for mkGoFlake.nix validation forwarding~~ done — removal target set to v1.0.0 at `9b376b3`
-17. ~~Update CI to build publicDepsTest explicitly~~ partially — `verify` check builds it indirectly
-18. ~~Consider GONOPROXY as alternative to GOPRIVATE for finer-grained control~~ → ROADMAP (Theme 5)
+17. ~~Update CI to build publicDepsTest explicitly~~ done — checks.verify exercises publicDepsTest (test.nix Test 4) and CI builds it on the ubuntu+macos matrix partially — `verify` check builds it indirectly
+18. ~~Consider GONOPROXY as alternative to GOPRIVATE for finer-grained control~~ **→ decided: defer — routed ROADMAP Theme 5 (smart private-dep detection; GOPRIVATE/GONOPROXY env family)** → ROADMAP (Theme 5)
 19. ~~Add a test that verifies the error message contains all 3 remediation options~~ done — `verifyValidation` checks message text
-20. ~~Consider `publicDepPattern` (regex exclusion) as alternative to `publicDeps` (exact list)~~ → ROADMAP (Theme 5)
-21. ~~Document the 5 known public LarsArtmann repos somewhere discoverable~~ → ROADMAP (Theme 5)
-22. ~~Consider whether `publicDeps` should auto-include sub-module paths~~ → ROADMAP (Theme 5)
+20. ~~Consider `publicDepPattern` (regex exclusion) as alternative to `publicDeps` (exact list)~~ done — adopted as the `privateDepPattern` regex exclusion option (mkPreparedSource.nix:77-110; ROADMAP Theme 5 records the escape hatches as shipped) → ROADMAP (Theme 5)
+21. ~~Document the 5 known public LarsArtmann repos somewhere discoverable~~ done — the five known-public repos are documented in docs/feedback/processed/2026-08-03_mkpreparedsource-false-positive-on-public-repos.md → ROADMAP (Theme 5)
+22. ~~Consider whether `publicDeps` should auto-include sub-module paths~~ done at `a199f6b` → ROADMAP (Theme 5)
 
 ### Documentation Polish
 
 23. ~~Update README.md examples to show `publicDeps` usage~~ done at `274cb35`
 24. ~~Add `publicDeps` to the go-standard.nix header comment usage example~~ done in option description
-25. ~~Update architecture.d2/svg diagram if it shows validation flow~~ still open → TODO_LIST M5
+25. ~~Update architecture.d2/svg diagram if it shows validation flow~~ done — docs/architecture.d2 shows the validation node; the diagram gained the container.nix component in the 2026-11-17 container push still open → TODO_LIST M5
 26. ~~Review all docs for any other "private modules" references that imply ALL LarsArtmann repos are private~~ done across successive doc passes
 
 ---

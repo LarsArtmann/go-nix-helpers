@@ -186,7 +186,7 @@ Still open → tracked in TODO_LIST (Blocked — needs interactive rebase + forc
 
 ### ~~Critical (breaking change remediation)~~
 
-1. ~~**Add "Breaking Changes" section to migration guide** documenting `repoName` path change~~ NOT-NEEDED — `repoName` change was reverted at `2cbb37b`; no breaking change shipped.
+1. ~~**Add "Breaking Changes" section to migration guide** documenting `repoName` path change~~ **NOT-DO — the repoName path change was reverted at `2cbb37b`; no breaking change shipped.** NOT-NEEDED — `repoName` change was reverted at `2cbb37b`; no breaking change shipped.
 2. ~~**Add CHANGELOG.md** with this session's breaking change entry~~ done — CHANGELOG.md exists and is comprehensive.
 3. ~~**Fix D3: rethink `autoGoPrivateEnv` with publicDeps**~~ done at `052d92d` — reverted to broad glob.
 4. ~~**Add test for requireDeps dedup** in test.nix~~ done at `687b62f`.
@@ -211,18 +211,18 @@ Still open → tracked in TODO_LIST (Blocked — needs interactive rebase + forc
 17. ~~**Remove `mkGoFlake.nix`** — set a removal date~~ done — removal target set to v1.0.0 at `9b376b3`
 18. ~~**Extract postPatch script** ← still open → TODO_LIST L10~~ **Won't implement — empirically rejected — L10.**
 19. ~~**Add monorepo integration test** to test.nix~~ done at `12f2350` — Test 6 (multi-deps)
-20. ~~**Document `GONOSUMCHECK`/`GONOSUMDB`**~~ → ROADMAP (Theme 5)
-21. ~~**Add `nix flake check` to generate-flake.sh smoke test**~~ partially — CI smoke-test job validates parse only
+20. ~~**Document `GONOSUMCHECK`/`GONOSUMDB`**~~ **→ decided: defer — routed ROADMAP Theme 5 (GONOSUMCHECK/GONOSUMDB env-var family)** → ROADMAP (Theme 5)
+21. ~~**Add `nix flake check` to generate-flake.sh smoke test**~~ done — template eval is covered by `checks.templateEval` inside nix flake check; the smoke-test job stays parse-only by design (build-smoke: ROADMAP Theme 3) partially — CI smoke-test job validates parse only
 22. ~~**Run integration tests on macOS too** ← still open → TODO_LIST L9~~ done — done — macOS matrix
 23. ~~**Add property tests** for stripVersionSuffix and repoName ← still open → TODO_LIST M1-M2~~ done — shipped — P5
 24. ~~**Add FAQ entry for `deps` with mixed owners** ← still open → TODO_LIST L4~~ done — shipped — L4 FAQ
 25. ~~**Document the `owner-repo` naming convention**~~ NOT-DO — not needed: owner prefix reverted at `2cbb37b`
-26. ~~**Consider `goPkg` as `lib.types.package`**~~ → ROADMAP (Theme 1)
+26. ~~**Consider `goPkg` as `lib.types.package`**~~ **→ decided: defer — routed ROADMAP Theme 1 (goPkg as lib.types.package — breaking, target v2)** → ROADMAP (Theme 1)
 27. ~~**Add `enableNixfmt` to migration guide** parameter mapping table~~ done at `b10399f`
 28. ~~**Test the CI freshness check** ← still open → TODO_LIST (Low)~~ **Won't implement — dormant — dropped.**
-29. ~~**Test the macOS CI job**~~ partially — CI runs `--no-build` on macOS
+29. ~~**Test the macOS CI job**~~ done — the CI check job runs on the macOS matrix leg (nix flake check --no-build; Linux cannot eval darwin) partially — CI runs `--no-build` on macOS
 30. ~~**Add `privateDepPattern` override documentation**~~ done at `274cb35`
-31. ~~**Consider GOPRIVATE wildcard with GONOPROXY exclusions**~~ → ROADMAP (Theme 5)
+31. ~~**Consider GOPRIVATE wildcard with GONOPROXY exclusions**~~ **→ decided: defer — routed ROADMAP Theme 5 (GOPRIVATE wildcard + GONOPROXY exclusions)** → ROADMAP (Theme 5)
 32. ~~**Add `--dry-run` flag to generate-flake.sh** ← still open → TODO_LIST M6~~ done — shipped — P9
 33. ~~**Add `generate-flake.sh` integration test** ← partially — CI smoke-test validates parse~~ done — done — CI smoke job
 34. ~~**Document the completion warning behavior** in README~~ done — option description updated
@@ -233,18 +233,18 @@ Still open → tracked in TODO_LIST (Blocked — needs interactive rebase + forc
 36. ~~**Fix commit df9a5ff empty message** ← BLOCKED → tracked in TODO_LIST (needs user approval for force push)~~ done — moved to TODO_LIST Blocked (df9a5ff)
 37. ~~**Add `shellcheck` to CI** ← still open → TODO_LIST H4~~ done — shipped — P2
 38. ~~**Add `shfmt` to treefmt** ← still open → TODO_LIST H5~~ done — shipped — P2
-39. ~~**Consider `lib.types.package` for goPkg`**~~ → ROADMAP (Theme 1)
+39. ~~**Consider `lib.types.package` for goPkg`**~~ **→ decided: defer — routed ROADMAP Theme 1 (goPkg as lib.types.package — breaking, target v2)** → ROADMAP (Theme 1)
 40. ~~**Add `vendorHash` placeholder detection** ← still open → TODO_LIST M3~~ done — shipped — P6
 41. ~~**Add `nix flake show` test** ← still open → TODO_LIST M4~~ done — shipped — structural check
 42. ~~**Add `--template` listing** to generate-flake.sh help text ← still open → TODO_LIST L3~~ done — shipped — P9
 43. ~~**Cache nix-store in smoke-test job** ← still open → TODO_LIST L8~~ done — shipped — L8
 44. ~~**Add badges for macOS CI** to README ← still open → TODO_LIST L2~~ done — covered by the CI matrix badge
-45. ~~**Add `CONTRIBUTING.md`** referenced by README~~ already exists
+45. ~~**Add `CONTRIBUTING.md`** referenced by README~~ done — CONTRIBUTING.md exists at repo root; README links it (README.md:519) already exists
 46. ~~**Update `docs/architecture.d2`** ← still open → TODO_LIST M5~~ done — shipped — P8
 47. ~~**Add `docs/flake-patterns.md`** entry for enableNixfmt toggle ← still open~~ **Won't implement — covered by migration guide + flake-patterns.**
-48. ~~**Consider `lib.mkForce` support**~~ → ROADMAP (Theme 1)
+48. ~~**Consider `lib.mkForce` support**~~ **→ decided: defer — routed ROADMAP Theme 1 (lib.mkForce support for list-attr overrides)** → ROADMAP (Theme 1)
 49. ~~**Add `--verbose` flag to generate-flake.sh** ← still open → TODO_LIST L1~~ done — shipped — P9
-50. ~~**Review all `_local_deps` references in downstream repos**~~ NOT-NEEDED — repoName change reverted at `2cbb37b`
+50. ~~**Review all `_local_deps` references in downstream repos**~~ **NOT-DO — the repoName change was reverted at `2cbb37b`; `_local_deps` references unchanged.** NOT-NEEDED — repoName change reverted at `2cbb37b`
 
 ---
 

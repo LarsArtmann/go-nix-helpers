@@ -246,14 +246,14 @@ action might provide a different treefmt.
 ### Medium impact
 
 21. ~~**Document `userExtraBuildAttrs` merge strategy**~~ done at `c510d7c` — option description lists concatenation vs override
-22. ~~**Add `GONOSUMDB` docs**~~ → ROADMAP (Theme 5)
+22. ~~**Add `GONOSUMDB` docs**~~ **→ decided: defer — routed ROADMAP Theme 5 (GONOSUMDB env-var family)** → ROADMAP (Theme 5)
 23. ~~**Add `privateDepPattern` override docs**~~ done at `274cb35`
 24. ~~**Add `--dry-run` flag to generate-flake.sh** ← still open → TODO_LIST M6~~ done — shipped — P9
 25. ~~**Add `--verbose` flag to generate-flake.sh** ← still open → TODO_LIST L1~~ done — shipped — P9
 26. ~~**Cache nix-store in smoke-test CI job** ← still open → TODO_LIST L8~~ **Won't implement — dropped.**
 27. ~~**Run integration tests on macOS** ← still open → TODO_LIST L9~~ done — done — macOS matrix
 28. ~~**Add treefmt.config inspection test** ← still open → TODO_LIST M10~~ done — shipped — P10
-29. ~~**Consider GOPRIVATE wildcard + GONOPROXY**~~ → ROADMAP (Theme 5)
+29. ~~**Consider GOPRIVATE wildcard + GONOPROXY**~~ **→ decided: defer — routed ROADMAP Theme 5 (GOPRIVATE wildcard + GONOPROXY exclusions)** → ROADMAP (Theme 5)
 30. ~~**Add `vendorHash` placeholder detection** ← still open → TODO_LIST M3~~ done — shipped — P6
 31. ~~**Add `nix flake show` test** ← still open → TODO_LIST M4~~ done — shipped — structural check
 32. ~~**Update `docs/architecture.d2`** ← still open → TODO_LIST M5~~ done — shipped — P8
@@ -266,18 +266,18 @@ action might provide a different treefmt.
 36. ~~**Fix commit df9a5ff empty message** ← BLOCKED → tracked in TODO_LIST (needs user approval)~~ done — moved to TODO_LIST Blocked (df9a5ff)
 37. ~~**Add `--template` listing** to generate-flake.sh help text ← still open → TODO_LIST L3~~ done — shipped — P9
 38. ~~**Add macOS CI badge** to README ← still open → TODO_LIST L2~~ done — covered by the CI matrix badge
-39. ~~**Add `CONTRIBUTING.md` link verification**~~ already exists
-40. ~~**Consider `lib.mkForce` support**~~ → ROADMAP (Theme 1)
-41. ~~**Consider `lib.types.package` for goPkg`**~~ → ROADMAP (Theme 1)
-42. ~~**Add test for `goPkgAttr = "go_1_24"`**~~ → covered by eval tests (non-default attr evaluates)
+39. ~~**Add `CONTRIBUTING.md` link verification**~~ done — CONTRIBUTING.md exists at repo root; README links it (README.md:519) already exists
+40. ~~**Consider `lib.mkForce` support**~~ **→ decided: defer — routed ROADMAP Theme 1 (lib.mkForce support for list-attr overrides)** → ROADMAP (Theme 1)
+41. ~~**Consider `lib.types.package` for goPkg`**~~ **→ decided: defer — routed ROADMAP Theme 1 (goPkg as lib.types.package — breaking, target v2)** → ROADMAP (Theme 1)
+42. ~~**Add test for `goPkgAttr = "go_1_24"`**~~ done — moduleTest asserts explicit goPkgAttr pins (go_1_26), null auto-resolution to the newest branch, and stale-pin detection (test-module.nix:658-925, 1386) → covered by eval tests (non-default attr evaluates)
 43. ~~**Clean up `collectMissingRequires` temp file in trap** ← still open → TODO_LIST L5~~ done — shipped — L5
 44. ~~**Add `stripVersionSuffix` edge case tests** ← still open → TODO_LIST L6~~ done — shipped — L6
-45. ~~**Document `_local_deps` naming convention**~~ NOT-NEEDED — simple `<repo>` naming
+45. ~~**Document `_local_deps` naming convention**~~ **NOT-DO — naming is plain `<repo>`; no convention doc needed.** NOT-NEEDED — simple `<repo>` naming
 46. ~~**Add FAQ entry for `deps` with mixed owners** ← still open → TODO_LIST L4~~ done — shipped — L4 FAQ
-47. ~~**Review all `_local_deps` references**~~ NOT-NEEDED — repoName change reverted
+47. ~~**Review all `_local_deps` references**~~ **NOT-DO — the repoName change was reverted at `2cbb37b`.** NOT-NEEDED — repoName change reverted
 48. ~~**Add `nix flake check --all-systems` to CI** ← still open → TODO_LIST L7~~ **Won't implement — infeasible from Linux — documented.**
-49. ~~**Consider `--impure` flag warning**~~ → ROADMAP (low priority)
-50. ~~**Add session-end checklist** to AGENTS.md~~ → tracked in TODO_LIST L-series
+49. ~~**Consider `--impure` flag warning**~~ **Won't implement — moot: generate-flake.sh ships no --impure flag and the go-flake-parts template is gone (removed at `9c8724b`).** → ROADMAP (low priority)
+50. ~~**Add session-end checklist** to AGENTS.md~~ **→ decided: defer — no tracker row today: the TODO_LIST L-series was retired and AGENTS.md carries no session-end checklist** → tracked in TODO_LIST L-series
 
 ---
 
