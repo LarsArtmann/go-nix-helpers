@@ -14,6 +14,50 @@ below through that section shipped before or with it.
 
 - Nothing yet.
 
+### Changed
+
+- TODO_LIST purge (2026-11-19): T4 Migrate Tier B consumers to go-standard (KeyCountdown, StopTube, branching-flow, bank-sync, overview, BuildFlow) — G2 unblocks all — DONE 2026-11-18
+- TODO_LIST purge (2026-11-19): T5 Migrate Tier C consumers off deprecated `mkGoFlake` (Standup-Killer, crush-daily) — DONE 2026-11-18
+- TODO_LIST purge (2026-11-19): T64 Self-host: import `flakeModules.go-standard` in this repo's own flake.nix (dogfood gap — the dead `systems` option and missing `passthru.go` survived because the flake hand-rolls its outputs) — DONE (pre-2026-11-18)
+- TODO_LIST purge (2026-11-19): T33 Wire `go-standard.systems` mapping verification into `test-module.nix` (the composite mapping is verified by CI + the 2026-09-25 consumer probe, but not by a module test) — DONE 2026-11-18
+- TODO_LIST purge (2026-11-19): T34 Sweep consumers: GOEXPERIMENT boilerplate → `goExperiment` option; cobra repos → `completionStyle = "subcommand"` (7/10 Tier A repeat it; sbts's extraBuildAttrs GOEXPERIMENT included — its modBuildPhase override is already gone) — DONE 2026-11-18
+- TODO_LIST purge (2026-11-19): T60 Re-run the consumer fleet audit with the auto-default + container option as checklist items (last full audit: 2026-08-11; also covers manual-GOPRIVATE cleanup) — DONE 2026-11-18
+- TODO_LIST purge (2026-11-19): T65 Polish batch P21–P26 from the 2026-09-25 CI-green plan: vendored-from revision marker in `check-rows.py`, docs-gates extension to `docs/planning`+`docs/reviews`, nix-health dirty-tree warning + dashboard canary line, E2 derivation-level red proof + pandoc strikethrough check, devShell `go` passthru parity, moduleTest assertion-count emission, goModFloorMessage malformed-input tests, `workflow_dispatch` flake-check target, old-nixpkgs pin refresh policy — DONE 2026-11-18
+- TODO_LIST purge (2026-11-19): T61 (repo: SKILLS) nix-private-go-repos skill: monorepo + private deps interaction guidance (per-package `extraBuildAttrs` × `deps`) — DONE
+- TODO_LIST purge (2026-11-19): T62 (repo: SKILLS) shellcheck as a pre-commit check for shell scripts in skills (`list-private-deps.sh` class) — DONE
+- TODO_LIST purge (2026-11-19): T63 (repo: crush-config) export the generalized lessons to `references/lessons.md`: toString-bools, tryEval messages, `or` precedence, piped-exit-codes — DONE 2026-11-18
+- TODO_LIST purge (2026-11-19): T66 Inspect `origin/systemnix-vn-version-fix` (contents, creator; delete if dead) — DONE 2026-11-18
+- TODO_LIST purge (2026-11-19): T67 Decompose CI run 44059828196 (2026-11-17 09:54, ALL jobs failed — infra vs real) — DONE 2026-11-18
+- TODO_LIST purge (2026-11-19): T69 View the 3 unopened 2026-0* snapshots (review HTML, feedback, postmortem) + trash the `result` symlink — DONE 2026-11-18
+- TODO_LIST purge (2026-11-19): T70 Concurrent-actor detector: pre-final check that no file outside the session's edit set changed (mtime scan) — the 2026-11-17 formatter incident bit twice — DONE 2026-11-18
+- TODO_LIST purge (2026-11-19): T71 Heading-mode canon: teach annotate.go a `### 1.` heading-item mode (or codify "headings stay bare" in the docs-health skill) so 08-12-shape files need no silent judgment call — DONE 2026-11-18
+- TODO_LIST purge (2026-11-19): T68 Upstream the ROUTED-arrow row classification to the docs-gates repo, then re-vendor `check-rows.py` cleanly — DONE 2026-11-18
+- TODO_LIST purge (2026-11-19): T35 docs/flake-patterns.md: container pattern + anti-patterns (Dockerfile, dockerTools for shipping) — DONE
+- TODO_LIST purge (2026-11-19): T36 docs/architecture.d2 + svg: add container.nix component — DONE
+- TODO_LIST purge (2026-11-19): T37 docs/consumer-audit-checklist.md: add container section — DONE
+- TODO_LIST purge (2026-11-19): T38 scripts/dashboard.sh: container column across fleet — DONE
+- TODO_LIST purge (2026-11-19): T39 Structure check: richer mismatch diff (jq-driven localization instead of dumping both configs) — DONE
+- TODO_LIST purge (2026-11-19): T40 Test custom `created` round-trip (RFC3339Nano edge) — DONE
+- TODO_LIST purge (2026-11-19): T41 Multi-arch manifest app: merge per-system images into one tag (skopeo copy --all) — DONE 2026-11-18
+- TODO_LIST purge (2026-11-19): T42 `container.fromImage` (distroless base) via n2c fromImage/pullImageFromManifest — DONE 2026-11-18
+- TODO_LIST purge (2026-11-19): T43 `container.initializeNixDatabase` passthrough (CI images) — DONE
+- TODO_LIST purge (2026-11-19): T44 Tag strategy knob docs: content-hash vs `self.rev`-derived default — DONE
+- TODO_LIST purge (2026-11-19): T45 README section on registry auth (docker login / skopeo) for image-push — DONE
+- TODO_LIST purge (2026-11-19): T46 GHCR push workflow template (consumer CI) using the image-push app; include a Forgejo-remote doc example in the migration guide — DONE
+- TODO_LIST purge (2026-11-19): T47 PapDashboard pilot: merge `oci-go-standard-pilot` branch + relock go-nix-helpers (branch verified via path override 2026-11-17) — DONE 2026-11-17
+- TODO_LIST purge (2026-11-19): T48 KeyHolderAI migration to `container` option — DONE 2026-11-17
+- TODO_LIST purge (2026-11-19): T49 standard-bug-tracking-schema migration to `container` option — DONE 2026-11-18
+- TODO_LIST purge (2026-11-19): T50 bank-sync: adopt go-standard (deps audit; mkPreparedSource already hand-wired) — DONE 2026-11-18
+- TODO_LIST purge (2026-11-19): T52 Fleet sweep: delete every remaining hand-rolled dockerTools block — DONE 2026-11-18
+- TODO_LIST purge (2026-11-19): T53 nix-private-go-repos skill: note that image push works with private deps (deps live in layers) — DONE 2026-11-18
+- TODO_LIST purge (2026-11-19): T54 Local aarch64-linux containerSmoke build (emulation) before CI sees it — DONE 2026-11-18
+- TODO_LIST purge (2026-11-19): T55 Review GH Actions runtime delta from containerSmoke (Go build per OS) — DONE 2026-11-18
+- TODO_LIST purge (2026-11-19): T56 CI + local parity: assert `nix flake check --all-systems --no-build` and wrap `shellcheck scripts/*.sh` into one ci-parity script/check (catches darwin eval gaps + the two CI-only gates locally) — DONE 2026-11-18
+- TODO_LIST purge (2026-11-19): T57 Post-push consumer audit: `nix flake update` sweeps (nix2container lands transitively in locks) — DONE 2026-11-18
+- TODO_LIST purge (2026-11-19): T58 Document the nix2container lock pin (rev `42d1df94`, 2026-10-30) in a doc note — DONE
+- TODO_LIST purge (2026-11-19): T59 Document the Nix 2.34 tryEval message-free assert helper pattern (never assert on thrown message text) — DONE
+- TODO_LIST purge (2026-11-19): Cut first tagged release (v0.1.0) — DONE
+
 ### Removed
 
 - `mkGoFlake.nix`, the `lib.mkGoFlake` export, and the deprecated

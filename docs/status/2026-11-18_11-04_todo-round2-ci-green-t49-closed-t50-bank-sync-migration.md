@@ -139,7 +139,7 @@ first FOD rebuilds since the 2026-11-13 "A12 wave 1" pin convergence
 **Sweeps:**
 16. T52 delete every remaining hand-rolled dockerTools block
 17. T57 post-push `nix flake update` sweeps (nix2container lands transitively)
-18. T34 / T60 (as specced in TODO_LIST) — DONE 2026-11-18: T34 and T60 both DONE with evidence in TODO_LIST
+18. ~~T34 / T60 (as specced in TODO_LIST) — DONE 2026-11-18: T34 and T60 both DONE with evidence in TODO_LIST~~ done — T34 + T60 DONE 2026-11-18 (rows graduated into CHANGELOG [Unreleased])
 19. Fleet-wide templ-components v1.27.0 alignment check (other consumers of the A12 pin may carry the same latent skew — same diagnosis: `nix build .#checks.lint`)
 
 **Module features:**

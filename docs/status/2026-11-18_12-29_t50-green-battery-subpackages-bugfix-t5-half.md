@@ -83,7 +83,7 @@ T4 remainder (KeyCountdown, StopTube, branching-flow, overview, BuildFlow) · T3
 31. T71: heading-mode canon (annotate.go, SKILLS repo)
 32. T41: multi-arch manifest app (skopeo copy --all)
 33. T42: container.fromImage (distroless base)
-34. v0.1.0 tag decision for go-nix-helpers
+34. ~~v0.1.0 tag decision for go-nix-helpers~~ done — decided and executed: v0.1.0 tagged at `ad06738` 2026-11-18 + GitHub release (TODO_LIST release row graduated into CHANGELOG)
 35. Owed inline TABLE VIEW report (Pareto + M/F summary)
 36. /tmp cleanup: banksync-old, templ-components-v1260/v1270, gf-anc, cqrshtmx, fod.json, dance logs
 37. Standup-Killer: requestid-no-name-leak check green verify

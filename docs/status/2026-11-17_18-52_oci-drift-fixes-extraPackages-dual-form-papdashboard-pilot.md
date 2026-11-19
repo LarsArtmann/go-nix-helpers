@@ -106,7 +106,7 @@ Nothing this session shipped broken or reverted. The honest near-misses, ranked:
 | 26 | T47 PapDashboard merge + relock (= f/2 above)                                      | BLOCKED on push         |
 | 27 | T48 KeyHolderAI migration                                                          | BLOCKED on push         |
 | 28 | T49 standard-bug-tracking-schema migration                                         | BLOCKED on push         |
-| 29 | T50 bank-sync: adopt go-standard (bigger project)                                  | BLOCKED on push         |
+| ~~29~~ | ~~T50 bank-sync: adopt go-standard (bigger project)~~ done — T50 DONE 2026-11-18 (bank-sync full battery green; graduated into CHANGELOG [Unreleased]) | ~~BLOCKED on push~~ |
 | 30 | T51 Code-Quality-Agent + artmann-technologies-website: adopt-or-manual decision    | BLOCKED (owner)         |
 | 31 | T52 fleet sweep: delete remaining hand-rolled dockerTools blocks                   | BLOCKED (after T47–T49) |
 | 32 | T53 nix-private-go-repos skill: private-dep images push fine (deps live in layers) | TODO                    |

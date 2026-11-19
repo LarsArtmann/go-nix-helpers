@@ -85,7 +85,7 @@ Permanently blocked (owner decisions, unchanged): v0.1.0 tag, Won't-implement po
 ## f) NEXT (up to 50, priority order)
 
 1. Fix bugtracker T49 tail: find real image attr name, verify image + structure build, commit Dockerfile removal (decide: `--no-verify` with reason vs fix repo's pre-existing gate debt)
-2. T50 bank-sync migration (me, sequential; provider resets 07:48)
+2. ~~T50 bank-sync migration (me, sequential; provider resets 07:48)~~ done — T50 DONE 2026-11-18, full battery green (graduated into CHANGELOG [Unreleased])
 3. T5 Standup-Killer off mkGoFlake
 4. T5 crush-daily off mkGoFlake
 5. T4 KeyCountdown (games/KeyCountdown) → go-standard

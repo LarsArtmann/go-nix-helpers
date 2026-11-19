@@ -119,6 +119,11 @@ of small work; none belongs in TODO_LIST until answered.
 - **Daemon WIP guard** — convention for sessions mid-refactor under the
   auto-commit daemon (a `DON'T-COMMIT` marker file?), or is
   broken-intermediate-state-in-master accepted?
+- **flake-docs consolidation** — collapse the per-flake docs drift checks into
+  one mechanism, or keep per-repo gates? (dormant since the 2026-09-24 plan
+  P24; never decided)
+- **nix.conf auto-GC threshold** — tune `max-free` auto-GC on the host, or
+  keep the nix-health.sh canary as the standing mitigation? (owner/root call)
 - **Second actor in this repo** — who pushed master at 18:55 on 2026-11-17 and
   created `origin/systemnix-vn-version-fix`, and who re-tab-indented the
   scripts twice? (T66 tracks the branch; coordination question remains.)

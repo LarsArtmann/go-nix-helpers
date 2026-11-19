@@ -86,3 +86,4 @@ test-assets/mock-templ-missing-generated/web/home_templ.go
 
 # Stray `go build` artifact inside the mock fixture (the daemon once committed it)
 test-assets/mock-project/mock-go-project
+.docs-gates-preflight.json

@@ -151,7 +151,7 @@ Not knowingly. One false claim was published as fact ("daemon pushes this repo")
 | 30 | `container.fromImage` (distroless base)                                                                               | 3h    | T42                    |
 | 31 | `container.initializeNixDatabase` passthrough                                                                         | 1h    | T43                    |
 | 32 | Tag strategy knob docs                                                                                                | 30min | T44                    |
-| 33 | nix2container lock pin doc note                                                                                       | 15min | T58                    |
+| ~~33~~ | ~~nix2container lock pin doc note~~ done — T58 DONE 2026-11-18 (pin policy documented at the flake input; graduated into CHANGELOG [Unreleased]) | ~~15min~~ | ~~T58~~ |
 | 34 | tryEval message-free pattern → flake-patterns.md                                                                      | 15min | T59                    |
 | 35 | Code-Quality-Agent + artmann-technologies-website adopt-or-manual (Forgejo carve-out applies)                         | 15min | T51 owner-gated        |
 | 36 | Add a Forgejo-remote fixture/consumer doc example to the migration guide                                              | 30min | NEW                    |
