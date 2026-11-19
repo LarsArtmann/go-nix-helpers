@@ -268,35 +268,35 @@ name). This will rot less than line numbers but still couples to file structure.
 
 | #      | Task                                              | Impact   | Effort    |
 | ------ | ------------------------------------------------- | -------- | --------- |
-| ~~31~~ | ~~Register `maintainers.larsartmann` in nixpkgs~~ | ~~Low~~  | ~~30min~~ **→ still open — routed TODO_LIST Blocked (external PR to nixpkgs required)** |
-| ~~32~~ | ~~Real private-repo integration test in CI~~      | ~~High~~ | ~~2h~~ **→ still open — routed TODO_LIST Blocked (needs DEPLOY_SSH_KEY secret; CI job scaffolded if:false)**    |
+| ~~31~~ | ~~Register `maintainers.larsartmann` in nixpkgs~~ | ~~Low~~  | ~~30min~~ **→ decided: defer — routed TODO_LIST Blocked (external PR to nixpkgs required)** |
+| ~~32~~ | ~~Real private-repo integration test in CI~~      | ~~High~~ | ~~2h~~ **→ decided: defer — routed TODO_LIST Blocked (needs DEPLOY_SSH_KEY secret; CI job scaffolded if:false)**    |
 | ~~33~~ | ~~Audit all downstream consumers~~                | ~~Med~~  | ~~2h~~ done — 34-repo fleet audit 2026-08-10 + checklist re-run 2026-11-18 (TODO_LIST T60 DONE)    |
-| ~~34~~ | ~~Real e2e consumer test~~                        | ~~High~~ | ~~4h~~ **→ still open — routed TODO_LIST Blocked (real-consumer CI job scaffolded if:false, needs DEPLOY_SSH_KEY); hermetic halves shipped as checks.templateEval + containerSmoke**    |
-| ~~35~~ | ~~Fix empty commit message in `df9a5ff`~~         | ~~Low~~  | ~~15min~~ **→ still open — routed TODO_LIST Blocked (interactive rebase + force-push; user approval needed)** |
+| ~~34~~ | ~~Real e2e consumer test~~                        | ~~High~~ | ~~4h~~ **→ decided: defer — routed TODO_LIST Blocked (real-consumer CI job scaffolded if:false, needs DEPLOY_SSH_KEY); hermetic halves shipped as checks.templateEval + containerSmoke**    |
+| ~~35~~ | ~~Fix empty commit message in `df9a5ff`~~         | ~~Low~~  | ~~15min~~ **→ decided: defer — routed TODO_LIST Blocked (interactive rebase + force-push; user approval needed)** |
 
 ### Long-term / ROADMAP
 
 | #      | Task                                                         | Impact   | Effort    |
 | ------ | ------------------------------------------------------------ | -------- | --------- |
-| ~~36~~ | ~~Auto-detect public repos via `proxy.golang.org` query~~    | ~~High~~ | ~~3h~~ **→ still open — routed ROADMAP Theme 5 (smart private-dep detection raw idea)**    |
-| ~~37~~ | ~~Curate default `publicDeps` list~~                         | ~~Med~~  | ~~30min~~ **→ still open — routed ROADMAP Theme 5 (curated default publicDeps raw idea)** |
-| ~~38~~ | ~~Auto-detect `enableTempl` by scanning for `.templ` files~~ | ~~Med~~  | ~~1h~~ **→ still open — routed ROADMAP Theme 1 (enableTempl auto-detect raw idea)**    |
+| ~~36~~ | ~~Auto-detect public repos via `proxy.golang.org` query~~    | ~~High~~ | ~~3h~~ **→ decided: defer — routed ROADMAP Theme 5 (smart private-dep detection raw idea)**    |
+| ~~37~~ | ~~Curate default `publicDeps` list~~                         | ~~Med~~  | ~~30min~~ **→ decided: defer — routed ROADMAP Theme 5 (curated default publicDeps raw idea)** |
+| ~~38~~ | ~~Auto-detect `enableTempl` by scanning for `.templ` files~~ | ~~Med~~  | ~~1h~~ **→ decided: defer — routed ROADMAP Theme 1 (enableTempl auto-detect raw idea)**    |
 | ~~39~~ | ~~Auto-calculate `vendorHash` on first build~~               | ~~Med~~  | ~~2h~~ done — helper half shipped: enableVendorHashCheck drift gate + apps.update-vendor-hash; eval-time auto-default remains a ROADMAP Theme 1 idea    |
-| ~~40~~ | ~~Publish to nixpkgs or nix-community~~                      | ~~Low~~  | ~~2h~~ **→ still open — routed ROADMAP Theme 4 (publish to nixpkgs / flake registry raw idea)**    |
-| ~~41~~ | ~~`goPkg` as `lib.types.package` (breaking v2)~~             | ~~Med~~  | ~~1h~~ **→ still open — routed ROADMAP Theme 1 (goPkg as lib.types.package — breaking, target v2)**    |
+| ~~40~~ | ~~Publish to nixpkgs or nix-community~~                      | ~~Low~~  | ~~2h~~ **→ decided: defer — routed ROADMAP Theme 4 (publish to nixpkgs / flake registry raw idea)**    |
+| ~~41~~ | ~~`goPkg` as `lib.types.package` (breaking v2)~~             | ~~Med~~  | ~~1h~~ **→ decided: defer — routed ROADMAP Theme 1 (goPkg as lib.types.package — breaking, target v2)**    |
 | ~~42~~ | ~~`lib.mkForce` support for list attr overrides~~            | ~~Med~~  | ~~30min~~ done — mkForce recipe card shipped in docs/migration-guide.md (`e6860c5`) |
-| ~~43~~ | ~~Migration script: 5-input flake → 3-input module~~         | ~~Low~~  | ~~2h~~ **→ still open — routed ROADMAP Theme 2 (migration-script raw idea)**    |
-| ~~44~~ | ~~Public documentation site (Astro/Starlight)~~              | ~~Low~~  | ~~4h~~ **→ still open — routed ROADMAP Theme 4 (public documentation site raw idea)**    |
+| ~~43~~ | ~~Migration script: 5-input flake → 3-input module~~         | ~~Low~~  | ~~2h~~ **→ decided: defer — routed ROADMAP Theme 2 (migration-script raw idea)**    |
+| ~~44~~ | ~~Public documentation site (Astro/Starlight)~~              | ~~Low~~  | ~~4h~~ **→ decided: defer — routed ROADMAP Theme 4 (public documentation site raw idea)**    |
 | ~~45~~ | ~~Semver-tagged releases with release notes~~                | ~~Med~~  | ~~1h~~ done — v0.1.0 tagged `ad06738` 2026-11-18 + GitHub release published; CHANGELOG [0.1.0] section present    |
 
 ### Fill remaining slots (deduped ideas from all sessions)
 
 | #      | Task                                                                                 | Impact  | Effort    |
 | ------ | ------------------------------------------------------------------------------------ | ------- | --------- |
-| ~~46~~ | ~~Add `--impure` flag warning in `generate-flake.sh` for SSH deps~~                  | ~~Low~~ | ~~15min~~ **→ still open — routed to ROADMAP low-priority by the 2026-08-03 04-44 pass (F49); no SSH/impure warning in generate-flake.sh today and no current ROADMAP row carries it** |
+| ~~46~~ | ~~Add `--impure` flag warning in `generate-flake.sh` for SSH deps~~                  | ~~Low~~ | ~~15min~~ **→ decided: defer — routed to ROADMAP low-priority by the 2026-08-03 04-44 pass (F49); no SSH/impure warning in generate-flake.sh today and no current ROADMAP row carries it** |
 | ~~47~~ | ~~Consider `publicDepPattern` (regex exclusion) vs `publicDeps` (list)~~             | ~~Med~~ | ~~30min~~ **NOT-DO — publicDeps list kept and made versioned-path aware (`a199f6b`); the regex alternative was never adopted.** |
 | ~~48~~ | ~~Consider GONOPROXY/GONOSUMDB as alternative to GOPRIVATE~~                         | ~~Low~~ | ~~30min~~ **NOT-DO — GOPRIVATE kept — it implies GONOSUMDB/GONOPROXY semantics; rationale documented at docs/flake-standard.md:171.** |
-| ~~49~~ | ~~Add `--list-public` script to check GitHub API for public repos~~                  | ~~Low~~ | ~~1h~~ **→ still open — routed ROADMAP Theme 5 (proxy.golang.org auto-detect idea)**    |
+| ~~49~~ | ~~Add `--list-public` script to check GitHub API for public repos~~                  | ~~Low~~ | ~~1h~~ **→ decided: defer — routed ROADMAP Theme 5 (proxy.golang.org auto-detect idea)**    |
 | ~~50~~ | ~~Add session-end checklist to AGENTS.md ("grep for stale comments after reverts")~~ | ~~Low~~ | ~~15min~~ **Won't implement — dropped 2026-08-03 (07-38 F14 verdict "Won't implement — dropped"); AGENTS.md carries lessons/gotchas, no session-end checklist exists today.** |
 
 ---

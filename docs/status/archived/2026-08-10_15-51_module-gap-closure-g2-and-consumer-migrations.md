@@ -153,7 +153,7 @@ All 3 migrated repos pass `nix flake check --no-build` but none have been actual
 1. ~~**7 remaining Tier A consumer migrations** — surveyed, patterns understood, not executed~~ done — done in the 16:50 sprint
 2. ~~**6 Tier B consumer migrations** — some now unblocked by G2, not started~~ done — moved to TODO_LIST T4
 3. ~~**2 Tier C migrations** (Standup-Killer, crush-daily) — need to migrate off deprecated `mkGoFlake`~~ done — moved to TODO_LIST T5
-4. ~~**`index` adopter cleanup** — 5th module adopter, not touched~~ done — still open — tracked with the Tier B/C fleet backlog
+4. ~~**`index` adopter cleanup** — 5th module adopter, not touched~~ done — index runs go-standard (import verified 2026-11-19); fleet backlog closed at ROADMAP T4/T5 (2026-11-18)
 5. ~~**CI standardization** across migrated repos — not started~~ **Won't implement — dormant — dropped.**
 6. ~~**`flake.lock` freshness audit** across consumer repos — not checked~~ **Won't implement — dormant — dropped.**
 7. ~~**Real `nix build` verification** of migrated repos — blocked on SSH access~~ done — moved to TODO_LIST T3
@@ -294,14 +294,14 @@ The module defaults to `systems = [ "x86_64-linux" "aarch64-linux" "x86_64-darwi
 
 30. ~~**Migrate Standup-Killer off deprecated mkGoFlake** — needs G2 for subModules ✓ shipped~~ done — moved to TODO_LIST T5
 31. ~~**Migrate crush-daily off deprecated mkGoFlake**~~ done — moved to TODO_LIST T5
-32. ~~**Migrate Code-Quality-Agent** — G1 shipped (goPkgOverride), can migrate now~~ done — still open — tracked with the Tier B/C fleet backlog (TODO_LIST T4/T5)
-33. ~~**Migrate go-structure-linter** — needs G2 for multi-module postPatchExtra ✓ shipped~~ done — still open — tracked with the Tier B/C fleet backlog (TODO_LIST T4/T5)
-34. ~~**Migrate file-and-image-renamer** — needs deps audit first~~ done — still open — tracked with the Tier B/C fleet backlog (TODO_LIST T4/T5)
-35. ~~**Migrate library-policy** — 139 lines, uses nix/* submodules~~ done — still open — tracked with the Tier B/C fleet backlog (TODO_LIST T4/T5)
-36. ~~**Migrate mr-sync** — 252 lines, own package.nix~~ done — still open — tracked with the Tier B/C fleet backlog (TODO_LIST T4/T5)
-37. ~~**Migrate go-cqrs-lite** — 1224 lines, monorepo library~~ done — still open — tracked with the Tier B/C fleet backlog (TODO_LIST T4/T5)
-38. ~~**Migrate DiscordSync** — 725 lines, many pinned revs~~ done — still open — tracked with the Tier B/C fleet backlog (TODO_LIST T4/T5)
-39. ~~**Migrate github-local-sync** — 279 lines, allowUnfree~~ done — still open — tracked with the Tier B/C fleet backlog (TODO_LIST T4/T5)
+32. ~~**Migrate Code-Quality-Agent** — G1 shipped (goPkgOverride), can migrate now~~ done — migrated with the Tier B/C fleet sweep (ROADMAP T4/T5 struck DONE 2026-11-18)
+33. ~~**Migrate go-structure-linter** — needs G2 for multi-module postPatchExtra ✓ shipped~~ done — migrated with the Tier B/C fleet sweep (ROADMAP T4/T5 struck DONE 2026-11-18)
+34. ~~**Migrate file-and-image-renamer** — needs deps audit first~~ done — migrated with the Tier B/C fleet sweep (ROADMAP T4/T5 struck DONE 2026-11-18)
+35. ~~**Migrate library-policy** — 139 lines, uses nix/* submodules~~ done — migrated with the Tier B/C fleet sweep (ROADMAP T4/T5 struck DONE 2026-11-18)
+36. ~~**Migrate mr-sync** — 252 lines, own package.nix~~ done — migrated with the Tier B/C fleet sweep (ROADMAP T4/T5 struck DONE 2026-11-18)
+37. ~~**Migrate go-cqrs-lite** — 1224 lines, monorepo library~~ done — migrated with the Tier B/C fleet sweep (ROADMAP T4/T5 struck DONE 2026-11-18)
+38. ~~**Migrate DiscordSync** — 725 lines, many pinned revs~~ done — migrated with the Tier B/C fleet sweep (ROADMAP T4/T5 struck DONE 2026-11-18)
+39. ~~**Migrate github-local-sync** — 279 lines, allowUnfree~~ done — migrated with the Tier B/C fleet sweep (ROADMAP T4/T5 struck DONE 2026-11-18)
 
 ### CI and infrastructure
 

@@ -190,14 +190,14 @@ The metric counted `github.com/larsartmann/*` strings in flake.nix vs go.mod, fl
 
 26. ~~Migrate `Standup-Killer` off deprecated `mkGoFlake` (needs G2 for subModules)~~ done — moved to TODO_LIST T5
 27. ~~Migrate `crush-daily` off deprecated `mkGoFlake` (needs G2)~~ done — moved to TODO_LIST T5
-28. ~~Migrate `Code-Quality-Agent` (G1 shipped — can migrate now)~~ done — still open — tracked with the Tier B/C fleet backlog (TODO_LIST T4/T5)
-29. ~~Migrate `go-structure-linter` (needs G2 for multi-module postPatchExtra)~~ done — still open — tracked with the Tier B/C fleet backlog (TODO_LIST T4/T5)
-30. ~~Migrate `file-and-image-renamer` (needs deps audit first)~~ done — still open — tracked with the Tier B/C fleet backlog (TODO_LIST T4/T5)
-31. ~~Migrate `library-policy` (139 lines, but uses nix/* submodules)~~ done — still open — tracked with the Tier B/C fleet backlog (TODO_LIST T4/T5)
-32. ~~Migrate `mr-sync` (252 lines, own package.nix)~~ done — still open — tracked with the Tier B/C fleet backlog (TODO_LIST T4/T5)
-33. ~~Migrate `go-cqrs-lite` (1224 lines! monorepo library)~~ done — still open — tracked with the Tier B/C fleet backlog (TODO_LIST T4/T5)
-34. ~~Migrate `DiscordSync` (725 lines, many pinned revs)~~ done — still open — tracked with the Tier B/C fleet backlog (TODO_LIST T4/T5)
-35. ~~Migrate `github-local-sync` (279 lines, allowUnfree)~~ done — still open — tracked with the Tier B/C fleet backlog (TODO_LIST T4/T5)
+28. ~~Migrate `Code-Quality-Agent` (G1 shipped — can migrate now)~~ done — migrated with the Tier B/C fleet sweep (ROADMAP T4/T5 struck DONE 2026-11-18)
+29. ~~Migrate `go-structure-linter` (needs G2 for multi-module postPatchExtra)~~ done — migrated with the Tier B/C fleet sweep (ROADMAP T4/T5 struck DONE 2026-11-18)
+30. ~~Migrate `file-and-image-renamer` (needs deps audit first)~~ done — migrated with the Tier B/C fleet sweep (ROADMAP T4/T5 struck DONE 2026-11-18)
+31. ~~Migrate `library-policy` (139 lines, but uses nix/* submodules)~~ done — migrated with the Tier B/C fleet sweep (ROADMAP T4/T5 struck DONE 2026-11-18)
+32. ~~Migrate `mr-sync` (252 lines, own package.nix)~~ done — migrated with the Tier B/C fleet sweep (ROADMAP T4/T5 struck DONE 2026-11-18)
+33. ~~Migrate `go-cqrs-lite` (1224 lines! monorepo library)~~ done — migrated with the Tier B/C fleet sweep (ROADMAP T4/T5 struck DONE 2026-11-18)
+34. ~~Migrate `DiscordSync` (725 lines, many pinned revs)~~ done — migrated with the Tier B/C fleet sweep (ROADMAP T4/T5 struck DONE 2026-11-18)
+35. ~~Migrate `github-local-sync` (279 lines, allowUnfree)~~ done — migrated with the Tier B/C fleet sweep (ROADMAP T4/T5 struck DONE 2026-11-18)
 
 ### Module adopter cleanups
 
@@ -205,7 +205,7 @@ The metric counted `github.com/larsartmann/*` strings in flake.nix vs go.mod, fl
 37. ~~`storbi`: remove unused inputs + expand deps for 4th private require~~ done — done `8fef98c` (inputs removed)
 38. ~~`template-arch-lint`: remove unused inputs + verify private requires~~ done — done `c556952`
 39. ~~`terraform-diagrams-aggregator`: remove unused inputs + expand publicDeps~~ done — done `434d541`
-40. ~~`index`: remove `enableCheck=true` + expand deps/publicDeps~~ done — still open — tracked with the Tier B/C fleet backlog (TODO_LIST T4/T5)
+40. ~~`index`: remove `enableCheck=true` + expand deps/publicDeps~~ done — migrated with the Tier B/C fleet sweep (ROADMAP T4/T5 struck DONE 2026-11-18)
 
 ### CI and infrastructure
 

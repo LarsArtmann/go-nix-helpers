@@ -216,7 +216,7 @@ Still open → tracked in TODO_LIST (Blocked — needs interactive rebase + forc
 22. ~~**Run integration tests on macOS too** ← still open → TODO_LIST L9~~ done — done — macOS matrix
 23. ~~**Add property tests** for stripVersionSuffix and repoName ← still open → TODO_LIST M1-M2~~ done — shipped — P5
 24. ~~**Add FAQ entry for `deps` with mixed owners** ← still open → TODO_LIST L4~~ done — shipped — L4 FAQ
-25. ~~**Document the `owner-repo` naming convention`**~~ NOT-NEEDED — owner prefix reverted at`2cbb37b`
+25. ~~**Document the `owner-repo` naming convention**~~ NOT-DO — not needed: owner prefix reverted at `2cbb37b`
 26. ~~**Consider `goPkg` as `lib.types.package`**~~ → ROADMAP (Theme 1)
 27. ~~**Add `enableNixfmt` to migration guide** parameter mapping table~~ done at `b10399f`
 28. ~~**Test the CI freshness check** ← still open → TODO_LIST (Low)~~ **Won't implement — dormant — dropped.**
