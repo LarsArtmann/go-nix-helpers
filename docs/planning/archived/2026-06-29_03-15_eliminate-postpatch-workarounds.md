@@ -15,7 +15,7 @@ The core problem: `buildGoModule` does NOT support `go.work` — it builds from 
 ## Root Causes
 
 | # | Gap                                                           | Location                       | Forces workarounds in              |
-| - | ------------------------------------------------------------- | ------------------------------ | ---------------------------------- |
+| --- | ------------------------------------------------------------- | ------------------------------ | ---------------------------------- |
 | ~~1~~ done at `7fdb95c` | ~~`stripVersionSuffix` only strips TRAILING `/vN`, not mid-path~~ | ~~`mkPreparedSource.nix:94-100`~~ | ~~crush-daily, DiscordSync, overview~~ |
 | ~~2~~ done at `7fdb95c` | ~~`discoverSubModules` scans depth-1 only~~ | ~~`mkPreparedSource.nix:136-156`~~ | ~~crush-daily, DiscordSync, overview~~ |
 | ~~3~~ done at `7fdb95c` | ~~`stripLocalReplacesScript` misses `=> ../` relative paths~~ | ~~`mkPreparedSource.nix:229-232`~~ | ~~BuildFlow~~ |
@@ -68,7 +68,7 @@ The single root-cause fix. Changes 2 functions in `mkPreparedSource.nix`:
 ## Level 1: Coarse Task Breakdown (30–100 min each)
 
 | #  | Priority | Task                                                                | Est   | Depends On |
-| -- | -------- | ------------------------------------------------------------------- | ----- | ---------- |
+| --- | -------- | ------------------------------------------------------------------- | ----- | ---------- |
 | ~~1~~ done at `7fdb95c` | ~~P0~~ | ~~Fix `stripVersionSuffix` to filter all `/vN` segments~~ | ~~30min~~ | ~~—~~ |
 | ~~2~~ done at `7fdb95c` | ~~P0~~ | ~~Make `discoverSubModules` recursive with exclusion list~~ | ~~60min~~ | ~~—~~ |
 | ~~3~~ done — nested mock + mid-path /vN tests rode 7fdb95c; 12 assertions green (companion §a) | ~~P0~~ | ~~Update test.nix: add nested eventtest-like mock + mid-path /vN test~~ | ~~30min~~ | ~~1,2~~ |
@@ -122,7 +122,7 @@ The single root-cause fix. Changes 2 functions in `mkPreparedSource.nix`:
 ### Phase B: stripLocalReplacesScript fix + dead code (Tasks 5,10)
 
 | #  | Task                                                                    | Est  | L1# |
-| -- | ----------------------------------------------------------------------- | ---- | --- |
+| --- | ----------------------------------------------------------------------- | ---- | --- |
 | ~~B1~~ done at `7fdb95c` | ~~Read current `stripLocalReplacesScript` (lines 228-232)~~ | ~~2min~~ | ~~5~~ |
 | ~~B2~~ done at `7fdb95c` | ~~Add `sed -i '/=> \.\.\//d' go.mod` line~~ | ~~3min~~ | ~~5~~ |
 | ~~B3~~ done — branching-flow 61a3aaca (companion §a) | ~~Read branching-flow postPatchExtra (lines 116-119)~~ | ~~2min~~ | ~~10~~ |
@@ -149,7 +149,7 @@ The single root-cause fix. Changes 2 functions in `mkPreparedSource.nix`:
 ### Phase D: Documentation (Tasks 11–13)
 
 | #  | Task                                                                  | Est   | L1# |
-| -- | --------------------------------------------------------------------- | ----- | --- |
+| --- | --------------------------------------------------------------------- | ----- | --- |
 | ~~D1~~ done — docs updated in the sweep (companion §a Documentation table) | ~~Update mkPreparedSource.nix header (recursive discovery mention)~~ | ~~10min~~ | ~~11~~ |
 | ~~D2~~ done — excludeSubModuleDirs documented (companion §a; parameter exists today, mkPreparedSource.nix:98) | ~~Update mkPreparedSource.nix parameter docs (add excludeSubModuleDirs)~~ | ~~5min~~ | ~~11~~ |
 | ~~D3~~ done — docs updated in the sweep (companion §a Documentation table) | ~~Update README.md: "Major version suffixes" section~~ | ~~10min~~ | ~~12~~ |
@@ -160,7 +160,7 @@ The single root-cause fix. Changes 2 functions in `mkPreparedSource.nix`:
 ### Phase E: Commits + pushes (Tasks 14–17)
 
 | #  | Task                                                 | Est   | L1# |
-| -- | ---------------------------------------------------- | ----- | --- |
+| --- | ---------------------------------------------------- | ----- | --- |
 | ~~E1~~ done — reviewed; changes in 7fdb95c (companion §a) | ~~Git diff review of go-nix-helpers changes~~ | ~~5min~~ | ~~14~~ |
 | ~~E2~~ done at `7fdb95c` | ~~Commit go-nix-helpers with detailed message~~ | ~~5min~~ | ~~14~~ |
 | ~~E3~~ done — 7fdb95c pushed to master (companion §a Commits) | ~~Push go-nix-helpers~~ | ~~2min~~ | ~~14~~ |
@@ -204,7 +204,7 @@ The single root-cause fix. Changes 2 functions in `mkPreparedSource.nix`:
 ### Phase G: Document genuinely-necessary cases (Task 23)
 
 | #  | Task                                                                      | Est  | L1# |
-| -- | ------------------------------------------------------------------------- | ---- | --- |
+| --- | ------------------------------------------------------------------------- | ---- | --- |
 | ~~G1~~ **NOT-DO — no in-repo comment added — rationale documented in companion §c instead.** | ~~Add comment to ast-state-analyzer postPatch explaining go.sum workaround~~ | ~~5min~~ | ~~23~~ |
 | ~~G2~~ done — standard-bug-tracking-schema 0761c9c0 (companion §a) | ~~Add comment to standard-bug-tracking-schema postPatch explaining auth~~ | ~~5min~~ | ~~23~~ |
 | ~~G3~~ done — no change needed; already documented inline, recorded in companion §c | ~~Note monitor365 postPatch is Rust/WASM (already documented inline)~~ | ~~2min~~ | ~~23~~ |
@@ -213,7 +213,7 @@ The single root-cause fix. Changes 2 functions in `mkPreparedSource.nix`:
 ### Phase H: Final verification (Task 24)
 
 | #  | Task                                                            | Est   | L1# |
-| -- | --------------------------------------------------------------- | ----- | --- |
+| --- | --------------------------------------------------------------- | ----- | --- |
 | ~~H1~~ done — verification recorded in companion §a/§c/Metrics; plan marked COMPLETE at 82cda7b | ~~Run `nix flake check` on go-nix-helpers~~ | ~~10min~~ | ~~24~~ |
 | ~~H2~~ done — verification recorded in companion §a/§c/Metrics; plan marked COMPLETE at 82cda7b | ~~Run `nix-build test.nix -A verify` one final time~~ | ~~10min~~ | ~~24~~ |
 | ~~H3~~ done — verification recorded in companion §a/§c/Metrics; plan marked COMPLETE at 82cda7b | ~~Grep for remaining postPatch/postPatchExtra across all projects~~ | ~~5min~~ | ~~24~~ |

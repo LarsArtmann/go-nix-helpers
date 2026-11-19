@@ -125,7 +125,7 @@ Permanently blocked (owner decisions, unchanged): v0.1.0 tag, Won't-implement po
 39. E2-style red proof for the NEW gate scope (planning+reviews) — my proof planted in planning/, already covers it (verify recorded)
 40. bugtracker repo's own debt (out of scope but observed): 4 red docs-gates, 191 file-size, 59 pnpm-audit findings blocking its pre-commit
 41. KeyHolderAI CHANGELOG/AGENTS updates from Simon's diff — verify completeness
-42. Consider `container.nixUid/nixGid` passthroughs (companion knobs to initializeNixDatabase; skipped as YAGNI this session)
+42. ~~Consider `container.nixUid/nixGid` passthroughs (companion knobs to initializeNixDatabase; skipped as YAGNI this session)~~ **Won't implement — YAGNI at ship time; no consumer has asked for nixUid/nixGid passthroughs (revisit on demand).**
 43. Self-host follow-up: emit `apps.default`? (module skips it package-less — intentional; document)
 44. Add dashboard container-state note to consumer-audit-checklist triage output (verify no duplication with section 9)
 45. Pareto plan errata: record T55 finding (containerSmoke was CI-absent) and T33 finding (redundant mapping) as answered questions

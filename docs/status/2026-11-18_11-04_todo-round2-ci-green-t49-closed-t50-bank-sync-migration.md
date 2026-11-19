@@ -128,7 +128,7 @@ first FOD rebuilds since the 2026-11-13 "A12 wave 1" pin convergence
 
 **Fleet migrations:**
 8. T5 Standup-Killer / crush-daily off mkGoFlake
-9. T4 KeyCountdown (games/KeyCountdown)
+9. ~~T4 KeyCountdown (games/KeyCountdown)~~ done — KeyCountdown migrated (e1f0a5290); T4 DONE 2026-11-18 (CHANGELOG [Unreleased] purge)
 10. T4 StopTube
 11. T4 branching-flow
 12. T4 overview

@@ -2,8 +2,8 @@
 
 > Short-term, actionable, bounded work for go-nix-helpers. For long-term vision,
 > see `ROADMAP.md`; for shipped changes, see `CHANGELOG.md`.
-> Last docs-health harvest: 2026-11-19 corpus drain pass (57 options, 237 moduleTest
-> checks re-derived from tool output; v0.1.0 shipped 2026-11-18; mkGoFlake removed).
+> Last docs-health harvest: 2026-11-19 corpus completion (annotate 358→0, pin removed;
+> 41 DONE rows purged into CHANGELOG; planning corpus resolved + archived).
 
 ## Status legend
 
@@ -65,6 +65,9 @@
 | T84 | (repo: samber-linter) restructure TestExitCodeContract: run the binary via exec with absolute paths (no t.Chdir) so subtests can take t.Parallel — ends the paralleltest/golines/nolintlint tug-of-war (lint red after 4 iterations) | TODO    | S      | CI runs 44403444230..2f189df; round-7 comprehensive report §d.3/§b                        |
 | T88 | (repo: crush-config) Daemon push gating: run treefmt + shellcheck over the tree before the auto-git daemon commits/pushes (host-level; the 2026-11-17 script tab-drift recurred twice via daemon-swept scripts) | TODO | 1h | source: docs/status/2026-11-18_06-46 item 30 (pairs with e.2) |
 | T89 | (repo: PapDashboard) End-to-end host run of the OCI image: image-load + compose up + health probe (T47 closed at build + structure-check level; host mutation deferred) | TODO | 1h | source: docs/planning/2026-11-17_21-17 fine row 12 |
+| T85 | (repo: docs-gates) append-verdict repair mode: `repair` skips already-struck lines today, so the pre-canon struck-without-verdict class needed a custom applier (2026-11-19 waves G/F2) — upstream an append mode | TODO | 2h | source: 2026-11-19 corpus drain (annotate 358→0) |
+| T86 | (repo: docs-gates) rows-gate fixes: separator normalizer (`| -- |` → `| --- |`) + code-fence false-positive table suppression (feedback 2026-08-03 lines 143-145: grep pipeline inside a nix fence parses as a table) | TODO | 1h | source: 2026-11-19 corpus drain strict-gate pass |
+| T87 | (repo: SKILLS) docs-health skill: codify spec-files-not-chat — subagent verdict specs arrive as TSV files, never chat reports (3 transcription mis-maps this session-class, all caught by the validator) | TODO | 30min | source: 2026-11-19 corpus drain subagent protocol |
 
 ## Decided against / rejected
 

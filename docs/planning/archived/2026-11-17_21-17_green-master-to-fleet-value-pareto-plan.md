@@ -21,7 +21,7 @@
 ### The 1% that delivers 51%: **Ship the green + settle the three verdicts**
 
 | # | Task                                                                | Why it is the 1%                                                                                                                                      |
-| - | ------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| --- | ------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
 | ~~1~~ done — pushed; first fully green CI run 44152413584 (2026-11-17; 04-39 §f.48) | ~~Push the 3 remaining commits; watch CI stay green~~ | ~~Closes the red-origin window for good; makes the corpus sweep + container option public; every fleet migration is gated on it~~ |
 | 2 **→ decided: defer — routed TODO_LIST.md Blocked: Won't-implement policy row + T15 row (both "Owner decision")** | Owner verdict batch: Won't-implement policy + T15 (templ-in-builds) | Two 15-min decisions that unblock the annotation canon (~210 unilateral verdicts pending ratification) and clear a BLOCKED row carried for 3 sessions |
 | ~~3~~ done — approved + cut: v0.1.0 tagged ad06738 2026-11-18 (release row graduated into CHANGELOG) | ~~v0.1.0 tag decision (+ cut if approved)~~ | ~~Unlocks mkGoFlake removal, template deletion, and consumer version pinning — the entire G-series unblocks on this one yes/no~~ |
@@ -29,7 +29,7 @@
 ### The 4% that delivers 64%: **The container pilot wave + fleet audit**
 
 | # | Task                                                                        | Why                                                                            |
-| - | --------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| --- | --------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
 | ~~4~~ done — T47 DONE 2026-11-17 (CHANGELOG [Unreleased] purge; merged 9af7bd7, relocked e8bc6e2) | ~~T47 PapDashboard pilot merge (branch verified, relock now trivial)~~ | ~~The first fleet image shipped on the option; converts "tested" into "deployed"~~ |
 | ~~5~~ done — T48 + T49 DONE (CHANGELOG [Unreleased] purge; KeyHolderAI 2026-11-17/18, sbts 91289661) | ~~T48 KeyHolderAI + T49 standard-bug-tracking-schema migrations~~ | ~~Two mechanical 2h migrations; every one deletes a hand-rolled image block~~ |
 | ~~6~~ done — T50 DONE 2026-11-18 (CHANGELOG [Unreleased] purge; full battery green) | ~~T50 bank-sync go-standard adoption~~ | ~~Largest remaining manual consumer; the pattern proof for Tier B~~ |
@@ -39,7 +39,7 @@
 ### The 20% that delivers 80%: **Finish the migration + hardening story**
 
 | #  | Task                                                                                                                                                                                                                            | Why                                                                                                                 |
-| -- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
 | ~~9~~ done — T4 + T5 DONE 2026-11-18 (CHANGELOG [Unreleased] purge; mkGoFlake zero consumers) | ~~T4 Tier B migrations (6 repos) + T5 Tier C (2 repos) → mkGoFlake at ZERO consumers~~ | ~~Ends the two-pattern era; makes the deletion contract enforceable~~ |
 | ~~10~~ done — deleted at 9c8724b (CHANGELOG Unreleased Removed) | ~~G2+G3: delete `mkGoFlake.nix` + `templates/go-flake-parts` (post-tag)~~ | ~~Removes deprecated surface + the last stale `go_1_26` reference~~ |
 | ~~11~~ done — T64 DONE (CHANGELOG [Unreleased] purge) | ~~T64 self-host: this repo's flake on `flakeModules.go-standard`~~ | ~~The dogfood gap that let a dead `systems` option and missing `passthru.go` survive; makes the module self-verifying~~ |
@@ -52,7 +52,7 @@
 ### The other 20% (to 100%): capability, verification, cross-repo, hygiene
 
 | #  | Task group                  | Contents                                                                                                                                 |
-| -- | --------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| --- | --------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
 | ~~17~~ done — T39/T40/T41/T42/T43 all DONE (CHANGELOG [Unreleased] purge; fromImage + fromImageEnv at moduleTest 226 checks) | ~~Shipping capability~~ | ~~T39 richer structure diff, T40 `created` round-trip, T41 multi-arch manifest app, T42 `fromImage`, T43 `initializeNixDatabase`~~ |
 | ~~18~~ done — T54 + T55 DONE (CHANGELOG [Unreleased] purge; aarch64 emulation build EXIT=0, delta reviewed) | ~~Verification extras~~ | ~~T54 local aarch64 containerSmoke, T55 CI runtime delta review~~ |
 | ~~19~~ done — T61/T62/T63/T68 all DONE (CHANGELOG [Unreleased] purge) | ~~Cross-repo~~ | ~~T61 SKILLS monorepo guidance, T62 SKILLS shellcheck pre-commit, T63 crush-config lessons export, T68 upstream ROUTED patch~~ |

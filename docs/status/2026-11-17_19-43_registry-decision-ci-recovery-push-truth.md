@@ -69,7 +69,7 @@ Not knowingly. One false claim was published as fact ("daemon pushes this repo")
 ## a) FULLY DONE
 
 | # | Item                                                                                                                                                             | Evidence                                                                    |
-| - | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
+| --- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
 | 1 | Registry decision encoded: `container.registry` description (source of truth), man page, README, AGENTS.md gotcha, T46 note, report §g.3 ANSWERED verdict        | commits `b5a2f42`+`214bbdb` (daemon split the batch); grep-verified on disk |
 | 2 | Fleet remote truth established: 16 Forgejo-remote repos on 2 hosts; carve-out wording kept generic in public docs, concrete hosts in AGENTS.md                   | remote scan of 250+ repos                                                   |
 | 3 | shfmt tab-drift fixed (5 scripts restored to treefmt format)                                                                                                     | `nix fmt`, idempotence re-run; CI Format Check root cause closed            |
@@ -82,7 +82,7 @@ Not knowingly. One false claim was published as fact ("daemon pushes this repo")
 ## b) PARTIALLY DONE
 
 | # | Item                      | Done                                                                                                             | Missing                                                                                                      |
-| - | ------------------------- | ---------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| --- | ------------------------- | ---------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
 | 1 | Master CI recovery        | 3 root causes fixed, ALL local gates green (218/218, --all-systems --no-build, shellcheck, fmt, docsAnnotations) | Not pushed → CI verdict on the fix chain unknown; origin remains red until owner approves push               |
 | 2 | Registry decision shipped | Encoded + committed locally                                                                                      | Unpushed; no consumer has adopted the carve-out yet (first Forgejo-remote adopter pending)                   |
 | 3 | CI diagnosis completeness | 6 runs + per-job logs; 4 failing jobs explained (3 causes + 1 cancellation)                                      | Run `44059828196` (09:54, ALL jobs failed) not decomposed — likely infra/flake-parts-tarball fetch, unproven |
@@ -117,8 +117,9 @@ Not knowingly. One false claim was published as fact ("daemon pushes this repo")
 
 ## f) Next — up to 50 (NEW = harvest candidates; T-refs = already in TODO_LIST)
 
+<!-- check-rows:ledger -->
 | #  | Item                                                                                                                  | Est   | Ref/Status             |
-| -- | --------------------------------------------------------------------------------------------------------------------- | ----- | ---------------------- |
+| --- | --------------------------------------------------------------------------------------------------------------------- | ----- | ---------------------- |
 | 1  | OWNER: push approval for the 4 local commits — origin CI red until landed                                             | 1min  | §g Q1                  |
 | 2  | Watch CI on the pushed chain; expect first green master since <2026-10-30                                             | 15min | after NEW-1            |
 | 3  | Investigate `origin/systemnix-vn-version-fix` (contents, creator, delete?)                                            | 15min | NEW                    |
@@ -151,7 +152,7 @@ Not knowingly. One false claim was published as fact ("daemon pushes this repo")
 | 30 | `container.fromImage` (distroless base)                                                                               | 3h    | T42                    |
 | 31 | `container.initializeNixDatabase` passthrough                                                                         | 1h    | T43                    |
 | 32 | Tag strategy knob docs                                                                                                | 30min | T44                    |
-| ~~33~~ | ~~nix2container lock pin doc note~~ done — T58 DONE 2026-11-18 (pin policy documented at the flake input; graduated into CHANGELOG [Unreleased]) | ~~15min~~ | ~~T58~~ |
+| 33 | nix2container lock pin doc note **→ done — T58 DONE 2026-11-18 (pin policy documented at the flake input; graduated into CHANGELOG [Unreleased])** | 15min | T58 |
 | 34 | tryEval message-free pattern → flake-patterns.md                                                                      | 15min | T59                    |
 | 35 | Code-Quality-Agent + artmann-technologies-website adopt-or-manual (Forgejo carve-out applies)                         | 15min | T51 owner-gated        |
 | 36 | Add a Forgejo-remote fixture/consumer doc example to the migration guide                                              | 30min | NEW                    |

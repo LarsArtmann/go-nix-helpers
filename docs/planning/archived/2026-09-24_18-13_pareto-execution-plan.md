@@ -104,7 +104,7 @@ Sorted by importance / impact / effort / customer-value (fleet of 34 consumer re
 | ~~P17~~ done — pkgs.go fallback in goBaseFrom stub tests + mkGoFlake eval smoke (04-39 §a D11/D12) | ~~`pkgs.go` fallback branch test + mkGoFlake eval smoke check~~ | ~~20%~~ | ~~Med~~ | ~~45min~~ | ~~T9+T10~~ |
 | ~~P18~~ done — floor check shipped, tested, documented (04-39 §a D13–D15; CHANGELOG goModFloorMessage) | ~~Eval-time go.mod floor check: read consumer go.mod, warn/throw when resolved toolchain < floor~~ | ~~20%~~ | ~~High~~ | ~~90min~~ | ~~T16~~ |
 | ~~P19~~ done — checks.docsAnnotations + exemption notes (04-39 §f.18–21; CHANGELOG) | ~~Vendor check-rows + grep-gate into `scripts/`, wire as flake check; add exemption notes to 07-38/06-51~~ | ~~20%~~ | ~~Med~~ | ~~90min~~ | ~~T30+T29~~ |
-| ~~P20~~ done — render-verify + groff done (04-39 §f.23–24); corpus clean — zero 1.~~-style markers remain in docs/status (grep-verified 2026-11-19) | ~~Docs polish: `1.~~`→`1. ~~` corpus pass + render-verify 5 largest tables + groff-check man pages~~ | ~~rest~~ | ~~Low~~ | ~~45min~~ | ~~T26+T27+T28~~ |
+| ~~P20~~ done — render-verify + groff done (04-39 §f.23–24); corpus clean — zero double-tilde-prefixed markers remain in docs/status (grep-verified 2026-11-19) | ~~Docs polish: `1.~~`→`1. ~~` corpus pass + render-verify 5 largest tables + groff-check man pages~~ | ~~rest~~ | ~~Low~~ | ~~45min~~ | ~~T26+T27+T28~~ |
 | ~~P21~~ done — F4–F9 all shipped (04-39 §f.25–29; verified in source: mkPreparedSource.nix:12/259, nix-lint.sh:113, dashboard.sh:33) | ~~Hygiene sweep: trash result* symlinks + gitignore, mindepth comment, "any depth" comment, `__intentionallyOverridingVersion`, nix-lint go_1_XX, dashboard GO_LATEST~~ | ~~rest~~ | ~~Low~~ | ~~60min~~ | ~~T17–T19, T22, T23, T25~~ |
 | ~~P22~~ done — old-nixpkgs CI job live and green (e94f290; CHANGELOG) | ~~Old-nixpkgs pinned CI matrix job for moduleTest (graceful degradation proof)~~ | ~~rest~~ | ~~Med~~ | ~~60min~~ | ~~T24~~ |
 | ~~P23~~ done — corrections + postmortem docs shipped (04-39 §f.31–32; files exist under docs/corrections/ + docs/postmortems/) | ~~Records: 0817f80 mechanism correction note + lock-bump postmortem doc~~ | ~~rest~~ | ~~Low~~ | ~~45min~~ | ~~T31+T32~~ |
@@ -139,11 +139,11 @@ workstreams ordered by Pareto tier. IDs encode parent (P1.1 = step 1 of P1).
 ### Workstream B — Harden the change surface (4% → 64%)
 
 | ID | Task                                                                                                         | Est                                                   |
-| -- | ------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------- |
+| --- | ------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------- |
 | ~~B1~~ done — shipped 2026-09-25 (04-39 §a B1–B3) | ~~test-module.nix: assert `requireDeps` default `{}`~~ | ~~8m~~ |
 | ~~B2~~ done — shipped 2026-09-25 (04-39 §a B1–B3) | ~~test-module.nix: assert requireDeps entries reach mkPreparedSource postPatch (grep passthru/postPatch)~~ | ~~12m~~ |
 | ~~B3~~ done — shipped 2026-09-25 (04-39 §a B1–B3) | ~~test.nix: assert dedup against existing requires (already covered — extend with a duplicate-entry case)~~ | ~~12m~~ |
-| ~~B4~~ done — shipped 2026-09-25 (04-39 §a B4–B5) | ~~flake.nix: add `templ-fixture-guard` check (`git ls-files~~ | ~~grep mock-templ-missing-generated.*_templ.go` → fail)~~ |
+| B4 **→ done — shipped 2026-09-25 (04-39 §a B4–B5)** | flake.nix: add `templ-fixture-guard` check (`git ls-files \| grep mock-templ-missing-generated.*_templ.go` → fail) |
 | ~~B5~~ done — shipped 2026-09-25 (04-39 §a B4–B5) | ~~Verify guard passes green; deliberately stage a fixture file, verify it fails, unstage~~ | ~~12m~~ |
 | ~~B6~~ done — shipped 2026-09-25 (04-39 §a B6–B9) | ~~pure-functions.nix: extract `goBaseFrom { pkgs lib goPkgAttr goPkgOverride goTarballVersion goTarballHash }`~~ | ~~12m~~ |
 | ~~B7~~ done — shipped 2026-09-25 (04-39 §a B6–B9) | ~~modules/go-standard.nix: replace inline goBase block with the helper; moduleTest green~~ | ~~12m~~ |
@@ -191,7 +191,7 @@ workstreams ordered by Pareto tier. IDs encode parent (P1.1 = step 1 of P1).
 | ~~D4~~ done — shipped 2026-09-25 (04-39 §a D1–D4) | ~~Tests for all three options (defaults + propagation) + man page + README rows + CHANGELOG~~ | ~~12m~~ |
 | ~~D5~~ done — shipped 2026-09-25 (04-39 §a D5); later rewritten message-free (Nix 2.34, CHANGELOG 0.1.0) | ~~templ-committed negative test: assert throw message contains "committed *_templ.go"~~ | ~~12m~~ |
 | ~~D6~~ done — shipped 2026-09-25 (04-39 §a D6 + §f.4: verifyValidation PASS after host fix) | ~~verifyValidation: assert error text names the missing module (extend script + expected-output check)~~ | ~~12m~~ |
-| ~~D7~~ done — shipped 2026-09-25 (04-39 §a D7; escapeShellArg at mkPreparedSource.nix:321) | ~~publicDeps: escape ERE metachars (`sed 's/[.[\*^$()+?{~~ | ~~]/\\&/g'`) before grep -vE; Test 7 still green~~ |
+| D7 **→ done — shipped 2026-09-25 (04-39 §a D7; escapeShellArg at mkPreparedSource.nix:321)** | publicDeps: escape ERE metachars (`sed 's/[.[\*^$()+?{\|]/\\&/g'`) before grep -vE; Test 7 still green |
 | ~~D8~~ done — shipped 2026-09-25 (04-39 §a D8; eval-time validation, test-module.nix:887/1521) | ~~excludeSubModuleDirs: validate/quote entries spliced into the case glob; add adversarial test~~ | ~~12m~~ |
 | ~~D9~~ done — shipped 2026-09-25 (04-39 §a D9; proxyVendorWarning go-standard.nix:1159) | ~~proxyVendor: emit builtins.trace when deps force it false and consumer set true~~ | ~~10m~~ |
 | D10 **→ decided: defer — routed TODO_LIST.md Blocked: "T15: templ generate in modBuildPhase when enableTempl — Owner decision pending (2026-09-25 §g.3: propose won't-implement…)"** | enableTempl: add `templ generate` to modBuildPhase (FOD) — standard-bug-tracking-schema can drop its override | 12m |
@@ -204,7 +204,7 @@ workstreams ordered by Pareto tier. IDs encode parent (P1.1 = step 1 of P1).
 ### Workstream E — CI-enforced truthfulness (20% → 80%)
 
 | ID | Task                                                                                                       | Est |
-| -- | ---------------------------------------------------------------------------------------------------------- | --- |
+| --- | ---------------------------------------------------------------------------------------------------------- | --- |
 | ~~E1~~ done — vendored check-rows.py + gate, 2026-09-25 (04-39 §f.18; CHANGELOG checks.docsAnnotations) | ~~Vendor `check-rows.py` + a grep-gate wrapper into `scripts/` (attribution comment to docs-health skill)~~ | ~~12m~~ |
 | ~~E2~~ done — green in full check + CI (04-39 §f.19) | ~~flake.nix: `checks.docs-annotations` running both gates over `docs/status/`; green~~ | ~~12m~~ |
 | ~~E3~~ done — guard-the-guard red on planted defects (04-39 §f.20; derivation-level re-proof via T65) | ~~Deliberately un-strike one row → verify red → restore (guard the guard)~~ | ~~12m~~ |
@@ -214,7 +214,7 @@ workstreams ordered by Pareto tier. IDs encode parent (P1.1 = step 1 of P1).
 
 | ID  | Task                                                                                               | Est |
 | --- | -------------------------------------------------------------------------------------------------- | --- |
-| ~~F1~~ done — zero 1.~~-style markers remain in docs/status (grep-verified 2026-11-19) | ~~Corpus regex pass `^(\s*\d+)\.~~` → `$1. ~~` over docs/status; spot-check diff~~ | ~~12m~~ |
+| ~~F1~~ done — zero double-tilde-prefixed markers remain in docs/status (grep-verified 2026-11-19) | ~~Corpus regex pass `^(\s*\d+)\.~~` → `$1. ~~` over docs/status; spot-check diff~~ | ~~12m~~ |
 | ~~F2~~ done — glow render pass (04-39 §f.23); pandoc <del> proof via T65 (117 del elements) | ~~Render-verify 5 largest struck tables (glow/markdown-preview); fix any broken shapes~~ | ~~12m~~ |
 | ~~F3~~ done — man render clean (04-39 §f.24) | ~~`MANWIDTH=80 man --local-file docs/man/go-standard.5` + mkPreparedSource.5; fix any groff warnings~~ | ~~5m~~ |
 | ~~F4~~ done — trashed + gitignored (04-39 §f.25) | ~~`trash result result-1 result-2 result-3 result-auto result-verify result-vv`; gitignore `result*`~~ | ~~5m~~ |
@@ -234,7 +234,7 @@ workstreams ordered by Pareto tier. IDs encode parent (P1.1 = step 1 of P1).
 ### Workstream G — Blocked enablers (after owner decisions)
 
 | ID | Task                                                                                           | Est |
-| -- | ---------------------------------------------------------------------------------------------- | --- |
+| --- | ---------------------------------------------------------------------------------------------- | --- |
 | ~~G1~~ done — v0.1.0 tagged ad06738 2026-11-18, GitHub release published, tag verified consumer-style (CHANGELOG 0.1.0) | ~~v0.1.0: verify suite green, cut CHANGELOG section, annotated tag, push, watch module proxy~~ | ~~12m~~ |
 | ~~G2~~ done — mkGoFlake deleted at 9c8724b (CHANGELOG Unreleased Removed) | ~~Post-tag: delete `mkGoFlake.nix` + trace wrapper + structural-check reference update~~ | ~~12m~~ |
 | ~~G3~~ done — templates/go-flake-parts deleted at 9c8724b (CHANGELOG Unreleased Removed) | ~~Post-tag: delete `templates/go-flake-parts/` + README/generate-flake.sh references~~ | ~~12m~~ |

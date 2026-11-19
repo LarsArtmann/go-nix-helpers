@@ -32,6 +32,9 @@ annotate-rows.py guard fix of the same date.
 Exit 0 when no table contains a PARTIAL row; exit 1 with the offending
 rows listed otherwise. Rows a pass deliberately leaves open (e.g. f-items
 kept for later) will surface here — judge and report them, don't hide them.
+A `<!-- check-rows:ledger -->` line above a table (blank lines allowed)
+exempts exactly that table and is reported as LEDGER-EXEMPT — for ledger
+tables whose open rows are the point (per-row inline verdicts).
 """
 
 import re
@@ -96,6 +99,21 @@ def tables(lines: list[str]):
         yield block
 
 
+def ledger_exempt(lines: list[str], first_line_no: int) -> bool:
+    # Upstream ledgerMarker semantics (docs-gates internal/docsrows): a
+    # `<!-- check-rows:ledger -->` line above the table exempts exactly
+    # that table; blank lines in between are allowed; any other non-blank
+    # line cancels it. Ported 2026-11-19 (the vendored copy predated it).
+    marker = "<!-- check-rows:ledger -->"
+    i = first_line_no - 2
+    while i >= 0:
+        if lines[i].strip() == "":
+            i -= 1
+            continue
+        return lines[i].strip() == marker
+    return False
+
+
 def check_file(path: Path) -> int:
     lines = path.read_text().splitlines()
     problems: list[str] = []
@@ -106,6 +124,9 @@ def check_file(path: Path) -> int:
             continue
 
         header_no = data[0][0]
+        if ledger_exempt(lines, block[0][0]):
+            print(f"{path.name}: table at line {header_no} LEDGER-EXEMPT (open rows are the point)")
+            continue
         classified = [(no, line, classify_row(line)) for no, line in data[1:]]
         struck_rows = sum(
             1 for _, _, state in classified if state in ("STRUCK", "ROUTED")

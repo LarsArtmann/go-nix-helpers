@@ -783,6 +783,18 @@
     </style>
   </head>
   <body>
+  <div style="margin:2rem auto;max-width:60rem;padding:1rem 1.5rem;border:2px solid #10b981;border-radius:8px;background:#ecfdf5;color:#064e3b;font-family:system-ui,sans-serif;">
+    <strong>RESOLVED — historical snapshot (banner 2026-11-19).</strong>
+    All findings closed: the 2026-06-29 postPatch elimination (<code>7fdb95c</code> + companion
+    report in docs/status/archived/), the publicDeps rework (<code>a199f6b</code>), the 2026-08-10
+    hardening sweep (<code>7ff77cc</code>&hellip;<code>a26b5aa</code>), and v0.1.0 (2026-11-18).
+    The &ldquo;still open as of 2026-07-24&rdquo; residuals are closed since: goPkg dead weight &rarr;
+    <code>goPkgAttr</code> auto-default + <code>goBaseFrom</code>; pseudo-version normalization &rarr;
+    integration Test 9; generate-flake fragility &rarr; full rewrite + sed escaping; requireDeps
+    dedup &rarr; shipped; repoName collision &rarr; pureFunctions property suite. Viewed and
+    verdicted 2026-11-18 (TODO_LIST T69, graduated into CHANGELOG [Unreleased]).
+  </div>
+
     <!-- Full-bleed top bar (optional — remove for quieter reports) -->
     <div class="top-bar">
       <span>FULL CODE REVIEW</span>

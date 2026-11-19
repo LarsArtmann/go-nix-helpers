@@ -97,7 +97,7 @@ T33 (systems mapping test), T34 (GOEXPERIMENT/completionStyle sweep), T35–T46 
 42. Push the 5 migrated consumer repos once approved (Q1) + verify CI on each
 43. Standup-Killer: full battery re-run at final tree + push (with crush-daily batch)
 44. monitor daemon pushes of migrated repos; re-run batteries at shipped trees
-45. /tmp cleanup: banksync-old, templ-components-v1260/v1270, gf-anc, cqrshtmx, fod.json, cd-_/st-_/bf-_/sk-_/gnh-_.log, cd-lock-snap.json, goenum-hash_.log, templ-hash*.log
+45. ~~/tmp cleanup: banksync-old, templ-components-v1260/v1270, gf-anc, cqrshtmx, fod.json, cd-_/st-_/bf-_/sk-_/gnh-_.log, cd-lock-snap.json, goenum-hash_.log, templ-hash*.log~~ done — cleared by the host's automatic midnight /tmp wipe (verified gone 2026-11-19)
 46. Fix the system jq (host, needs owner/root) or document the python3 fallback in AGENTS global lessons
 47. BuildFlow hook: inject GOEXPERIMENT into its pre-commit env (3rd strike)
 48. Consider: bank-sync templCli/crush-daily templCliFor → shared helper upstream (go-nix-helpers option `templCliVersion`?) — 4 repos now hand-roll the same overrideAttrs

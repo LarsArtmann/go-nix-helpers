@@ -16,6 +16,14 @@ below through that section shipped before or with it.
 
 ### Changed
 
+- 2026-11-19 docs corpus completion: the docs-gates annotate gate drained
+  358→0 (ratchet pin `.docs-gates.json` deleted — fleet default 0 is now the
+  enforced state), ~800 inline verdicts applied across the archived status
+  corpus, the planning corpus (5 MDs, ~640 rows) fully resolved and moved to
+  `docs/planning/archived/` with resolution banners on both HTML snapshots,
+  TODO_LIST purged of 41 DONE rows into this section, and the full battery
+  green (freshness, audit-all, annotate, routing, cadence). Archive manifest:
+  `docs/status/2026-11-19_01-58_docs-corpus-completion.md`.
 - TODO_LIST purge (2026-11-19): T4 Migrate Tier B consumers to go-standard (KeyCountdown, StopTube, branching-flow, bank-sync, overview, BuildFlow) — G2 unblocks all — DONE 2026-11-18
 - TODO_LIST purge (2026-11-19): T5 Migrate Tier C consumers off deprecated `mkGoFlake` (Standup-Killer, crush-daily) — DONE 2026-11-18
 - TODO_LIST purge (2026-11-19): T64 Self-host: import `flakeModules.go-standard` in this repo's own flake.nix (dogfood gap — the dead `systems` option and missing `passthru.go` survived because the flake hand-rolls its outputs) — DONE (pre-2026-11-18)

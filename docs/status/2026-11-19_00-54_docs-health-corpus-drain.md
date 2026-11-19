@@ -140,23 +140,23 @@ daemon's 23:22 formatter commit broke it).
 
 ## f) NEXT (ordered; execution paused)
 
-1. Resume alejandra-verdicts-F2 (feed rebuilt line list) → drain last ~59
-   archived findings → battery annotate = 0.
-2. Resume athena-planning-corpus → apply planning/feedback verdicts →
+1. ~~Resume alejandra-verdicts-F2 (feed rebuilt line list) → drain last ~59
+   archived findings → battery annotate = 0.~~ done — F2 spec applied (39 verdicts, 6 hashes verified); annotate = 0 findings CLEAN, twice confirmed
+2. ~~Resume athena-planning-corpus → apply planning/feedback verdicts →
    `rows --strict` + `bare-rows` per file → `git mv` to archived/ (planning
-   + reviews; banners for the 2 HTMLs) → manifest in the wrap-up report.
-3. Ratchet: delete `.docs-gates.json` (0 = default), update AGENTS.md note.
-4. TODO_LIST: strike + `docs-gates purge` the 41 DONE rows → CHANGELOG entry.
-5. CHANGELOG `[Unreleased]`: corpus drain + living-doc accuracy fixes.
-6. Final battery (5/5 green at annotate=0) + local gates + `nix fmt` +
-   `nix flake check --no-build`; commit.
-7. Optional push (owner call — billing blocker still gates 13 repos' CI).
-8. Standing rows unchanged: T72–T84 (billing reruns, T84 samber-linter,
-   T73 gogenfilter TS, T74/T75 convergence sweeps, T76 bank-sync app adoption).
-9. Upstream candidates (docs-gates repo): append-verdict writer mode (e.1),
-   separator-shape normalizer (e.3) — route via T79-class rows.
-10. crush-config lessons.md: digit-class grep lesson (e.2) + "spec maps from
-    emitted keys, twice burned in one session" (d.1).
+   plus reviews; banners for the 2 HTMLs) → manifest in the wrap-up report.~~ done — 645 rows verdicted via repair; all strict/bare gates green; 7 files archived; manifest in docs/status/2026-11-19_01-58_docs-corpus-completion.md
+3. ~~Ratchet: delete `.docs-gates.json` (0 = default), update AGENTS.md note.~~ done — pin deleted at annotate=0 confirmed twice; AGENTS.md note rewritten (judge-vocab + routed-form canon)
+4. ~~TODO_LIST: strike + `docs-gates purge` the 41 DONE rows → CHANGELOG entry.~~ done — 41 rows purged into CHANGELOG [Unreleased] Changed; 6 drift items annotated closed first (pre-flight gate)
+5. ~~CHANGELOG `[Unreleased]`: corpus drain + living-doc accuracy fixes.~~ done — corpus-completion summary entry + 41 purge bullets under Changed
+6. ~~Final battery (5/5 green at annotate=0) + local gates + `nix fmt` +
+   `nix flake check --no-build`; commit.~~ done — battery 5/5 PASS at annotate=0; verification + commit in the completion session (docs/status/2026-11-19_01-58_*)
+7. ~~Optional push (owner call — billing blocker still gates 13 repos' CI).~~ done — push explicitly ordered (owner directive 2026-11-19) and executed in the completion session
+8. ~~Standing rows unchanged: T72–T84 (billing reruns, T84 samber-linter,
+   T73 gogenfilter TS, T74/T75 convergence sweeps, T76 bank-sync app adoption).~~ done — verified unchanged; T85–T89 added (upstream candidates + harvested gaps: daemon gating, PapDashboard e2e)
+9. ~~Upstream candidates (docs-gates repo): append-verdict writer mode (e.1),
+   separator-shape normalizer (e.3) — route via T79-class rows.~~ done — routed TODO_LIST T85 (append-verdict) + T86 (separator + fence false-positive)
+10. ~~crush-config lessons.md: digit-class grep lesson (e.2) + "spec maps from
+    emitted keys, twice burned in one session" (d.1).~~ done — lessons committed to crush-config references/lessons.md in the completion session (plus the judge-vocab routed-verdict lesson)
 
 ## g) QUESTIONS (3)
 
@@ -169,3 +169,6 @@ daemon's 23:22 formatter commit broke it).
 3. **Purge depth**: purge ALL 41 DONE rows in one CHANGELOG entry (my
    recommendation — TODO_LIST becomes open-work-only), or keep the recent
    round-6/7 rows (T35–T59 era) struck-but-visible for one more cycle?
+
+
+**§g Resolution (2026-11-19 01:58):** Q1 resume → done (this session). Q2 push → ordered + executed. Q3 purge depth → ALL 41 rows purged (owner default accepted).
