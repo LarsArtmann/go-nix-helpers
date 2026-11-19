@@ -208,8 +208,9 @@ in
       default = null;
       description = ''
         Override the templ CLI everywhere the module wires it: the
-        package build's nativeBuildInputs, devShells, and treefmt's
-        templ program. Accepts a package OR a `pkgs: package` function
+        package build's nativeBuildInputs, devShells, treefmt's
+        templ program, and the templ-freshness oracle. Accepts a
+        package OR a `pkgs: package` function
         (recommended — mirrors extraBuildAttrs; the flake-level options
         block has no pkgs in scope, and the function form keeps the pin
         per-system correct). nixpkgs' templ trails go.mod requirements in
@@ -241,7 +242,8 @@ in
         *_templ.go against the committed one. The templ-committed check
         only enforces sibling EXISTENCE; this catches a .templ edit (or a
         templ version bump) whose regeneration was never committed. The
-        oracle is the nixpkgs-pinned templ (the same one treefmt uses),
+        oracle is templBin — the templCliPackage override when set, else
+        nixpkgs' templ (the same one treefmt uses),
         so a templ bump that changes generated output fails `nix flake
         check` until `templ generate` is re-run and committed. Requires
         templGenerationPolicy = "committed" (preBuild repos gitignore
@@ -1895,8 +1897,9 @@ in
             else
               {
                 # Regenerate-and-diff gate: templ-committed proves a *_templ.go
-                # sibling EXISTS; this proves its CONTENT matches what the
-                # nixpkgs-pinned templ produces today. Runs on the FULL source
+                # sibling EXISTS; this proves its CONTENT matches what
+                # templBin (the templCliPackage override, or nixpkgs' templ)
+                # produces today. Runs on the FULL source
                 # copy (templ resolves types across sibling .go files), not a
                 # filtered one. On drift, prints the unified diff and fails —
                 # the fix ritual is exactly `templ generate` + commit.
@@ -1904,7 +1907,7 @@ in
                   pkgs.runCommand "${cfg.pname}-templ-freshness"
                     {
                       nativeBuildInputs = [
-                        pkgs.templ
+                        templBin
                         pkgs.findutils
                         pkgs.diffutils
                       ];

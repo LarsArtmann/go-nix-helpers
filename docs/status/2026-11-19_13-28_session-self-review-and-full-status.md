@@ -128,7 +128,7 @@
 20. Next harvest: 01-58 report is the newest status report (open §f = none;
     backlog table rows route to TODO_LIST — already landed)
 21. Zero-main-packages hard-fail guard (AGENTS subPackages gotcha backlog)
-22. container.nixUid/nixGid passthroughs — revisit on consumer demand
+22. ~~container.nixUid/nixGid passthroughs — revisit on consumer demand~~ done — covered by the 06-46:42 Won't-implement verdict (the revisit-on-demand escape is recorded there)
 23. docs-gates upstream issue: G/uniform vs pipe-in-code-span (the `\|`
     escape doesn't help; routed-row remedy documented in AGENTS)
 24. docs-gates upstream: fence-aware rows scanner (subset of T86)

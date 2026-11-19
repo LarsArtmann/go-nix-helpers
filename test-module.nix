@@ -849,6 +849,14 @@ let
     enableTemplFreshnessCheck = true;
   };
 
+  # templCliPackage pin must reach the freshness oracle (2026-11-19: the
+  # check hardcoded pkgs.templ, so a pinned CLI never changed the oracle
+  # and repos with go.mod ahead of nixpkgs' templ saw phantom drift).
+  freshnessPinnedCfg = mkFreshnessChecks ./test-assets/mock-templ-committed {
+    enableTemplFreshnessCheck = true;
+    templCliPackage = pkgs: pkgs.hello;
+  };
+
   # preBuild policy + freshness enabled: must THROW at eval (nothing
   # committed to diff).
   freshnessPreBuildEval = builtins.tryEval (
@@ -1509,6 +1517,10 @@ let
       "differs from templ generate output"
       (freshnessStaleCfg.templ-freshness.buildCommand or "")
     ) "stale echo + diff in buildCommand")
+    (assertCheck "templCliPackage pins the freshness oracle" (
+      lib.hasInfix "-hello" (freshnessPinnedCfg.templ-freshness.drvPath or "")
+      && !(lib.hasInfix "-hello" (freshnessFreshCfg.templ-freshness.drvPath or ""))
+    ) "pinned CLI in the check derivation references")
     (assertCheck "enableTemplFreshnessCheck + preBuild policy throws at eval" (
       !freshnessPreBuildEval.success
     ) "eval throw")

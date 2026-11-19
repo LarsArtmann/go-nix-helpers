@@ -68,6 +68,7 @@
 | T85 | (repo: docs-gates) append-verdict repair mode: `repair` skips already-struck lines today, so the pre-canon struck-without-verdict class needed a custom applier (2026-11-19 waves G/F2) — upstream an append mode | TODO | 2h | source: 2026-11-19 corpus drain (annotate 358→0) |
 | T86 | (repo: docs-gates) rows-gate fixes: separator normalizer (`| -- |` → `| --- |`) + code-fence false-positive table suppression (feedback 2026-08-03 lines 143-145: grep pipeline inside a nix fence parses as a table) | TODO | 1h | source: 2026-11-19 corpus drain strict-gate pass |
 | T87 | (repo: SKILLS) docs-health skill: codify spec-files-not-chat — subagent verdict specs arrive as TSV files, never chat reports (3 transcription mis-maps this session-class, all caught by the validator) | TODO | 30min | source: 2026-11-19 corpus drain subagent protocol |
+| T90 | Verify the wave-G verdict line-number citations (02-51 refs like test-module.nix:367-371 were grep-verified for existence, not per-line) | TODO | 30min | source: docs/status/2026-11-19_13-28_* §f.19 |
 
 ## Decided against / rejected
 
