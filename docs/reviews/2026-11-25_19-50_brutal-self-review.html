@@ -878,6 +878,7 @@
           <a href="#plan">Plan</a>
           <a href="#questions">The 12 questions</a>
           <a href="#evidence">Evidence and method</a>
+          <a href="#amendments">Amendments</a>
         </nav>
       </aside>
 
@@ -1850,6 +1851,8 @@
                   Nothing structural. The 18:53 commit rewrote emphasis marks
                   in 25 docs and a vendored Python file: harmless, but noise
                   that no gate was designed to review.
+                  <strong>Corrected 2026-11-25 21:10: this is wrong, see
+                  Amendments.</strong>
                 </td>
               </tr>
               <tr>
@@ -2007,11 +2010,77 @@
           </ul>
         </section>
 
+        <section id="amendments">
+          <h2><span class="num">&#9670;</span>Amendments</h2>
+          <p>
+            Dated corrections to this shipped report. Nothing above is
+            rewritten silently.
+          </p>
+          <div class="callout callout-amber">
+            <strong>
+              2026-11-25 21:10 &middot; correction to question 9, F10 and
+              Step 9
+            </strong>
+            The report called the 18:53 reformat of the docs "harmless, but
+            noise". That is wrong. Commit 2e8d1c7 broke a gate and truncated
+            a row. Verified at 21:05 by running the repo's own gate at HEAD
+            and at e0c4b70 (detached worktree).
+          </div>
+          <ul>
+            <li>
+              <code>scripts/check-docs-annotations.sh</code> (the
+              <code>checks.docsAnnotations</code> row-uniformity gate) exits
+              1 at HEAD and passed at e0c4b70. dprint turned the bare
+              verdict lines that followed 11 header-only tables in 7 archived
+              status reports into table rows, so those tables now mix struck
+              and unstruck rows:
+              <code>docs/status/archived/2026-06-09_14-14_subModules-vN-suffix-fix.md</code>
+              (1 table),
+              <code>2026-07-24_21-31_README-and-GitHub-metadata-refresh.md</code>
+              (1),
+              <code>2026-07-24_22-45_full-todo-execution-review.md</code>
+              (1),
+              <code>2026-08-03_02-51_docs-health-and-update-old-docs-comprehensive-pass.md</code>
+              (1),
+              <code>2026-08-10_08-44_l10-resolution-and-publicdeps-fix.md</code>
+              (2),
+              <code>2026-08-10_09-23_empirical-l10-and-publicdeps-fix.md</code>
+              (2) and
+              <code>2026-09-24_18-13_smart-defaults-proposal-session-status.md</code>
+              (3).
+            </li>
+            <li>
+              <code>TODO_LIST.md</code> line 69 (T86) is truncated: dprint
+              split the cell at a pipe inside a backtick span and dropped
+              the rest of the task text plus its status, effort and evidence
+              cells. The row was intact at e0c4b70. F10 and Step 9 presented
+              this as old documentation drift; the sweep created it.
+            </li>
+            <li>
+              CI does not build this check: the <code>check</code> job runs
+              <code>nix flake check --no-build</code>, so the second
+              breakage is invisible to CI.
+            </li>
+          </ul>
+          <p>
+            Not checked: whether the other reformatted Markdown files lost
+            text. A normalised comparison (whitespace, pipes and emphasis
+            markers stripped) differs for 27 of the 30 files the commit
+            touched, which is expected from dprint's escaping and table
+            changes; the differences were not analysed.
+          </p>
+          <p>
+            Full inventory:
+            <code>docs/status/2026-11-25_21-00_buildflow-integration-review-session-status.md</code>.
+          </p>
+        </section>
+
         <footer class="footer">
           <p>
             Generated 2026-11-25 &middot; Reviewed against go-nix-helpers
             2e8d1c7 and BuildFlow source 766db034b &middot; All claims
             verified against source code, CI logs or live runs where noted
+            &middot; Amended 2026-11-25 21:10 (see Amendments)
           </p>
         </footer>
       </main>

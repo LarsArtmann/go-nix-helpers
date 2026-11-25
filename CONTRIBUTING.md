@@ -21,7 +21,7 @@ nix develop    # enters the dev shell with nixfmt, nix, git
 ### Format
 
 ```bash
-nix fmt    # formats all .nix files with nixfmt
+nix fmt    # formats .nix (nixfmt) and scripts/*.sh (shfmt)
 ```
 
 ### Check
@@ -78,7 +78,7 @@ nix run .#verifyValidation    # negative-case test (run outside sandbox)
 - Use `lib.mkOption` with explicit types for all options
 - Use `lib.mkDefault` for low-priority defaults that consumers can override
 - Use `lib.mkIf` for conditional outputs
-- Format with `nixfmt` (run `nix fmt`)
+- Format with `nix fmt` (nixfmt for `.nix`, shfmt for shell scripts)
 - Keep the module comment header up to date with the usage example
 
 ## Reporting issues
