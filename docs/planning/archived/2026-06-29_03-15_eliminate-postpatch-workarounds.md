@@ -14,12 +14,12 @@ The core problem: `buildGoModule` does NOT support `go.work` — it builds from 
 
 ## Root Causes
 
-| # | Gap                                                           | Location                       | Forces workarounds in              |
-| --- | ------------------------------------------------------------- | ------------------------------ | ---------------------------------- |
-| ~~1~~ done at `7fdb95c` | ~~`stripVersionSuffix` only strips TRAILING `/vN`, not mid-path~~ | ~~`mkPreparedSource.nix:94-100`~~ | ~~crush-daily, DiscordSync, overview~~ |
-| ~~2~~ done at `7fdb95c` | ~~`discoverSubModules` scans depth-1 only~~ | ~~`mkPreparedSource.nix:136-156`~~ | ~~crush-daily, DiscordSync, overview~~ |
-| ~~3~~ done at `7fdb95c` | ~~`stripLocalReplacesScript` misses `=> ../` relative paths~~ | ~~`mkPreparedSource.nix:229-232`~~ | ~~BuildFlow~~ |
-| ~~4~~ done — stale block deleted in branching-flow 61a3aaca (companion §a) | ~~branching-flow strips phantom enum/envdetect (dead code)~~ | ~~`branching-flow/flake.nix:117`~~ | ~~branching-flow~~ |
+| #                                                                          | Gap                                                               | Location                           | Forces workarounds in                  |
+| -------------------------------------------------------------------------- | ----------------------------------------------------------------- | ---------------------------------- | -------------------------------------- |
+| ~~1~~ done at `7fdb95c`                                                    | ~~`stripVersionSuffix` only strips TRAILING `/vN`, not mid-path~~ | ~~`mkPreparedSource.nix:94-100`~~  | ~~crush-daily, DiscordSync, overview~~ |
+| ~~2~~ done at `7fdb95c`                                                    | ~~`discoverSubModules` scans depth-1 only~~                       | ~~`mkPreparedSource.nix:136-156`~~ | ~~crush-daily, DiscordSync, overview~~ |
+| ~~3~~ done at `7fdb95c`                                                    | ~~`stripLocalReplacesScript` misses `=> ../` relative paths~~     | ~~`mkPreparedSource.nix:229-232`~~ | ~~BuildFlow~~                          |
+| ~~4~~ done — stale block deleted in branching-flow 61a3aaca (companion §a) | ~~branching-flow strips phantom enum/envdetect (dead code)~~      | ~~`branching-flow/flake.nix:117`~~ | ~~branching-flow~~                     |
 
 ## Pareto Breakdown
 
@@ -28,14 +28,16 @@ The core problem: `buildGoModule` does NOT support `go.work` — it builds from 
 The single root-cause fix. Changes 2 functions in `mkPreparedSource.nix`:
 
 ~~1. **`stripVersionSuffix`**: Change from "strip trailing `/vN`" to "filter ALL `/vN` segments"~~ done at `7fdb95c`
-   - `event/v3/eventtest` → `event/eventtest` (currently broken)
-   - `codec/v2` → `codec` (currently works)
-   - `github.com/.../go-filewatcher/v2` → `github.com/.../go-filewatcher` (currently works)
+
+- `event/v3/eventtest` → `event/eventtest` (currently broken)
+- `codec/v2` → `codec` (currently works)
+- `github.com/.../go-filewatcher/v2` → `github.com/.../go-filewatcher` (currently works)
 
 ~~2. **`discoverSubModules`**: Walk the dep tree recursively instead of depth-1 only~~ done at `7fdb95c`
-   - Add exclusion list: `["example" "examples" "testdata" ".git" "vendor"]`
-   - Read actual filesystem path for `localDir` (not derived from module path)
-   - Discover ALL nested `go.mod` files at any depth
+
+- Add exclusion list: `["example" "examples" "testdata" ".git" "vendor"]`
+- Read actual filesystem path for `localDir` (not derived from module path)
+- Discover ALL nested `go.mod` files at any depth
 
 **Eliminates**: 3 `postPatchExtra` blocks (crush-daily, DiscordSync, overview)
 
@@ -67,32 +69,32 @@ The single root-cause fix. Changes 2 functions in `mkPreparedSource.nix`:
 
 ## Level 1: Coarse Task Breakdown (30–100 min each)
 
-| #  | Priority | Task                                                                | Est   | Depends On |
-| --- | -------- | ------------------------------------------------------------------- | ----- | ---------- |
-| ~~1~~ done at `7fdb95c` | ~~P0~~ | ~~Fix `stripVersionSuffix` to filter all `/vN` segments~~ | ~~30min~~ | ~~—~~ |
-| ~~2~~ done at `7fdb95c` | ~~P0~~ | ~~Make `discoverSubModules` recursive with exclusion list~~ | ~~60min~~ | ~~—~~ |
-| ~~3~~ done — nested mock + mid-path /vN tests rode 7fdb95c; 12 assertions green (companion §a) | ~~P0~~ | ~~Update test.nix: add nested eventtest-like mock + mid-path /vN test~~ | ~~30min~~ | ~~1,2~~ |
-| ~~4~~ done — verify run green in the 2026-06-29 sweep (companion §a) | ~~P0~~ | ~~Run `nix-build test.nix -A verify` to verify core fixes~~ | ~~15min~~ | ~~3~~ |
-| ~~5~~ done at `7fdb95c` | ~~P1~~ | ~~Fix `stripLocalReplacesScript` to strip `=> ../` paths~~ | ~~15min~~ | ~~—~~ |
-| ~~6~~ done — crush-daily consumer commit 649e8a9 (companion §a) | ~~P0~~ | ~~Remove `postPatchExtra` from crush-daily~~ | ~~30min~~ | ~~4~~ |
-| ~~7~~ done — DiscordSync commit ff1f0db (companion §a) | ~~P0~~ | ~~Remove `postPatchExtra` from DiscordSync~~ | ~~30min~~ | ~~4~~ |
-| ~~8~~ done — overview commit 08cce7e (companion §a) | ~~P0~~ | ~~Remove `postPatchExtra` from overview~~ | ~~30min~~ | ~~4~~ |
-| ~~9~~ done — BuildFlow commit b2f81cdc (companion §a) | ~~P1~~ | ~~Remove `postPatchExtra` from BuildFlow~~ | ~~15min~~ | ~~5~~ |
-| ~~10~~ done — branching-flow commit 61a3aaca (companion §a) | ~~P1~~ | ~~Delete stale `postPatchExtra` from branching-flow~~ | ~~15min~~ | ~~—~~ |
-| ~~11~~ done — header updated (companion §a Documentation table) | ~~P0~~ | ~~Update mkPreparedSource.nix header comments~~ | ~~15min~~ | ~~1,2,5~~ |
-| ~~12~~ done — README auto-discovery + /vN sections updated (companion §a) | ~~P0~~ | ~~Update go-nix-helpers README.md~~ | ~~30min~~ | ~~1,2,5~~ |
-| ~~13~~ done — AGENTS.md bullets updated (companion §a) | ~~P0~~ | ~~Update go-nix-helpers AGENTS.md~~ | ~~15min~~ | ~~1,2~~ |
-| ~~14~~ done at `7fdb95c` | ~~P0~~ | ~~Commit + push go-nix-helpers changes~~ | ~~15min~~ | ~~4,11,12,13~~ |
-| ~~15~~ done — pushed as 649e8a9, ff1f0db, 08cce7e (companion §a) | ~~P0~~ | ~~Commit + push crush-daily, DiscordSync, overview changes~~ | ~~30min~~ | ~~6,7,8,14~~ |
-| ~~16~~ done — pushed as b2f81cdc, 61a3aaca (companion §a) | ~~P0~~ | ~~Commit + push BuildFlow, branching-flow changes~~ | ~~15min~~ | ~~9,10,14~~ |
-| ~~17~~ done — all 5 consumers built green (companion §a Build column) | ~~P0~~ | ~~Verify builds: `nix build` on all 5 modified consumers~~ | ~~60min~~ | ~~15,16~~ |
-| ~~18~~ **NOT-DO — attempted and REVERTED 2026-06-29 — Cyberdom go.mod stale vs path: input; pre-existing breakage, external Cyberdom-side (companion §b; follow-up marked Won't-implement external in §f.1).** | ~~P2~~ | ~~Migrate Cyberdom to use subModules (simplest manual-postPatch)~~ | ~~60min~~ | ~~14~~ |
-| ~~19~~ done — golangci-lint-auto-configure c7a0f49 (companion §a) | ~~P2~~ | ~~Migrate golangci-lint-auto-configure to mkPreparedSource deps~~ | ~~60min~~ | ~~14~~ |
-| ~~20~~ done — hierarchical-errors migrated (companion §a) | ~~P2~~ | ~~Migrate hierarchical-errors to mkPreparedSource deps~~ | ~~90min~~ | ~~14~~ |
-| ~~21~~ done — go-auto-upgrade 3564189 (companion §a) | ~~P2~~ | ~~Migrate go-auto-upgrade to mkPreparedSource deps~~ | ~~90min~~ | ~~14~~ |
-| ~~22~~ done — file-and-image-renamer 7429154 (companion §a) | ~~P2~~ | ~~Migrate file-and-image-renamer to mkPreparedSource deps~~ | ~~90min~~ | ~~14~~ |
-| ~~23~~ done — 2 of 4 commented in-repo (0761c9c0, 76755ac); ast-state-analyzer + monitor365 documented in companion §c instead | ~~P3~~ | ~~Add explanatory comments to 4 genuinely-necessary postPatch cases~~ | ~~30min~~ | ~~17~~ |
-| ~~24~~ done — final verification recorded in companion Metrics; plan marked COMPLETE at 82cda7b | ~~P0~~ | ~~Final verification: nix flake check on go-nix-helpers~~ | ~~15min~~ | ~~all~~ |
+| #                                                                                                                                                                                                              | Priority | Task                                                                    | Est       | Depends On     |
+| -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | ----------------------------------------------------------------------- | --------- | -------------- |
+| ~~1~~ done at `7fdb95c`                                                                                                                                                                                        | ~~P0~~   | ~~Fix `stripVersionSuffix` to filter all `/vN` segments~~               | ~~30min~~ | ~~—~~          |
+| ~~2~~ done at `7fdb95c`                                                                                                                                                                                        | ~~P0~~   | ~~Make `discoverSubModules` recursive with exclusion list~~             | ~~60min~~ | ~~—~~          |
+| ~~3~~ done — nested mock + mid-path /vN tests rode 7fdb95c; 12 assertions green (companion §a)                                                                                                                 | ~~P0~~   | ~~Update test.nix: add nested eventtest-like mock + mid-path /vN test~~ | ~~30min~~ | ~~1,2~~        |
+| ~~4~~ done — verify run green in the 2026-06-29 sweep (companion §a)                                                                                                                                           | ~~P0~~   | ~~Run `nix-build test.nix -A verify` to verify core fixes~~             | ~~15min~~ | ~~3~~          |
+| ~~5~~ done at `7fdb95c`                                                                                                                                                                                        | ~~P1~~   | ~~Fix `stripLocalReplacesScript` to strip `=> ../` paths~~              | ~~15min~~ | ~~—~~          |
+| ~~6~~ done — crush-daily consumer commit 649e8a9 (companion §a)                                                                                                                                                | ~~P0~~   | ~~Remove `postPatchExtra` from crush-daily~~                            | ~~30min~~ | ~~4~~          |
+| ~~7~~ done — DiscordSync commit ff1f0db (companion §a)                                                                                                                                                         | ~~P0~~   | ~~Remove `postPatchExtra` from DiscordSync~~                            | ~~30min~~ | ~~4~~          |
+| ~~8~~ done — overview commit 08cce7e (companion §a)                                                                                                                                                            | ~~P0~~   | ~~Remove `postPatchExtra` from overview~~                               | ~~30min~~ | ~~4~~          |
+| ~~9~~ done — BuildFlow commit b2f81cdc (companion §a)                                                                                                                                                          | ~~P1~~   | ~~Remove `postPatchExtra` from BuildFlow~~                              | ~~15min~~ | ~~5~~          |
+| ~~10~~ done — branching-flow commit 61a3aaca (companion §a)                                                                                                                                                    | ~~P1~~   | ~~Delete stale `postPatchExtra` from branching-flow~~                   | ~~15min~~ | ~~—~~          |
+| ~~11~~ done — header updated (companion §a Documentation table)                                                                                                                                                | ~~P0~~   | ~~Update mkPreparedSource.nix header comments~~                         | ~~15min~~ | ~~1,2,5~~      |
+| ~~12~~ done — README auto-discovery + /vN sections updated (companion §a)                                                                                                                                      | ~~P0~~   | ~~Update go-nix-helpers README.md~~                                     | ~~30min~~ | ~~1,2,5~~      |
+| ~~13~~ done — AGENTS.md bullets updated (companion §a)                                                                                                                                                         | ~~P0~~   | ~~Update go-nix-helpers AGENTS.md~~                                     | ~~15min~~ | ~~1,2~~        |
+| ~~14~~ done at `7fdb95c`                                                                                                                                                                                       | ~~P0~~   | ~~Commit + push go-nix-helpers changes~~                                | ~~15min~~ | ~~4,11,12,13~~ |
+| ~~15~~ done — pushed as 649e8a9, ff1f0db, 08cce7e (companion §a)                                                                                                                                               | ~~P0~~   | ~~Commit + push crush-daily, DiscordSync, overview changes~~            | ~~30min~~ | ~~6,7,8,14~~   |
+| ~~16~~ done — pushed as b2f81cdc, 61a3aaca (companion §a)                                                                                                                                                      | ~~P0~~   | ~~Commit + push BuildFlow, branching-flow changes~~                     | ~~15min~~ | ~~9,10,14~~    |
+| ~~17~~ done — all 5 consumers built green (companion §a Build column)                                                                                                                                          | ~~P0~~   | ~~Verify builds: `nix build` on all 5 modified consumers~~              | ~~60min~~ | ~~15,16~~      |
+| ~~18~~ **NOT-DO — attempted and REVERTED 2026-06-29 — Cyberdom go.mod stale vs path: input; pre-existing breakage, external Cyberdom-side (companion §b; follow-up marked Won't-implement external in §f.1).** | ~~P2~~   | ~~Migrate Cyberdom to use subModules (simplest manual-postPatch)~~      | ~~60min~~ | ~~14~~         |
+| ~~19~~ done — golangci-lint-auto-configure c7a0f49 (companion §a)                                                                                                                                              | ~~P2~~   | ~~Migrate golangci-lint-auto-configure to mkPreparedSource deps~~       | ~~60min~~ | ~~14~~         |
+| ~~20~~ done — hierarchical-errors migrated (companion §a)                                                                                                                                                      | ~~P2~~   | ~~Migrate hierarchical-errors to mkPreparedSource deps~~                | ~~90min~~ | ~~14~~         |
+| ~~21~~ done — go-auto-upgrade 3564189 (companion §a)                                                                                                                                                           | ~~P2~~   | ~~Migrate go-auto-upgrade to mkPreparedSource deps~~                    | ~~90min~~ | ~~14~~         |
+| ~~22~~ done — file-and-image-renamer 7429154 (companion §a)                                                                                                                                                    | ~~P2~~   | ~~Migrate file-and-image-renamer to mkPreparedSource deps~~             | ~~90min~~ | ~~14~~         |
+| ~~23~~ done — 2 of 4 commented in-repo (0761c9c0, 76755ac); ast-state-analyzer + monitor365 documented in companion §c instead                                                                                 | ~~P3~~   | ~~Add explanatory comments to 4 genuinely-necessary postPatch cases~~   | ~~30min~~ | ~~17~~         |
+| ~~24~~ done — final verification recorded in companion Metrics; plan marked COMPLETE at 82cda7b                                                                                                                | ~~P0~~   | ~~Final verification: nix flake check on go-nix-helpers~~               | ~~15min~~ | ~~all~~        |
 
 **Total estimated: ~16 hours**
 
@@ -102,122 +104,122 @@ The single root-cause fix. Changes 2 functions in `mkPreparedSource.nix`:
 
 ### Phase A: Core mkPreparedSource fixes (Tasks 1–4)
 
-| #   | Task                                                                      | Est   | L1# |
-| --- | ------------------------------------------------------------------------- | ----- | --- |
-| ~~A1~~ done — executed with the 2026-06-29 sweep; core fixes in 7fdb95c (companion report docs/status/archived/2026-06-29_04-21_postpatch-elimination-complete.md) | ~~Read current `stripVersionSuffix` implementation (lines 92-100)~~ | ~~2min~~ | ~~1~~ |
-| ~~A2~~ done — executed with the 2026-06-29 sweep; core fixes in 7fdb95c (companion report docs/status/archived/2026-06-29_04-21_postpatch-elimination-complete.md) | ~~Implement filter-based `stripVersionSuffix` (filter all v[0-9]+ segments)~~ | ~~5min~~ | ~~1~~ |
-| ~~A3~~ done — executed with the 2026-06-29 sweep; core fixes in 7fdb95c (companion report docs/status/archived/2026-06-29_04-21_postpatch-elimination-complete.md) | ~~Verify with `nix eval` that `event/v3/eventtest` → `event/eventtest`~~ | ~~3min~~ | ~~1~~ |
-| ~~A4~~ done — executed with the 2026-06-29 sweep; core fixes in 7fdb95c (companion report docs/status/archived/2026-06-29_04-21_postpatch-elimination-complete.md) | ~~Read current `discoverSubModules` implementation (lines 130-161)~~ | ~~5min~~ | ~~2~~ |
-| ~~A5~~ done — executed with the 2026-06-29 sweep; core fixes in 7fdb95c (companion report docs/status/archived/2026-06-29_04-21_postpatch-elimination-complete.md) | ~~Design recursive walk function with exclusion list~~ | ~~10min~~ | ~~2~~ |
-| ~~A6~~ done — executed with the 2026-06-29 sweep; core fixes in 7fdb95c (companion report docs/status/archived/2026-06-29_04-21_postpatch-elimination-complete.md) | ~~Implement recursive `discoverSubModules`~~ | ~~10min~~ | ~~2~~ |
-| ~~A7~~ done — executed with the 2026-06-29 sweep; core fixes in 7fdb95c (companion report docs/status/archived/2026-06-29_04-21_postpatch-elimination-complete.md) | ~~Fix `localDir` to use actual filesystem path (not stripVersionSuffix)~~ | ~~5min~~ | ~~2~~ |
-| ~~A8~~ done — executed with the 2026-06-29 sweep; core fixes in 7fdb95c (companion report docs/status/archived/2026-06-29_04-21_postpatch-elimination-complete.md) | ~~Verify `builtins.readDir` recursion works on Nix store paths~~ | ~~5min~~ | ~~2~~ |
-| ~~A9~~ done — executed with the 2026-06-29 sweep; core fixes in 7fdb95c (companion report docs/status/archived/2026-06-29_04-21_postpatch-elimination-complete.md) | ~~Read current test.nix mock dep structure~~ | ~~3min~~ | ~~3~~ |
-| ~~A10~~ done — executed with the 2026-06-29 sweep; core fixes in 7fdb95c (companion report docs/status/archived/2026-06-29_04-21_postpatch-elimination-complete.md) | ~~Add nested `event/v3/eventtest`-like mock to test.nix~~ | ~~10min~~ | ~~3~~ |
-| ~~A11~~ done — executed with the 2026-06-29 sweep; core fixes in 7fdb95c (companion report docs/status/archived/2026-06-29_04-21_postpatch-elimination-complete.md) | ~~Add mid-path /vN strip test assertion to verify script~~ | ~~5min~~ | ~~3~~ |
-| ~~A12~~ done — executed with the 2026-06-29 sweep; core fixes in 7fdb95c (companion report docs/status/archived/2026-06-29_04-21_postpatch-elimination-complete.md) | ~~Add depth-2 discovery test assertion to verify script~~ | ~~5min~~ | ~~3~~ |
-| ~~A13~~ done — executed with the 2026-06-29 sweep; core fixes in 7fdb95c (companion report docs/status/archived/2026-06-29_04-21_postpatch-elimination-complete.md) | ~~Run `nix-build test.nix -A verify -o result-verify && ./result-verify`~~ | ~~10min~~ | ~~4~~ |
-| ~~A14~~ done — executed with the 2026-06-29 sweep; core fixes in 7fdb95c (companion report docs/status/archived/2026-06-29_04-21_postpatch-elimination-complete.md) | ~~Fix any test failures~~ | ~~10min~~ | ~~4~~ |
+| #                                                                                                                                                                   | Task                                                                          | Est       | L1#   |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- | --------- | ----- |
+| ~~A1~~ done — executed with the 2026-06-29 sweep; core fixes in 7fdb95c (companion report docs/status/archived/2026-06-29_04-21_postpatch-elimination-complete.md)  | ~~Read current `stripVersionSuffix` implementation (lines 92-100)~~           | ~~2min~~  | ~~1~~ |
+| ~~A2~~ done — executed with the 2026-06-29 sweep; core fixes in 7fdb95c (companion report docs/status/archived/2026-06-29_04-21_postpatch-elimination-complete.md)  | ~~Implement filter-based `stripVersionSuffix` (filter all v[0-9]+ segments)~~ | ~~5min~~  | ~~1~~ |
+| ~~A3~~ done — executed with the 2026-06-29 sweep; core fixes in 7fdb95c (companion report docs/status/archived/2026-06-29_04-21_postpatch-elimination-complete.md)  | ~~Verify with `nix eval` that `event/v3/eventtest` → `event/eventtest`~~      | ~~3min~~  | ~~1~~ |
+| ~~A4~~ done — executed with the 2026-06-29 sweep; core fixes in 7fdb95c (companion report docs/status/archived/2026-06-29_04-21_postpatch-elimination-complete.md)  | ~~Read current `discoverSubModules` implementation (lines 130-161)~~          | ~~5min~~  | ~~2~~ |
+| ~~A5~~ done — executed with the 2026-06-29 sweep; core fixes in 7fdb95c (companion report docs/status/archived/2026-06-29_04-21_postpatch-elimination-complete.md)  | ~~Design recursive walk function with exclusion list~~                        | ~~10min~~ | ~~2~~ |
+| ~~A6~~ done — executed with the 2026-06-29 sweep; core fixes in 7fdb95c (companion report docs/status/archived/2026-06-29_04-21_postpatch-elimination-complete.md)  | ~~Implement recursive `discoverSubModules`~~                                  | ~~10min~~ | ~~2~~ |
+| ~~A7~~ done — executed with the 2026-06-29 sweep; core fixes in 7fdb95c (companion report docs/status/archived/2026-06-29_04-21_postpatch-elimination-complete.md)  | ~~Fix `localDir` to use actual filesystem path (not stripVersionSuffix)~~     | ~~5min~~  | ~~2~~ |
+| ~~A8~~ done — executed with the 2026-06-29 sweep; core fixes in 7fdb95c (companion report docs/status/archived/2026-06-29_04-21_postpatch-elimination-complete.md)  | ~~Verify `builtins.readDir` recursion works on Nix store paths~~              | ~~5min~~  | ~~2~~ |
+| ~~A9~~ done — executed with the 2026-06-29 sweep; core fixes in 7fdb95c (companion report docs/status/archived/2026-06-29_04-21_postpatch-elimination-complete.md)  | ~~Read current test.nix mock dep structure~~                                  | ~~3min~~  | ~~3~~ |
+| ~~A10~~ done — executed with the 2026-06-29 sweep; core fixes in 7fdb95c (companion report docs/status/archived/2026-06-29_04-21_postpatch-elimination-complete.md) | ~~Add nested `event/v3/eventtest`-like mock to test.nix~~                     | ~~10min~~ | ~~3~~ |
+| ~~A11~~ done — executed with the 2026-06-29 sweep; core fixes in 7fdb95c (companion report docs/status/archived/2026-06-29_04-21_postpatch-elimination-complete.md) | ~~Add mid-path /vN strip test assertion to verify script~~                    | ~~5min~~  | ~~3~~ |
+| ~~A12~~ done — executed with the 2026-06-29 sweep; core fixes in 7fdb95c (companion report docs/status/archived/2026-06-29_04-21_postpatch-elimination-complete.md) | ~~Add depth-2 discovery test assertion to verify script~~                     | ~~5min~~  | ~~3~~ |
+| ~~A13~~ done — executed with the 2026-06-29 sweep; core fixes in 7fdb95c (companion report docs/status/archived/2026-06-29_04-21_postpatch-elimination-complete.md) | ~~Run `nix-build test.nix -A verify -o result-verify && ./result-verify`~~    | ~~10min~~ | ~~4~~ |
+| ~~A14~~ done — executed with the 2026-06-29 sweep; core fixes in 7fdb95c (companion report docs/status/archived/2026-06-29_04-21_postpatch-elimination-complete.md) | ~~Fix any test failures~~                                                     | ~~10min~~ | ~~4~~ |
 
 ### Phase B: stripLocalReplacesScript fix + dead code (Tasks 5,10)
 
-| #  | Task                                                                    | Est  | L1# |
-| --- | ----------------------------------------------------------------------- | ---- | --- |
-| ~~B1~~ done at `7fdb95c` | ~~Read current `stripLocalReplacesScript` (lines 228-232)~~ | ~~2min~~ | ~~5~~ |
-| ~~B2~~ done at `7fdb95c` | ~~Add `sed -i '/=> \.\.\//d' go.mod` line~~ | ~~3min~~ | ~~5~~ |
-| ~~B3~~ done — branching-flow 61a3aaca (companion §a) | ~~Read branching-flow postPatchExtra (lines 116-119)~~ | ~~2min~~ | ~~10~~ |
+| #                                                    | Task                                                                        | Est      | L1#    |
+| ---------------------------------------------------- | --------------------------------------------------------------------------- | -------- | ------ |
+| ~~B1~~ done at `7fdb95c`                             | ~~Read current `stripLocalReplacesScript` (lines 228-232)~~                 | ~~2min~~ | ~~5~~  |
+| ~~B2~~ done at `7fdb95c`                             | ~~Add `sed -i '/=> \.\.\//d' go.mod` line~~                                 | ~~3min~~ | ~~5~~  |
+| ~~B3~~ done — branching-flow 61a3aaca (companion §a) | ~~Read branching-flow postPatchExtra (lines 116-119)~~                      | ~~2min~~ | ~~10~~ |
 | ~~B4~~ done — branching-flow 61a3aaca (companion §a) | ~~Verify enum/envdetect don't exist in go-output or branching-flow go.mod~~ | ~~5min~~ | ~~10~~ |
-| ~~B5~~ done — branching-flow 61a3aaca (companion §a) | ~~Delete the stale postPatchExtra block~~ | ~~3min~~ | ~~10~~ |
+| ~~B5~~ done — branching-flow 61a3aaca (companion §a) | ~~Delete the stale postPatchExtra block~~                                   | ~~3min~~ | ~~10~~ |
 
 ### Phase C: Consumer cleanup — remove postPatchExtra (Tasks 6–9)
 
-| #   | Task                                            | Est   | L1# |
-| --- | ----------------------------------------------- | ----- | --- |
-| ~~C1~~ done — crush-daily 649e8a9 (companion §a) | ~~Read crush-daily postPatchExtra (lines 58-67)~~ | ~~3min~~ | ~~6~~ |
-| ~~C2~~ done — crush-daily 649e8a9 (companion §a) | ~~Delete crush-daily postPatchExtra block~~ | ~~3min~~ | ~~6~~ |
-| ~~C3~~ done — crush-daily 649e8a9 (companion §a) | ~~Build crush-daily: `nix build .#`~~ | ~~10min~~ | ~~6~~ |
-| ~~C4~~ done — DiscordSync ff1f0db (companion §a) | ~~Read DiscordSync postPatchExtra (lines 132-138)~~ | ~~3min~~ | ~~7~~ |
-| ~~C5~~ done — DiscordSync ff1f0db (companion §a) | ~~Delete DiscordSync postPatchExtra block~~ | ~~3min~~ | ~~7~~ |
-| ~~C6~~ done — DiscordSync ff1f0db (companion §a) | ~~Build DiscordSync: `nix build .#`~~ | ~~10min~~ | ~~7~~ |
-| ~~C7~~ done — overview 08cce7e (companion §a) | ~~Read overview postPatchExtra (lines 174-180)~~ | ~~3min~~ | ~~8~~ |
-| ~~C8~~ done — overview 08cce7e (companion §a) | ~~Delete overview postPatchExtra block~~ | ~~3min~~ | ~~8~~ |
-| ~~C9~~ done — overview 08cce7e (companion §a) | ~~Build overview: `nix build .#`~~ | ~~10min~~ | ~~8~~ |
-| ~~C10~~ done — BuildFlow b2f81cdc (companion §a) | ~~Read BuildFlow postPatchExtra (lines 179-183)~~ | ~~3min~~ | ~~9~~ |
-| ~~C11~~ done — BuildFlow b2f81cdc (companion §a) | ~~Delete BuildFlow postPatchExtra block~~ | ~~3min~~ | ~~9~~ |
-| ~~C12~~ done — BuildFlow b2f81cdc (companion §a) | ~~Build BuildFlow: `nix build .#`~~ | ~~10min~~ | ~~9~~ |
+| #                                                | Task                                                | Est       | L1#   |
+| ------------------------------------------------ | --------------------------------------------------- | --------- | ----- |
+| ~~C1~~ done — crush-daily 649e8a9 (companion §a) | ~~Read crush-daily postPatchExtra (lines 58-67)~~   | ~~3min~~  | ~~6~~ |
+| ~~C2~~ done — crush-daily 649e8a9 (companion §a) | ~~Delete crush-daily postPatchExtra block~~         | ~~3min~~  | ~~6~~ |
+| ~~C3~~ done — crush-daily 649e8a9 (companion §a) | ~~Build crush-daily: `nix build .#`~~               | ~~10min~~ | ~~6~~ |
+| ~~C4~~ done — DiscordSync ff1f0db (companion §a) | ~~Read DiscordSync postPatchExtra (lines 132-138)~~ | ~~3min~~  | ~~7~~ |
+| ~~C5~~ done — DiscordSync ff1f0db (companion §a) | ~~Delete DiscordSync postPatchExtra block~~         | ~~3min~~  | ~~7~~ |
+| ~~C6~~ done — DiscordSync ff1f0db (companion §a) | ~~Build DiscordSync: `nix build .#`~~               | ~~10min~~ | ~~7~~ |
+| ~~C7~~ done — overview 08cce7e (companion §a)    | ~~Read overview postPatchExtra (lines 174-180)~~    | ~~3min~~  | ~~8~~ |
+| ~~C8~~ done — overview 08cce7e (companion §a)    | ~~Delete overview postPatchExtra block~~            | ~~3min~~  | ~~8~~ |
+| ~~C9~~ done — overview 08cce7e (companion §a)    | ~~Build overview: `nix build .#`~~                  | ~~10min~~ | ~~8~~ |
+| ~~C10~~ done — BuildFlow b2f81cdc (companion §a) | ~~Read BuildFlow postPatchExtra (lines 179-183)~~   | ~~3min~~  | ~~9~~ |
+| ~~C11~~ done — BuildFlow b2f81cdc (companion §a) | ~~Delete BuildFlow postPatchExtra block~~           | ~~3min~~  | ~~9~~ |
+| ~~C12~~ done — BuildFlow b2f81cdc (companion §a) | ~~Build BuildFlow: `nix build .#`~~                 | ~~10min~~ | ~~9~~ |
 
 ### Phase D: Documentation (Tasks 11–13)
 
-| #  | Task                                                                  | Est   | L1# |
-| --- | --------------------------------------------------------------------- | ----- | --- |
-| ~~D1~~ done — docs updated in the sweep (companion §a Documentation table) | ~~Update mkPreparedSource.nix header (recursive discovery mention)~~ | ~~10min~~ | ~~11~~ |
-| ~~D2~~ done — excludeSubModuleDirs documented (companion §a; parameter exists today, mkPreparedSource.nix:98) | ~~Update mkPreparedSource.nix parameter docs (add excludeSubModuleDirs)~~ | ~~5min~~ | ~~11~~ |
-| ~~D3~~ done — docs updated in the sweep (companion §a Documentation table) | ~~Update README.md: "Major version suffixes" section~~ | ~~10min~~ | ~~12~~ |
-| ~~D4~~ done — docs updated in the sweep (companion §a Documentation table) | ~~Update README.md: "Auto-discovery" section (mention recursion)~~ | ~~10min~~ | ~~12~~ |
-| ~~D5~~ done — docs updated in the sweep (companion §a Documentation table) | ~~Update README.md: add "stripLocalReplaces" relative-path mention~~ | ~~5min~~ | ~~12~~ |
-| ~~D6~~ done — docs updated in the sweep (companion §a Documentation table) | ~~Update AGENTS.md: /vN handling bullet~~ | ~~5min~~ | ~~13~~ |
+| #                                                                                                             | Task                                                                      | Est       | L1#    |
+| ------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- | --------- | ------ |
+| ~~D1~~ done — docs updated in the sweep (companion §a Documentation table)                                    | ~~Update mkPreparedSource.nix header (recursive discovery mention)~~      | ~~10min~~ | ~~11~~ |
+| ~~D2~~ done — excludeSubModuleDirs documented (companion §a; parameter exists today, mkPreparedSource.nix:98) | ~~Update mkPreparedSource.nix parameter docs (add excludeSubModuleDirs)~~ | ~~5min~~  | ~~11~~ |
+| ~~D3~~ done — docs updated in the sweep (companion §a Documentation table)                                    | ~~Update README.md: "Major version suffixes" section~~                    | ~~10min~~ | ~~12~~ |
+| ~~D4~~ done — docs updated in the sweep (companion §a Documentation table)                                    | ~~Update README.md: "Auto-discovery" section (mention recursion)~~        | ~~10min~~ | ~~12~~ |
+| ~~D5~~ done — docs updated in the sweep (companion §a Documentation table)                                    | ~~Update README.md: add "stripLocalReplaces" relative-path mention~~      | ~~5min~~  | ~~12~~ |
+| ~~D6~~ done — docs updated in the sweep (companion §a Documentation table)                                    | ~~Update AGENTS.md: /vN handling bullet~~                                 | ~~5min~~  | ~~13~~ |
 
 ### Phase E: Commits + pushes (Tasks 14–17)
 
-| #  | Task                                                 | Est   | L1# |
-| --- | ---------------------------------------------------- | ----- | --- |
-| ~~E1~~ done — reviewed; changes in 7fdb95c (companion §a) | ~~Git diff review of go-nix-helpers changes~~ | ~~5min~~ | ~~14~~ |
-| ~~E2~~ done at `7fdb95c` | ~~Commit go-nix-helpers with detailed message~~ | ~~5min~~ | ~~14~~ |
-| ~~E3~~ done — 7fdb95c pushed to master (companion §a Commits) | ~~Push go-nix-helpers~~ | ~~2min~~ | ~~14~~ |
-| ~~E4~~ done — crush-daily 649e8a9 pushed (companion §a) | ~~Commit + push crush-daily~~ | ~~5min~~ | ~~15~~ |
-| ~~E5~~ done — DiscordSync ff1f0db pushed (companion §a) | ~~Commit + push DiscordSync~~ | ~~5min~~ | ~~15~~ |
-| ~~E6~~ done — overview 08cce7e pushed (companion §a) | ~~Commit + push overview~~ | ~~5min~~ | ~~15~~ |
-| ~~E7~~ done — BuildFlow b2f81cdc pushed (companion §a) | ~~Commit + push BuildFlow~~ | ~~5min~~ | ~~16~~ |
-| ~~E8~~ done — branching-flow 61a3aaca pushed (companion §a) | ~~Commit + push branching-flow~~ | ~~5min~~ | ~~16~~ |
+| #                                                                   | Task                                                     | Est       | L1#    |
+| ------------------------------------------------------------------- | -------------------------------------------------------- | --------- | ------ |
+| ~~E1~~ done — reviewed; changes in 7fdb95c (companion §a)           | ~~Git diff review of go-nix-helpers changes~~            | ~~5min~~  | ~~14~~ |
+| ~~E2~~ done at `7fdb95c`                                            | ~~Commit go-nix-helpers with detailed message~~          | ~~5min~~  | ~~14~~ |
+| ~~E3~~ done — 7fdb95c pushed to master (companion §a Commits)       | ~~Push go-nix-helpers~~                                  | ~~2min~~  | ~~14~~ |
+| ~~E4~~ done — crush-daily 649e8a9 pushed (companion §a)             | ~~Commit + push crush-daily~~                            | ~~5min~~  | ~~15~~ |
+| ~~E5~~ done — DiscordSync ff1f0db pushed (companion §a)             | ~~Commit + push DiscordSync~~                            | ~~5min~~  | ~~15~~ |
+| ~~E6~~ done — overview 08cce7e pushed (companion §a)                | ~~Commit + push overview~~                               | ~~5min~~  | ~~15~~ |
+| ~~E7~~ done — BuildFlow b2f81cdc pushed (companion §a)              | ~~Commit + push BuildFlow~~                              | ~~5min~~  | ~~16~~ |
+| ~~E8~~ done — branching-flow 61a3aaca pushed (companion §a)         | ~~Commit + push branching-flow~~                         | ~~5min~~  | ~~16~~ |
 | ~~E9~~ done — 5/5 consumers built green (companion §a Build column) | ~~Verify all 5 consumers build: `nix build .#` on each~~ | ~~15min~~ | ~~17~~ |
 
 ### Phase F: Migrate manual-postPatch projects (Tasks 18–22)
 
-| #   | Task                                                        | Est   | L1# |
-| --- | ----------------------------------------------------------- | ----- | --- |
-| ~~F1~~ **NOT-DO — attempted and REVERTED — Cyberdom-side staleness, external (companion §b).** | ~~Read Cyberdom flake.nix postPatch block (lines 122-131)~~ | ~~3min~~ | ~~18~~ |
-| ~~F2~~ **NOT-DO — attempted and REVERTED — Cyberdom-side staleness, external (companion §b).** | ~~Read Cyberdom flake inputs and deps structure~~ | ~~5min~~ | ~~18~~ |
-| ~~F3~~ **NOT-DO — attempted and REVERTED — Cyberdom-side staleness, external (companion §b).** | ~~Convert Cyberdom postPatch to subModules config~~ | ~~10min~~ | ~~18~~ |
+| #                                                                                              | Task                                                            | Est       | L1#    |
+| ---------------------------------------------------------------------------------------------- | --------------------------------------------------------------- | --------- | ------ |
+| ~~F1~~ **NOT-DO — attempted and REVERTED — Cyberdom-side staleness, external (companion §b).** | ~~Read Cyberdom flake.nix postPatch block (lines 122-131)~~     | ~~3min~~  | ~~18~~ |
+| ~~F2~~ **NOT-DO — attempted and REVERTED — Cyberdom-side staleness, external (companion §b).** | ~~Read Cyberdom flake inputs and deps structure~~               | ~~5min~~  | ~~18~~ |
+| ~~F3~~ **NOT-DO — attempted and REVERTED — Cyberdom-side staleness, external (companion §b).** | ~~Convert Cyberdom postPatch to subModules config~~             | ~~10min~~ | ~~18~~ |
 | ~~F4~~ **NOT-DO — attempted and REVERTED — Cyberdom-side staleness, external (companion §b).** | ~~Build Cyberdom: `nix build .#` (may need vendorHash update)~~ | ~~15min~~ | ~~18~~ |
-| ~~F5~~ **NOT-DO — attempted and REVERTED — Cyberdom-side staleness, external (companion §b).** | ~~Commit + push Cyberdom~~ | ~~5min~~ | ~~18~~ |
-| ~~F6~~ done — golangci-lint-auto-configure c7a0f49 (companion §a) | ~~Read golangci-lint-auto-configure postPatch (lines 97-100)~~ | ~~3min~~ | ~~19~~ |
-| ~~F7~~ done — golangci-lint-auto-configure c7a0f49 (companion §a) | ~~Read golangci-lint-auto-configure flake inputs~~ | ~~5min~~ | ~~19~~ |
-| ~~F8~~ done — golangci-lint-auto-configure c7a0f49 (companion §a) | ~~Convert to mkPreparedSource deps map~~ | ~~10min~~ | ~~19~~ |
-| ~~F9~~ done — golangci-lint-auto-configure c7a0f49 (companion §a) | ~~Build + fix vendorHash~~ | ~~15min~~ | ~~19~~ |
-| ~~F10~~ done — golangci-lint-auto-configure c7a0f49 (companion §a) | ~~Commit + push golangci-lint-auto-configure~~ | ~~5min~~ | ~~19~~ |
-| ~~F11~~ done — hierarchical-errors migrated (companion §a) | ~~Read hierarchical-errors postPatch (lines 80-100)~~ | ~~5min~~ | ~~20~~ |
-| ~~F12~~ done — hierarchical-errors migrated (companion §a) | ~~Read hierarchical-errors flake structure~~ | ~~5min~~ | ~~20~~ |
-| ~~F13~~ done — hierarchical-errors migrated (companion §a) | ~~Convert preparedSrc to mkPreparedSource call~~ | ~~15min~~ | ~~20~~ |
-| ~~F14~~ done — hierarchical-errors migrated (companion §a) | ~~Build + fix vendorHash~~ | ~~15min~~ | ~~20~~ |
-| ~~F15~~ done — hierarchical-errors migrated (companion §a) | ~~Commit + push hierarchical-errors~~ | ~~5min~~ | ~~20~~ |
-| ~~F16~~ done — go-auto-upgrade 3564189 (companion §a) | ~~Read go-auto-upgrade postPatch (lines 96-114)~~ | ~~5min~~ | ~~21~~ |
-| ~~F17~~ done — go-auto-upgrade 3564189 (companion §a) | ~~Read go-auto-upgrade flake structure~~ | ~~5min~~ | ~~21~~ |
-| ~~F18~~ done — go-auto-upgrade 3564189 (companion §a) | ~~Convert preparedSrc to mkPreparedSource call~~ | ~~15min~~ | ~~21~~ |
-| ~~F19~~ done — go-auto-upgrade 3564189 (companion §a) | ~~Build + fix vendorHash~~ | ~~15min~~ | ~~21~~ |
-| ~~F20~~ done — go-auto-upgrade 3564189 (companion §a) | ~~Commit + push go-auto-upgrade~~ | ~~5min~~ | ~~21~~ |
-| ~~F21~~ done — file-and-image-renamer 7429154 (companion §a) | ~~Read file-and-image-renamer localReplaces (lines 71-90)~~ | ~~5min~~ | ~~22~~ |
-| ~~F22~~ done — file-and-image-renamer 7429154 (companion §a) | ~~Read file-and-image-renamer flake structure~~ | ~~5min~~ | ~~22~~ |
-| ~~F23~~ done — file-and-image-renamer 7429154 (companion §a) | ~~Convert localReplaces to mkPreparedSource deps + subModules~~ | ~~15min~~ | ~~22~~ |
-| ~~F24~~ done — file-and-image-renamer 7429154 (companion §a) | ~~Build + fix vendorHash~~ | ~~15min~~ | ~~22~~ |
-| ~~F25~~ done — file-and-image-renamer 7429154 (companion §a) | ~~Commit + push file-and-image-renamer~~ | ~~5min~~ | ~~22~~ |
+| ~~F5~~ **NOT-DO — attempted and REVERTED — Cyberdom-side staleness, external (companion §b).** | ~~Commit + push Cyberdom~~                                      | ~~5min~~  | ~~18~~ |
+| ~~F6~~ done — golangci-lint-auto-configure c7a0f49 (companion §a)                              | ~~Read golangci-lint-auto-configure postPatch (lines 97-100)~~  | ~~3min~~  | ~~19~~ |
+| ~~F7~~ done — golangci-lint-auto-configure c7a0f49 (companion §a)                              | ~~Read golangci-lint-auto-configure flake inputs~~              | ~~5min~~  | ~~19~~ |
+| ~~F8~~ done — golangci-lint-auto-configure c7a0f49 (companion §a)                              | ~~Convert to mkPreparedSource deps map~~                        | ~~10min~~ | ~~19~~ |
+| ~~F9~~ done — golangci-lint-auto-configure c7a0f49 (companion §a)                              | ~~Build + fix vendorHash~~                                      | ~~15min~~ | ~~19~~ |
+| ~~F10~~ done — golangci-lint-auto-configure c7a0f49 (companion §a)                             | ~~Commit + push golangci-lint-auto-configure~~                  | ~~5min~~  | ~~19~~ |
+| ~~F11~~ done — hierarchical-errors migrated (companion §a)                                     | ~~Read hierarchical-errors postPatch (lines 80-100)~~           | ~~5min~~  | ~~20~~ |
+| ~~F12~~ done — hierarchical-errors migrated (companion §a)                                     | ~~Read hierarchical-errors flake structure~~                    | ~~5min~~  | ~~20~~ |
+| ~~F13~~ done — hierarchical-errors migrated (companion §a)                                     | ~~Convert preparedSrc to mkPreparedSource call~~                | ~~15min~~ | ~~20~~ |
+| ~~F14~~ done — hierarchical-errors migrated (companion §a)                                     | ~~Build + fix vendorHash~~                                      | ~~15min~~ | ~~20~~ |
+| ~~F15~~ done — hierarchical-errors migrated (companion §a)                                     | ~~Commit + push hierarchical-errors~~                           | ~~5min~~  | ~~20~~ |
+| ~~F16~~ done — go-auto-upgrade 3564189 (companion §a)                                          | ~~Read go-auto-upgrade postPatch (lines 96-114)~~               | ~~5min~~  | ~~21~~ |
+| ~~F17~~ done — go-auto-upgrade 3564189 (companion §a)                                          | ~~Read go-auto-upgrade flake structure~~                        | ~~5min~~  | ~~21~~ |
+| ~~F18~~ done — go-auto-upgrade 3564189 (companion §a)                                          | ~~Convert preparedSrc to mkPreparedSource call~~                | ~~15min~~ | ~~21~~ |
+| ~~F19~~ done — go-auto-upgrade 3564189 (companion §a)                                          | ~~Build + fix vendorHash~~                                      | ~~15min~~ | ~~21~~ |
+| ~~F20~~ done — go-auto-upgrade 3564189 (companion §a)                                          | ~~Commit + push go-auto-upgrade~~                               | ~~5min~~  | ~~21~~ |
+| ~~F21~~ done — file-and-image-renamer 7429154 (companion §a)                                   | ~~Read file-and-image-renamer localReplaces (lines 71-90)~~     | ~~5min~~  | ~~22~~ |
+| ~~F22~~ done — file-and-image-renamer 7429154 (companion §a)                                   | ~~Read file-and-image-renamer flake structure~~                 | ~~5min~~  | ~~22~~ |
+| ~~F23~~ done — file-and-image-renamer 7429154 (companion §a)                                   | ~~Convert localReplaces to mkPreparedSource deps + subModules~~ | ~~15min~~ | ~~22~~ |
+| ~~F24~~ done — file-and-image-renamer 7429154 (companion §a)                                   | ~~Build + fix vendorHash~~                                      | ~~15min~~ | ~~22~~ |
+| ~~F25~~ done — file-and-image-renamer 7429154 (companion §a)                                   | ~~Commit + push file-and-image-renamer~~                        | ~~5min~~  | ~~22~~ |
 
 ### Phase G: Document genuinely-necessary cases (Task 23)
 
-| #  | Task                                                                      | Est  | L1# |
-| --- | ------------------------------------------------------------------------- | ---- | --- |
-| ~~G1~~ **NOT-DO — no in-repo comment added — rationale documented in companion §c instead.** | ~~Add comment to ast-state-analyzer postPatch explaining go.sum workaround~~ | ~~5min~~ | ~~23~~ |
-| ~~G2~~ done — standard-bug-tracking-schema 0761c9c0 (companion §a) | ~~Add comment to standard-bug-tracking-schema postPatch explaining auth~~ | ~~5min~~ | ~~23~~ |
-| ~~G3~~ done — no change needed; already documented inline, recorded in companion §c | ~~Note monitor365 postPatch is Rust/WASM (already documented inline)~~ | ~~2min~~ | ~~23~~ |
-| ~~G4~~ done — go-structure-linter 76755ac (companion §a) | ~~Add comment to go-structure-linter postPatchExtra explaining multi-module~~ | ~~5min~~ | ~~23~~ |
+| #                                                                                            | Task                                                                          | Est      | L1#    |
+| -------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- | -------- | ------ |
+| ~~G1~~ **NOT-DO — no in-repo comment added — rationale documented in companion §c instead.** | ~~Add comment to ast-state-analyzer postPatch explaining go.sum workaround~~  | ~~5min~~ | ~~23~~ |
+| ~~G2~~ done — standard-bug-tracking-schema 0761c9c0 (companion §a)                           | ~~Add comment to standard-bug-tracking-schema postPatch explaining auth~~     | ~~5min~~ | ~~23~~ |
+| ~~G3~~ done — no change needed; already documented inline, recorded in companion §c          | ~~Note monitor365 postPatch is Rust/WASM (already documented inline)~~        | ~~2min~~ | ~~23~~ |
+| ~~G4~~ done — go-structure-linter 76755ac (companion §a)                                     | ~~Add comment to go-structure-linter postPatchExtra explaining multi-module~~ | ~~5min~~ | ~~23~~ |
 
 ### Phase H: Final verification (Task 24)
 
-| #  | Task                                                            | Est   | L1# |
-| --- | --------------------------------------------------------------- | ----- | --- |
-| ~~H1~~ done — verification recorded in companion §a/§c/Metrics; plan marked COMPLETE at 82cda7b | ~~Run `nix flake check` on go-nix-helpers~~ | ~~10min~~ | ~~24~~ |
-| ~~H2~~ done — verification recorded in companion §a/§c/Metrics; plan marked COMPLETE at 82cda7b | ~~Run `nix-build test.nix -A verify` one final time~~ | ~~10min~~ | ~~24~~ |
-| ~~H3~~ done — verification recorded in companion §a/§c/Metrics; plan marked COMPLETE at 82cda7b | ~~Grep for remaining postPatch/postPatchExtra across all projects~~ | ~~5min~~ | ~~24~~ |
-| ~~H4~~ done — 5 necessary cases confirmed remaining (companion §c + Metrics) | ~~Verify count reduced from 15 to 5 (genuinely necessary only)~~ | ~~5min~~ | ~~24~~ |
+| #                                                                                               | Task                                                                | Est       | L1#    |
+| ----------------------------------------------------------------------------------------------- | ------------------------------------------------------------------- | --------- | ------ |
+| ~~H1~~ done — verification recorded in companion §a/§c/Metrics; plan marked COMPLETE at 82cda7b | ~~Run `nix flake check` on go-nix-helpers~~                         | ~~10min~~ | ~~24~~ |
+| ~~H2~~ done — verification recorded in companion §a/§c/Metrics; plan marked COMPLETE at 82cda7b | ~~Run `nix-build test.nix -A verify` one final time~~               | ~~10min~~ | ~~24~~ |
+| ~~H3~~ done — verification recorded in companion §a/§c/Metrics; plan marked COMPLETE at 82cda7b | ~~Grep for remaining postPatch/postPatchExtra across all projects~~ | ~~5min~~  | ~~24~~ |
+| ~~H4~~ done — 5 necessary cases confirmed remaining (companion §c + Metrics)                    | ~~Verify count reduced from 15 to 5 (genuinely necessary only)~~    | ~~5min~~  | ~~24~~ |
 
 **Total Level 2 tasks: 75**
 **Total estimated: ~14 hours**

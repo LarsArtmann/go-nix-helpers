@@ -170,5 +170,4 @@ daemon's 23:22 formatter commit broke it).
    recommendation — TODO_LIST becomes open-work-only), or keep the recent
    round-6/7 rows (T35–T59 era) struck-but-visible for one more cycle?
 
-
 **§g Resolution (2026-11-19 01:58):** Q1 resume → done (this session). Q2 push → ordered + executed. Q3 purge depth → ALL 41 rows purged (owner default accepted).

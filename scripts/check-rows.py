@@ -125,7 +125,9 @@ def check_file(path: Path) -> int:
 
         header_no = data[0][0]
         if ledger_exempt(lines, block[0][0]):
-            print(f"{path.name}: table at line {header_no} LEDGER-EXEMPT (open rows are the point)")
+            print(
+                f"{path.name}: table at line {header_no} LEDGER-EXEMPT (open rows are the point)"
+            )
             continue
         classified = [(no, line, classify_row(line)) for no, line in data[1:]]
         struck_rows = sum(

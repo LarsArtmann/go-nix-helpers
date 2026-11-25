@@ -132,33 +132,33 @@ The `templates/go-flake-parts/` template is manually maintained. Consider genera
 
 ## f) Top 25 Things We Should Get Done Next
 
-| #      | Priority | Task                                                                                                                                  | Impact                   |
-| ------ | -------- | ------------------------------------------------------------------------------------------------------------------------------------- | ------------------------ |
-done — vendorHash recalculated per consumer during the /v2 sweep; pattern now standard (CHANGELOG 0.1.0)
-done — same /v2-sweep class; consumers rebuilt green
-done — BuildFlow vendorHash refreshed when it adopted go-standard (2026-08-10 Tier A sweep)
-done — flake.nix + treefmt live at repo root; `nix fmt` works (checks.treefmt)
-done — pure-functions.nix covers repoName via checks.pureFunctions (72 checks)
-done — test.nix verify suite covers mkPreparedSource output (9 scenarios)
-done — test.nix verify suite
-done (docs-health pass 2026-11-19)
-done — flake.nix self-hosts all checks
-done — AGENTS.md documents the eval-bound-hooks + daemon-race recipes
-done — lock guard + drift gate patterns documented in docs/flake-patterns.md
-done (docs-health pass 2026-11-19)
-done — README quickstart + module table kept current by docs-health passes
-done — scripts/nix-health.sh pre-flight canary
-done — scripts/dashboard.sh fleet overview
-done — scripts/ci-parity.sh local CI parity
-done — containerSmoke + docsAnnotations checks in flake.nix
-done — templates/go-standard + ghcr-push-workflow.yml
-done — container option ships superb OCI defaults (FEATURES.md)
-done — update-vendor-hash app automates the dance
-done — vendorHashes per-system option (the gogenfilter case)
-done — goPkgAttr auto-default + goTarballVersion/Hash escape hatch
-done — publicDeps exclusion (versioned-path aware)
-done — subModules explicit + auto pipeline unified 2026-08-12
-done — CHANGELOG 0.1.0 section
+| #                                                                                                        | Priority | Task | Impact |
+| -------------------------------------------------------------------------------------------------------- | -------- | ---- | ------ |
+| done — vendorHash recalculated per consumer during the /v2 sweep; pattern now standard (CHANGELOG 0.1.0) |          |      |        |
+| done — same /v2-sweep class; consumers rebuilt green                                                     |          |      |        |
+| done — BuildFlow vendorHash refreshed when it adopted go-standard (2026-08-10 Tier A sweep)              |          |      |        |
+| done — flake.nix + treefmt live at repo root; `nix fmt` works (checks.treefmt)                           |          |      |        |
+| done — pure-functions.nix covers repoName via checks.pureFunctions (72 checks)                           |          |      |        |
+| done — test.nix verify suite covers mkPreparedSource output (9 scenarios)                                |          |      |        |
+| done — test.nix verify suite                                                                             |          |      |        |
+| done (docs-health pass 2026-11-19)                                                                       |          |      |        |
+| done — flake.nix self-hosts all checks                                                                   |          |      |        |
+| done — AGENTS.md documents the eval-bound-hooks + daemon-race recipes                                    |          |      |        |
+| done — lock guard + drift gate patterns documented in docs/flake-patterns.md                             |          |      |        |
+| done (docs-health pass 2026-11-19)                                                                       |          |      |        |
+| done — README quickstart + module table kept current by docs-health passes                               |          |      |        |
+| done — scripts/nix-health.sh pre-flight canary                                                           |          |      |        |
+| done — scripts/dashboard.sh fleet overview                                                               |          |      |        |
+| done — scripts/ci-parity.sh local CI parity                                                              |          |      |        |
+| done — containerSmoke + docsAnnotations checks in flake.nix                                              |          |      |        |
+| done — templates/go-standard + ghcr-push-workflow.yml                                                    |          |      |        |
+| done — container option ships superb OCI defaults (FEATURES.md)                                          |          |      |        |
+| done — update-vendor-hash app automates the dance                                                        |          |      |        |
+| done — vendorHashes per-system option (the gogenfilter case)                                             |          |      |        |
+| done — goPkgAttr auto-default + goTarballVersion/Hash escape hatch                                       |          |      |        |
+| done — publicDeps exclusion (versioned-path aware)                                                       |          |      |        |
+| done — subModules explicit + auto pipeline unified 2026-08-12                                            |          |      |        |
+| done — CHANGELOG 0.1.0 section                                                                           |          |      |        |
 
 ---
 

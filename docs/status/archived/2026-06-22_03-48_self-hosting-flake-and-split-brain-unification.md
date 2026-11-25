@@ -17,7 +17,7 @@ review and fixes performed on 2026-06-19 and 2026-06-22.
   full code review — template evaluation crash, hardcoded validation pattern,
   broken test suite, grep garbage, CI swallowing failures, hardcoded paths, docs
   errors. All verified empirically before fixing.
-done — flake.nix self-hosts via the module; structural check verifies outputs
+  done — flake.nix self-hosts via the module; structural check verifies outputs
   so the repo self-hosts, unified the split-brain sub-module code paths, cleaned
   up test anti-patterns, added `AGENTS.md`.
 
@@ -262,33 +262,33 @@ discoverability. The raw import path still works for backwards compatibility.
 
 ## f) Top 25 Things We Should Get Done Next
 
-| #      | Priority | Task                                                                               | Impact                            |
-| ------ | -------- | ---------------------------------------------------------------------------------- | --------------------------------- |
-done — treefmt + shfmt canon; checks.treefmt
-done — test.nix verify suite green
-done — moduleTest 237 checks
-done — pureFunctions 72 checks
-done — structural + templateEval checks
-done — AGENTS.md living doc current
-done — ROADMAP Theme 2 struck done 2026-11-18
-done — CHANGELOG append-only through 0.1.0
-done — scripts/nix-health.sh canary
-done — scripts/ci-parity.sh local parity
-done — templ fixture guard wired as a check
-done — containerSmoke real-backend check
-done — docsAnnotations gate
-done — nix flake check green at f59e03d (round-7)
-done — all living docs verified 2026-11-19
-done — AGENTS.md + docs/flake-patterns.md
-done — AGENTS.md daemon-race recipe
-done — scripts/check-concurrent-actors.sh (T70)
-done — AGENTS.md push-behavior + daemon notes
-done — ci-parity --full recipe
-done — nix-health canary
-done — AGENTS.md host-break gotcha
-done — nix-health + ci-parity scripts
-done — scripts/nix-lint.sh --check
-done — AGENTS.md + CHANGELOG
+| #                                                 | Priority | Task | Impact |
+| ------------------------------------------------- | -------- | ---- | ------ |
+| done — treefmt + shfmt canon; checks.treefmt      |          |      |        |
+| done — test.nix verify suite green                |          |      |        |
+| done — moduleTest 237 checks                      |          |      |        |
+| done — pureFunctions 72 checks                    |          |      |        |
+| done — structural + templateEval checks           |          |      |        |
+| done — AGENTS.md living doc current               |          |      |        |
+| done — ROADMAP Theme 2 struck done 2026-11-18     |          |      |        |
+| done — CHANGELOG append-only through 0.1.0        |          |      |        |
+| done — scripts/nix-health.sh canary               |          |      |        |
+| done — scripts/ci-parity.sh local parity          |          |      |        |
+| done — templ fixture guard wired as a check       |          |      |        |
+| done — containerSmoke real-backend check          |          |      |        |
+| done — docsAnnotations gate                       |          |      |        |
+| done — nix flake check green at f59e03d (round-7) |          |      |        |
+| done — all living docs verified 2026-11-19        |          |      |        |
+| done — AGENTS.md + docs/flake-patterns.md         |          |      |        |
+| done — AGENTS.md daemon-race recipe               |          |      |        |
+| done — scripts/check-concurrent-actors.sh (T70)   |          |      |        |
+| done — AGENTS.md push-behavior + daemon notes     |          |      |        |
+| done — ci-parity --full recipe                    |          |      |        |
+| done — nix-health canary                          |          |      |        |
+| done — AGENTS.md host-break gotcha                |          |      |        |
+| done — nix-health + ci-parity scripts             |          |      |        |
+| done — scripts/nix-lint.sh --check                |          |      |        |
+| done — AGENTS.md + CHANGELOG                      |          |      |        |
 
 ---
 

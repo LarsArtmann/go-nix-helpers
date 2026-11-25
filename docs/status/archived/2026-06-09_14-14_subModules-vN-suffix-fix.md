@@ -176,33 +176,33 @@ The `templates/go-flake-parts/flake.nix` is manually maintained. When `mkPrepare
 
 ## f) Top 25 Things We Should Get Done Next
 
-| #      | Priority | Task                                                                                                  | Impact                                 |
-| ------ | -------- | ----------------------------------------------------------------------------------------------------- | -------------------------------------- |
-done at `7b69382`
-done — crush-daily on go-standard today (TODO_LIST T5 DONE 2026-11-18)
-done — Standup-Killer on go-standard (TODO_LIST T5 DONE 2026-11-18)
-done — PMA on go-standard (PMA 9b47684: "Migrate to go-standard module, remove 966 lines")
-done — go-structure-linter on go-standard (AGENTS.md consumer list)
-done at `3c22ce4`
-done — checks.pureFunctions (5b915f8 property suite, 72 checks)
-done — test.nix verify suite (9 scenarios)
-done at `3c22ce4`
-done — GO_LATEST auto-derived in scripts/dashboard.sh (this file §c "dashboard.sh hardcodes go_1_25" verdict)
-done — fleet audit done — all consumers on go-standard (T4/T5 DONE 2026-11-18)
-done — CHANGELOG.md exists (this file §c3)
-done — FEATURES.md exists (§c5)
-done — TODO_LIST.md exists (§c6)
-done — moot — directory gone (§c7)
-done — PMA on go-standard via deps (PMA 9b47684)
-done — 2026-06-29 postPatch sweep eliminated the workaround class
-**Won't implement — this file §c5 verdict: dormant — dropped.**
-done — .github/workflows/ci.yml runs integration + module tests
-done — go.sum handled via go mod tidy in FOD (b383d78)
-**→ still open — noted in ROADMAP Theme 3 (dry-run idea)**
-done — flakeModules.go-standard published since 2026-08 (3-input module)
-done — flake exposes lib.mkPreparedSource (verified by checks.structural)
-**→ still open — routed TODO_LIST Blocked (real private-repo CI test; needs DEPLOY_SSH_KEY)**
-**NOT-DO — buildGoModule has no go.work support; the replace-directive pipeline is the shipped answer (2026-06-29 verdict).**
+| #                                                                                                                             | Priority | Task | Impact |
+| ----------------------------------------------------------------------------------------------------------------------------- | -------- | ---- | ------ |
+| done at `7b69382`                                                                                                             |          |      |        |
+| done — crush-daily on go-standard today (TODO_LIST T5 DONE 2026-11-18)                                                        |          |      |        |
+| done — Standup-Killer on go-standard (TODO_LIST T5 DONE 2026-11-18)                                                           |          |      |        |
+| done — PMA on go-standard (PMA 9b47684: "Migrate to go-standard module, remove 966 lines")                                    |          |      |        |
+| done — go-structure-linter on go-standard (AGENTS.md consumer list)                                                           |          |      |        |
+| done at `3c22ce4`                                                                                                             |          |      |        |
+| done — checks.pureFunctions (5b915f8 property suite, 72 checks)                                                               |          |      |        |
+| done — test.nix verify suite (9 scenarios)                                                                                    |          |      |        |
+| done at `3c22ce4`                                                                                                             |          |      |        |
+| done — GO_LATEST auto-derived in scripts/dashboard.sh (this file §c "dashboard.sh hardcodes go_1_25" verdict)                 |          |      |        |
+| done — fleet audit done — all consumers on go-standard (T4/T5 DONE 2026-11-18)                                                |          |      |        |
+| done — CHANGELOG.md exists (this file §c3)                                                                                    |          |      |        |
+| done — FEATURES.md exists (§c5)                                                                                               |          |      |        |
+| done — TODO_LIST.md exists (§c6)                                                                                              |          |      |        |
+| done — moot — directory gone (§c7)                                                                                            |          |      |        |
+| done — PMA on go-standard via deps (PMA 9b47684)                                                                              |          |      |        |
+| done — 2026-06-29 postPatch sweep eliminated the workaround class                                                             |          |      |        |
+| **Won't implement — this file §c5 verdict: dormant — dropped.**                                                               |          |      |        |
+| done — .github/workflows/ci.yml runs integration + module tests                                                               |          |      |        |
+| done — go.sum handled via go mod tidy in FOD (b383d78)                                                                        |          |      |        |
+| **→ still open — noted in ROADMAP Theme 3 (dry-run idea)**                                                                    |          |      |        |
+| done — flakeModules.go-standard published since 2026-08 (3-input module)                                                      |          |      |        |
+| done — flake exposes lib.mkPreparedSource (verified by checks.structural)                                                     |          |      |        |
+| **→ still open — routed TODO_LIST Blocked (real private-repo CI test; needs DEPLOY_SSH_KEY)**                                 |          |      |        |
+| **NOT-DO — buildGoModule has no go.work support; the replace-directive pipeline is the shipped answer (2026-06-29 verdict).** |          |      |        |
 
 ---
 

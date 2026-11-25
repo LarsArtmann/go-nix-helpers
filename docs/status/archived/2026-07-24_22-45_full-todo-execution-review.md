@@ -11,37 +11,37 @@
 
 These items are implemented, pass `nix flake check`, and have no known issues:
 
-| #      | Task                                            | Evidence                                                                          |
-| ------ | ----------------------------------------------- | --------------------------------------------------------------------------------- |
-done at `1c5c18a`
-done at `05b7b77`
-done at `4d4cc32`, `1c5c18a`
-done at `4d4cc32`
-done at `05b7b77`
-done at `90caf46`
-done at `90caf46`
-done at `4d4cc32`
-done at `4d4cc32`
-done at `4d4cc32`
-done at `05b7b77`
-done at `05b7b77`
-done at `4d4cc32`
-done at `4d4cc32`, `1c5c18a`
-done at `4d4cc32`
-done at `1c5c18a`
-done at `90caf46`
-done at `05b7b77`
-done at `4d4cc32`
-done at `4d4cc32`
-done — completed; moduleTest since grown to 237 checks (2026-11-19)
-done at `1c5c18a`
-done at `4d4cc32`, `1c5c18a`
-done at `4d4cc32`
-done at `05b7b77`
-done — subModules shipped; documented in AGENTS.md (explicit + auto pipeline)
-done at `4d4cc32`
-done at `4d4cc32`
-done at `05b7b77`
+| #                                                                             | Task | Evidence |
+| ----------------------------------------------------------------------------- | ---- | -------- |
+| done at `1c5c18a`                                                             |      |          |
+| done at `05b7b77`                                                             |      |          |
+| done at `4d4cc32`, `1c5c18a`                                                  |      |          |
+| done at `4d4cc32`                                                             |      |          |
+| done at `05b7b77`                                                             |      |          |
+| done at `90caf46`                                                             |      |          |
+| done at `90caf46`                                                             |      |          |
+| done at `4d4cc32`                                                             |      |          |
+| done at `4d4cc32`                                                             |      |          |
+| done at `4d4cc32`                                                             |      |          |
+| done at `05b7b77`                                                             |      |          |
+| done at `05b7b77`                                                             |      |          |
+| done at `4d4cc32`                                                             |      |          |
+| done at `4d4cc32`, `1c5c18a`                                                  |      |          |
+| done at `4d4cc32`                                                             |      |          |
+| done at `1c5c18a`                                                             |      |          |
+| done at `90caf46`                                                             |      |          |
+| done at `05b7b77`                                                             |      |          |
+| done at `4d4cc32`                                                             |      |          |
+| done at `4d4cc32`                                                             |      |          |
+| done — completed; moduleTest since grown to 237 checks (2026-11-19)           |      |          |
+| done at `1c5c18a`                                                             |      |          |
+| done at `4d4cc32`, `1c5c18a`                                                  |      |          |
+| done at `4d4cc32`                                                             |      |          |
+| done at `05b7b77`                                                             |      |          |
+| done — subModules shipped; documented in AGENTS.md (explicit + auto pipeline) |      |          |
+| done at `4d4cc32`                                                             |      |          |
+| done at `4d4cc32`                                                             |      |          |
+| done at `05b7b77`                                                             |      |          |
 
 **Test verification:**
 
@@ -301,27 +301,27 @@ All 4 bugs (D1–D4) and both partially-done items (B5 man pages, B6 CHANGELOG) 
 
 ### Section F "next tasks" — item-by-item status
 
-| #         | Task                                                                                                                          | Status                                                       | Evidence                                             |
-| --------- | ----------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------ | ---------------------------------------------------- |
-done — publicDeps exclusion list shipped — see CHANGELOG 0.1.0 (nested /v2+/v3 exclusion extended 2026-11)
-done at `9c8724b`
-done — templ-committed check + templGenerationPolicy; documented in AGENTS.md
-**→ routed — ROADMAP Theme 3 (real private-repo CI test; scaffolded, needs DEPLOY_SSH_KEY)**
-**→ routed — ROADMAP Theme 4 (nixpkgs / flake-registry publication)**
-done — v0.1.0 tagged 2026-11-18 (this file's row 8 roadmap)
-done — CI green since 2026-11-17 (red-master fixes; CHANGELOG 0.1.0 Fixed)
-done at `2f3b6b2`
-done at `2f3b6b2`
-**→ routed — ROADMAP Theme 2 (migration guide + auto-migrate script idea)**
-done — via 2026-08-10 Tier A sweep (10 repos) + 2026-11-18 T4/T5 Tier B/C completion
-**→ still open — routed TODO_LIST "Blocked" (needs DEPLOY_SSH_KEY)**
-**→ still open — routed TODO_LIST "Decided against" (won't-implement policy owner decision)**
-done at `689ac19`
-| ~~15–20~~ | ~~Design improvements (enableCompletions redesign, apps.fmt conditional, go.mod skeleton, man pages in devShell, extraApps)~~ | ~~#19 done `ef2361f`; rest still open~~                      | ~~TODO_LIST + ROADMAP~~                              |
-| ~~21–26~~ | ~~CI improvements (macOS, Cachix, flake.lock check, generate-flake.sh smoke test)~~                                           | ~~Still open~~                                               | ~~TODO_LIST~~                                        |
-| ~~27–33~~ | ~~Documentation polish (enableCompletions docs, extraApps migration, FAQ entries, GOTOOLCHAIN docs)~~                         | ~~#33 done (architecture diagram shipped); rest still open~~ | ~~TODO_LIST~~                                        |
-| ~~34–42~~ | ~~Feature additions (enableGoVet, preCommitHooks, nixosModules, darwinModules, docker, cross-compilation)~~                   | ~~Still open — long-term~~                                   | ~~ROADMAP~~                                          |
-| ~~43–50~~ | ~~Ecosystem (register maintainer, audit consumers, examples, benchmarks, publish)~~                                           | ~~Still open — blocked/long-term~~                           | ~~TODO_LIST (blocked) + ROADMAP~~                    |
+| #                                                                                                          | Task                                                                                                                          | Status                                                       | Evidence                          |
+| ---------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------ | --------------------------------- |
+| done — publicDeps exclusion list shipped — see CHANGELOG 0.1.0 (nested /v2+/v3 exclusion extended 2026-11) |                                                                                                                               |                                                              |                                   |
+| done at `9c8724b`                                                                                          |                                                                                                                               |                                                              |                                   |
+| done — templ-committed check + templGenerationPolicy; documented in AGENTS.md                              |                                                                                                                               |                                                              |                                   |
+| **→ routed — ROADMAP Theme 3 (real private-repo CI test; scaffolded, needs DEPLOY_SSH_KEY)**               |                                                                                                                               |                                                              |                                   |
+| **→ routed — ROADMAP Theme 4 (nixpkgs / flake-registry publication)**                                      |                                                                                                                               |                                                              |                                   |
+| done — v0.1.0 tagged 2026-11-18 (this file's row 8 roadmap)                                                |                                                                                                                               |                                                              |                                   |
+| done — CI green since 2026-11-17 (red-master fixes; CHANGELOG 0.1.0 Fixed)                                 |                                                                                                                               |                                                              |                                   |
+| done at `2f3b6b2`                                                                                          |                                                                                                                               |                                                              |                                   |
+| done at `2f3b6b2`                                                                                          |                                                                                                                               |                                                              |                                   |
+| **→ routed — ROADMAP Theme 2 (migration guide + auto-migrate script idea)**                                |                                                                                                                               |                                                              |                                   |
+| done — via 2026-08-10 Tier A sweep (10 repos) + 2026-11-18 T4/T5 Tier B/C completion                       |                                                                                                                               |                                                              |                                   |
+| **→ still open — routed TODO_LIST "Blocked" (needs DEPLOY_SSH_KEY)**                                       |                                                                                                                               |                                                              |                                   |
+| **→ still open — routed TODO_LIST "Decided against" (won't-implement policy owner decision)**              |                                                                                                                               |                                                              |                                   |
+| done at `689ac19`                                                                                          |                                                                                                                               |                                                              |                                   |
+| ~~15–20~~                                                                                                  | ~~Design improvements (enableCompletions redesign, apps.fmt conditional, go.mod skeleton, man pages in devShell, extraApps)~~ | ~~#19 done `ef2361f`; rest still open~~                      | ~~TODO_LIST + ROADMAP~~           |
+| ~~21–26~~                                                                                                  | ~~CI improvements (macOS, Cachix, flake.lock check, generate-flake.sh smoke test)~~                                           | ~~Still open~~                                               | ~~TODO_LIST~~                     |
+| ~~27–33~~                                                                                                  | ~~Documentation polish (enableCompletions docs, extraApps migration, FAQ entries, GOTOOLCHAIN docs)~~                         | ~~#33 done (architecture diagram shipped); rest still open~~ | ~~TODO_LIST~~                     |
+| ~~34–42~~                                                                                                  | ~~Feature additions (enableGoVet, preCommitHooks, nixosModules, darwinModules, docker, cross-compilation)~~                   | ~~Still open — long-term~~                                   | ~~ROADMAP~~                       |
+| ~~43–50~~                                                                                                  | ~~Ecosystem (register maintainer, audit consumers, examples, benchmarks, publish)~~                                           | ~~Still open — blocked/long-term~~                           | ~~TODO_LIST (blocked) + ROADMAP~~ |
 
 ### Questions (G1–G3) — resolution
 

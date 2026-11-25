@@ -64,7 +64,7 @@ nix flake check # evaluates and runs all checks
 | `packages.default`  | Compiled binary via `buildGoModule` (newest packaged Go) |
 | `packages.<pname>`  | Same package under its own name                          |
 | `apps.fmt`          | `treefmt` wrapper (only if >=1 formatter enabled)        |
-|| `apps.update-vendor-hash` | One-command vendorHash recompute (substitutes the old hash by value) |
+|                     | `apps.update-vendor-hash`                                |
 | `apps.default`      | `nix run .#<pname>`                                      |
 | `apps.test`         | `go test -race -v ./...`                                 |
 | `apps.lint`         | `golangci-lint run ./...`                                |
@@ -212,7 +212,7 @@ See the full option table below, or copy one of the [templates](#templates).
 | `enableCheck`               | `true`                       | Run `go test` during the Nix build (`doCheck`)                                                                                                                                                 |
 | `enableTestCheck`           | `false`                      | Generate `checks.test` — force `go test` in CI even when `enableCheck = false`                                                                                                                 |
 | `enableVendorHashCheck`     | `true`                       | Generate `checks.vendor-hash` — realize the goModules FOD so a drifted vendorHash fails `nix flake check` fast                                                                                 |
-|| `enableUpdateVendorHashApp` | `true`                       | Emit `apps.update-vendor-hash`: build → parse `got:` sha256 → substitute into `flake.nix` (targets the OLD hash value, so sibling FOD lines are safe) → re-verify; flat `vendorHash` + Go module only |
+|                             | `enableUpdateVendorHashApp`  | `true`                                                                                                                                                                                         |
 | `enableLockGuards`          | `false`                      | Eval-time flake.lock guards (registry-tarball trap, fleet-pin drift, dropped `follows`) — nix-email pattern                                                                                    |
 | `lockGuards`                | `{ }`                        | Guard tunables: `expectedNixpkgsRev`, `expectedFollows` (see module docs)                                                                                                                      |
 | `enableOverlay`             | `true`                       | Generate `flake.overlays.default`                                                                                                                                                              |
@@ -221,7 +221,7 @@ See the full option table below, or copy one of the [templates](#templates).
 | `enableTempl`               | `false`                      | Include `templ` in devShells and treefmt                                                                                                                                                       |
 | `templGenerationPolicy`     | `"committed"`                | `"committed"` enforces committed `*_templ.go` siblings (templ-committed check); `"preBuild"` skips it for build-time generation                                                                |
 | `enableTemplFreshnessCheck` | `false`                      | Generate `checks.templ-freshness` — regenerate-and-diff gate: committed `*_templ.go` must match `templ generate` output (nixpkgs-pinned templ); requires `templGenerationPolicy = "committed"` |
-|| `templCliPackage`            | `null` (`pkgs.templ`)        | ONE templ CLI pin consumed by the package build, devShells, AND treefmt (`templ.package`) — kills per-consumer `pkgs.templ` skew                                                                    |
+|                             | `templCliPackage`            | `null` (`pkgs.templ`)                                                                                                                                                                          |
 | `enableGovulncheck`         | `true`                       | Include `govulncheck` in the default devShell                                                                                                                                                  |
 | `enableGopls`               | `true`                       | Include `gopls` in the default devShell                                                                                                                                                        |
 | `enableGolangciLint`        | `true`                       | Include `golangci-lint` in devShells and the lint app                                                                                                                                          |
@@ -318,9 +318,9 @@ preparedSrc = mkPreparedSource {
 
 ## Templates
 
-| Template                                                             | Use when...                                         |
-| -------------------------------------------------------------------- | --------------------------------------------------- |
-| [`templates/go-standard/flake.nix`](templates/go-standard/flake.nix) | Starting a new project — recommended, minimal setup |
+| Template                                                               | Use when...                                                                                     |
+| ---------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| [`templates/go-standard/flake.nix`](templates/go-standard/flake.nix)   | Starting a new project — recommended, minimal setup                                             |
 | [`templates/ghcr-push-workflow.yml`](templates/ghcr-push-workflow.yml) | Consumer CI pushing images via `apps.<pkg>-image-push` (Forgejo variant in the migration guide) |
 
 ---

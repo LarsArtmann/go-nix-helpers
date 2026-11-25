@@ -7,14 +7,14 @@
 
 ## a) Headline results
 
-| Gate | Before session | After | 
-| --- | --- | --- |
-| annotate findings | 358 pin / 68 live at resume (39 after wave G) | **0 — CLEAN, twice confirmed** |
-| `.docs-gates.json` pin | annotate_max = 358 | **deleted** (fleet default 0 = strictest) |
-| battery | 4/5 (annotate red at 359→68) | **5/5 PASS** |
-| TODO_LIST | 41 DONE rows unstruck | **purged** into CHANGELOG [Unreleased] (open-work-only: T72–T89) |
-| planning corpus | 5 MDs (~640 bare rows) + 2 HTMLs unresolved | **645 verdicts applied, 7 files archived** |
-| local gates (check-docs-annotations.sh) | green | green (re-verified) |
+| Gate                                    | Before session                                | After                                                            |
+| --------------------------------------- | --------------------------------------------- | ---------------------------------------------------------------- |
+| annotate findings                       | 358 pin / 68 live at resume (39 after wave G) | **0 — CLEAN, twice confirmed**                                   |
+| `.docs-gates.json` pin                  | annotate_max = 358                            | **deleted** (fleet default 0 = strictest)                        |
+| battery                                 | 4/5 (annotate red at 359→68)                  | **5/5 PASS**                                                     |
+| TODO_LIST                               | 41 DONE rows unstruck                         | **purged** into CHANGELOG [Unreleased] (open-work-only: T72–T89) |
+| planning corpus                         | 5 MDs (~640 bare rows) + 2 HTMLs unresolved   | **645 verdicts applied, 7 files archived**                       |
+| local gates (check-docs-annotations.sh) | green                                         | green (re-verified)                                              |
 
 ## b) What happened (execution log)
 
@@ -56,30 +56,30 @@
 
 ## c) Archive manifest (this sweep)
 
-| File | Classification | Reason |
-| --- | --- | --- |
-| docs/planning/archived/2026-06-29_03-15_eliminate-postpatch-workarounds.md | ANNOTATE→ARCHIVE | every item verdicted (116 lines; companion 04-21 report as evidence); Cyberdom = NOT-DO (reverted, external) |
-| docs/planning/archived/2026-07-24_22-18_pareto-execution-plan.html | SUPERSEDED→ARCHIVE | banner: superseded by the 2026-08-10 re-rank (all H/M shipped, L10 rejected on merit) |
-| docs/planning/archived/2026-08-10_02-41_pareto-execution-plan.md | ANNOTATE→ARCHIVE | 126 lines verdicted; STATUS: EXECUTED verified against git; P12 = Won't implement; 3 rows routed to TODO_LIST Blocked |
-| docs/planning/archived/2026-09-24_18-13_pareto-execution-plan.md | ANNOTATE→ARCHIVE | 113 lines verdicted; C-tier closed via T4/T5 DONE; D10/T15 + policy rows routed |
-| docs/planning/archived/2026-09-25_09-54_ci-green-fleet-consolidation-pareto-plan.md | ANNOTATE→ARCHIVE | 126 lines verdicted; first fully green CI run 44152413584; 4.5/4.6 NOT-DO (flake consumption, not Go module) |
-| docs/planning/archived/2026-11-17_21-17_green-master-to-fleet-value-pareto-plan.md | ANNOTATE→ARCHIVE | 159 lines verdicted; fine row 12 (PapDashboard e2e host run) = NOT-DO-deferred, harvested as T89 |
-| docs/reviews/archived/2026-06-19_full-code-review.html | RESOLVED→ARCHIVE | banner: all findings closed (postPatch elimination, publicDeps rework, hardening sweep, v0.1.0) |
-| docs/feedback/processed/2026-08-03_*.md | LEAVE (terminal) | already terminal; 5 evidence rows verdicted; lines 143–145 = code-fence false-positive table (T86) |
+| File                                                                                | Classification     | Reason                                                                                                                |
+| ----------------------------------------------------------------------------------- | ------------------ | --------------------------------------------------------------------------------------------------------------------- |
+| docs/planning/archived/2026-06-29_03-15_eliminate-postpatch-workarounds.md          | ANNOTATE→ARCHIVE   | every item verdicted (116 lines; companion 04-21 report as evidence); Cyberdom = NOT-DO (reverted, external)          |
+| docs/planning/archived/2026-07-24_22-18_pareto-execution-plan.html                  | SUPERSEDED→ARCHIVE | banner: superseded by the 2026-08-10 re-rank (all H/M shipped, L10 rejected on merit)                                 |
+| docs/planning/archived/2026-08-10_02-41_pareto-execution-plan.md                    | ANNOTATE→ARCHIVE   | 126 lines verdicted; STATUS: EXECUTED verified against git; P12 = Won't implement; 3 rows routed to TODO_LIST Blocked |
+| docs/planning/archived/2026-09-24_18-13_pareto-execution-plan.md                    | ANNOTATE→ARCHIVE   | 113 lines verdicted; C-tier closed via T4/T5 DONE; D10/T15 + policy rows routed                                       |
+| docs/planning/archived/2026-09-25_09-54_ci-green-fleet-consolidation-pareto-plan.md | ANNOTATE→ARCHIVE   | 126 lines verdicted; first fully green CI run 44152413584; 4.5/4.6 NOT-DO (flake consumption, not Go module)          |
+| docs/planning/archived/2026-11-17_21-17_green-master-to-fleet-value-pareto-plan.md  | ANNOTATE→ARCHIVE   | 159 lines verdicted; fine row 12 (PapDashboard e2e host run) = NOT-DO-deferred, harvested as T89                      |
+| docs/reviews/archived/2026-06-19_full-code-review.html                              | RESOLVED→ARCHIVE   | banner: all findings closed (postPatch elimination, publicDeps rework, hardening sweep, v0.1.0)                       |
+| docs/feedback/processed/2026-08-03_*.md                                             | LEAVE (terminal)   | already terminal; 5 evidence rows verdicted; lines 143–145 = code-fence false-positive table (T86)                    |
 
 ## d) Standing backlog (T72–T89 disposition — merge-by-reference only)
 
-| Row | State | Note |
-| --- | --- | --- |
-| T72 billing rerun | BLOCKED (owner-side) | unchanged; every push local-green |
-| T73 gogenfilter TS | TODO | still open in TODO_LIST |
-| T74/T75 convergence sweeps | TODO | unchanged |
-| T76 bank-sync app adoption | TODO | unchanged |
-| T84 samber-linter test restructure | TODO | unchanged |
-| T85/T86 docs-gates upstream | TODO (new) | append-verdict mode; separator + fence normalizer |
-| T87 spec-files-not-chat | TODO (new) | docs-health skill protocol row |
-| T88 daemon push gating | TODO (new) | harvested from 06-46 item 30 (repo: crush-config) |
-| T89 PapDashboard e2e host run | TODO (new) | harvested from 11-17 plan fine 12 |
+| Row                                | State                | Note                                              |
+| ---------------------------------- | -------------------- | ------------------------------------------------- |
+| T72 billing rerun                  | BLOCKED (owner-side) | unchanged; every push local-green                 |
+| T73 gogenfilter TS                 | TODO                 | still open in TODO_LIST                           |
+| T74/T75 convergence sweeps         | TODO                 | unchanged                                         |
+| T76 bank-sync app adoption         | TODO                 | unchanged                                         |
+| T84 samber-linter test restructure | TODO                 | unchanged                                         |
+| T85/T86 docs-gates upstream        | TODO (new)           | append-verdict mode; separator + fence normalizer |
+| T87 spec-files-not-chat            | TODO (new)           | docs-health skill protocol row                    |
+| T88 daemon push gating             | TODO (new)           | harvested from 06-46 item 30 (repo: crush-config) |
+| T89 PapDashboard e2e host run      | TODO (new)           | harvested from 11-17 plan fine 12                 |
 
 ## e) Verification (this session)
 

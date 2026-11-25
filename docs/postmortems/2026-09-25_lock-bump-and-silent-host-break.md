@@ -67,7 +67,7 @@ restart the daemon.
   is broken, pushing and letting CI be the build oracle is legitimate
   (with owner approval; this repo does not push without it).
 
-*Evidence: `docs/status/2026-09-25_04-33_pareto-execution-session-interrupted.md`
+_Evidence: `docs/status/2026-09-25_04-33_pareto-execution-session-interrupted.md`
 (theory 1, later retracted), `docs/status/2026-09-25_04-39_pareto-execution-wrapup-and-corrections.md`
 (corrected root-cause analysis), commit `105c981` (the 8-assertion repair +
-`cgoEnabled` fix).*
+`cgoEnabled` fix)._

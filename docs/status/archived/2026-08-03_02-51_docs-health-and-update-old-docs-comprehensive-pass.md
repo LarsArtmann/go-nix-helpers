@@ -152,76 +152,76 @@ The AGENTS.md says "An auto-git commit daemon runs continuously and commits chan
 
 ### ~~Priority 1: Documentation sync (do immediately)~~
 
-| #      | Task                                                                           | Impact   | Effort    | Evidence |
-| ------ | ------------------------------------------------------------------------------ | -------- | --------- | -------- |
-| ~~1~~  | ~~Fix README.md troubleshooting text~~ ✓ done `9b376b3`                        | ~~High~~ | ~~10min~~ | ~~—~~    |
-| ~~2~~  | ~~Add `publicDeps` as remediation option in README~~ ✓ done `274cb35`          | ~~High~~ | ~~10min~~ | ~~—~~    |
-| ~~3~~  | ~~Document `enableCompletions` cobra/urfave/cli requirement~~ ✓ done `9b376b3` | ~~Med~~  | ~~10min~~ | ~~—~~    |
-| ~~4~~  | ~~Add FAQ entry for `vendorHash = null`~~ ✓ done `b10399f`                     | ~~Med~~  | ~~15min~~ | ~~—~~    |
-| ~~5~~  | ~~Add FAQ entry for monorepo `vendorHash` sharing~~ ✓ done `b10399f`           | ~~Med~~  | ~~15min~~ | ~~—~~    |
-| ~~6~~  | ~~Document `GOTOOLCHAIN = "local"`~~ ✓ done `b10399f`                          | ~~Low~~  | ~~10min~~ | ~~—~~    |
-| ~~7~~  | ~~Add `publicDeps` usage example to `docs/flake-patterns.md` → still open~~    | ~~Med~~  | ~~20min~~ | ~~—~~ **→ decided: documented elsewhere — publicDeps lives in the module option docs + AGENTS.md; no flake-patterns.md example**    |
-| ~~8~~  | ~~Update migration guide with new options~~ ✓ done `b10399f`                   | ~~Med~~  | ~~20min~~ | ~~—~~    |
-| ~~9~~  | ~~Document `publicDeps` path-exact matching~~ ✓ done `274cb35`                 | ~~Med~~  | ~~15min~~ | ~~—~~    |
-| ~~10~~ | ~~Add `publicDeps` usage example to README~~ ✓ done `274cb35`                  | ~~Low~~  | ~~10min~~ | ~~—~~    |
-| ~~11~~ | ~~Review all docs for stale references~~ ✓ done across sessions                | ~~Low~~  | ~~15min~~ | ~~—~~    |
+| #      | Task                                                                           | Impact   | Effort    | Evidence                                                                                                                         |
+| ------ | ------------------------------------------------------------------------------ | -------- | --------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| ~~1~~  | ~~Fix README.md troubleshooting text~~ ✓ done `9b376b3`                        | ~~High~~ | ~~10min~~ | ~~—~~                                                                                                                            |
+| ~~2~~  | ~~Add `publicDeps` as remediation option in README~~ ✓ done `274cb35`          | ~~High~~ | ~~10min~~ | ~~—~~                                                                                                                            |
+| ~~3~~  | ~~Document `enableCompletions` cobra/urfave/cli requirement~~ ✓ done `9b376b3` | ~~Med~~  | ~~10min~~ | ~~—~~                                                                                                                            |
+| ~~4~~  | ~~Add FAQ entry for `vendorHash = null`~~ ✓ done `b10399f`                     | ~~Med~~  | ~~15min~~ | ~~—~~                                                                                                                            |
+| ~~5~~  | ~~Add FAQ entry for monorepo `vendorHash` sharing~~ ✓ done `b10399f`           | ~~Med~~  | ~~15min~~ | ~~—~~                                                                                                                            |
+| ~~6~~  | ~~Document `GOTOOLCHAIN = "local"`~~ ✓ done `b10399f`                          | ~~Low~~  | ~~10min~~ | ~~—~~                                                                                                                            |
+| ~~7~~  | ~~Add `publicDeps` usage example to `docs/flake-patterns.md` → still open~~    | ~~Med~~  | ~~20min~~ | ~~—~~ **→ decided: documented elsewhere — publicDeps lives in the module option docs + AGENTS.md; no flake-patterns.md example** |
+| ~~8~~  | ~~Update migration guide with new options~~ ✓ done `b10399f`                   | ~~Med~~  | ~~20min~~ | ~~—~~                                                                                                                            |
+| ~~9~~  | ~~Document `publicDeps` path-exact matching~~ ✓ done `274cb35`                 | ~~Med~~  | ~~15min~~ | ~~—~~                                                                                                                            |
+| ~~10~~ | ~~Add `publicDeps` usage example to README~~ ✓ done `274cb35`                  | ~~Low~~  | ~~10min~~ | ~~—~~                                                                                                                            |
+| ~~11~~ | ~~Review all docs for stale references~~ ✓ done across sessions                | ~~Low~~  | ~~15min~~ | ~~—~~                                                                                                                            |
 
 ### ~~Priority 2: Deepen tests from eval-only to behavioral~~
 
-| #      | Task                                                                                                         | Impact   | Effort    |
-| ------ | ------------------------------------------------------------------------------------------------------------ | -------- | --------- |
-| ~~12~~ | ~~Inspect `buildGoModule` derivation attrs → TODO_LIST M7~~                                                  | ~~High~~ | ~~30min~~ done — the 237-assertion moduleTest inspects the derivation attrs directly (env flattening, postInstall) |
-| ~~13~~ | ~~Verify `ldflags` contains version injection → TODO_LIST M7~~                                               | ~~High~~ | ~~30min~~ done — version injection asserted: ldflags null-default (moduleTest) + version propagation tests; finalLdflags injects by default |
-| ~~14~~ | ~~Verify `nativeBuildInputs` contains `installShellFiles` when `enableCompletions = true`~~ ✓ done `12f2350` | ~~High~~ | ~~30min~~ |
-| ~~15~~ | ~~Test `extraBuildAttrs.postInstall` merge → TODO_LIST M7~~                                                  | ~~Med~~  | ~~30min~~ done — G2 concat tests prove the extraBuildAttrs merge (nativeBuildInputs); postInstall rides the same concat path |
-| ~~16~~ | ~~Test `deps` / `mkPreparedSource` integration~~ ✓ done `12f2350` (multi-deps test)                          | ~~Med~~  | ~~1h~~    |
+| #      | Task                                                                                                         | Impact   | Effort                                                                                                                                                  |
+| ------ | ------------------------------------------------------------------------------------------------------------ | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ~~12~~ | ~~Inspect `buildGoModule` derivation attrs → TODO_LIST M7~~                                                  | ~~High~~ | ~~30min~~ done — the 237-assertion moduleTest inspects the derivation attrs directly (env flattening, postInstall)                                      |
+| ~~13~~ | ~~Verify `ldflags` contains version injection → TODO_LIST M7~~                                               | ~~High~~ | ~~30min~~ done — version injection asserted: ldflags null-default (moduleTest) + version propagation tests; finalLdflags injects by default             |
+| ~~14~~ | ~~Verify `nativeBuildInputs` contains `installShellFiles` when `enableCompletions = true`~~ ✓ done `12f2350` | ~~High~~ | ~~30min~~                                                                                                                                               |
+| ~~15~~ | ~~Test `extraBuildAttrs.postInstall` merge → TODO_LIST M7~~                                                  | ~~Med~~  | ~~30min~~ done — G2 concat tests prove the extraBuildAttrs merge (nativeBuildInputs); postInstall rides the same concat path                            |
+| ~~16~~ | ~~Test `deps` / `mkPreparedSource` integration~~ ✓ done `12f2350` (multi-deps test)                          | ~~Med~~  | ~~1h~~                                                                                                                                                  |
 | ~~17~~ | ~~Add test for `privateDepPattern` override → TODO_LIST M7~~                                                 | ~~Med~~  | ~~20min~~ **→ decided: covered by proxy — default-pattern assert + test.nix validation/publicDeps scenarios; a bespoke override test was never minted** |
-| ~~18~~ | ~~Add test for `publicDeps` with `/v2` versioned paths → TODO_LIST M9~~                                      | ~~Med~~  | ~~20min~~ done — test.nix publicDeps /v2 scenario (codec/v2 + storage/v2) |
-| ~~19~~ | ~~Test that error message contains all 3 remediation options~~ ✓ done — `verifyValidation` checks text       | ~~Low~~  | ~~15min~~ |
+| ~~18~~ | ~~Add test for `publicDeps` with `/v2` versioned paths → TODO_LIST M9~~                                      | ~~Med~~  | ~~20min~~ done — test.nix publicDeps /v2 scenario (codec/v2 + storage/v2)                                                                               |
+| ~~19~~ | ~~Test that error message contains all 3 remediation options~~ ✓ done — `verifyValidation` checks text       | ~~Low~~  | ~~15min~~                                                                                                                                               |
 
 ### ~~Priority 3: Module design improvements~~
 
-| #      | Task                                                                                               | Impact   | Effort    |
-| ------ | -------------------------------------------------------------------------------------------------- | -------- | --------- |
-| ~~20~~ | ~~Make `autoGoPrivateEnv` aware of `publicDeps`~~ ✓ decided against `052d92d` — broad glob safer   | ~~High~~ | ~~1h~~    |
-| ~~21~~ | ~~Improve `enableCompletions` UX~~ ✓ done `c510d7c` — warning + timeout                            | ~~High~~ | ~~1h~~    |
-done at `a31fec9`
-done at `a31fec9`
-done at `a31fec9`
-done at `a31fec9`
-done at `a31fec9`
-done at `a31fec9`
-done at `a31fec9`
-done at `a31fec9`
-done at `a31fec9`
-done at `a31fec9`
-done at `a31fec9`
-| ------ | ------------------------------------------------------------------------------- | ------- | --------- |
-| ~~29~~ | ~~Add `generate-flake.sh` smoke test to CI~~ ✓ done `b10399f`                   | ~~Med~~ | ~~1h~~    |
-| ~~30~~ | ~~Add macOS CI runner~~ ✓ done `b10399f`                                        | ~~Med~~ | ~~30min~~ |
-| ~~31~~ | ~~Add `flake.lock` freshness check to CI~~ ✓ done `b10399f`                     | ~~Med~~ | ~~30min~~ |
-| ~~32~~ | ~~Build `publicDepsTest` explicitly in CI → partially done (verify builds it)~~ | ~~Low~~ | ~~15min~~ done — publicDeps scenarios ride checks.verify, built in CI; no separate publicDepsTest derivation was minted |
-| ~~33~~ | ~~Configure Cachix → ROADMAP (low priority)~~                                   | ~~Low~~ | ~~30min~~ **→ decided: dropped — no Cachix adopted; CI stays on the plain matrix (no ROADMAP row carried it forward)** |
+| #                 | Task                                                                                             | Impact   | Effort                                                                                                                  |
+| ----------------- | ------------------------------------------------------------------------------------------------ | -------- | ----------------------------------------------------------------------------------------------------------------------- |
+| ~~20~~            | ~~Make `autoGoPrivateEnv` aware of `publicDeps`~~ ✓ decided against `052d92d` — broad glob safer | ~~High~~ | ~~1h~~                                                                                                                  |
+| ~~21~~            | ~~Improve `enableCompletions` UX~~ ✓ done `c510d7c` — warning + timeout                          | ~~High~~ | ~~1h~~                                                                                                                  |
+| done at `a31fec9` |                                                                                                  |          |                                                                                                                         |
+| done at `a31fec9` |                                                                                                  |          |                                                                                                                         |
+| done at `a31fec9` |                                                                                                  |          |                                                                                                                         |
+| done at `a31fec9` |                                                                                                  |          |                                                                                                                         |
+| done at `a31fec9` |                                                                                                  |          |                                                                                                                         |
+| done at `a31fec9` |                                                                                                  |          |                                                                                                                         |
+| done at `a31fec9` |                                                                                                  |          |                                                                                                                         |
+| done at `a31fec9` |                                                                                                  |          |                                                                                                                         |
+| done at `a31fec9` |                                                                                                  |          |                                                                                                                         |
+| done at `a31fec9` |                                                                                                  |          |                                                                                                                         |
+| done at `a31fec9` |                                                                                                  |          |                                                                                                                         |
+| ------            | -------------------------------------------------------------------------------                  | -------  | ---------                                                                                                               |
+| ~~29~~            | ~~Add `generate-flake.sh` smoke test to CI~~ ✓ done `b10399f`                                    | ~~Med~~  | ~~1h~~                                                                                                                  |
+| ~~30~~            | ~~Add macOS CI runner~~ ✓ done `b10399f`                                                         | ~~Med~~  | ~~30min~~                                                                                                               |
+| ~~31~~            | ~~Add `flake.lock` freshness check to CI~~ ✓ done `b10399f`                                      | ~~Med~~  | ~~30min~~                                                                                                               |
+| ~~32~~            | ~~Build `publicDepsTest` explicitly in CI → partially done (verify builds it)~~                  | ~~Low~~  | ~~15min~~ done — publicDeps scenarios ride checks.verify, built in CI; no separate publicDepsTest derivation was minted |
+| ~~33~~            | ~~Configure Cachix → ROADMAP (low priority)~~                                                    | ~~Low~~  | ~~30min~~ **→ decided: dropped — no Cachix adopted; CI stays on the plain matrix (no ROADMAP row carried it forward)**  |
 
 ### ~~Priority 5: E2E / Integration testing (BLOCKED)~~
 
-| #      | Task                                                                                                          | Impact   | Effort |
-| ------ | ------------------------------------------------------------------------------------------------------------- | -------- | ------ |
+| #      | Task                                                                                                          | Impact   | Effort                                                                                                                                                   |
+| ------ | ------------------------------------------------------------------------------------------------------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | ~~34~~ | ~~Write real e2e consumer test → BLOCKED, tracked in TODO_LIST~~                                              | ~~High~~ | ~~4h~~ **→ decided: split — hermetic halves shipped (checks.templateEval + containerSmoke); real-consumer leg stays TODO_LIST Blocked (DEPLOY_SSH_KEY)** |
-| ~~35~~ | ~~Wire e2e test into CI → BLOCKED (depends on 34)~~                                                           | ~~High~~ | ~~1h~~ **→ decided: split — hermetic halves run as CI flake checks; real-consumer wiring waits on the TODO_LIST Blocked leg** |
-| ~~36~~ | ~~Test monorepo with real `buildGoModule`~~ ✓ done `12f2350` (multi-deps test)                                | ~~Med~~  | ~~2h~~ |
-| ~~37~~ | ~~Test overlay application in a real nixpkgs context → BLOCKED~~                                              | ~~Med~~  | ~~1h~~ done — overlayCheck + enableOverlay=false variant in the moduleTest; templateEval evaluates the overlay-bearing template against real nixpkgs |
-| ~~38~~ | ~~Add `deps`/`mkPreparedSource` integration test → partially done (multi-deps test covers mkPreparedSource)~~ | ~~Med~~  | ~~2h~~ done — test.nix multi-deps scenario covers deps/mkPreparedSource (9 scenarios total) |
+| ~~35~~ | ~~Wire e2e test into CI → BLOCKED (depends on 34)~~                                                           | ~~High~~ | ~~1h~~ **→ decided: split — hermetic halves run as CI flake checks; real-consumer wiring waits on the TODO_LIST Blocked leg**                            |
+| ~~36~~ | ~~Test monorepo with real `buildGoModule`~~ ✓ done `12f2350` (multi-deps test)                                | ~~Med~~  | ~~2h~~                                                                                                                                                   |
+| ~~37~~ | ~~Test overlay application in a real nixpkgs context → BLOCKED~~                                              | ~~Med~~  | ~~1h~~ done — overlayCheck + enableOverlay=false variant in the moduleTest; templateEval evaluates the overlay-bearing template against real nixpkgs     |
+| ~~38~~ | ~~Add `deps`/`mkPreparedSource` integration test → partially done (multi-deps test covers mkPreparedSource)~~ | ~~Med~~  | ~~2h~~ done — test.nix multi-deps scenario covers deps/mkPreparedSource (9 scenarios total)                                                              |
 
 done at `105c981`
 done at `105c981`
 done at `105c981`
 done at `105c981`
-| ~~39~~ | ~~Test `proxyVendor` toggle → TODO_LIST M7 (behavioral tests)~~          | ~~Low~~ | ~~15min~~ |
+| ~~39~~ | ~~Test `proxyVendor` toggle → TODO_LIST M7 (behavioral tests)~~ | ~~Low~~ | ~~15min~~ |
 done at `105c981`
 done at `2a8deeb`
 | ~~42~~ | ~~Test `shellExtraEnv` / `autoGoPrivate`~~ ✓ done (shellExtraEnv tested) | ~~Low~~ | ~~15min~~ |
-| ~~43~~ | ~~Test `enableTempl` adds `pkgs.templ`~~ ✓ done `12f2350`                | ~~Low~~ | ~~15min~~ |
+| ~~43~~ | ~~Test `enableTempl` adds `pkgs.templ`~~ ✓ done `12f2350` | ~~Low~~ | ~~15min~~ |
 done at `2e7547c`
 done at `2e7547c`
 done at `2e7547c`
@@ -237,15 +237,21 @@ done at `2e7547c`
 done at `2e7547c`
 done at `2e7547c`
 done at `2e7547c`
+
 ## G) Questions I cannot figure out myself
+
 done at `2e7547c`
+
 ### ~~G1. Should `publicDeps` use exact match or prefix match?~~
+
 done at `2e7547c`
 ~~Current implementation uses `grep -vFx` (exact string match). If a user lists `"github.com/larsartmann/go-output"` but `go.mod` contains `"github.com/larsartmann/go-output/v2"`, the filter won't match. Prefix match would handle `/v2` automatically but could create surprise exclusions. I cannot resolve this without your preference for safety vs convenience.~~
 done at `2e7547c`
 **Resolution:** Exact match kept — safer (no surprise exclusions). Documented in README and man page at `274cb35`. Prefix matching is a ROADMAP item (Theme 5). Test for `/v2` paths tracked in TODO_LIST M9.
 done at `2e7547c`
+
 ### ~~G2. Should we maintain a built-in known-public list?~~
+
 done at `2e7547c`
 done at `2e7547c`
 

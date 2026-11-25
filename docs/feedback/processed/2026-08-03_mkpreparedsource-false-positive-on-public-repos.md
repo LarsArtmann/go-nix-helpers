@@ -26,13 +26,13 @@ This blanket-matches ALL repos under the LarsArtmann GitHub account. The validat
 
 But these repos are **public** and on the Go proxy:
 
-| Repo                                     | GitHub visibility  | proxy.golang.org  |
-| ---------------------------------------- | ------------------ | ----------------- |
-| ~~`github.com/larsartmann/go-atomic-write`~~ done — evidence rows for the resolved feedback (Fix B publicDeps shipped, versioned-path aware at `a199f6b`; base-path nested sub-module exclusion in v0.1.0) | ~~`"private": false`~~ | ~~v0.4.1 available~~ |
-| ~~`github.com/larsartmann/go-ndjson`~~ done — evidence rows for the resolved feedback (Fix B publicDeps shipped, versioned-path aware at `a199f6b`; base-path nested sub-module exclusion in v0.1.0) | ~~`"private": false`~~ | ~~v0.0.1 available~~ |
-| ~~`github.com/larsartmann/go-sse`~~ done — evidence rows for the resolved feedback (Fix B publicDeps shipped, versioned-path aware at `a199f6b`; base-path nested sub-module exclusion in v0.1.0) | ~~`"private": false`~~ | ~~v0.3.0 available~~ |
-| ~~`github.com/larsartmann/go-output`~~ done — evidence rows for the resolved feedback (Fix B publicDeps shipped, versioned-path aware at `a199f6b`; base-path nested sub-module exclusion in v0.1.0) | ~~`"private": false`~~ | ~~v0.35.0 available~~ |
-| ~~`github.com/larsartmann/go-branded-id`~~ done — evidence rows for the resolved feedback (Fix B publicDeps shipped, versioned-path aware at `a199f6b`; base-path nested sub-module exclusion in v0.1.0) | ~~`"private": false`~~ | ~~v0.5.1 available~~ |
+| Repo                                                                                                                                                                                                       | GitHub visibility      | proxy.golang.org      |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------- | --------------------- |
+| ~~`github.com/larsartmann/go-atomic-write`~~ done — evidence rows for the resolved feedback (Fix B publicDeps shipped, versioned-path aware at `a199f6b`; base-path nested sub-module exclusion in v0.1.0) | ~~`"private": false`~~ | ~~v0.4.1 available~~  |
+| ~~`github.com/larsartmann/go-ndjson`~~ done — evidence rows for the resolved feedback (Fix B publicDeps shipped, versioned-path aware at `a199f6b`; base-path nested sub-module exclusion in v0.1.0)       | ~~`"private": false`~~ | ~~v0.0.1 available~~  |
+| ~~`github.com/larsartmann/go-sse`~~ done — evidence rows for the resolved feedback (Fix B publicDeps shipped, versioned-path aware at `a199f6b`; base-path nested sub-module exclusion in v0.1.0)          | ~~`"private": false`~~ | ~~v0.3.0 available~~  |
+| ~~`github.com/larsartmann/go-output`~~ done — evidence rows for the resolved feedback (Fix B publicDeps shipped, versioned-path aware at `a199f6b`; base-path nested sub-module exclusion in v0.1.0)       | ~~`"private": false`~~ | ~~v0.35.0 available~~ |
+| ~~`github.com/larsartmann/go-branded-id`~~ done — evidence rows for the resolved feedback (Fix B publicDeps shipped, versioned-path aware at `a199f6b`; base-path nested sub-module exclusion in v0.1.0)   | ~~`"private": false`~~ | ~~v0.5.1 available~~  |
 
 These do not need SSH flake inputs. They resolve through the Go module proxy like any standard public dependency.
 

@@ -152,58 +152,58 @@ If forced to name the biggest lingering smell: **the "nix flake check" badge in 
 
 Sorted by a rough Pareto mix of impact, effort, and urgency.
 
-| #      | Task                                                                   | Category         | Impact     | Effort                                                                     |
-| ------ | ---------------------------------------------------------------------- | ---------------- | ---------- | -------------------------------------------------------------------------- |
-done at `ce35aa5`
-done at `7415763`
-done at `7415763`
-done — shipped as `.github/ISSUE_TEMPLATE/bug_report.md` + `feature_request.md` (`7415763`) — .md forms, not the requested .yml
-done at `7415763`
-done at `7415763`
-**Won't implement — social preview dropped (this report §c3/§e3).**
-**Won't implement — dormant — dropped (this report §c7).**
-done at `7415763`
-done at `7415763`
-done at `d8574df`
-done at `7415763`, `50fd2c3`
-done at `2f3b6b2`
-**Superseded — template `go-flake-parts` removed post-v0.1.0 (`9c8724b`, 2026-11-18); CI template coverage is now go-standard-only.**
-done — `.github/dependabot.yml` + CI `flake-lock-freshness` job (.github/workflows/ci.yml:244)
-**→ still open — noted in ROADMAP.md Theme 4 (docs-site idea; this report §c4)**
-| ~~17~~ | ~~Add release tags and `CHANGELOG.md`~~                                | ~~Process~~      | ~~Medium~~ | ~~1 h~~ done — done — CHANGELOG exists; tags in TODO_LIST Blocked (v0.1.0) |
-**Won't implement — dormant — dropped (this report §c16); v0.1.0 later cut manually at `ad06738` (2026-11-18).**
-done — checks.pureFunctions, 72 checks (pure-functions.nix + test-pure-functions.nix)
-**→ still open — routed TODO_LIST Blocked (real private-repo CI test; needs DEPLOY_SSH_KEY secret)**
-**→ still open — untracked (docs-site idea parked in ROADMAP.md Theme 4)**
-| ~~22~~ | ~~Add man pages for `mkPreparedSource` and `go-standard` options~~     | ~~Docs~~         | ~~Low~~    | ~~2 h~~ done — done — `d8574df`                                            |
-| ~~23~~ | ~~Add shell completions for generated apps~~                           | ~~DX~~           | ~~Low~~    | ~~1 h~~ done — done — enableCompletions option                             |
-done — README FAQ documents the systems/multi-OS story (README.md:441,449); cross-compile helpers themselves won't-implement (2026-07-23 review #31)
-**→ still open — untracked (nearest shipped equivalents: README options table + docs/flake-patterns.md)**
-done — 2026-11-17 corpus sweep annotated + archived all reports; enforced by checks.docsAnnotations (flake.nix:228) and the .docs-gates.json ratchet
-done — mkGoFlake removed post-v0.1.0 (`9c8724b`); fleet fully on go-standard (TODO_LIST T4/T5 DONE 2026-11-18)
-**Won't implement — upstream nixpkgs scope (buildGoModule); the replace-directive pipeline is the shipped answer (2026-06-29 report verdict).**
-done — `goPkgOverride` + `goTarballVersion`/`goTarballHash` ship custom toolchains (README.md:206-209); repo-level granularity, not per-monorepo-package
-| ~~30~~ | ~~Add `enableGolangciLint` toggle (currently always on)~~              | ~~Config~~       | ~~Low~~    | ~~30 min~~ **Won't implement — dormant — dropped (reopen on demand).**     |
-| ~~31~~ | ~~Add `enableGofumpt` / `enableGoimports` toggles in treefmt~~         | ~~Config~~       | ~~Low~~    | ~~30 min~~ done — shipped                                                  |
-| ~~32~~ | ~~Add built-in `nix run .#fmt` alias app~~                             | ~~DX~~           | ~~Low~~    | ~~15 min~~ done — shipped — apps.fmt                                       |
-done — meta.maintainers is an inline attrset (modules/go-standard.nix:1356) + `extraMeta` option (module :695) covers longDescription
-done — composite-module brutal review 2026-07-23 (adjacent archived report) + self-review passes 2026-08-10 / 2026-09-25
-done — public-API naming reviewed 2026-08-03: `publicDeps` rename rejected as breaking, owner-namespacing reverted at `2cbb37b` (archived/2026-08-03_03-28 + _04-44)
-done — helpers deduped into pure-functions.nix; postPatch-extraction (L10) empirically rejected 2026-08-10 (TODO_LIST Decided-against)
-**NOT-DO — GitHub traffic insights are read on github.com; there is nothing to implement in this repo.**
-**→ still open — routed TODO_LIST Blocked (external nixpkgs PR)**
-**→ still open — untracked (marketing; no TODO_LIST/ROADMAP row)**
-**→ still open — noted in ROADMAP.md Theme 4 (short demo video/GIF idea)**
-**→ still open — noted in ROADMAP.md Theme 4 (publish to nixpkgs / flake registry)**
-**→ resolved by scripts/ci-parity.sh (TODO_LIST T56 DONE 2026-11-18) — a script, not a `nix run` app**
-**→ still open — untracked (nearest coverage: docs/migration-guide.md:409 early-adopter pre-commit hook recipe)**
-done — treefmt program enables are mkDefault so consumer treefmt blocks merge cleanly (`4f817b3`) + treefmt Configuration Rules in docs/flake-patterns.md
-done — README.md:343-345 FAQ + docs/man/go-standard.5 document goPkgAttr/goTarballVersion pinning
-**→ still open — untracked (README ships a before/after table vs manual flakes; no vs-other-tools comparison exists)**
-| ~~47~~ | ~~Add a public roadmap file (`ROADMAP.md`)~~                           | ~~Planning~~     | ~~Low~~    | ~~30 min~~ done — done — exists                                            |
-**→ still open — untracked (owner-side GitHub settings; no repo artifact)**
-**Won't implement — dormant — dropped (this report §c20).**
-**→ still open — untracked (marketing; the short demo-video idea is parked in ROADMAP.md Theme 4)**
+| #                                                                                                                                                                    | Task                                                               | Category     | Impact     | Effort                                                                     |
+| -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------ | ------------ | ---------- | -------------------------------------------------------------------------- |
+| done at `ce35aa5`                                                                                                                                                    |                                                                    |              |            |                                                                            |
+| done at `7415763`                                                                                                                                                    |                                                                    |              |            |                                                                            |
+| done at `7415763`                                                                                                                                                    |                                                                    |              |            |                                                                            |
+| done — shipped as `.github/ISSUE_TEMPLATE/bug_report.md` + `feature_request.md` (`7415763`) — .md forms, not the requested .yml                                      |                                                                    |              |            |                                                                            |
+| done at `7415763`                                                                                                                                                    |                                                                    |              |            |                                                                            |
+| done at `7415763`                                                                                                                                                    |                                                                    |              |            |                                                                            |
+| **Won't implement — social preview dropped (this report §c3/§e3).**                                                                                                  |                                                                    |              |            |                                                                            |
+| **Won't implement — dormant — dropped (this report §c7).**                                                                                                           |                                                                    |              |            |                                                                            |
+| done at `7415763`                                                                                                                                                    |                                                                    |              |            |                                                                            |
+| done at `7415763`                                                                                                                                                    |                                                                    |              |            |                                                                            |
+| done at `d8574df`                                                                                                                                                    |                                                                    |              |            |                                                                            |
+| done at `7415763`, `50fd2c3`                                                                                                                                         |                                                                    |              |            |                                                                            |
+| done at `2f3b6b2`                                                                                                                                                    |                                                                    |              |            |                                                                            |
+| **Superseded — template `go-flake-parts` removed post-v0.1.0 (`9c8724b`, 2026-11-18); CI template coverage is now go-standard-only.**                                |                                                                    |              |            |                                                                            |
+| done — `.github/dependabot.yml` + CI `flake-lock-freshness` job (.github/workflows/ci.yml:244)                                                                       |                                                                    |              |            |                                                                            |
+| **→ still open — noted in ROADMAP.md Theme 4 (docs-site idea; this report §c4)**                                                                                     |                                                                    |              |            |                                                                            |
+| ~~17~~                                                                                                                                                               | ~~Add release tags and `CHANGELOG.md`~~                            | ~~Process~~  | ~~Medium~~ | ~~1 h~~ done — done — CHANGELOG exists; tags in TODO_LIST Blocked (v0.1.0) |
+| **Won't implement — dormant — dropped (this report §c16); v0.1.0 later cut manually at `ad06738` (2026-11-18).**                                                     |                                                                    |              |            |                                                                            |
+| done — checks.pureFunctions, 72 checks (pure-functions.nix + test-pure-functions.nix)                                                                                |                                                                    |              |            |                                                                            |
+| **→ still open — routed TODO_LIST Blocked (real private-repo CI test; needs DEPLOY_SSH_KEY secret)**                                                                 |                                                                    |              |            |                                                                            |
+| **→ still open — untracked (docs-site idea parked in ROADMAP.md Theme 4)**                                                                                           |                                                                    |              |            |                                                                            |
+| ~~22~~                                                                                                                                                               | ~~Add man pages for `mkPreparedSource` and `go-standard` options~~ | ~~Docs~~     | ~~Low~~    | ~~2 h~~ done — done — `d8574df`                                            |
+| ~~23~~                                                                                                                                                               | ~~Add shell completions for generated apps~~                       | ~~DX~~       | ~~Low~~    | ~~1 h~~ done — done — enableCompletions option                             |
+| done — README FAQ documents the systems/multi-OS story (README.md:441,449); cross-compile helpers themselves won't-implement (2026-07-23 review #31)                 |                                                                    |              |            |                                                                            |
+| **→ still open — untracked (nearest shipped equivalents: README options table + docs/flake-patterns.md)**                                                            |                                                                    |              |            |                                                                            |
+| done — 2026-11-17 corpus sweep annotated + archived all reports; enforced by checks.docsAnnotations (flake.nix:228) and the .docs-gates.json ratchet                 |                                                                    |              |            |                                                                            |
+| done — mkGoFlake removed post-v0.1.0 (`9c8724b`); fleet fully on go-standard (TODO_LIST T4/T5 DONE 2026-11-18)                                                       |                                                                    |              |            |                                                                            |
+| **Won't implement — upstream nixpkgs scope (buildGoModule); the replace-directive pipeline is the shipped answer (2026-06-29 report verdict).**                      |                                                                    |              |            |                                                                            |
+| done — `goPkgOverride` + `goTarballVersion`/`goTarballHash` ship custom toolchains (README.md:206-209); repo-level granularity, not per-monorepo-package             |                                                                    |              |            |                                                                            |
+| ~~30~~                                                                                                                                                               | ~~Add `enableGolangciLint` toggle (currently always on)~~          | ~~Config~~   | ~~Low~~    | ~~30 min~~ **Won't implement — dormant — dropped (reopen on demand).**     |
+| ~~31~~                                                                                                                                                               | ~~Add `enableGofumpt` / `enableGoimports` toggles in treefmt~~     | ~~Config~~   | ~~Low~~    | ~~30 min~~ done — shipped                                                  |
+| ~~32~~                                                                                                                                                               | ~~Add built-in `nix run .#fmt` alias app~~                         | ~~DX~~       | ~~Low~~    | ~~15 min~~ done — shipped — apps.fmt                                       |
+| done — meta.maintainers is an inline attrset (modules/go-standard.nix:1356) + `extraMeta` option (module :695) covers longDescription                                |                                                                    |              |            |                                                                            |
+| done — composite-module brutal review 2026-07-23 (adjacent archived report) + self-review passes 2026-08-10 / 2026-09-25                                             |                                                                    |              |            |                                                                            |
+| done — public-API naming reviewed 2026-08-03: `publicDeps` rename rejected as breaking, owner-namespacing reverted at `2cbb37b` (archived/2026-08-03_03-28 + _04-44) |                                                                    |              |            |                                                                            |
+| done — helpers deduped into pure-functions.nix; postPatch-extraction (L10) empirically rejected 2026-08-10 (TODO_LIST Decided-against)                               |                                                                    |              |            |                                                                            |
+| **NOT-DO — GitHub traffic insights are read on github.com; there is nothing to implement in this repo.**                                                             |                                                                    |              |            |                                                                            |
+| **→ still open — routed TODO_LIST Blocked (external nixpkgs PR)**                                                                                                    |                                                                    |              |            |                                                                            |
+| **→ still open — untracked (marketing; no TODO_LIST/ROADMAP row)**                                                                                                   |                                                                    |              |            |                                                                            |
+| **→ still open — noted in ROADMAP.md Theme 4 (short demo video/GIF idea)**                                                                                           |                                                                    |              |            |                                                                            |
+| **→ still open — noted in ROADMAP.md Theme 4 (publish to nixpkgs / flake registry)**                                                                                 |                                                                    |              |            |                                                                            |
+| **→ resolved by scripts/ci-parity.sh (TODO_LIST T56 DONE 2026-11-18) — a script, not a `nix run` app**                                                               |                                                                    |              |            |                                                                            |
+| **→ still open — untracked (nearest coverage: docs/migration-guide.md:409 early-adopter pre-commit hook recipe)**                                                    |                                                                    |              |            |                                                                            |
+| done — treefmt program enables are mkDefault so consumer treefmt blocks merge cleanly (`4f817b3`) + treefmt Configuration Rules in docs/flake-patterns.md            |                                                                    |              |            |                                                                            |
+| done — README.md:343-345 FAQ + docs/man/go-standard.5 document goPkgAttr/goTarballVersion pinning                                                                    |                                                                    |              |            |                                                                            |
+| **→ still open — untracked (README ships a before/after table vs manual flakes; no vs-other-tools comparison exists)**                                               |                                                                    |              |            |                                                                            |
+| ~~47~~                                                                                                                                                               | ~~Add a public roadmap file (`ROADMAP.md`)~~                       | ~~Planning~~ | ~~Low~~    | ~~30 min~~ done — done — exists                                            |
+| **→ still open — untracked (owner-side GitHub settings; no repo artifact)**                                                                                          |                                                                    |              |            |                                                                            |
+| **Won't implement — dormant — dropped (this report §c20).**                                                                                                          |                                                                    |              |            |                                                                            |
+| **→ still open — untracked (marketing; the short demo-video idea is parked in ROADMAP.md Theme 4)**                                                                  |                                                                    |              |            |                                                                            |
 
 ---
 
@@ -235,37 +235,37 @@ The next session (2026-07-24 22:45, `7415763`) executed 24/27 TODOs from TODO_LI
 
 ### NOT STARTED items — resolved since this report
 
-| #      | Item                     | Status                                            | Evidence                                                    |
-| ------ | ------------------------ | ------------------------------------------------- | ----------------------------------------------------------- |
-done at `ce35aa5`
-done at `7415763`
-done at `7415763`
-done at `7415763`
-done at `7415763`
-done at `7415763`
-done at `7415763`
-done at `d8574df`, `ef2361f`
+| #                            | Item | Status | Evidence |
+| ---------------------------- | ---- | ------ | -------- |
+| done at `ce35aa5`            |      |        |          |
+| done at `7415763`            |      |        |          |
+| done at `7415763`            |      |        |          |
+| done at `7415763`            |      |        |          |
+| done at `7415763`            |      |        |          |
+| done at `7415763`            |      |        |          |
+| done at `7415763`            |      |        |          |
+| done at `d8574df`, `ef2361f` |      |        |          |
 
 ### Top 50 next tasks — resolved since this report
 
-| #      | Task                                | Status                                 | Evidence                                             |
-| ------ | ----------------------------------- | -------------------------------------- | ---------------------------------------------------- |
-done at `ce35aa5`
-done at `7415763`
-done at `7415763`
-done at `7415763`
-done at `7415763`
-done at `7415763`
-done at `7415763`
-done at `7415763`
-done at `d8574df`
-done at `7415763`, `50fd2c3`
-done at `7415763`
-done at `d8574df`
-done at `7415763`
-done at `7415763`
-done at `7415763`
-done at `7415763`
-done at `7415763`
+| #                            | Task | Status | Evidence |
+| ---------------------------- | ---- | ------ | -------- |
+| done at `ce35aa5`            |      |        |          |
+| done at `7415763`            |      |        |          |
+| done at `7415763`            |      |        |          |
+| done at `7415763`            |      |        |          |
+| done at `7415763`            |      |        |          |
+| done at `7415763`            |      |        |          |
+| done at `7415763`            |      |        |          |
+| done at `7415763`            |      |        |          |
+| done at `d8574df`            |      |        |          |
+| done at `7415763`, `50fd2c3` |      |        |          |
+| done at `7415763`            |      |        |          |
+| done at `d8574df`            |      |        |          |
+| done at `7415763`            |      |        |          |
+| done at `7415763`            |      |        |          |
+| done at `7415763`            |      |        |          |
+| done at `7415763`            |      |        |          |
+| done at `7415763`            |      |        |          |
 
 Items not listed above remain open — see TODO_LIST.md and ROADMAP.md for current state.
