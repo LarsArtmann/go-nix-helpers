@@ -1,0 +1,2057 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Report Title</title>
+    <style>
+      /* =========================================================================
+         BAUHAUS LIGHT — Editorial template
+         Design language: form follows function. Primary colors on warm paper.
+         Zero external dependencies: system fonts, no CDN, no build step.
+         Token architecture: see references/bauhaus-tokens.md
+         ========================================================================= */
+
+      :root {
+        /* --- Primitive palette (Bauhaus Light) --- */
+        --color-paper: #f4f4f0;
+        --color-paper-2: #ffffff;
+        --color-paper-3: #e8e8e2;
+        --color-ink: #111111;
+        --color-red: #e63946;
+        --color-blue: #1d3557;
+        --color-yellow: #f4d35e;
+        --color-hairline: rgba(17, 17, 17, 0.14);
+        --color-hairline-strong: rgba(17, 17, 17, 0.3);
+
+        /* --- Semantic layer (shared vocabulary with dark template) --- */
+        --surface: var(--color-paper);
+        --surface-raised: var(--color-paper-2);
+        --surface-sunken: var(--color-paper-3);
+        --text: var(--color-ink);
+        --text-muted: rgba(17, 17, 17, 0.72);
+        --text-faint: rgba(17, 17, 17, 0.5);
+        --border: var(--color-hairline);
+        --border-strong: var(--color-hairline-strong);
+        --accent: var(--color-red);
+        --problem: var(--color-red);
+        --solution: var(--color-blue);
+        --warning: var(--color-yellow);
+
+        /* --- Backward-compatible aliases (do not break consumer skills) --- */
+        --bg: var(--surface);
+        --bg-elevated: var(--surface-raised);
+        --bg-sunken: var(--surface-sunken);
+        --bg-card: var(--surface-raised);
+        --bg-code: var(--surface-sunken);
+        --ink: var(--text);
+        --ink-secondary: var(--text-muted);
+        --ink-muted: var(--text-faint);
+        --rose: var(--problem);
+        --rose-glow: color-mix(in srgb, var(--problem) 15%, transparent);
+        --emerald: var(--solution);
+        --emerald-glow: color-mix(in srgb, var(--solution) 15%, transparent);
+        --amber: var(--warning);
+        --amber-glow: color-mix(in srgb, var(--warning) 15%, transparent);
+        --amber-light: color-mix(in srgb, var(--warning) 22%, transparent);
+        --coral: var(--problem);
+        --coral-light: color-mix(in srgb, var(--problem) 12%, transparent);
+        --teal: var(--solution);
+        --teal-light: color-mix(in srgb, var(--solution) 12%, transparent);
+
+        /* --- Shape --- */
+        --radius: 0px;
+        --radius-sm: 0px;
+
+        /* --- Type stacks (system only — zero external fonts) --- */
+        --font-heading:
+          ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+          "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        --font-body:
+          ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+          "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        --font-mono:
+          ui-monospace, "Cascadia Code", "Source Code Pro", "JetBrains Mono",
+          Menlo, Consolas, monospace;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      @media (prefers-reduced-motion: reduce) {
+        html {
+          scroll-behavior: auto;
+        }
+        *,
+        *::before,
+        *::after {
+          transition-duration: 0.01ms !important;
+          animation-duration: 0.01ms !important;
+        }
+      }
+      section[id],
+      [id] {
+        scroll-margin-top: 60px;
+      }
+
+      body {
+        background: var(--surface);
+        color: var(--text);
+        font-family: var(--font-body);
+        font-size: 16px;
+        line-height: 1.65;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+
+      /* --- Accessibility: keyboard focus --- */
+      :focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 2px;
+      }
+      a:focus-visible {
+        outline-offset: -1px;
+      }
+
+      /* --- Full-bleed top bar --- */
+      .top-bar {
+        background: var(--text);
+        color: var(--surface);
+        padding: 0.6rem 2rem;
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      /* --- Layout: optional sticky sidebar TOC --- */
+      .layout {
+        display: flex;
+        gap: 2.5rem;
+        padding: 2rem;
+      }
+      .sidebar {
+        width: 220px;
+        flex-shrink: 0;
+        position: sticky;
+        top: 1rem;
+        align-self: flex-start;
+        height: calc(100vh - 2rem);
+        overflow-y: auto;
+        display: none;
+      }
+      .sidebar nav {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+      }
+      .sidebar .label {
+        font-family: var(--font-mono);
+        font-size: 0.68rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.14em;
+        color: var(--accent);
+        margin-bottom: 0.75rem;
+        padding-bottom: 0.4rem;
+        border-bottom: 2px solid var(--text);
+      }
+      .sidebar a {
+        font-size: 0.86rem;
+        color: var(--text);
+        text-decoration: none;
+        padding: 0.5rem 0.75rem;
+        border-left: 4px solid transparent;
+        font-weight: 600;
+        transition: all 0.15s ease;
+        line-height: 1.4;
+      }
+      .sidebar a:hover,
+      .sidebar a.active {
+        border-left-color: var(--accent);
+        background: color-mix(in srgb, var(--accent) 8%, transparent);
+        color: var(--accent);
+      }
+      .main {
+        flex: 1;
+        min-width: 0;
+      }
+
+      /* --- Headings --- */
+      h1,
+      h2,
+      h3,
+      h4 {
+        font-family: var(--font-heading);
+        font-weight: 900;
+        letter-spacing: -0.02em;
+        color: var(--text);
+      }
+      h1 {
+        font-size: clamp(1.9rem, 4.5vw, 2.8rem);
+        line-height: 1.05;
+        margin: 0 0 0.6rem;
+      }
+      h2 {
+        font-size: 1.5rem;
+        margin: 2.5rem 0 1rem;
+        padding-bottom: 0.4rem;
+        border-bottom: 3px solid var(--text);
+        display: flex;
+        align-items: baseline;
+        gap: 0.7rem;
+      }
+      h2 .num {
+        font-family: var(--font-mono);
+        font-size: 0.82rem;
+        color: var(--accent);
+        font-weight: 700;
+        letter-spacing: 0.04em;
+      }
+      h3 {
+        font-size: 1.15rem;
+        margin: 0 0 0.4rem;
+        font-weight: 700;
+      }
+      h4 {
+        font-size: 1rem;
+        margin: 0 0 0.3rem;
+        font-weight: 700;
+      }
+      p {
+        margin: 0 0 1rem;
+      }
+
+      /* --- Hero --- */
+      .hero {
+        padding: 1.5rem 0 2rem;
+        margin-bottom: 1.5rem;
+        border-bottom: 3px solid var(--text);
+      }
+      .eyebrow {
+        font-family: var(--font-mono);
+        font-size: 0.72rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.16em;
+        color: var(--accent);
+        margin-bottom: 0.9rem;
+      }
+      .subtitle {
+        font-size: 1.1rem;
+        color: var(--text-muted);
+        max-width: 70ch;
+        margin: 0 0 1rem;
+      }
+      .meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+      }
+      .tag {
+        display: inline-block;
+        font-family: var(--font-mono);
+        font-size: 0.7rem;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        padding: 0.25rem 0.6rem;
+        background: var(--surface-sunken);
+        color: var(--text);
+        border: 1px solid var(--border-strong);
+      }
+      .tag.amber {
+        background: var(--warning);
+        border-color: var(--warning);
+        color: var(--text);
+      }
+      .tag.teal {
+        background: var(--solution);
+        border-color: var(--solution);
+        color: var(--surface);
+      }
+
+      /* Bauhaus signature: geometric shape cluster (optional) */
+      .hero-shapes {
+        position: relative;
+        height: 90px;
+        margin-bottom: 1.2rem;
+      }
+      .hero-shapes .circle {
+        position: absolute;
+        top: 0;
+        right: 180px;
+        width: 64px;
+        height: 64px;
+        background: var(--problem);
+        border-radius: 50%;
+      }
+      .hero-shapes .square {
+        position: absolute;
+        top: 26px;
+        right: 90px;
+        width: 56px;
+        height: 56px;
+        background: var(--solution);
+      }
+      .hero-shapes .tri {
+        position: absolute;
+        top: 8px;
+        right: 0;
+        width: 0;
+        height: 0;
+        border-left: 32px solid transparent;
+        border-right: 32px solid transparent;
+        border-bottom: 56px solid var(--warning);
+      }
+      .hero-shapes .bar {
+        position: absolute;
+        bottom: 0;
+        right: 230px;
+        width: 100px;
+        height: 14px;
+        background: var(--text);
+      }
+
+      /* --- Scorecard / stat cards --- */
+      .scorecard,
+      .stat-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: 0;
+        margin: 1.5rem 0 2rem;
+        border: 3px solid var(--text);
+      }
+      .score-card,
+      .stat-card {
+        padding: 1.3rem 1rem;
+        text-align: center;
+        border-right: 3px solid var(--text);
+        background: var(--surface-raised);
+      }
+      .score-card:last-child,
+      .stat-card:last-child {
+        border-right: none;
+      }
+
+      .score,
+      .stat-value {
+        font-family: var(--font-heading);
+        font-size: 2.6rem;
+        font-weight: 900;
+        line-height: 1;
+        letter-spacing: -0.04em;
+      }
+      .score-card .label,
+      .stat-label {
+        font-family: var(--font-mono);
+        font-size: 0.62rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        margin-top: 0.5rem;
+      }
+      /* Semantic state classes — no nth-child decoration, no !important */
+      .score-good,
+      .stat-good {
+        background: var(--solution);
+        color: var(--surface);
+      }
+      .score-warn,
+      .stat-warn {
+        background: var(--warning);
+        color: var(--text);
+      }
+      .score-bad,
+      .stat-bad {
+        background: var(--problem);
+        color: var(--surface);
+      }
+
+      /* --- General cards --- */
+      .card {
+        background: var(--surface-raised);
+        border: 2px solid var(--text);
+        padding: 1.2rem 1.4rem;
+        margin-bottom: 1rem;
+        border-left: 8px solid var(--border-strong);
+      }
+      .card-problem {
+        border-left-color: var(--problem);
+      }
+      .card-solution {
+        border-left-color: var(--solution);
+      }
+      .card-warning {
+        border-left-color: var(--warning);
+      }
+
+      /* --- Issue cards --- */
+      .issue {
+        background: var(--surface-raised);
+        border: 2px solid var(--text);
+        padding: 1.2rem 1.4rem;
+        margin-bottom: 1rem;
+        border-left: 8px solid var(--border-strong);
+      }
+      .issue-critical {
+        border-left-color: var(--problem);
+      }
+      .issue-important {
+        border-left-color: var(--warning);
+      }
+      .issue-nice {
+        border-left-color: var(--solution);
+      }
+      .issue h3 {
+        margin-bottom: 0.3rem;
+      }
+      .issue .where {
+        font-family: var(--font-mono);
+        font-size: 0.78rem;
+        color: var(--text-faint);
+        margin: 0.2rem 0 0.6rem;
+      }
+      .issue p:last-child {
+        margin-bottom: 0;
+      }
+
+      /* --- Severity badges --- */
+      .severity {
+        display: inline-block;
+        font-family: var(--font-mono);
+        font-size: 0.62rem;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        padding: 0.22rem 0.6rem;
+        margin-bottom: 0.6rem;
+        color: var(--surface);
+      }
+      .severity-critical {
+        background: var(--problem);
+      }
+      .severity-important {
+        background: var(--warning);
+        color: var(--text);
+      }
+      .severity-nice {
+        background: var(--solution);
+      }
+
+      /* --- Inline badges --- */
+      .badge {
+        display: inline-block;
+        font-family: var(--font-mono);
+        font-size: 0.62rem;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        padding: 0.2rem 0.55rem;
+        border: 1px solid var(--text);
+        color: var(--text);
+      }
+      .badge-critical {
+        background: var(--problem);
+        color: var(--surface);
+      }
+      .badge-high {
+        background: var(--warning);
+      }
+      .badge-medium {
+        background: var(--surface-sunken);
+      }
+      .badge-low {
+        background: var(--surface-raised);
+        color: var(--text-muted);
+      }
+      .badge-fixed {
+        background: var(--solution);
+        color: var(--surface);
+      }
+
+      /* --- Callouts --- */
+      .callout {
+        margin: 0.8rem 0 0;
+        padding: 0.8rem 1rem;
+        border: 1px solid var(--border-strong);
+        border-left: 4px solid var(--border-strong);
+        background: var(--surface-sunken);
+        font-size: 0.92rem;
+      }
+      .callout strong {
+        display: inline-block;
+        margin-right: 0.4rem;
+      }
+      .callout-teal,
+      .callout-solution {
+        border-left-color: var(--solution);
+        background: color-mix(
+          in srgb,
+          var(--solution) 10%,
+          var(--surface-raised)
+        );
+      }
+      .callout-amber,
+      .callout-warning {
+        border-left-color: var(--warning);
+        background: color-mix(
+          in srgb,
+          var(--warning) 18%,
+          var(--surface-raised)
+        );
+      }
+
+      /* --- Strengths --- */
+      .strengths {
+        display: grid;
+        gap: 0.5rem;
+        margin: 1rem 0 1.5rem;
+      }
+      .strength {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 0.9rem;
+        padding: 0.75rem 0;
+        border-bottom: 2px solid var(--border);
+      }
+      .strength .check {
+        font-family: var(--font-mono);
+        font-weight: 900;
+        color: var(--solution);
+        font-size: 1.3rem;
+        line-height: 1.3;
+      }
+      .strength .text strong {
+        display: block;
+        margin-bottom: 0.15rem;
+      }
+      .strength .text span {
+        color: var(--text-muted);
+        font-size: 0.92rem;
+      }
+
+      /* --- Tables --- */
+      .table-wrap {
+        overflow-x: auto;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 1rem 0 1.5rem;
+        font-size: 0.92rem;
+        border: 2px solid var(--text);
+      }
+      th {
+        text-align: left;
+        padding: 0.6rem 0.9rem;
+        background: var(--text);
+        color: var(--surface);
+        font-family: var(--font-mono);
+        font-size: 0.66rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        border-right: 1px solid var(--border-strong);
+      }
+      th:last-child {
+        border-right: none;
+      }
+      td {
+        padding: 0.6rem 0.9rem;
+        border-top: 1px solid var(--border);
+        border-right: 1px solid var(--border);
+      }
+      td:last-child {
+        border-right: none;
+      }
+      tr:nth-child(even) td {
+        background: var(--surface-sunken);
+      }
+      table.compare td.yes {
+        color: var(--solution);
+        font-weight: 700;
+      }
+      table.compare td.no {
+        color: var(--problem);
+        font-weight: 700;
+      }
+
+      /* --- Code blocks + syntax highlighting --- */
+      pre {
+        background: var(--text);
+        color: var(--surface);
+        padding: 1rem 1.2rem;
+        margin: 1rem 0;
+        font-family: var(--font-mono);
+        font-size: 0.82rem;
+        line-height: 1.65;
+        overflow-x: auto;
+        border: 2px solid var(--text);
+      }
+      code {
+        font-family: var(--font-mono);
+      }
+      p code,
+      li code,
+      td code {
+        font-size: 0.88em;
+        background: var(--surface-sunken);
+        padding: 0.1rem 0.35rem;
+      }
+      .tok-keyword {
+        color: var(--warning);
+      }
+      .tok-type {
+        color: var(--warning);
+      }
+      .tok-string {
+        color: #95e1d3;
+      }
+      .tok-comment {
+        color: rgba(244, 244, 240, 0.45);
+        font-style: italic;
+      }
+      .tok-func {
+        color: #6eb5ff;
+      }
+      .tok-number {
+        color: var(--warning);
+      }
+      .tok-generic {
+        color: var(--problem);
+      }
+      .tok-builtin {
+        color: #6eb5ff;
+      }
+      .tok-punct {
+        color: rgba(244, 244, 240, 0.7);
+      }
+      .tok-attr {
+        color: var(--warning);
+      }
+
+      /* --- Dependency tree / ASCII diagrams --- */
+      .dep-tree {
+        background: var(--surface-sunken);
+        border: 2px solid var(--text);
+        padding: 1rem 1.2rem;
+        margin: 1rem 0;
+        font-family: var(--font-mono);
+        font-size: 0.82rem;
+        line-height: 1.7;
+        white-space: pre;
+        overflow-x: auto;
+      }
+      .dep-tree .root {
+        color: var(--accent);
+        font-weight: 700;
+      }
+      .dep-tree .ok {
+        color: var(--solution);
+      }
+      .dep-tree .unwanted {
+        color: var(--problem);
+      }
+
+      /* --- Inline node-and-arrow diagrams --- */
+      .diagram {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 1rem;
+        margin: 1rem 0;
+        background: var(--surface-raised);
+        border: 2px solid var(--text);
+      }
+      .node {
+        display: inline-block;
+        padding: 0.4rem 0.75rem;
+        font-family: var(--font-mono);
+        font-size: 0.8rem;
+        font-weight: 700;
+        background: var(--surface-sunken);
+        border: 1px solid var(--text);
+      }
+      .node-core {
+        background: var(--accent);
+        color: var(--surface);
+      }
+      .node-problem {
+        background: var(--problem);
+        color: var(--surface);
+      }
+      .node-good {
+        background: var(--solution);
+        color: var(--surface);
+      }
+      .arrow {
+        color: var(--text-faint);
+        font-family: var(--font-mono);
+      }
+
+      /* --- Grids --- */
+      .grid-2 {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+        margin: 1rem 0;
+      }
+      .grid-3 {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+        margin: 1rem 0;
+      }
+
+      /* --- Inline TOC --- */
+      .toc {
+        background: var(--surface-raised);
+        border: 2px solid var(--text);
+        border-left: 6px solid var(--accent);
+        padding: 1rem 1.3rem;
+        margin: 1rem 0 1.5rem;
+      }
+      .toc h3 {
+        margin-bottom: 0.5rem;
+      }
+      .toc ul {
+        list-style: none;
+        padding: 0;
+      }
+      .toc li {
+        margin: 0.25rem 0;
+      }
+      .toc a {
+        color: var(--text);
+        text-decoration: none;
+        font-size: 0.92rem;
+        font-weight: 600;
+      }
+      .toc a:hover {
+        color: var(--accent);
+      }
+
+      /* --- Migration / numbered steps --- */
+      .migration-step {
+        display: grid;
+        grid-template-columns: 56px 1fr;
+        gap: 1rem;
+        margin: 1rem 0;
+        padding: 1.1rem;
+        background: var(--surface-raised);
+        border: 2px solid var(--text);
+        border-left: 6px solid var(--accent);
+      }
+      .migration-num {
+        font-family: var(--font-mono);
+        font-weight: 900;
+        font-size: 1.8rem;
+        color: var(--accent);
+        line-height: 1;
+      }
+      .migration-content h4 {
+        margin-bottom: 0.2rem;
+      }
+      .migration-content p {
+        margin-bottom: 0;
+        color: var(--text-muted);
+        font-size: 0.94rem;
+      }
+
+      /* --- Before/After comparison --- */
+      .compare-header {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.75rem;
+        margin: 1rem 0 0.5rem;
+      }
+      .compare-before,
+      .compare-after {
+        font-family: var(--font-mono);
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        padding: 0.4rem 0.7rem;
+        color: var(--surface);
+      }
+      .compare-before {
+        background: var(--problem);
+      }
+      .compare-after {
+        background: var(--solution);
+      }
+      .compare-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.75rem;
+        margin-bottom: 1rem;
+      }
+      .compare-row pre {
+        margin: 0;
+      }
+
+      /* --- Footer --- */
+      .footer {
+        margin-top: 2rem;
+        padding-top: 1rem;
+        border-top: 3px solid var(--text);
+        font-size: 0.82rem;
+        color: var(--text-muted);
+        font-family: var(--font-mono);
+      }
+
+      /* --- Responsive --- */
+      @media (min-width: 1024px) {
+        .sidebar {
+          display: block;
+        }
+      }
+      @media (max-width: 768px) {
+        .layout {
+          flex-direction: column;
+          padding: 1rem;
+        }
+        .top-bar {
+          padding: 0.6rem 1rem;
+          flex-wrap: wrap;
+          gap: 0.3rem;
+        }
+        .grid-2,
+        .grid-3 {
+          grid-template-columns: 1fr;
+        }
+        .compare-header,
+        .compare-row {
+          grid-template-columns: 1fr;
+        }
+        .scorecard,
+        .stat-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .score-card:nth-child(2),
+        .stat-card:nth-child(2) {
+          border-right: none;
+        }
+        .score-card:nth-child(1),
+        .stat-card:nth-child(1),
+        .score-card:nth-child(2),
+        .stat-card:nth-child(2) {
+          border-bottom: 3px solid var(--text);
+        }
+        .migration-step {
+          grid-template-columns: 1fr;
+        }
+        .hero-shapes {
+          display: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Full-bleed top bar (optional — remove for quieter reports) -->
+    <div class="top-bar">
+      <span>BRUTAL SELF-REVIEW</span>
+      <span>2026-11-25</span>
+      <span>go-nix-helpers &times; BuildFlow</span>
+    </div>
+
+    <div class="layout">
+      <aside class="sidebar" data-nav>
+        <nav>
+          <div class="label">Contents</div>
+          <a href="#summary">Summary</a>
+          <a href="#strengths">What already works</a>
+          <a href="#decisions">Decisions for the owner</a>
+          <a href="#findings">Findings</a>
+          <a href="#seam">The seam: who owns what</a>
+          <a href="#plan">Plan</a>
+          <a href="#questions">The 12 questions</a>
+          <a href="#evidence">Evidence and method</a>
+        </nav>
+      </aside>
+
+      <main class="main">
+        <header class="hero">
+          <div class="hero-shapes">
+            <div class="bar"></div>
+            <div class="circle"></div>
+            <div class="square"></div>
+            <div class="tri"></div>
+          </div>
+          <div class="eyebrow">BRUTAL SELF-REVIEW &middot; 2026-11-25</div>
+          <h1>go-nix-helpers &times; BuildFlow: two tools, no contract</h1>
+          <p class="subtitle">
+            What is wrong with go-nix-helpers as BuildFlow's sibling, what it
+            costs the fleet today, and the smallest set of changes that makes
+            the two tools agree. Every claim was checked against source, CI
+            logs or a live run on 2026-11-25. Anything not checked is labelled
+            UNVERIFIED.
+          </p>
+          <div class="meta">
+            <span class="tag amber">Scope: go-nix-helpers 2e8d1c7</span>
+            <span class="tag">BuildFlow source 766db034b, binary ff4aaa4</span>
+            <span class="tag teal">Read-only review: nothing was changed</span>
+          </div>
+        </header>
+
+        <section id="scorecard" class="scorecard">
+          <div class="score-card">
+            <div class="score">12</div>
+            <div class="label">Questions answered</div>
+          </div>
+          <div class="score-card score-bad">
+            <div class="score">12</div>
+            <div class="label">Split brains</div>
+          </div>
+          <div class="score-card score-bad">
+            <div class="score">6</div>
+            <div class="label">Ghost systems</div>
+          </div>
+          <div class="score-card score-warn">
+            <div class="score">3</div>
+            <div class="label">Owner decisions</div>
+          </div>
+          <div class="score-card score-good">
+            <div class="score">9</div>
+            <div class="label">Plan steps</div>
+          </div>
+        </section>
+
+        <section id="summary">
+          <h2><span class="num">00</span>Summary</h2>
+          <p>
+            Master CI is red at HEAD. A BuildFlow run re-indented all seven
+            shell scripts to tabs; go-standard's treefmt is pinned to two
+            spaces; the Format Check job fails. That is the visible symptom
+            and it is one command away from fixed.
+          </p>
+          <p>
+            The cause is structural. go-nix-helpers and BuildFlow overlap in
+            five areas (formatting, vendorHash repair, toolchain environment,
+            templ codegen, flake linting) and share no machine-readable
+            contract. Each side encodes its assumptions about the other in
+            comments. The 61 consumers encode the fallout in workarounds and
+            in <code>.buildflow.yml</code> skips.
+          </p>
+          <p>
+            go-nix-helpers itself cannot pass BuildFlow today: a dry run fails
+            9 of 139 steps with 44 findings, nearly all noise from test
+            fixtures. The reference consumer is not a BuildFlow citizen.
+          </p>
+          <div class="callout callout-amber">
+            <strong>The bottom line</strong>
+            Three decisions unlock most of the value: pick one shell canon,
+            pick one vendorHash repair owner, and publish from go-standard the
+            four facts BuildFlow currently guesses (formatter ownership,
+            toolchain environment, hash locations, the pinned templ CLI).
+          </div>
+        </section>
+
+        <section id="strengths">
+          <h2><span class="num">&#9670;</span>What already works</h2>
+          <div class="strengths">
+            <div class="strength">
+              <div class="check">+</div>
+              <div class="text">
+                <strong>Upstreaming happens and consumers delete code</strong>
+                <span>
+                  The stray-symlink sanitizer moved into
+                  <code>mkPreparedSource</code> and BuildFlow deleted its
+                  wrapper (BuildFlow/flake.nix:387-389). Several consumers
+                  record "fixed upstream in go-nix-helpers" for templ and
+                  sub-module fixes.
+                </span>
+              </div>
+            </div>
+            <div class="strength">
+              <div class="check">+</div>
+              <div class="text">
+                <strong>The hermetic gates are real</strong>
+                <span>
+                  <code>checks.vendor-hash</code> really depends on the
+                  vendor FOD: evaluated in go-output, the go-modules
+                  derivation is an input of the check. A stale hash fails
+                  there first.
+                </span>
+              </div>
+            </div>
+            <div class="strength">
+              <div class="check">+</div>
+              <div class="text">
+                <strong>One module carries 61 consumers</strong>
+                <span>
+                  A self-hosting flake, 72 pure-function checks, 228 to 237
+                  module assertions, a real-backend container smoke test.
+                </span>
+              </div>
+            </div>
+            <div class="strength">
+              <div class="check">+</div>
+              <div class="text">
+                <strong>Single pins exist where it matters</strong>
+                <span>
+                  <code>templCliPackage</code> is one pin for build, devShells
+                  and treefmt; <code>goPkgAttr</code> resolves the newest Go
+                  instead of a hardcoded branch.
+                </span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="decisions">
+          <h2><span class="num">01</span>Decisions for the owner</h2>
+          <p>
+            These three reverse or settle positions already written down in
+            the two repos. They are yours to make; each has my pick and the
+            evidence.
+          </p>
+
+          <div class="issue issue-critical" id="decision-1">
+            <span class="severity severity-critical">D1 &middot; Blocking</span>
+            <h3>Shell indentation: two spaces or tabs</h3>
+            <div class="where">
+              modules/go-standard.nix:1972-1973 &middot; .editorconfig:8
+            </div>
+            <p>
+              go-standard pins treefmt's shfmt to two spaces plus simplify
+              (decided 2026-11-18 to stay stable across treefmt-nix relocks).
+              Everything else in the fleet produces tabs: shfmt's own default,
+              treefmt-nix's current default, BuildFlow's shfmt lane, and the
+              <code>.editorconfig</code> template whose <code>[*]</code> rule
+              says tab in 200 of 224 repos. 38 of the 43 consumers with
+              classifiable shell scripts are tab-indented; 5 are two-space.
+              Only two consumers enable <code>enableShfmt</code> at all.
+            </p>
+            <p>
+              <strong>Pick: tabs.</strong> Pin the module default to tabs
+              explicitly (keeps lock independence, aligns with every other
+              writer). One consumer, standard-bug-tracking-schema, has 24
+              two-space scripts and can override locally.
+            </p>
+            <p>
+              <strong>Alternative: keep two spaces.</strong> Run
+              <code>nix fmt</code>, add a two-space <code>[*.sh]</code> rule
+              to <code>.editorconfig</code>, pin
+              <code>tool_options.shfmt.options</code> in
+              <code>.buildflow.yml</code>, and wait for the BuildFlow
+              ownership fix. Dismissed because it keeps three config sites in
+              sync by hand and still loses to any bare
+              <code>shfmt -w</code>.
+            </p>
+          </div>
+
+          <div class="issue issue-critical" id="decision-2">
+            <span class="severity severity-critical">D2 &middot; Blocking</span>
+            <h3>One vendorHash repair owner</h3>
+            <div class="where">
+              modules/go-standard.nix:1445-1481 &middot; BuildFlow
+              tools/providers/nix_hash_fix_detect.go:58-114
+            </div>
+            <p>
+              Three implementations exist: BuildFlow's
+              <code>nix-hash-fix</code>, the module's
+              <code>apps.update-vendor-hash</code>, and private apps in 10
+              consumers. The module's app rewrites exactly one literal
+              <code>vendorHash = "&lt;old&gt;";</code> line in flake.nix, so
+              it cannot serve the 15 consumers that write
+              <code>vendorHash = import ./vendorHash.nix;</code>, nor the
+              per-system <code>vendorHashes</code> option the module itself
+              offers. The two repos give opposite advice: the BuildFlow skill
+              says "never hand-fix, that is nix-hash-fix's job"; go-nix-helpers
+              TODO_LIST.md:57 (T76) tells bank-sync to adopt the module app.
+            </p>
+            <p>
+              <strong>Pick: nix-hash-fix owns the repair.</strong> It is the
+              superset (literal attributes, bare-hash files, several
+              packages, journal and rollback) and it already has tests.
+              go-standard stops shipping an algorithm and publishes hash
+              locations instead (Step 4 and Step 5). BuildFlow must learn the
+              per-system attrset shape.
+            </p>
+            <p>
+              <strong>Alternative: the Nix app owns it.</strong> Dismissed
+              because it would need the multi-package and hash-file logic
+              BuildFlow already has, and BuildFlow's pre-commit and verify
+              loop would still call its own.
+            </p>
+          </div>
+
+          <div class="issue issue-important" id="decision-3">
+            <span class="severity severity-important">D3 &middot; Important</span>
+            <h3>One distribution policy</h3>
+            <div class="where">
+              CHANGELOG.md:81-85 &middot; AGENTS.md:27,51 &middot;
+              templates/go-standard/flake.nix:18
+            </div>
+            <p>
+              Four policies are in writing: the CHANGELOG says pin the tag;
+              AGENTS.md, README and the template say
+              <code>git+ssh://&hellip;?ref=master</code>; the owner directive
+              of 2026-10-05 (cited in BuildFlow/flake.nix:12-18) says all
+              LarsArtmann inputs track latest; go-aichat says "never track
+              master here". Per the fleet audit (not recounted), 59 of 69
+              explicit inputs track a branch, 9 are SHA-pinned and 1 is
+              tag-pinned; 60 of the 61 go-standard consumers use the
+              <code>github:</code> scheme the docs never show. Those 61 lock
+              six different revisions (48 at e0c4b70); SystemNix carries 20
+              lock nodes at 3 revisions (audit).
+            </p>
+            <p>
+              <strong>Pick: latest-tracking plus tagged releases.</strong>
+              Keep the 2026-10-05 directive, cut v0.2.0 now (26 untagged
+              commits, including the post-tag fix e0c4b70 that the CHANGELOG
+              does not record), and make every doc show the same URL.
+            </p>
+          </div>
+        </section>
+
+        <section id="findings">
+          <h2><span class="num">02</span>Findings</h2>
+          <p>Ordered by impact. Each ends with the plan step that fixes it.</p>
+
+          <div class="issue issue-critical" id="f1">
+            <span class="severity severity-critical"
+              >Blocking &middot; High impact</span
+            >
+            <h3>
+              F1. Two formatters own the same shell scripts and BuildFlow
+              cannot see the other one
+            </h3>
+            <div class="where">
+              BuildFlow/tools/providers/format_ownership.go:97-141 &middot;
+              modules/go-standard.nix:1953-1975, 444-452
+            </div>
+            <p>
+              <strong>Symptom (verified).</strong> CI run 45669527657, job
+              <code>check (ubuntu-latest)</code>, step Format Check:
+              "formatted 16 files (7 changed)". Commit 2e8d1c7 re-indented all
+              seven <code>scripts/*.sh</code> to tabs (whitespace-only for all
+              but <code>check-rows.py</code>). Master was green at e0c4b70.
+            </p>
+            <p>
+              <strong>Mechanism (verified in source).</strong> BuildFlow
+              defers a formatter lane to treefmt only when
+              <code>inspectTreefmtOwnership</code> finds
+              <code>treefmt.toml</code>, <code>.treefmt.toml</code>, a root
+              <code>treefmt.nix</code>, or a literal
+              <code>treefmt = {</code> block in flake.nix. go-standard
+              declares treefmt inside its module file. In go-nix-helpers
+              BuildFlow prints <code>treefmt: no files matching</code> and
+              runs its <code>shfmt</code> lane un-deferred
+              (<code>shfmt -w</code>, no indent flag,
+              additional_tools.go:22-32). shfmt defaults to tabs and also
+              reads <code>.editorconfig</code>, whose <code>[*]</code> rule
+              says <code>indent_style = tab</code>. treefmt's shfmt is pinned
+              to two spaces. Two writers, one file type, opposite settings.
+            </p>
+            <p>
+              <strong>Blast radius.</strong> The same blindness affects all 61
+              consumers for the lanes shfmt, prettier-format, oxfmt,
+              dprint-format, templ-fmt and d2-fmt. For shell it is latent in
+              59 of them because <code>enableShfmt</code> defaults to false.
+            </p>
+            <p>
+              <strong>The docs blame the wrong actor.</strong> AGENTS.md:121
+              and :128 attribute the drift to "a concurrent session (its
+              editor's shfmt config differs)". The 18:52 fingerprints (tab
+              shfmt, dprint emphasis rewrites in 25 docs, a ruff line wrap)
+              match a <code>buildflow --fix --build-mode=full</code> run, and
+              a sweep with exactly that command line was running from an SSH
+              session during this review (actor inferred, not observed).
+            </p>
+            <p>
+              <strong>BuildFlow reports green while CI is red.</strong>
+              <code>buildflow -s nix-fmt</code> passes here ("formatted 18
+              files (0 changed)") because its round-trip copy carries only
+              <code>*.nix</code> files.
+            </p>
+            <div class="callout callout-teal">
+              <strong>Fix: D1, then Step 3a and Step 4</strong>
+              Settle the canon now. Upstream, BuildFlow must treat "flake
+              imports a module, no static treefmt config" as unknown and defer
+              conservatively, which is already its stated doctrine
+              (format_ownership.go:17-23), and resolve exactly through the
+              exported config path.
+            </div>
+          </div>
+
+          <div class="issue issue-critical" id="f2">
+            <span class="severity severity-critical"
+              >Blocking &middot; High impact</span
+            >
+            <h3>
+              F2. vendorHash repair has three implementations and a record of
+              damage
+            </h3>
+            <div class="where">
+              See D2 &middot; consumer AGENTS.md files in go-aichat, CV,
+              pbx-lens
+            </div>
+            <p>
+              Beyond the split itself, consumers recorded real incidents:
+              go-aichat/AGENTS.md:153 (four targets rewritten in one run, a
+              bogus <code>AAAA</code> hash, "undetected for a week");
+              CV/.buildflow.yml:76-82 (five pins left as
+              <code>AAAA</code> placeholders and committed by the daemon,
+              BuildFlow#108, step skipped); pbx-lens/AGENTS.md:88-89 ("never
+              nix-hash-fix, BuildFlow#55"). BuildFlow's own backlog plans to
+              extend the other tool instead (TODO_LIST.md:755, DS12).
+            </p>
+            <div class="callout callout-teal">
+              <strong>Fix: D2, then Steps 4 and 5</strong>
+              One repairer. go-standard publishes the hash locations; the
+              module's app becomes a thin pointer or is retired.
+            </div>
+          </div>
+
+          <div class="issue issue-important" id="f3">
+            <span class="severity severity-important"
+              >Important &middot; Medium impact</span
+            >
+            <h3>
+              F3. go-nix-helpers is linted as a Go application and cannot go
+              green
+            </h3>
+            <div class="where">
+              BuildFlow/language/file_detection.go:16-25 &middot;
+              constants/constants.go:169 &middot; test-assets/
+            </div>
+            <p>
+              <code>buildflow --dry-run --verbose</code> here: "BuildFlow
+              failed go-nix-helpers 105/139 (44 findings, 3 skipped via
+              config, 51 not applicable)". Nine steps fail: cqrs-lint,
+              erraudit and samber-linter, each on the root and on three
+              modules. Every failure is on <code>test-assets/mock-templ-*</code>,
+              fixtures that are deliberately stale or missing generated code.
+              Go is detected from any <code>.go</code> file in the tree;
+              <code>testdata</code> is skipped, <code>test-assets</code> is
+              not.
+            </p>
+            <p>
+              <code>nix-checker</code> reports 32 findings, all false on this
+              repo: 7 errors (one <code>empty-hash-attr</code> on the
+              <code>vendorHash</code> option definition at
+              go-standard.nix:493, six <code>fake-hash</code> on test and
+              template placeholders) and 25 info or warning suggestions to
+              extract hashes into <code>vendorHash.nix</code> inside the
+              module's own test suite. At error severity they fail the
+              findings gate.
+            </p>
+            <p>
+              Also noise: go-structure-linter ("go.mod missing (critical)",
+              ".golangci.yml missing (error)"); <code>nix build .</code> on a
+              flake with no default package (<code>packages.x86_64-linux</code>
+              is empty); the Python lanes firing on the single vendored
+              <code>scripts/check-rows.py</code> ("collected 0 items"), which
+              ruff-format already rewrote at HEAD.
+            </p>
+            <p>
+              Legitimate findings hidden in the noise: no SECURITY.md
+              (error); actionlint 6 (SC2086 at ci.yml:76 and :129,
+              <code>if: false</code> at :273); cue-vet: ci.yml violates the
+              fleet CI policy on matrix <code>runs-on</code>; a dependabot
+              entry missing for <code>test-assets/mock-templ-stale</code>;
+              dprint.json fetches four plugins over the network.
+            </p>
+            <div class="callout callout-teal">
+              <strong>Fix: Step 2, with Step 3b, 3c and 3d</strong>
+              Add <code>.buildflow.yml</code> that tells BuildFlow this is a
+              Nix library with fixture directories, fix the real findings,
+              and let BuildFlow own the gates CI currently duplicates.
+            </div>
+          </div>
+
+          <div class="issue issue-important" id="f4">
+            <span class="severity severity-important"
+              >Important &middot; Medium impact</span
+            >
+            <h3>
+              F4. The toolchain environment is declared in the flake and
+              re-declared by hand
+            </h3>
+            <div class="where">
+              BuildFlow/internal/cli/precommit_types.go:97-102 &middot;
+              BuildFlow/.buildflow.yml:37-42
+            </div>
+            <p>
+              20 go-standard consumers set <code>goExperiment</code> in
+              flake.nix. Three mirror it in <code>.buildflow.yml</code>
+              (branching-flow, BuildFlow, touchbase); 17 do not. Six repos
+              set <code>GOTOOLCHAIN</code> by hand in
+              <code>.buildflow.yml</code>. BuildFlow's pre-commit template
+              hardcodes <code>export GOEXPERIMENT=jsonv2</code> and
+              <code>export CGO_ENABLED=1</code> whatever the flake says.
+              BuildFlow's own config documents the failure class ("phantom
+              drift"). On Go 1.27 jsonv2 is inert, so this is latent today
+              and live on any older toolchain or non-default experiment.
+            </p>
+            <div class="callout callout-teal">
+              <strong>Fix: Step 4, then Step 3g</strong>
+              go-standard publishes the resolved environment once; BuildFlow
+              loads it instead of hardcoding.
+            </div>
+          </div>
+
+          <div class="issue issue-important" id="f5">
+            <span class="severity severity-important"
+              >Important &middot; Medium impact</span
+            >
+            <h3>
+              F5. templ codegen and treefmt disagree on ordering and on the
+              generator
+            </h3>
+            <div class="where">
+              crush-daily/.buildflow.yml:22-28 &middot; BuildFlow
+              TODO_LIST.md:343 (CG3)
+            </div>
+            <p>
+              At least five consumers skip BuildFlow's
+              <code>templ-generate</code> because it runs after formatting
+              with a PATH <code>templ</code> and re-canonicalises
+              <code>*_templ.go</code>, so <code>checks.format</code> fails
+              afterwards: crush-daily, dnsblockd, go-cqrs-lite,
+              browser-history, nsfw-classifier (crush-daily checked at
+              source, the rest per the fleet audit). BuildFlow's CG3 (codegen
+              before formatters in fix mode) is open. Per the audit,
+              dnsblockd switched
+              go-standard's freshness oracle off because "the two disagree on
+              every view file by construction (25/25 drift)". Two oracles
+              guard one invariant with different generators.
+            </p>
+            <div class="callout callout-teal">
+              <strong>Fix: Step 4, then Step 3f</strong>
+              go-standard exports the pinned templ CLI; BuildFlow runs
+              codegen before formatters and uses the pin.
+            </div>
+          </div>
+
+          <div class="issue issue-important" id="f6">
+            <span class="severity severity-important"
+              >Important &middot; Medium impact</span
+            >
+            <h3>
+              F6. go-standard's largest consumer fills its gaps by hand
+            </h3>
+            <div class="where">BuildFlow/flake.nix:359-540 &middot; nix/devshells.nix</div>
+            <table class="compare">
+              <thead>
+                <tr>
+                  <th>Need</th>
+                  <th>BuildFlow today</th>
+                  <th>go-standard change</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Own binary on PATH in the devShell</td>
+                  <td class="no"><code>enableDevShells = false</code></td>
+                  <td>Option to add the built package to devShells</td>
+                </tr>
+                <tr>
+                  <td>Overlay with more than packages</td>
+                  <td class="no"><code>enableOverlay = false</code></td>
+                  <td>Extra overlay entries option</td>
+                </tr>
+                <tr>
+                  <td>Public LarsArtmann dependencies</td>
+                  <td class="no"><code>validatePrivateDeps = false</code></td>
+                  <td>Detect public deps automatically (ROADMAP theme 5)</td>
+                </tr>
+                <tr>
+                  <td>Short version string</td>
+                  <td class="no"><code>version</code> set by hand</td>
+                  <td>Default to the short rev</td>
+                </tr>
+                <tr>
+                  <td>Version-targeted replaces that conflict</td>
+                  <td class="no"><code>postPatchExtra</code> sed (:488-490)</td>
+                  <td>Strip any replace whose module gets an injected one</td>
+                </tr>
+                <tr>
+                  <td>Sibling module <code>tools/go.mod</code></td>
+                  <td class="no">7 hand-written replace lines (:492-501)</td>
+                  <td>Inject into extra module files</td>
+                </tr>
+                <tr>
+                  <td><code>go.work</code> at the root</td>
+                  <td class="no"><code>env.GOWORK = "off"</code></td>
+                  <td>Option or default</td>
+                </tr>
+                <tr>
+                  <td>BuildFlow tools and dprint plugins</td>
+                  <td class="no">Hand-wired env</td>
+                  <td>Hook for the tools bundle and <code>BUILDFLOW_DPRINT_PLUGINS</code></td>
+                </tr>
+              </tbody>
+            </table>
+            <p>
+              One bug lives here too: <code>apps.fmt</code> is emitted only
+              when gofumpt, goimports, nixfmt or templ is enabled
+              (go-standard.nix:1678); a consumer that enables only
+              <code>enableShfmt</code> gets no fmt app.
+            </p>
+            <div class="callout callout-teal">
+              <strong>Fix: Step 6</strong>
+              One pull request per row, each deleting the matching block of
+              BuildFlow's flake.nix as its test.
+            </div>
+          </div>
+
+          <div class="issue issue-important" id="f7">
+            <span class="severity severity-important"
+              >Important &middot; Medium impact</span
+            >
+            <h3>F7. Distribution: one tag, six locked revisions, four policies</h3>
+            <div class="where">CHANGELOG.md:77-85 &middot; git tag v0.1.0</div>
+            <p>
+              See D3. Additionally: audiblesync is SHA-pinned to go-nix-helpers
+              HEAD 2e8d1c7 with <code>enableShfmt = true</code> and tabbed
+              scripts, so its own treefmt check cannot be a no-op; fixes such
+              as e0c4b70 reach consumers only when each repo relocks on its
+              own.
+            </p>
+            <div class="callout callout-teal">
+              <strong>Fix: Step 8</strong>
+              Tag, record, and make the docs agree.
+            </div>
+          </div>
+
+          <div class="issue issue-important" id="f8">
+            <span class="severity severity-important"
+              >Important &middot; Medium impact</span
+            >
+            <h3>
+              F8. "Is this repo clean" is defined three times in this repo
+            </h3>
+            <div class="where">
+              .github/workflows/ci.yml &middot; scripts/ci-parity.sh &middot;
+              BuildFlow lanes
+            </div>
+            <p>
+              ci.yml (format check, shellcheck, lock freshness),
+              <code>ci-parity.sh</code> (format, shellcheck, flake check,
+              lock freshness) and BuildFlow's providers (nix-fmt, shellcheck,
+              nix-flake-check, nix-flake-update) cover the same gates. The
+              lock-freshness job (ci.yml:244-266) requires
+              <code>nix flake update</code> to be a no-op while
+              flake.nix:19-23 forbids bumping nix2container outside a
+              containerSmoke run; the two rules collide the day nix2container
+              moves. <code>ci-parity.sh</code> uses
+              <code>--fail-on-change</code>, CI uses <code>--ci</code>.
+              <code>nix-lint.sh --check</code> and
+              <code>dashboard.sh --check</code> re-implement
+              <code>nix flake check</code> per repo, and nix-lint's rules 1,
+              2 and 15 are comment-only stubs.
+            </p>
+            <div class="callout callout-teal">
+              <strong>Fix: Steps 2 and 7</strong>
+              One owner per gate; ci.yml keeps only Nix-native legs.
+            </div>
+          </div>
+
+          <div class="issue issue-nice" id="f9">
+            <span class="severity severity-nice">Nice to have &middot; Low impact</span>
+            <h3>F9. Ghost systems: capability present, nothing wired to it</h3>
+            <div class="where">scripts/ &middot; modules/go-standard.nix &middot; .github/</div>
+            <table class="compare">
+              <thead>
+                <tr>
+                  <th>Ghost</th>
+                  <th>Evidence</th>
+                  <th>Verdict</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>scripts/check-concurrent-actors.sh</code></td>
+                  <td>Zero operational references (git grep, docs excluded)</td>
+                  <td class="no">Integrate as a BuildFlow <code>check_scripts</code> entry, or delete</td>
+                </tr>
+                <tr>
+                  <td><code>apps.fmt</code> for shfmt-only consumers</td>
+                  <td>go-standard.nix:1678 omits <code>enableShfmt</code></td>
+                  <td class="no">Fix the condition</td>
+                </tr>
+                <tr>
+                  <td>CI job <code>private-deps-test</code></td>
+                  <td><code>if: false</code>, ci.yml:273</td>
+                  <td class="no">Delete or wire the secret</td>
+                </tr>
+                <tr>
+                  <td>nix-lint.sh patterns 1, 2, 15</td>
+                  <td>Comment-only stubs (:79-85, :139-140)</td>
+                  <td class="no">Implement in the shared rule set or drop</td>
+                </tr>
+                <tr>
+                  <td><code>checks.format</code> and <code>checks.treefmt</code></td>
+                  <td>One check registered twice (go-standard.nix:1772-1784)</td>
+                  <td class="no">Deprecate one name</td>
+                </tr>
+                <tr>
+                  <td><code>dprint.json</code></td>
+                  <td>No devShell package and no CI job runs it; only BuildFlow does</td>
+                  <td class="no">Vendor the plugins locally, or delete and let BuildFlow regenerate</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="issue issue-nice" id="f10">
+            <span class="severity severity-nice">Nice to have &middot; Low impact</span>
+            <h3>F10. Documentation drift and small breakage</h3>
+            <div class="where">AGENTS.md &middot; TODO_LIST.md &middot; templates/</div>
+            <ul>
+              <li>AGENTS.md:61 says "7+ downstream consumers"; there are 61.</li>
+              <li>AGENTS.md gives the module assertion count as 228 and as 237 in the same file, and says <code>nix fmt</code> formats ".nix files" (:68) when it also formats scripts.</li>
+              <li>TODO_LIST.md:69 (T86) is a corrupted row: the text is cut and a stray table fragment follows.</li>
+              <li>docs/ci-workflow.yml, the consumer drop-in, uses floating action tags and builds <code>checks.x86_64-linux.test</code>, which exists only with <code>enableTestCheck</code> (default false).</li>
+              <li>templates/ghcr-push-workflow.yml uses floating action tags; the template ships no <code>.buildflow.yml</code>; scripts/generate-flake.sh hardcodes <code>go 1.26</code> (:207) and prints a manual hash dance (:225-227) that two tools now automate.</li>
+              <li>FEATURES.md's script table lists five scripts and omits ci-parity.sh and check-concurrent-actors.sh.</li>
+              <li>The CHANGELOG's Fixed section says "Nothing yet." although e0c4b70 landed after the tag.</li>
+              <li>.editorconfig's <code>[*]</code> tab rule also contradicts the four-space scripts/check-rows.py.</li>
+            </ul>
+            <div class="callout callout-teal">
+              <strong>Fix: Step 9</strong>
+              Mechanical; an hour in total.
+            </div>
+          </div>
+        </section>
+
+        <section id="seam">
+          <h2><span class="num">03</span>The seam: who owns what</h2>
+          <p>
+            The principle that removes the split brains: go-nix-helpers is the
+            single source of truth for the Nix and toolchain facts of a Go
+            repo; BuildFlow is the single owner of the quality loop. BuildFlow
+            reads the facts through a small explicit contract instead of
+            guessing or re-implementing them.
+          </p>
+          <div class="diagram">
+            <span class="node node-core">go-nix-helpers<br />facts</span>
+            <span class="arrow">&rarr;</span>
+            <span class="node">contract<br />4 exports</span>
+            <span class="arrow">&rarr;</span>
+            <span class="node">BuildFlow<br />loop</span>
+          </div>
+          <table class="compare">
+            <thead>
+              <tr>
+                <th>Concern</th>
+                <th>Owner today</th>
+                <th>Owner after</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Build, vendor FOD, devShell, image, prepared source</td>
+                <td>go-standard</td>
+                <td class="yes">go-standard, unchanged</td>
+              </tr>
+              <tr>
+                <td>Which formatter owns which file type</td>
+                <td class="no">treefmt config in the module, invisible; BuildFlow lanes guess</td>
+                <td class="yes">go-standard publishes; BuildFlow reads and defers</td>
+              </tr>
+              <tr>
+                <td>Formatting runs, detect, repair, verify</td>
+                <td class="no">treefmt, BuildFlow lanes, ci.yml, ci-parity.sh</td>
+                <td class="yes">BuildFlow loop; <code>nix fmt</code> stays the formatter for treefmt-owned types</td>
+              </tr>
+              <tr>
+                <td>vendorHash repair</td>
+                <td class="no">Three implementations</td>
+                <td class="yes">nix-hash-fix (D2)</td>
+              </tr>
+              <tr>
+                <td>Toolchain environment</td>
+                <td class="no">flake, .buildflow.yml, hook template</td>
+                <td class="yes">go-standard publishes; BuildFlow loads</td>
+              </tr>
+              <tr>
+                <td>templ codegen and its oracle</td>
+                <td class="no">BuildFlow templ-generate and go-standard freshness check</td>
+                <td class="yes">Codegen, then format; one generator pin</td>
+              </tr>
+              <tr>
+                <td>Flake lint rules</td>
+                <td class="no">nix-lint.sh and nix-checker</td>
+                <td class="yes">One rule set (Step 7)</td>
+              </tr>
+              <tr>
+                <td>CI gate for a commit</td>
+                <td class="no">ci.yml and, elsewhere, a BuildFlow job</td>
+                <td class="yes">Nix-native legs in ci.yml; everything else in the BuildFlow job</td>
+              </tr>
+            </tbody>
+          </table>
+          <p>
+            Scoping rule against the scope-creep trap: stop adding options to
+            either tool that absorb the other's job. go-standard's lint, test,
+            vulncheck and freshness checks stay opt-in for hermetic parity;
+            BuildFlow stops growing Nix knowledge that belongs with the
+            module.
+          </p>
+        </section>
+
+        <section id="plan">
+          <h2><span class="num">04</span>Plan</h2>
+          <p>
+            Ordered by impact divided by effort. Effort is my estimate. Each
+            step states what "done" means.
+          </p>
+
+          <div class="migration-step">
+            <div class="migration-num">1</div>
+            <div class="migration-content">
+              <h4>Settle the shell canon and restore CI (D1)</h4>
+              <p>
+                go-nix-helpers, about 30 minutes. With tabs: change the two
+                mkDefault pins in modules/go-standard.nix:1972-1973 to an
+                explicit tab pin, update the option text and the AGENTS.md
+                canon paragraph. Done when <code>nix fmt</code> is a no-op at
+                HEAD and the <code>check (ubuntu-latest)</code> job is green.
+                With two spaces instead: run <code>nix fmt</code> now, fix
+                <code>.editorconfig</code>, add the shfmt options to
+                <code>.buildflow.yml</code>.
+              </p>
+            </div>
+          </div>
+
+          <div class="migration-step">
+            <div class="migration-num">2</div>
+            <div class="migration-content">
+              <h4>Make go-nix-helpers a BuildFlow citizen</h4>
+              <p>
+                1 to 2 hours. Add <code>.buildflow.yml</code> that tells
+                BuildFlow this is a Nix library with fixture directories
+                (<code>go_mod_ignore_dirs: [test-assets]</code> or
+                <code>language: nix</code>; confirm the effect with
+                <code>buildflow --dry-run</code>). Add SECURITY.md. Fix the
+                actionlint, cue-vet and dependabot findings. Run
+                <code>buildflow precommit install</code>. Retire
+                <code>scripts/ci-parity.sh</code> and the CI shellcheck job
+                once a BuildFlow job runs in CI; keep
+                <code>nix fmt -- --fail-on-change</code> as the product gate
+                and move the three unique ci-parity legs (templ fixture
+                guard, old-nixpkgs moduleTest, lock freshness) into
+                <code>check_scripts</code>. Done when <code>buildflow</code>
+                exits 0 here. Blocked on the seven nix-checker false
+                positives until Step 3c lands or an exclude covers them.
+              </p>
+            </div>
+          </div>
+
+          <div class="migration-step">
+            <div class="migration-num">3</div>
+            <div class="migration-content">
+              <h4>File the BuildFlow fixes</h4>
+              <p>
+                Each diagnosis below is already verified at source level
+                here. (a) Formatter ownership is blind to module-declared
+                treefmt. (b) Go detection and module walks do not skip
+                fixture directories; <code>findGoModDirs</code> and
+                <code>findAllModuleDirs</code> ignore
+                <code>go_mod_ignore_dirs</code>. (c) nix-checker flags option
+                definitions and test placeholders. (d) <code>nix build .</code>
+                on flakes without a default package. (e) nix-hash-fix does not
+                recognise a per-system <code>vendorHashes</code> attrset
+                (source reading, not exercised). (f) CG3: codegen before
+                formatters. (g) The hook template hardcodes GOEXPERIMENT and
+                CGO_ENABLED.
+              </p>
+            </div>
+          </div>
+
+          <div class="migration-step">
+            <div class="migration-num">4</div>
+            <div class="migration-content">
+              <h4>Publish the contract from go-standard (proposed API)</h4>
+              <p>
+                About half a day, both repos. Four eval-able outputs, names
+                proposed: <code>flake.treefmtConfigFile</code> (the store path
+                of the generated treefmt.toml, which already exists as
+                <code>config.treefmt.build.configFile</code>),
+                <code>flake.toolchainEnv</code> (GOEXPERIMENT, CGO_ENABLED,
+                GOTOOLCHAIN, GOWORK, GOPRIVATE),
+                <code>flake.vendorHashLocations</code>, and the pinned templ
+                CLI path. BuildFlow reads them with <code>nix eval</code> and
+                falls back to today's behavior with a warning when a flake
+                does not provide them. Done when a BuildFlow dry run in a
+                go-standard consumer prints "deferred: treefmt owns" for the
+                shell and templ lanes.
+              </p>
+            </div>
+          </div>
+
+          <div class="migration-step">
+            <div class="migration-num">5</div>
+            <div class="migration-content">
+              <h4>Retire the vendorHash algorithm from go-standard (D2)</h4>
+              <p>
+                1 to 2 hours. Default <code>enableUpdateVendorHashApp</code>
+                to false or turn the app into a pointer that prints the
+                BuildFlow command. Update TODO_LIST.md:57 (T76) and the
+                migration guide.
+              </p>
+            </div>
+          </div>
+
+          <div class="migration-step">
+            <div class="migration-num">6</div>
+            <div class="migration-content">
+              <h4>Close the go-standard gaps BuildFlow fills by hand</h4>
+              <p>
+                One pull request per row of the F6 table, about half a day
+                each. Each PR deletes the matching block of BuildFlow's
+                flake.nix, which is its integration test. Fix the
+                <code>apps.fmt</code> condition in the first one.
+              </p>
+            </div>
+          </div>
+
+          <div class="migration-step">
+            <div class="migration-num">7</div>
+            <div class="migration-content">
+              <h4>One flake-lint rule set</h4>
+              <p>
+                1 to 2 sessions. Land BuildFlow's M8 (TODO_LIST.md:638): move
+                the nix-checker detection core into a Go module inside
+                go-nix-helpers, fold the live nix-lint.sh rules into it, and
+                delete nix-lint.sh. This needs a decision that go-nix-helpers
+                may host Go code; its AGENTS.md says it contains none. The
+                payoff is structural: the rule set that checks consumer
+                flakes would live next to the option definitions it checks,
+                which removes the 32 false positives here by construction.
+              </p>
+            </div>
+          </div>
+
+          <div class="migration-step">
+            <div class="migration-num">8</div>
+            <div class="migration-content">
+              <h4>Distribution (D3)</h4>
+              <p>
+                About 1 hour. Tag v0.2.0. Add Fixed entries for the post-tag
+                commits. Make AGENTS.md, README, the migration guide and the
+                template show one URL form. Ship a
+                <code>.buildflow.yml</code> and SHA-pinned actions in the
+                template. Drop <code>go 1.26</code> and the manual hash dance
+                from generate-flake.sh.
+              </p>
+            </div>
+          </div>
+
+          <div class="migration-step">
+            <div class="migration-num">9</div>
+            <div class="migration-content">
+              <h4>Cleanup</h4>
+              <p>
+                About 1 hour. The T86 row, docs/ci-workflow.yml, the FEATURES
+                script table, the AGENTS.md counts, the stale ROADMAP row,
+                <code>.editorconfig</code>, dprint.json, the dead CI job, and
+                the ghost script. Then tell consumers their workarounds are
+                stale where BuildFlow already fixed the cause: four
+                <code>projectRootFile</code> overrides (BuildFlow copies root
+                markers since 2026-10-25) and erraudit's note that the
+                module's vendor-hash check "never realizes the FOD".
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section id="questions">
+          <h2><span class="num">05</span>The 12 questions</h2>
+          <table class="compare">
+            <thead>
+              <tr>
+                <th>Question</th>
+                <th>Answer</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1. What did you forget?</td>
+                <td>
+                  That BuildFlow is a consumer with 61 siblings. No BuildFlow
+                  config, no hook, no cross-tool test, and the docs blamed an
+                  editor for BuildFlow's lane.
+                </td>
+              </tr>
+              <tr>
+                <td>2. What is stupid that we do anyway?</td>
+                <td>
+                  Keep three vendorHash repairers and three gate sets, and
+                  hand-sync GOEXPERIMENT between flake.nix and
+                  <code>.buildflow.yml</code>.
+                </td>
+              </tr>
+              <tr>
+                <td>3. What could you have done better?</td>
+                <td>
+                  The 2026-11-18 shfmt pin was decided against treefmt-nix
+                  alone. BuildFlow's lane, the editorconfig template and the
+                  fleet's actual scripts were not checked.
+                </td>
+              </tr>
+              <tr>
+                <td>4. What could you still improve?</td>
+                <td>Steps 2 to 9 of the plan.</td>
+              </tr>
+              <tr>
+                <td>5. Did you lie to me?</td>
+                <td>
+                  The docs did, three times: "7+ downstream consumers" (61),
+                  "a concurrent session's editor" (BuildFlow's shfmt lane),
+                  and erraudit's "never realizes the FOD" (it does). This
+                  review's own interim count, "59 of 64 consumers are
+                  tab-indented", was wrong and is corrected to 38 of 43.
+                </td>
+              </tr>
+              <tr>
+                <td>6. How can we be less stupid?</td>
+                <td>
+                  One owner per concern, published as data, and tested across
+                  tools: a check that <code>nix fmt</code> is a no-op after a
+                  BuildFlow fix run.
+                </td>
+              </tr>
+              <tr>
+                <td>7. Ghost systems?</td>
+                <td>
+                  Six, listed in F9. The concurrent-actors script has value
+                  as a BuildFlow <code>check_scripts</code> entry; the fmt
+                  app bug is a one-line fix.
+                </td>
+              </tr>
+              <tr>
+                <td>8. Scope creep trap?</td>
+                <td>
+                  Yes, in both directions: go-standard grew quality gates
+                  BuildFlow also owns, and BuildFlow grew Nix knowledge that
+                  belongs with the module. See the scoping rule under "The
+                  seam".
+                </td>
+              </tr>
+              <tr>
+                <td>9. Did we remove something useful?</td>
+                <td>
+                  Nothing structural. The 18:53 commit rewrote emphasis marks
+                  in 25 docs and a vendored Python file: harmless, but noise
+                  that no gate was designed to review.
+                </td>
+              </tr>
+              <tr>
+                <td>10. Split brains?</td>
+                <td>
+                  Twelve: shell canon; vendorHash repair; toolchain
+                  environment; templ codegen and oracle; dprint versus
+                  treefmt file ownership; pin policy; nix-checker versus
+                  nix-lint.sh; three gate sets; module versus hand-written
+                  <code>checks.vendor-hash</code>; BuildFlow's green versus
+                  CI's red on this repo; docs versus reality; T76 versus the
+                  BuildFlow skill.
+                </td>
+              </tr>
+              <tr>
+                <td>11. Tests?</td>
+                <td>
+                  Strong on the Nix side. Zero on the consumer contract: no
+                  test runs the module's outputs through BuildFlow, the
+                  update-vendor-hash app has no test for the hash-file shape
+                  used by 15 consumers, and the assertion count disagrees
+                  inside AGENTS.md.
+                </td>
+              </tr>
+              <tr>
+                <td>12. Were inherited claims re-verified?</td>
+                <td>
+                  Six were checked at their source. False: erraudit's FOD
+                  claim; "projectRootFile is hardcoded" (conditional since
+                  commit 4518373 per the audit, present at e0c4b70 and
+                  HEAD); the editor attribution. Incomplete: "nix fmt
+                  formats .nix files". Shipped: symlink sanitization, and
+                  the ROADMAP's eval-time floor check (ROADMAP.md:102-104
+                  lists it as an idea; go-standard.nix:1095 implements it).
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <section id="evidence">
+          <h2><span class="num">06</span>Evidence and method</h2>
+          <p>
+            Reads only. No file in either repository was edited, nothing was
+            committed, no nix build was run. Live runs: two BuildFlow dry runs
+            and one detect-only <code>buildflow -s nix-fmt</code>; eval-only
+            <code>nix eval</code> and <code>nix derivation show</code>.
+          </p>
+          <table class="compare">
+            <thead>
+              <tr>
+                <th>Number</th>
+                <th>Value</th>
+                <th>How it was counted</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>go-standard consumers</td>
+                <td>61</td>
+                <td>grep <code>flakeModules.go-standard</code> in <code>~/projects/*/flake.nix</code>, excluding this repo</td>
+              </tr>
+              <tr>
+                <td>Of those with a <code>.buildflow.yml</code></td>
+                <td>39</td>
+                <td>same set</td>
+              </tr>
+              <tr>
+                <td>Consumers enabling <code>enableShfmt</code></td>
+                <td>2</td>
+                <td>standard-bug-tracking-schema, audiblesync</td>
+              </tr>
+              <tr>
+                <td>Tab-indented versus two-space scripts</td>
+                <td>38 vs 5</td>
+                <td>of 43 consumers with a classifiable first indent level</td>
+              </tr>
+              <tr>
+                <td><code>.editorconfig</code> with a <code>[*]</code> tab rule</td>
+                <td>200 of 224</td>
+                <td>multiline grep</td>
+              </tr>
+              <tr>
+                <td><code>goExperiment</code> set in the flake</td>
+                <td>20</td>
+                <td>mirrored in <code>.buildflow.yml</code>: 3; not mirrored: 17</td>
+              </tr>
+              <tr>
+                <td>Distinct go-nix-helpers revisions locked by those 61</td>
+                <td>6</td>
+                <td>root lock node per repo: e0c4b70 48, 1a553ce 5, 2c5d1d7 4, 2e8d1c7 2, ad06738 1, 52dc6f8 1</td>
+              </tr>
+              <tr>
+                <td>Consumers using the <code>github:</code> scheme</td>
+                <td>60 of 61</td>
+                <td>one uses <code>git+https</code>; the docs show <code>git+ssh</code></td>
+              </tr>
+              <tr>
+                <td>Consumers with a private vendor-hash app</td>
+                <td>10</td>
+                <td>app attribute defined in flake.nix (14 repos fleet-wide)</td>
+              </tr>
+              <tr>
+                <td>Consumers using <code>vendorHash = import ./vendorHash.nix</code></td>
+                <td>15</td>
+                <td>exact-form grep</td>
+              </tr>
+              <tr>
+                <td><code>dprint.json</code> with remote plugin URLs</td>
+                <td>255 of 273</td>
+                <td>grep <code>plugins.dprint.dev</code></td>
+              </tr>
+              <tr>
+                <td>Repos with go.mod and flake.nix but no go-nix-helpers reference</td>
+                <td>107 of 178</td>
+                <td>grep in flake.nix; an upper bound, shared-module imports are not detected</td>
+              </tr>
+              <tr>
+                <td>Commits since the only tag v0.1.0</td>
+                <td>26</td>
+                <td><code>git rev-list --count v0.1.0..HEAD</code></td>
+              </tr>
+              <tr>
+                <td>BuildFlow dry run here</td>
+                <td>105/139, 44 findings, 9 failed</td>
+                <td><code>buildflow --dry-run --verbose</code>, 19:19 CET</td>
+              </tr>
+              <tr>
+                <td>nix-checker findings here</td>
+                <td>32 (7 error, 11 warning, 14 info)</td>
+                <td><code>buildflow -s nix-checker --format finding</code></td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h3>Not verified</h3>
+          <ul>
+            <li>nix-hash-fix behavior for a per-system <code>vendorHashes</code> attrset: read from source, never exercised.</li>
+            <li>The effect of <code>language: nix</code> on non-Go lanes.</li>
+            <li>Who ran BuildFlow at 18:52: inferred from tool fingerprints and from a live sweep process in another repo.</li>
+            <li>Why 30 consumers set <code>enableCheck = false</code>.</li>
+            <li>The possible <code>checks.vendor-hash</code> collision in go-humanize-linter: not evaluated.</li>
+            <li>The module assertion counts (228 and 237): not recounted.</li>
+            <li>BuildFlow line numbers were read between 9bd42377b and
+            766db034b; the daemon commits there continuously, so they may
+            have shifted by a few lines.</li>
+          </ul>
+
+          <h3>Key sources</h3>
+          <ul>
+            <li>go-nix-helpers: modules/go-standard.nix (:444-452, :1445-1481, :1678, :1772-1784, :1815-1826, :1953-1975), flake.nix (:19-23, :53-58), .editorconfig:8, .github/workflows/ci.yml (:49-50, :202-216, :244-266, :273), AGENTS.md (:27, :51, :61, :68, :121, :128), CHANGELOG.md (:77-85), TODO_LIST.md (:57, :69), templates/go-standard/flake.nix:18, scripts/generate-flake.sh (:207, :225-227).</li>
+            <li>BuildFlow: tools/providers/format_ownership.go (:17-23, :97-141, :175-178), additional_tools.go:22-32, module_and_system_tools.go (:46-55, :113), internal/cli/precommit_types.go:97-102, language/file_detection.go:16-25, constants/constants.go:169, modules/nix-checker/stale_module_repair.go:41-137, flake.nix (:359-540), .buildflow.yml:37-42, TODO_LIST.md (:343, :638, :755), nix/devshells.nix, nix/dprint-plugins.nix.</li>
+            <li>CI: go-nix-helpers run 45669527657 (failed at 2e8d1c7); master green at e0c4b70 on 2026-11-19.</li>
+            <li>Consumers: go-aichat/AGENTS.md:153; CV/.buildflow.yml:76-82; pbx-lens/AGENTS.md:88-89; crush-daily/.buildflow.yml:22-28; crm/flake.nix:153-159; erraudit/flake.nix:98-105; BuildFlow/docs/GOTCHAS.md:36.</li>
+          </ul>
+        </section>
+
+        <footer class="footer">
+          <p>
+            Generated 2026-11-25 &middot; Reviewed against go-nix-helpers
+            2e8d1c7 and BuildFlow source 766db034b &middot; All claims
+            verified against source code, CI logs or live runs where noted
+          </p>
+        </footer>
+      </main>
+    </div>
+
+    <!-- Progressive-enhancement scrollspy. Nav still works without JS via anchor links. -->
+    <script>
+      (function () {
+        if (!("IntersectionObserver" in window)) return;
+        var nav = document.querySelector("[data-nav]");
+        if (!nav) return;
+        var links = nav.querySelectorAll('a[href^="#"]');
+        var ids = Array.from(links).map(function (l) {
+          return l.getAttribute("href").slice(1);
+        });
+        var sections = ids
+          .map(function (id) {
+            return document.getElementById(id);
+          })
+          .filter(Boolean);
+        if (!sections.length) return;
+        var observer = new IntersectionObserver(
+          function (entries) {
+            entries.forEach(function (entry) {
+              if (entry.isIntersecting) {
+                links.forEach(function (link) {
+                  link.classList.toggle(
+                    "active",
+                    link.getAttribute("href") === "#" + entry.target.id,
+                  );
+                });
+              }
+            });
+          },
+          { rootMargin: "-80px 0px -60% 0px", threshold: 0 },
+        );
+        sections.forEach(function (s) {
+          observer.observe(s);
+        });
+      })();
+    </script>
+  </body>
+</html>
